@@ -58,7 +58,6 @@ public class ParticipantTest {
     public void hasToString() {
         Event e = new Event();
         var actual = new Participant("a", e).toString();
-        System.out.println(actual);
         assertTrue(actual.contains(Event.class.getSimpleName()));
         assertTrue(actual.contains("\n"));
         assertTrue(actual.contains("event"));
