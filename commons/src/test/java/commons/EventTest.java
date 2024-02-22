@@ -10,7 +10,6 @@ public class EventTest {
         var e = new Event("t", "c");
         assertEquals("t", e.getTitle());
         assertEquals("c", e.getCode());
-
     }
 
     @Test
