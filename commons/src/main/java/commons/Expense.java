@@ -61,6 +61,10 @@ public class Expense{
         return date;
     }
 
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
     public Event getEvent() {
         return event;
     }
@@ -87,4 +91,5 @@ public class Expense{
     public String toString() {
         return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
+
 }
