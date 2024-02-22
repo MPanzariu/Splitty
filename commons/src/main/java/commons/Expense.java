@@ -7,27 +7,34 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
 
 @Entity
-public class Participant{
+public class Expense{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
+    private int priceInCents;
+    private Date date;
     @ManyToOne()
     private Event event;
-    @OneToMany(mappedBy = "owedTo", orphanRemoval = true)
-    private Set<Expense> expensesOwedTo;
+    @ManyToOne()
+    private Participant owedTo;
 
     @SuppressWarnings("unused")
-    public Participant() {}
+    public Expense() {}
 
-    public Participant(String name, Event event) {
+    public Expense(String name, int priceInCents, Date date, Event event, Participant owedTo) {
         this.name = name;
+        this.priceInCents = priceInCents;
+        this.date = date;
         this.event = event;
-        this.expensesOwedTo = new HashSet<>();
+        this.owedTo = owedTo;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void setName(String name) {
@@ -38,20 +45,32 @@ public class Participant{
         return name;
     }
 
+    public void setPriceInCents(int priceInCents) {
+        this.priceInCents = priceInCents;
+    }
+
+    public int getPriceInCents() {
+        return priceInCents;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
     public Event getEvent() {
         return event;
     }
 
-    public void addExpense(Expense expense){
-        expensesOwedTo.add(expense);
+    public void setOwedTo(Participant participant){
+        this.owedTo = participant;
     }
 
-    public void removeExpense(Expense expense){
-        expensesOwedTo.remove(expense);
-    }
-
-    public Set<Expense> getExpensesOwedTo() {
-        return expensesOwedTo;
+    public Participant getOwedTo(){
+        return this.owedTo;
     }
 
     @Override

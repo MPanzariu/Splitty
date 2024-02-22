@@ -20,13 +20,15 @@ public class Event{
     private String title;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Participant> participants;
-
+    @OneToMany(mappedBy = "event", orphanRemoval = true)
+    private Set<Expense> expenses;
 
     @SuppressWarnings("unused")
     public Event() {}
 
     public Event(String title, String code) {
         this.participants = new HashSet<>();
+        this.expenses = new HashSet<>();
         this.title = title;
         this.code = code;
     }
@@ -37,6 +39,14 @@ public class Event{
 
     public void removeParticipant(Participant participant){
         participants.remove(participant);
+    }
+
+    public void addExpense(Expense expense){
+        expenses.add(expense);
+    }
+
+    public void removeExpense(Expense expense){
+        expenses.remove(expense);
     }
 
     public void setTitle(String title) {
