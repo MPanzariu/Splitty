@@ -7,6 +7,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 public class Event{
     @Id
@@ -15,14 +18,25 @@ public class Event{
     @Column(unique=true)
     private String code;
     private String title;
+    @OneToMany(mappedBy = "event", orphanRemoval = true)
+    private Set<Participant> participants;
 
 
     @SuppressWarnings("unused")
     public Event() {}
 
     public Event(String title, String code) {
+        this.participants = new HashSet<>();
         this.title = title;
         this.code = code;
+    }
+
+    public void addParticipant(Participant participant){
+        participants.add(participant);
+    }
+
+    public void removeParticipant(Participant participant){
+        participants.remove(participant);
     }
 
     public void setTitle(String title) {
@@ -35,6 +49,10 @@ public class Event{
 
     public String getTitle() {
         return title;
+    }
+
+    public Set<Participant> getParticipants() {
+        return participants;
     }
 
     public long getId() {

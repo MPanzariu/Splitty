@@ -13,6 +13,8 @@ public class Participant{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
+    @ManyToOne()
+    private Event event;
 
     @SuppressWarnings("unused")
     public Participant() {}
