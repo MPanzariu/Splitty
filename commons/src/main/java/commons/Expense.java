@@ -70,7 +70,7 @@ public class Expense{
     }
 
     public Participant getOwedTo(){
-        return this.owedTo;
+        return owedTo;
     }
 
     @Override

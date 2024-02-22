@@ -15,9 +15,9 @@ public class Event{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    private String title;
     @Column(unique=true)
     private String code;
-    private String title;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
@@ -27,10 +27,26 @@ public class Event{
     public Event() {}
 
     public Event(String title, String code) {
-        this.participants = new HashSet<>();
-        this.expenses = new HashSet<>();
         this.title = title;
         this.code = code;
+        this.participants = new HashSet<>();
+        this.expenses = new HashSet<>();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public void addParticipant(Participant participant){
@@ -41,6 +57,10 @@ public class Event{
         participants.remove(participant);
     }
 
+    public Set<Participant> getParticipants() {
+        return participants;
+    }
+
     public void addExpense(Expense expense){
         expenses.add(expense);
     }
@@ -49,24 +69,8 @@ public class Event{
         expenses.remove(expense);
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public long getId() {
-        return id;
+    public Set<Expense> getExpenses(){
+        return expenses;
     }
 
     @Override
