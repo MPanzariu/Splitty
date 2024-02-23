@@ -20,7 +20,6 @@ public class EventController {
     public EventController(EventService eventService) {
         this.eventService = eventService;
     }
-    
     //Empty event controller class
     private ExpenseService expenseService;
 
