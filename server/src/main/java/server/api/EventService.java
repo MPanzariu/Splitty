@@ -24,33 +24,4 @@ public class EventService {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
     }
-
-    /**
-     * remove a participant, make sure both the event and participants exist or else
-     * throw an exception
-     * @param participantId the participant we want to remove
-     */
-    public void removeParticipantFromEvent(Long participantId) {
-        Participant participant = participantRepository.findById(participantId)
-                .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
-        Event event = participant.getEvent();
-        event.removeParticipant(participant);
-        eventRepository.save(event);
-    }
-
-    /**
-     * edit the details of a participant that is in an event
-     * @param participantId the participant whose details we want to change
-     * @param participantDetails the details of the participant
-     * @return the participants modified details are now saved in the database
-     */
-
-    public Participant editParticipant(Long participantId, Participant participantDetails) {
-        Participant participant = participantRepository.findById(participantId)
-                .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
-        participant.setName(participantDetails.getName());
-        return participantRepository.save(participant);
-    }
-
-
 }

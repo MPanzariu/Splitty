@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EventServiceTest {
+public class ParticipantServiceTest {
 
     @Mock
     private EventRepository eventRepository;
@@ -26,11 +26,7 @@ public class EventServiceTest {
     private ParticipantRepository participantRepository;
 
     @InjectMocks
-    private EventService eventService;
-
-    private Event mockEvent;
-    private Participant mockParticipant;
-    private Participant updatedDetails;
+    private ParticipantService participantService;
 
     /**
      * create a mock event and participant to see if it can be removed, not needing to interact
@@ -41,9 +37,8 @@ public class EventServiceTest {
         Event mockEvent = new Event("Sample Event", "CODE123");
         Participant mockParticipant = new Participant("John Doe", mockEvent);
         mockEvent.addParticipant(mockParticipant);
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(mockEvent));
         when(participantRepository.findById(anyLong())).thenReturn(Optional.of(mockParticipant));
-        eventService.removeParticipantFromEvent(1L, 1L);
+        participantService.removeParticipant(mockParticipant.getId());
         assertFalse(mockEvent.getParticipants().contains(mockParticipant));
         verify(eventRepository).save(mockEvent);
     }
@@ -59,11 +54,10 @@ public class EventServiceTest {
         Participant mockParticipant2 = new Participant("Participant Two", mockEvent);
         mockEvent.addParticipant(mockParticipant1);
         mockEvent.addParticipant(mockParticipant2);
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(mockEvent));
-        when(participantRepository.findById(1L)).thenReturn(Optional.of(mockParticipant1));
-        when(participantRepository.findById(2L)).thenReturn(Optional.of(mockParticipant2));
-        eventService.removeParticipantFromEvent(1L, 1L);
-        eventService.removeParticipantFromEvent(1L, 2L);
+        when(participantRepository.findById(mockParticipant1.getId())).thenReturn(Optional.of(mockParticipant1));
+        when(participantRepository.findById(mockParticipant2.getId())).thenReturn(Optional.of(mockParticipant2));
+        participantService.removeParticipant(mockParticipant1.getId());
+        participantService.removeParticipant(mockParticipant2.getId());
         assertFalse(mockEvent.getParticipants().contains(mockParticipant1));
         assertFalse(mockEvent.getParticipants().contains(mockParticipant2));
         verify(eventRepository, times(2)).save(mockEvent);
@@ -74,15 +68,13 @@ public class EventServiceTest {
      * and throw an exception in that case
      */
     @Test
-    public void removeParticipantFromNonexistentEventThrowsException() {
+    public void removeNonexistentParticipantThrowsException() {
         long nonexistentEventId = 999L;
-        long participantId = 1L;
-        when(eventRepository.findById(nonexistentEventId)).thenReturn(Optional.empty());
-        try {
-            eventService.removeParticipantFromEvent(nonexistentEventId, participantId);
+        try{
+            participantService.removeParticipant(nonexistentEventId);
             fail("Expected EntityNotFoundException not thrown");
         } catch (EntityNotFoundException ex) {
-            assertEquals("Event not found", ex.getMessage());
+            assertEquals("Participant not found", ex.getMessage());
         }
         verify(eventRepository, never()).save(any(Event.class));
     }
@@ -95,10 +87,9 @@ public class EventServiceTest {
         Event mockEvent = new Event("Sample Event", "CODE123");
         Participant mockParticipant = new Participant("John Doe", mockEvent);
         Participant updatedDetails = new Participant("Jane Doe", mockEvent);
-        when(eventRepository.findByCode(mockEvent.getCode())).thenReturn(Optional.of(mockEvent));
-        when(participantRepository.findByEventCodeAndName(mockEvent.getCode(), "John Doe")).thenReturn(Optional.of(mockParticipant));
+        when(participantRepository.findById(mockParticipant.getId())).thenReturn(Optional.of(mockParticipant));
         when(participantRepository.save(any(Participant.class))).thenReturn(updatedDetails);
-        Participant result = eventService.editParticipant(mockEvent.getCode(), "John Doe", updatedDetails);
+        Participant result = participantService.editParticipant(mockParticipant.getId(), updatedDetails);
         assertEquals("Jane Doe", result.getName());
     }
 
@@ -108,12 +99,9 @@ public class EventServiceTest {
      */
     @Test
     public void editParticipantToEventNonExistentEventCheck() {
-        String eventCode = "EVT123";
-        String participantCode = "PRT456";
         Participant updatedDetails = new Participant("Jane Doe", null);
-        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> {
-            eventService.editParticipant(eventCode, participantCode, updatedDetails);
+            participantService.editParticipant(updatedDetails.getId(), updatedDetails);
         }, "Should throw EntityNotFoundException for a nonexistent event.");
     }
 
@@ -126,28 +114,7 @@ public class EventServiceTest {
         String eventCode = "EVT123";
         String participantName = "Jane Doe";
         Event mockEvent = new Event("Sample Event", eventCode);
-
-        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
-        when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> eventService.editParticipant(eventCode, participantName, new Participant(participantName, mockEvent)));
-    }
-
-    /**
-     * Test what happens when we try to edit a participant that does not belong to
-     * a specific event
-     */
-    @Test
-    public void editParticipantToEventButItDoesNotBelongToEvent() {
-        String eventCode = "EVT123";
-        String participantName = "John Doe";
-        Event mockEvent = new Event("Sample Event", eventCode);
         Participant mockParticipant = new Participant(participantName, mockEvent);
-        Participant updatedDetails = new Participant("Jane Doe", mockEvent);
-        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
-        when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> {
-            eventService.editParticipant(eventCode, participantName, updatedDetails);
-        }, "Should throw EntityNotFoundException if the participant is not found in the specified event.");
+        assertThrows(EntityNotFoundException.class, () -> participantService.editParticipant(mockParticipant.getId(), mockParticipant));
     }
 }

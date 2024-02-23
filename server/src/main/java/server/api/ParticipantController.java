@@ -38,7 +38,7 @@ public class ParticipantController {
      */
     @DeleteMapping("/{participantId}")
     public ResponseEntity<?> removeParticipant(@PathVariable Long participantId) {
-        participantService.removeParticipantFromEvent(participantId);
+        participantService.removeParticipant(participantId);
         return ResponseEntity.ok().build();
     }
 }
