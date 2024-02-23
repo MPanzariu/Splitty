@@ -30,6 +30,10 @@ public class Participant{
         this.expensesOwedTo = new HashSet<>();
     }
 
+    public long getId() {
+        return id;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
