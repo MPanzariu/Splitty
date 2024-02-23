@@ -59,8 +59,7 @@ public class ParticipantControllerTest {
      */
     @Test
     public void editParticipantOkResponseFromServer() {
-        String eventCode = "RandomCode123";
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", eventCode));
+        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event"));
         given(participantService.editParticipant(anyLong(), any(Participant.class)))
                 .willReturn(participantDetails);
         ResponseEntity<Participant> response = participantController.editParticipant(participantDetails.getId(), participantDetails);
