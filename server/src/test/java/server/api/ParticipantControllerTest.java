@@ -17,15 +17,15 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class EventControllerTest {
+public class ParticipantControllerTest {
 
     private MockMvc mockMvc;
 
     @Mock
-    private EventService eventService;
+    private ParticipantService participantService;
 
     @InjectMocks
-    private EventController eventController;
+    private ParticipantController participantController;
 
     /**
      * make the mock eventService available for use
@@ -34,7 +34,7 @@ public class EventControllerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(participantController).build();
     }
 
     /**
@@ -44,12 +44,11 @@ public class EventControllerTest {
      */
     @Test
     public void removeParticipant_ShouldReturnOk() throws Exception {
-        long eventId = 1L;
         long participantId = 1L;
 
-        doNothing().when(eventService).removeParticipantFromEvent(eventId, participantId);
+        doNothing().when(participantService).removeParticipant(participantId);
 
-        mockMvc.perform(delete("/api/events/{eventId}/participants/{participantId}", eventId, participantId)
+        mockMvc.perform(delete("/api/participants/{participantId}", participantId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -62,10 +61,9 @@ public class EventControllerTest {
     public void editParticipantOkResponseFromServer() {
         String eventCode = "RandomCode123";
         Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", eventCode));
-        given(eventService.editParticipant(anyString(), anyString(), any(Participant.class)))
+        given(participantService.editParticipant(anyLong(), any(Participant.class)))
                 .willReturn(participantDetails);
-        ResponseEntity<Participant> response = eventController.editParticipant(eventCode,
-                participantDetails.getEvent().getCode(), participantDetails);
+        ResponseEntity<Participant> response = participantController.editParticipant(participantDetails.getId(), participantDetails);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Jane Doe", response.getBody().getName());
     }

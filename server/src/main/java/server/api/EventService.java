@@ -1,8 +1,4 @@
 package server.api;
-
-import commons.Event;
-import commons.Participant;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
