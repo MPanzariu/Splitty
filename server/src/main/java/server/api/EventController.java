@@ -1,10 +1,11 @@
 package server.api;
 import org.springframework.beans.factory.annotation.Autowired;
+import commons.Expense;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
@@ -30,5 +31,26 @@ public class EventController {
     public ResponseEntity<?> removeParticipant(@PathVariable Long eventId, @PathVariable Long participantId) {
         eventService.removeParticipantFromEvent(eventId, participantId);
         return ResponseEntity.ok().build();
+    }
+
+    //Empty event controller class
+    private ExpenseService expenseService;
+    @PostMapping("/{eventId}/expenses")
+    public ResponseEntity<Void> addExpenseToEvent(@PathVariable Long eventId, @RequestBody
+    Expense expense) {
+        expenseService.addExpenseToEvent(eventId, expense);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+    @GetMapping("/{eventId}/expenses")
+    public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable Long eventId) {
+        List<Expense> expenses = expenseService.getAllExpensesForEvent(eventId);
+        return ResponseEntity.ok(expenses);
+    }
+
+    @GetMapping("/{eventId}/total-expenses")
+    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable Long eventId) {
+        double totalExpenses = expenseService.calculateTotalExpensesForEvent(eventId);
+        return ResponseEntity.ok(totalExpenses);
+
     }
 }
