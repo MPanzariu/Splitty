@@ -33,7 +33,7 @@ public class EventController {
         eventService.removeParticipantFromEvent(eventId, participantId);
         return ResponseEntity.ok().build();
     }
-    
+
     //Empty event controller class
     private ExpenseService expenseService;
 
