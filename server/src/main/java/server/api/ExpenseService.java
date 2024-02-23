@@ -2,7 +2,6 @@ package server.api;
 
 import commons.Event;
 import commons.Expense;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
