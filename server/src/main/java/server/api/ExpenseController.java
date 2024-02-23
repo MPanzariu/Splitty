@@ -54,5 +54,16 @@ public class ExpenseController {
         return ResponseEntity.ok(totalExpenses);
     }
 
-    
+    /**
+     *
+     * @param id the id of the expense
+     * @return a status indicating wheter or not the even was deleted
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
+        boolean deleted = expenseService.deleteExpense(id);
+        if(deleted)
+            return ResponseEntity.ok("Expense deleted successfully");
+        return ResponseEntity.notFound().build();
+    }
 }

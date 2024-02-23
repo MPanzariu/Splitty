@@ -7,6 +7,8 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
@@ -53,5 +55,21 @@ public class ExpenseService {
     public int calculateTotalExpensesForEvent(Long eventId) {
         List<Expense> expenses = getAllExpensesForEvent(eventId);
         return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
+    }
+
+    /**
+     * !!!NEEDS FURTHER INSPECTION
+     * @param id the id of the expense to be deleted
+     * @return true if the expense was deleted, false otherwise
+     */
+    public boolean deleteExpense(Long id) {
+        List<Expense> exp = expenseRepository.findByEventId(id);
+        for(int i = 0; i < exp.size(); i ++) {
+            if(exp.get(i).getId() == id) {
+                exp.remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 }
