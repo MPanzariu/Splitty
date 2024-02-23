@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExpenseTest {
+    /**
+     * Constructor test
+     */
     @Test
     public void checkConstructor() {
         Date d = new Date();
@@ -21,6 +24,9 @@ public class ExpenseTest {
         assertSame(p, e.getOwedTo());
     }
 
+    /**
+     * Test for name setter and getter
+     */
     @Test
     public void setterGetterNameCheck(){
         Date d = new Date();
@@ -28,9 +34,13 @@ public class ExpenseTest {
         Participant p = new Participant();
         var e = new Expense("name", 10, d, event, p);
         assertEquals("name", e.getName());
-        e.setName("n");
-        assertEquals("n", e.getName());
+        e.setName("new name");
+        assertEquals("new name", e.getName());
     }
+
+    /**
+     * Test for price getter and setter
+     */
 
     @Test
     public void setterGetterPriceCheck(){
@@ -43,6 +53,9 @@ public class ExpenseTest {
         assertEquals(1, e.getPriceInCents());
     }
 
+    /**
+     * Test for date getter and setter
+     */
     @Test
     public void setterGetterDateCheck(){
         Date d = new Date();
@@ -54,6 +67,10 @@ public class ExpenseTest {
         e.setDate(newDate);
         assertSame(newDate, e.getDate());
     }
+
+    /**
+     * Test for setter and getter for participant the expense is owed to
+     */
     @Test
     public void setterGetterOwedToCheck(){
         Date d = new Date();
@@ -66,6 +83,9 @@ public class ExpenseTest {
         assertSame(p1, e.getOwedTo());
     }
 
+    /**
+     * Equality checker for equal expenses
+     */
     @Test
     public void equalsHashCode() {
         Date d = new Date();
@@ -77,17 +97,23 @@ public class ExpenseTest {
         assertEquals(a.hashCode(), b.hashCode());
     }
 
+    /**
+     * Equality checker for unequal expenses
+     */
     @Test
     public void notEqualsHashCode() {
         Date d = new Date();
         Event event = new Event();
         Participant p = new Participant();
         var a = new Expense("name", 10, d, event, p);
-        var b = new Expense("name1", 10, d, event, p);
+        var b = new Expense("new name", 10, d, event, p);
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
+    /**
+     * Tests for toString
+     */
     @Test
     public void hasToString() {
         Date d = new Date();
