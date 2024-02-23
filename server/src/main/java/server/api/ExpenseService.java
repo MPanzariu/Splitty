@@ -39,7 +39,7 @@ public class ExpenseService {
      * @param eventId the id by which we find the event
      * @return a list of all the expenses of the specific event
      */
-    public List<Expense> getAllExpensesForEvent(Long eventId) {
+    public List<Expense> getAllExpensesForEvent(String eventId) {
         return expenseRepository.findByEventId(eventId);
     }
 
@@ -50,7 +50,7 @@ public class ExpenseService {
      * @return the total of all the expenses of the specific event
      * in cents
      */
-    public int calculateTotalExpensesForEvent(Long eventId) {
+    public int calculateTotalExpensesForEvent(String eventId) {
         List<Expense> expenses = getAllExpensesForEvent(eventId);
         return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
     }
