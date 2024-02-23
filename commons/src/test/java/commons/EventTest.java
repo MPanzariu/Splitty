@@ -1,10 +1,6 @@
 package commons;
 
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -95,6 +91,16 @@ public class EventTest {
         Event event = new Event("title");
         String id = event.getId();
         assertEquals(Event.codeLength, id.length());
+    }
+
+    /***
+     * Test to make sure IDs are unique
+     */
+    @Test
+    public void idDiffersTest(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("new title");
+        assertNotEquals(event1.getId(), event2.getId());
     }
 
 }
