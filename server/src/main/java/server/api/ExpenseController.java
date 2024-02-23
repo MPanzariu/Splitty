@@ -23,7 +23,7 @@ public class ExpenseController {
      * @return the status of the task
      */
     @PostMapping("/{eventId}/expenses")
-    public ResponseEntity<Void> addExpenseToEvent(@PathVariable Long eventId, @RequestBody
+    public ResponseEntity<Void> addExpenseToEvent(@PathVariable String eventId, @RequestBody
     Expense expense) {
         expenseService.addExpenseToEvent(eventId, expense);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -37,7 +37,7 @@ public class ExpenseController {
      * (a list of all expenses for a specific event)
      */
     @GetMapping("/{eventId}/expenses")
-    public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable Long eventId) {
+    public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable String eventId) {
         List<Expense> expenses = expenseService.getAllExpensesForEvent(eventId);
         return ResponseEntity.ok(expenses);
     }
@@ -49,7 +49,7 @@ public class ExpenseController {
      * @return the sum of all the expenses for a specific event
      */
     @GetMapping("/{eventId}/total-expenses")
-    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable Long eventId) {
+    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable String eventId) {
         double totalExpenses = expenseService.calculateTotalExpensesForEvent(eventId);
         return ResponseEntity.ok(totalExpenses);
     }
@@ -61,9 +61,7 @@ public class ExpenseController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
-        boolean deleted = expenseService.deleteExpense(id);
-        if(deleted)
-            return ResponseEntity.ok("Expense deleted successfully");
-        return ResponseEntity.notFound().build();
+        expenseService.deleteExpense(id);
+        return ResponseEntity.ok().build();
     }
 }

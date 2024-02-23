@@ -2,6 +2,8 @@ package server.api;
 
 import commons.Event;
 import commons.Expense;
+import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
@@ -29,7 +31,7 @@ public class ExpenseService {
      * @param eventId the id by which we find the event
      * @param expense the specific expense for that event
      */
-    public void addExpenseToEvent(Long eventId, Expense expense) {
+    public void addExpenseToEvent(String eventId, Expense expense) {
         Event event = eventRepository.findById(eventId).orElseThrow(()
             -> new IllegalArgumentException("Event not found"));
         expense.setEvent(event);
@@ -62,14 +64,11 @@ public class ExpenseService {
      * @param id the id of the expense to be deleted
      * @return true if the expense was deleted, false otherwise
      */
-    public boolean deleteExpense(Long id) {
-        List<Expense> exp = expenseRepository.findByEventId(id);
-        for(int i = 0; i < exp.size(); i ++) {
-            if(exp.get(i).getId() == id) {
-                exp.remove(i);
-                return true;
-            }
-        }
-        return false;
+    public void deleteExpense(Long id) {
+        Expense expense = expenseRepository.findById(id).
+                orElseThrow(() -> new EntityNotFoundException("Expense not found"));
+        Event event = expense.getEvent();
+        event.removeExpense(expense);
+        eventRepository.save(event);
     }
 }
