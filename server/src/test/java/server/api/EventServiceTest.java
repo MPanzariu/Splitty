@@ -98,7 +98,7 @@ public class EventServiceTest {
         when(eventRepository.findByCode(mockEvent.getCode())).thenReturn(Optional.of(mockEvent));
         when(participantRepository.findByEventCodeAndName(mockEvent.getCode(), "John Doe")).thenReturn(Optional.of(mockParticipant));
         when(participantRepository.save(any(Participant.class))).thenReturn(updatedDetails);
-        Participant result = eventService.editParticipantToEvent(mockEvent.getCode(), "John Doe", updatedDetails);
+        Participant result = eventService.editParticipant(mockEvent.getCode(), "John Doe", updatedDetails);
         assertEquals("Jane Doe", result.getName());
     }
 
@@ -113,7 +113,7 @@ public class EventServiceTest {
         Participant updatedDetails = new Participant("Jane Doe", null);
         when(eventRepository.findByCode(eventCode)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> {
-            eventService.editParticipantToEvent(eventCode, participantCode, updatedDetails);
+            eventService.editParticipant(eventCode, participantCode, updatedDetails);
         }, "Should throw EntityNotFoundException for a nonexistent event.");
     }
 
@@ -130,7 +130,7 @@ public class EventServiceTest {
         when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
         when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> eventService.editParticipantToEvent(eventCode, participantName, new Participant(participantName, mockEvent)));
+        assertThrows(EntityNotFoundException.class, () -> eventService.editParticipant(eventCode, participantName, new Participant(participantName, mockEvent)));
     }
 
     /**
@@ -147,7 +147,7 @@ public class EventServiceTest {
         when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
         when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> {
-            eventService.editParticipantToEvent(eventCode, participantName, updatedDetails);
+            eventService.editParticipant(eventCode, participantName, updatedDetails);
         }, "Should throw EntityNotFoundException if the participant is not found in the specified event.");
     }
 }

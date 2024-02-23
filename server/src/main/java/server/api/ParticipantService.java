@@ -9,7 +9,7 @@ import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
 @Service
-public class EventService {
+public class ParticipantService {
     private final EventRepository eventRepository;
     private final ParticipantRepository participantRepository;
 
@@ -20,7 +20,7 @@ public class EventService {
      * @param participantRepository used for handling participants
      */
     @Autowired
-    public EventService(EventRepository eventRepository, ParticipantRepository participantRepository) {
+    public ParticipantService(EventRepository eventRepository, ParticipantRepository participantRepository) {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
     }
