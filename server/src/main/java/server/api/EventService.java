@@ -40,4 +40,23 @@ public class EventService {
         event.getParticipants().remove(participant);
         eventRepository.save(event);
     }
+
+    /**
+     * edit the details of a participant that is in an event
+     * @param eventCode the event where the participant that we want to modify the details of is in
+     * @param participantName the participant whose details we want to change
+     * @param participantDetails the details of the participant
+     * @return the participants modified details are now saved in the database
+     */
+    public Participant editParticipantToEvent(String eventCode, String participantName, Participant participantDetails) {
+        Event event = eventRepository.findByCode(eventCode)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        Participant participant = participantRepository.findByEventCodeAndName(eventCode, participantName)
+                .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
+        if (!event.getCode().equals(participant.getEvent().getCode())) {
+            throw new IllegalArgumentException("Participant does not belong to the specified event");
+        }
+        participant.setName(participantDetails.getName());
+        return participantRepository.save(participant);
+    }
 }

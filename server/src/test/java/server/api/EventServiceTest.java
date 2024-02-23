@@ -28,6 +28,10 @@ public class EventServiceTest {
     @InjectMocks
     private EventService eventService;
 
+    private Event mockEvent;
+    private Participant mockParticipant;
+    private Participant updatedDetails;
+
     /**
      * create a mock event and participant to see if it can be removed, not needing to interact
      * with a real database
@@ -83,4 +87,67 @@ public class EventServiceTest {
         verify(eventRepository, never()).save(any(Event.class));
     }
 
+    /**
+     * check to see if the editing of the participant works
+     */
+    @Test
+    public void checkEditParticipantToEvent() {
+        Event mockEvent = new Event("Sample Event", "CODE123");
+        Participant mockParticipant = new Participant("John Doe", mockEvent);
+        Participant updatedDetails = new Participant("Jane Doe", mockEvent);
+        when(eventRepository.findByCode(mockEvent.getCode())).thenReturn(Optional.of(mockEvent));
+        when(participantRepository.findByEventCodeAndName(mockEvent.getCode(), "John Doe")).thenReturn(Optional.of(mockParticipant));
+        when(participantRepository.save(any(Participant.class))).thenReturn(updatedDetails);
+        Participant result = eventService.editParticipantToEvent(mockEvent.getCode(), "John Doe", updatedDetails);
+        assertEquals("Jane Doe", result.getName());
+    }
+
+    /**
+     * test to see what happens if we try to edit a participant's detail
+     * if the event he was assigned to did not exist
+     */
+    @Test
+    public void editParticipantToEventNonExistentEventCheck() {
+        String eventCode = "EVT123";
+        String participantCode = "PRT456";
+        Participant updatedDetails = new Participant("Jane Doe", null);
+        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> {
+            eventService.editParticipantToEvent(eventCode, participantCode, updatedDetails);
+        }, "Should throw EntityNotFoundException for a nonexistent event.");
+    }
+
+    /**
+     * test to see what would happen if we tried to edit a participant that was not
+     * existing in the first place
+     */
+    @Test
+    public void editParticipantToEventNonExistentParticipantCheck() {
+        String eventCode = "EVT123";
+        String participantName = "Jane Doe";
+        Event mockEvent = new Event("Sample Event", eventCode);
+
+        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
+        when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> eventService.editParticipantToEvent(eventCode, participantName, new Participant(participantName, mockEvent)));
+    }
+
+    /**
+     * Test what happens when we try to edit a participant that does not belong to
+     * a specific event
+     */
+    @Test
+    public void editParticipantToEventButItDoesNotBelongToEvent() {
+        String eventCode = "EVT123";
+        String participantName = "John Doe";
+        Event mockEvent = new Event("Sample Event", eventCode);
+        Participant mockParticipant = new Participant(participantName, mockEvent);
+        Participant updatedDetails = new Participant("Jane Doe", mockEvent);
+        when(eventRepository.findByCode(eventCode)).thenReturn(Optional.of(mockEvent));
+        when(participantRepository.findByEventCodeAndName(eventCode, participantName)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> {
+            eventService.editParticipantToEvent(eventCode, participantName, updatedDetails);
+        }, "Should throw EntityNotFoundException if the participant is not found in the specified event.");
+    }
 }
