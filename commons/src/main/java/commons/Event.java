@@ -9,15 +9,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 public class Event{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String id;
     private String title;
-    @Column(unique=true)
-    private String code;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
@@ -26,14 +24,33 @@ public class Event{
     @SuppressWarnings("unused")
     public Event() {}
 
-    public Event(String title, String code) {
+    public Event(String title) {
         this.title = title;
-        this.code = code;
         this.participants = new HashSet<>();
         this.expenses = new HashSet<>();
+        this.id = generateId();
     }
 
-    public long getId() {
+    static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
+    // I, 1, O, and 0 omitted for UX
+    static final int codeLength = 6;
+    // 32^6 = 1,073,741,824 combinations
+
+    public static String generateId(){
+        int maxRandomBound = validCharacters.length;
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(int i = 0; i < codeLength; i++){
+            int charIndex = random.nextInt(0, maxRandomBound);
+            char character = validCharacters[charIndex];
+            stringBuilder.append(character);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public String getId() {
         return id;
     }
 
@@ -43,10 +60,6 @@ public class Event{
 
     public String getTitle() {
         return title;
-    }
-
-    public String getCode() {
-        return code;
     }
 
     public void addParticipant(Participant participant){

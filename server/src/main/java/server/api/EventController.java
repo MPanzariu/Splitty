@@ -45,7 +45,7 @@ public class EventController {
      * (a list of all expenses for a specific event)
      */
     @GetMapping("/{eventId}/expenses")
-    public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable Long eventId) {
+    public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable String eventId) {
         List<Expense> expenses = expenseService.getAllExpensesForEvent(eventId);
         return ResponseEntity.ok(expenses);
     }
@@ -57,7 +57,7 @@ public class EventController {
      * @return the sum of all the expenses for a specific event
      */
     @GetMapping("/{eventId}/total-expenses")
-    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable Long eventId) {
+    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable String eventId) {
         double totalExpenses = expenseService.calculateTotalExpensesForEvent(eventId);
         return ResponseEntity.ok(totalExpenses);
     }

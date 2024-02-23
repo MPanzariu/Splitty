@@ -34,7 +34,7 @@ public class ParticipantServiceTest {
      */
     @Test
     public void testRemoveParticipantFromEvent() {
-        Event mockEvent = new Event("Sample Event", "CODE123");
+        Event mockEvent = new Event("Sample Event");
         Participant mockParticipant = new Participant("John Doe", mockEvent);
         mockEvent.addParticipant(mockParticipant);
         when(participantRepository.findById(anyLong())).thenReturn(Optional.of(mockParticipant));
@@ -49,7 +49,7 @@ public class ParticipantServiceTest {
      */
     @Test
     public void testRemoveMultipleParticipantsFromEvent() {
-        Event mockEvent = new Event("Sample Event", "CODE123");
+        Event mockEvent = new Event("Sample Event");
         Participant mockParticipant1 = new Participant("Participant One", mockEvent);
         Participant mockParticipant2 = new Participant("Participant Two", mockEvent);
         mockEvent.addParticipant(mockParticipant1);
@@ -84,7 +84,7 @@ public class ParticipantServiceTest {
      */
     @Test
     public void checkEditParticipantToEvent() {
-        Event mockEvent = new Event("Sample Event", "CODE123");
+        Event mockEvent = new Event("Sample Event");
         Participant mockParticipant = new Participant("John Doe", mockEvent);
         Participant updatedDetails = new Participant("Jane Doe", mockEvent);
         when(participantRepository.findById(mockParticipant.getId())).thenReturn(Optional.of(mockParticipant));
@@ -111,9 +111,8 @@ public class ParticipantServiceTest {
      */
     @Test
     public void editParticipantToEventNonExistentParticipantCheck() {
-        String eventCode = "EVT123";
         String participantName = "Jane Doe";
-        Event mockEvent = new Event("Sample Event", eventCode);
+        Event mockEvent = new Event("Sample Event");
         Participant mockParticipant = new Participant(participantName, mockEvent);
         assertThrows(EntityNotFoundException.class, () -> participantService.editParticipant(mockParticipant.getId(), mockParticipant));
     }
