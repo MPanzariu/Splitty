@@ -25,6 +25,10 @@ class ExpenseServiceTest {
     @InjectMocks
     private ExpenseService mockExpenseService;
 
+    /**
+     * Tests the method getAllExpensesForEvent
+     * from the class ExpenseService
+     */
     @Test
     public void getAllExpensesForEventTest() {
         String eventId = "mockEventId";
@@ -46,6 +50,10 @@ class ExpenseServiceTest {
         assertEquals(expectedExpenses, actualExpenses);
     }
 
+    /**
+     * Tests the method calculateTotalExpensesForEvent
+     * from the class eventService
+     */
     @Test
     public void calculateTotalExpensesForEventTest() {
         String eventId = "mockEventId";
@@ -64,6 +72,10 @@ class ExpenseServiceTest {
         assertEquals(sum, 300);
     }
 
+    /**
+     * Tests the method deleteExpense
+     * from the class ExpenseService
+     */
     @Test
     public void deleteExpenseTest() {
         Event mockEvent = new Event("Sample Event");
