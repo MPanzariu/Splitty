@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import server.database.EventRepository;
 import server.database.ExpenseRepository;
 
 import java.util.ArrayList;
@@ -22,12 +23,14 @@ class ExpenseServiceTest {
     @Mock
     private ExpenseRepository mockExpenseRepository;
 
+    @Mock
+    private EventRepository mockEventRepository;
+
     @InjectMocks
     private ExpenseService mockExpenseService;
 
     /**
-     * Tests the method getAllExpensesForEvent
-     * from the class ExpenseService
+     * Tests the getExpensesForEvents
      */
     @Test
     public void getAllExpensesForEventTest() {
@@ -37,22 +40,15 @@ class ExpenseServiceTest {
             null, null, null));
         expectedExpenses.add(new Expense("Expense 2", 200,
             null, null, null));
-
-        // Stubbing behavior of mockExpenseRepository
         when(mockExpenseRepository.findByEventId(anyString()))
             .thenReturn(expectedExpenses);
-
-        // Call the method under test
         List<Expense> actualExpenses =
             mockExpenseService.getAllExpensesForEvent(eventId);
-
-        // Verify the result
         assertEquals(expectedExpenses, actualExpenses);
     }
 
     /**
-     * Tests the method calculateTotalExpensesForEvent
-     * from the class eventService
+     * Tests the getExpensesForEvents
      */
     @Test
     public void calculateTotalExpensesForEventTest() {
@@ -73,8 +69,7 @@ class ExpenseServiceTest {
     }
 
     /**
-     * Tests the method deleteExpense
-     * from the class ExpenseService
+     * Tests the getExpensesForEvents
      */
     @Test
     public void deleteExpenseTest() {
