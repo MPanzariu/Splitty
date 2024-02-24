@@ -64,7 +64,7 @@ public class ExpenseService {
      * @param id the id of the expense to be deleted
      * @return true if the expense was deleted, false otherwise
      */
-    public void deleteExpense(Long id) {
+    public void deleteExpense(String id) {
         Expense expense = expenseRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Expense not found"));
         Event event = expense.getEvent();

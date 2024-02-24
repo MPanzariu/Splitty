@@ -60,7 +60,7 @@ public class ExpenseController {
      * @return a status indicating wheter or not the even was deleted
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
+    public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") String id) {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok().build();
     }
