@@ -32,10 +32,14 @@ public class ExpenseService {
      * @param expense the specific expense for that event
      */
     public void addExpenseToEvent(String eventId, Expense expense) {
-        Event event = eventRepository.findById(eventId).orElseThrow(()
-            -> new IllegalArgumentException("Event not found"));
+        Optional<Event> opEvent = eventRepository.findById(eventId);
+        if (opEvent.isEmpty())
+            throw new IllegalArgumentException("Event not found");
+        Event event = opEvent.get();
         expense.setEvent(event);
         expenseRepository.save(expense);
+        event.addExpense(expense);
+        eventRepository.save(event);
     }
 
     /**
@@ -64,7 +68,7 @@ public class ExpenseService {
      * @param id the id of the expense to be deleted
      * @return true if the expense was deleted, false otherwise
      */
-    public void deleteExpense(String id) {
+    public void deleteExpense(long id) {
         Expense expense = expenseRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Expense not found"));
         Event event = expense.getEvent();
