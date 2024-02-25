@@ -32,7 +32,7 @@ public class Event{
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
-    // I, 1, O, and 0 omitted for UX
+    // I, 1, O, and 0 omitted for UX (user experience)
     static final int codeLength = 6;
     // 32^6 = 1,073,741,824 combinations
 
