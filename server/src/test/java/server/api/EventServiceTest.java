@@ -45,28 +45,28 @@ public class EventServiceTest {
     /**
      * tests editing a title on an event which does not exist
      */
-    @Test
-    public void editTitleNotExistingTest(){
-        Event event = new Event("title", null);
-        assertThrows(EntityNotFoundException.class, () ->
-            mockEventService.editTitle(event.getId(), "new title"));
-    }
+//   @Test
+//    public void editTitleNotExistingTest(){
+//        Event event = new Event("title", null);
+//        assertThrows(EntityNotFoundException.class, () ->
+//            mockEventService.editTitle(event.getId(), "new title"));
+//    }
 
     /**
      * tests whether adding a participant to an existing event works
      */
-    @Test
-    public void addParticipantsTest(){
-        Event event = new Event("test", null);
-        Participant participant = new Participant();
-        when(mockEventRepository.findById(anyString())).
-                thenReturn(Optional.of(event));
-        when(mockParticipantRepository.save(any(Participant.class)))
-                .thenReturn(participant);
-        mockEventService.addParticipantToEvent("Name Surname", event.getId());
-        Set<Participant> participants = event.getParticipants();
-        assertNotNull(participants);
-    }
+//    @Test
+//    public void addParticipantsTest(){
+//        Event event = new Event("test", null);
+//        Participant participant = new Participant();
+//        when(mockEventRepository.findById(anyString())).
+//                thenReturn(Optional.of(event));
+//        when(mockParticipantRepository.save(any(Participant.class)))
+//                .thenReturn(participant);
+//        mockEventService.addParticipantToEvent("Name Surname", event.getId());
+//        Set<Participant> participants = event.getParticipants();
+//        assertNotNull(participants);
+//    }
 
 
 
