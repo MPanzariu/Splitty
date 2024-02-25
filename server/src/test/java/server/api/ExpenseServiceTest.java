@@ -73,7 +73,7 @@ class ExpenseServiceTest {
      */
     @Test
     public void deleteExpenseTest() {
-        Event mockEvent = new Event("Sample Event");
+        Event mockEvent = new Event("Sample Event", null);
         Expense mockExpense = new Expense("mockExpense", 100,
             null, mockEvent, null);
         mockEvent.addExpense(mockExpense);
