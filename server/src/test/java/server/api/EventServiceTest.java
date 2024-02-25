@@ -1,33 +1,33 @@
 package server.api;
 
-//import commons.Event;
+import commons.Event;
 //import commons.Participant;
-//import jakarta.persistence.EntityNotFoundException;
-//import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
+import org.mockito.InjectMocks;
 //import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 //import server.database.EventRepository;
 //import server.database.ParticipantRepository;
-
+//
 //import java.util.Optional;
 //import java.util.Set;
-//
-//import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 //import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
-//
-//    @Mock
-//    private EventRepository mockEventRepository;
 
 //    @Mock
-//    private ParticipantRepository mockParticipantRepository;
+//    private EventRepository mockEventRepository;
 //
-//    @InjectMocks
-//    private EventService mockEventService;
+//    @Mock
+//    private ParticipantRepository mockParticipantRepository;
+
+    @InjectMocks
+    private EventService mockEventService;
 
 //    /**
 //     * tests if the title editing method works, on an existing event
@@ -42,15 +42,15 @@ public class EventServiceTest {
 //        assertEquals(newEvent.getTitle(), "newTitle");
 //    }
 
-//    /**
-//     * tests editing a title on an event which does not exist
-//     */
-//   @Test
-//    public void editTitleNotExistingTest(){
-//        Event event = new Event("title", null);
-//        assertThrows(EntityNotFoundException.class, () ->
-//            mockEventService.editTitle(event.getId(), "new title"));
-//    }
+    /**
+     * tests editing a title on an event which does not exist
+     */
+   @Test
+    public void editTitleNotExistingTest(){
+        Event event = new Event("title", null);
+        assertThrows(EntityNotFoundException.class, () ->
+            mockEventService.editTitle(event.getId(), "new title"));
+    }
 
 //    /**
 //     * tests whether adding a participant to an existing event works
