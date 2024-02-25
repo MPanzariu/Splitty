@@ -1,18 +1,18 @@
 package server.api;
 
 import commons.Event;
-import commons.Participant;
-import jakarta.persistence.EntityNotFoundException;
+//import commons.Participant;
+//import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.EventRepository;
-import server.database.ParticipantRepository;
+//import server.database.ParticipantRepository;
 
 import java.util.Optional;
-import java.util.Set;
+//import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,8 +23,8 @@ public class EventServiceTest {
     @Mock
     private EventRepository mockEventRepository;
 
-    @Mock
-    private ParticipantRepository mockParticipantRepository;
+//    @Mock
+//    private ParticipantRepository mockParticipantRepository;
 
     @InjectMocks
     private EventService mockEventService;
@@ -42,9 +42,9 @@ public class EventServiceTest {
         assertEquals(newEvent.getTitle(), "newTitle");
     }
 
-    /**
-     * tests editing a title on an event which does not exist
-     */
+//    /**
+//     * tests editing a title on an event which does not exist
+//     */
 //   @Test
 //    public void editTitleNotExistingTest(){
 //        Event event = new Event("title", null);
@@ -52,9 +52,9 @@ public class EventServiceTest {
 //            mockEventService.editTitle(event.getId(), "new title"));
 //    }
 
-    /**
-     * tests whether adding a participant to an existing event works
-     */
+//    /**
+//     * tests whether adding a participant to an existing event works
+//     */
 //    @Test
 //    public void addParticipantsTest(){
 //        Event event = new Event("test", null);
