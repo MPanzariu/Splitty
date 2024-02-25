@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,11 +16,12 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 public class EventControllerTest {
 
-    EventRepository repository = mock(EventRepository.class);
+    EventRepository repository;
     EventController controller;
 
     @BeforeEach
     void setup() {
+        repository = new TestEventRepository();
         controller = new EventController(repository);
     }
 
@@ -40,7 +42,6 @@ public class EventControllerTest {
     @Test
     void addValidEvent() {
         Event event = new Event("Party");
-        when(repository.save(event)).thenReturn(event);
         ResponseEntity<Event> response = controller.add(event);
         assertEquals(event, response.getBody());
     }
@@ -54,11 +55,20 @@ public class EventControllerTest {
 
     @Test
     void joinExistingEvent() {
-        String invitationCode = "Invitation to party";
         Event event = new Event("Party");
-        when(repository.findById(invitationCode)).thenReturn(Optional.of(event));
-        controller.add(event);
-        ResponseEntity<Event> response = controller.join(invitationCode);
+        Event persistedEvent = controller.add(event).getBody();
+        ResponseEntity<Event> response = controller.join(persistedEvent.getId());
         assertEquals(event, response.getBody());
+    }
+
+    @Test
+    void getMultipleEvents() {
+        Event event1 = new Event("Party");
+        Event event2 = new Event("Holiday");
+        Event expectedEvent1 = controller.add(event1).getBody();
+        Event expectedEvent2 = controller.add(event2).getBody();
+        List<Event> expectedEvents = List.of(expectedEvent1, expectedEvent2);
+        List<Event> retrievedEvents = controller.all().getBody();
+        assertEquals(expectedEvents, retrievedEvents);
     }
 }

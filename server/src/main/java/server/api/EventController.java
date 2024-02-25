@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -39,11 +40,20 @@ public class EventController {
      * @param id ID of the event
      * @return ResponseEntity with the event iff the event can be found. Else return a bad request.
      */
-    @GetMapping("join/{id}")
-    ResponseEntity<Event> join(@PathVariable() String id) {
+    @GetMapping("/join/{id}")
+    ResponseEntity<Event> join(@PathVariable String id) {
         Optional<Event> event = repository.findById(id);
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(event.get());
+    }
+
+    /**
+     * Endpoint for retrieving all events.
+     * @return All events from the database.
+     */
+    @GetMapping("/all")
+    ResponseEntity<List<Event>> all() {
+        return ResponseEntity.ok(repository.findAll());
     }
 }
