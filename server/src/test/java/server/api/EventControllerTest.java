@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -108,4 +110,5 @@ public class EventControllerTest {
         List<Event> orderedList = List.of(persistedEvent2, persistedEvent1);
         assertEquals(orderedList, response.getBody());
     }
+
 }
