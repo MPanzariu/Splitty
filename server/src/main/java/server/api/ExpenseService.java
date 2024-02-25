@@ -31,11 +31,15 @@ public class ExpenseService {
      * @param eventId the id by which we find the event
      * @param expense the specific expense for that event
      */
-    public void addExpenseToEvent(String eventId, Expense expense) {
-        Event event = eventRepository.findById(eventId).orElseThrow(()
-            -> new IllegalArgumentException("Event not found"));
+    public void addExpense(String eventId, Expense expense) {
+        Optional<Event> opEvent = eventRepository.findById(eventId);
+        if (opEvent.isEmpty())
+            throw new IllegalArgumentException("Event not found");
+        Event event = opEvent.get();
         expense.setEvent(event);
         expenseRepository.save(expense);
+        event.addExpense(expense);
+        eventRepository.save(event);
     }
 
     /**
@@ -43,7 +47,7 @@ public class ExpenseService {
      * @param eventId the id by which we find the event
      * @return a list of all the expenses of the specific event
      */
-    public List<Expense> getAllExpensesForEvent(String eventId) {
+    public List<Expense> getAllExpenses(String eventId) {
         return expenseRepository.findByEventId(eventId);
     }
 
@@ -54,8 +58,8 @@ public class ExpenseService {
      * @return the total of all the expenses of the specific event
      * in cents
      */
-    public int calculateTotalExpensesForEvent(String eventId) {
-        List<Expense> expenses = getAllExpensesForEvent(eventId);
+    public int calculateTotalExpenses(String eventId) {
+        List<Expense> expenses = getAllExpenses(eventId);
         return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
     }
 
@@ -64,7 +68,7 @@ public class ExpenseService {
      * @param id the id of the expense to be deleted
      * @return true if the expense was deleted, false otherwise
      */
-    public void deleteExpense(Long id) {
+    public void deleteExpense(long id) {
         Expense expense = expenseRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Expense not found"));
         Event event = expense.getEvent();

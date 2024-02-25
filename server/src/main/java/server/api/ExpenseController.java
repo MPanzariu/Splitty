@@ -25,7 +25,7 @@ public class ExpenseController {
     @PostMapping("/{eventId}/expenses")
     public ResponseEntity<Void> addExpenseToEvent(@PathVariable String eventId, @RequestBody
     Expense expense) {
-        expenseService.addExpenseToEvent(eventId, expense);
+        expenseService.addExpense(eventId, expense);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -38,7 +38,7 @@ public class ExpenseController {
      */
     @GetMapping("/{eventId}/expenses")
     public ResponseEntity<List<Expense>> getAllExpensesForEvent(@PathVariable String eventId) {
-        List<Expense> expenses = expenseService.getAllExpensesForEvent(eventId);
+        List<Expense> expenses = expenseService.getAllExpenses(eventId);
         return ResponseEntity.ok(expenses);
     }
 
@@ -50,14 +50,14 @@ public class ExpenseController {
      */
     @GetMapping("/{eventId}/total-expenses")
     public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable String eventId) {
-        double totalExpenses = expenseService.calculateTotalExpensesForEvent(eventId);
+        double totalExpenses = expenseService.calculateTotalExpenses(eventId);
         return ResponseEntity.ok(totalExpenses);
     }
 
     /**
      *
      * @param id the id of the expense
-     * @return a status indicating wheter or not the even was deleted
+     * @return a status indicating whether the even was deleted
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
