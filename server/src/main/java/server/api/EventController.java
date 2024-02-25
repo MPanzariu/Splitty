@@ -4,25 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
-import server.database.ExpenseRepository;
-import server.database.ParticipantRepository;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
-    private final EventService eventService;
 
     private final EventRepository repository;
 
     /**
-     * constructor
-     * @param eventService sets the current eventService
+     * Constructor of EventController.
      */
     @Autowired
-    public EventController(EventService eventService, EventRepository repository) {
-        this.eventService = eventService;
+    public EventController(EventRepository repository) {
         this.repository = repository;
     }
 
