@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,6 @@ public class EventController {
     ResponseEntity<Event> add(@RequestBody Event event) {
         if(event.getTitle() == null || event.getTitle().isEmpty())
             return ResponseEntity.badRequest().build();
-
         return ResponseEntity.ok(repository.save(event));
     }
 
@@ -68,5 +68,27 @@ public class EventController {
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(event.get());
+    }
+
+    /**
+     * Endpoint for giving an ordered list of events by title.
+     * @return A list of events ordered by title
+     */
+    @GetMapping("ordered/title")
+    ResponseEntity<List<Event>> orderByTitle() {
+        List<Event> events = all().getBody();
+        events.sort(Comparator.comparing(Event::getTitle));
+        return ResponseEntity.ok(events);
+    }
+
+    /**
+     * Endopoint for giving all events ordered by creation date.
+     * @return List of all events ordered by creation date
+     */
+    @GetMapping("ordered/date")
+    ResponseEntity<List<Event>> orderByCreationDate() {
+        List<Event> events = all().getBody();
+        events.sort(Comparator.comparing(Event::getCreationDate));
+        return ResponseEntity.ok(events);
     }
 }

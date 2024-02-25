@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,6 +17,7 @@ public class Event{
     @Id
     private String id;
     private String title;
+    private Date creationDate;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
@@ -24,11 +26,12 @@ public class Event{
     @SuppressWarnings("unused")
     public Event() {}
 
-    public Event(String title) {
+    public Event(String title, Date creationDate) {
         this.title = title;
         this.participants = new HashSet<>();
         this.expenses = new HashSet<>();
         this.id = generateId();
+        this.creationDate = creationDate;
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
@@ -60,6 +63,10 @@ public class Event{
 
     public String getTitle() {
         return title;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
     }
 
     public void addParticipant(Participant participant){

@@ -67,7 +67,7 @@ public class ParticipantControllerTest {
      */
     @Test
     public void editParticipantOkResponseFromServer() {
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event"));
+        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
         given(participantService.editParticipant(anyLong(), any(Participant.class)))
                 .willReturn(participantDetails);
         ResponseEntity<Participant> response = participantController.editParticipant(participantDetails.getId(), participantDetails);
@@ -81,7 +81,7 @@ public class ParticipantControllerTest {
     @Test
     public void editParticipantNonExistent() {
         Long nonExistentId = 999L;
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event"));
+        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
 
         given(participantService.editParticipant(eq(nonExistentId), any(Participant.class)))
                 .willThrow(new EntityNotFoundException("Participant not found"));
@@ -96,7 +96,7 @@ public class ParticipantControllerTest {
     @Test
     public void editParticipantVerifyDetails() {
         Long participantId = 1L;
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event"));
+        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
         given(participantService.editParticipant(eq(participantId), any(Participant.class)))
                 .willAnswer(invocation -> invocation.getArgument(1));
         ResponseEntity<Participant> response = participantController.editParticipant(participantId, participantDetails);
