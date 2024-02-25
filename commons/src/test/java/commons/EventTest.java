@@ -10,7 +10,7 @@ public class EventTest {
      */
     @Test
     public void checkConstructor() {
-        var e = new Event("title");
+        var e = new Event("title", null);
         assertEquals("title", e.getTitle());
     }
     /**
@@ -18,7 +18,7 @@ public class EventTest {
      */
     @Test
     public void getterSetterTitleCheck(){
-        var e = new Event("title");
+        var e = new Event("title", null);
         assertEquals("title",e.getTitle());
         e.setTitle("new title");
         assertEquals("new title",e.getTitle());
@@ -28,7 +28,7 @@ public class EventTest {
      */
     @Test
     public void participantsCheck(){
-        var e = new Event("title");
+        var e = new Event("title", null);
         assertTrue(e.getParticipants().isEmpty());
         Participant p = new Participant();
         e.addParticipant(p);
@@ -41,7 +41,7 @@ public class EventTest {
      */
     @Test
     public void expensesCheck(){
-        var e = new Event("title");
+        var e = new Event("title", null);
         assertTrue(e.getExpenses().isEmpty());
         Expense ex = new Expense();
         e.addExpense(ex);
@@ -54,7 +54,7 @@ public class EventTest {
      */
     @Test
     public void equalsHashCode() {
-        var a = new Event("title");
+        var a = new Event("title", null);
         var b = a;
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
@@ -64,8 +64,8 @@ public class EventTest {
      */
     @Test
     public void notEqualsHashCode() {
-        var a = new Event("title");
-        var b = new Event("title2");
+        var a = new Event("title", null);
+        var b = new Event("title2", null);
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
@@ -74,7 +74,7 @@ public class EventTest {
      */
     @Test
     public void hasToString() {
-        var actual = new Event("title").toString();
+        var actual = new Event("title", null).toString();
         assertTrue(actual.contains(Event.class.getSimpleName()));
         assertTrue(actual.contains("\n"));
         assertTrue(actual.contains("expenses"));
@@ -88,7 +88,7 @@ public class EventTest {
      */
     @Test
     public void idFormatTest(){
-        Event event = new Event("title");
+        Event event = new Event("title", null);
         String id = event.getId();
         assertEquals(Event.codeLength, id.length());
     }
@@ -98,8 +98,8 @@ public class EventTest {
      */
     @Test
     public void idDiffersTest(){
-        Event event1 = new Event("title");
-        Event event2 = new Event("new title");
+        Event event1 = new Event("title", null);
+        Event event2 = new Event("new title", null);
         assertNotEquals(event1.getId(), event2.getId());
     }
 
