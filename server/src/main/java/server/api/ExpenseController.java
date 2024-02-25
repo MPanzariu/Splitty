@@ -57,7 +57,7 @@ public class ExpenseController {
     /**
      *
      * @param id the id of the expense
-     * @return a status indicating wheter or not the even was deleted
+     * @return a status indicating whether the even was deleted
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
