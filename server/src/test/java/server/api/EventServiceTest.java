@@ -30,12 +30,12 @@ public class EventServiceTest {
 
     @Test
     public void editTitleExistingTest() {
-            Event event = new Event("title", null);
-            when(mockEventRepository.findById(anyString())).
-                    thenReturn(Optional.of(event));
-            Event newEvent = mockEventService.
-                    editTitle(event.getId(), "newTitle");
-            assertEquals(newEvent.getTitle(), "newTitle");
+        Event event = new Event("title", null);
+        when(mockEventRepository.findById(anyString())).
+                thenReturn(Optional.of(event));
+        Event newEvent = mockEventService.
+                editTitle(event.getId(), "newTitle");
+        assertEquals(newEvent.getTitle(), "newTitle");
     }
 
     @Test
