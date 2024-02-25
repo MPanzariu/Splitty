@@ -43,7 +43,7 @@ class ExpenseServiceTest {
         when(mockExpenseRepository.findByEventId(anyString()))
             .thenReturn(expectedExpenses);
         List<Expense> actualExpenses =
-            mockExpenseService.getAllExpensesForEvent(eventId);
+            mockExpenseService.getAllExpenses(eventId);
         assertEquals(expectedExpenses, actualExpenses);
     }
 
@@ -61,7 +61,7 @@ class ExpenseServiceTest {
         when(mockExpenseRepository.findByEventId(anyString()))
             .thenReturn(expectedExpenses);
         List<Expense> actualExpenses = mockExpenseService
-            .getAllExpensesForEvent(eventId);
+            .getAllExpenses(eventId);
         int sum = 0;
         for (Expense actualExpense : actualExpenses)
             sum += actualExpense.getPriceInCents();
