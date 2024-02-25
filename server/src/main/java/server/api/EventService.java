@@ -1,8 +1,12 @@
 package server.api;
+import commons.Event;
+import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
+
 
 @Service
 public class EventService {
@@ -11,13 +15,41 @@ public class EventService {
 
     /**
      * constructor
-     * autowired - automatically inject instances of the parameters when creaitng an EventService
+     * autowired - automatically inject instances of the parameters when creating an EventService
      * @param eventRepository used for handling events
-     * @param participantRepository used for handling participants
+     * @param participantRepository used for
      */
     @Autowired
     public EventService(EventRepository eventRepository, ParticipantRepository participantRepository) {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
     }
+
+    /**
+     * edit the title of an event
+     * @param eventId the event whose title we want to edit
+     * @param newTitle the new title
+     * @return the new title of the event is saved in the database
+     */
+    public Event editTitle (String eventId, String newTitle){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        event.setTitle(newTitle);
+        return eventRepository.save(event);
+    }
+
+    /**
+     * add a new participant to an event, add a new participant to the repository
+     * @param participantName the name of the participant we want to add
+     * @param eventId the event to which we want to add a participant
+     */
+    public void addParticipantToEvent (String participantName, String eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        Participant participant = new Participant(participantName, event);
+        event.addParticipant(participant);
+        participantRepository.save(participant);
+        eventRepository.save(event);
+    }
+
 }
