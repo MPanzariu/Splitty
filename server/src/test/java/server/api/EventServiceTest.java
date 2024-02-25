@@ -2,6 +2,7 @@ package server.api;
 
 import commons.Event;
 import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,9 @@ public class EventServiceTest {
     @InjectMocks
     private EventService mockEventService;
 
+    /**
+     * tests if the title editing method works, on an existing event
+     */
     @Test
     public void editTitleExistingTest() {
         Event event = new Event("title", null);
@@ -38,6 +42,19 @@ public class EventServiceTest {
         assertEquals(newEvent.getTitle(), "newTitle");
     }
 
+    /**
+     * tests editing a title on an event which does not exist
+     */
+    @Test
+    public void editTitleNotExistingTest(){
+        Event event = new Event("title", null);
+        assertThrows(EntityNotFoundException.class, () ->
+            mockEventService.editTitle(event.getId(), "new title"));
+    }
+
+    /**
+     * tests whether adding a participant to an existing event works
+     */
     @Test
     public void addParticipantsTest(){
         Event event = new Event("test", null);
