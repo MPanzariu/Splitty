@@ -20,7 +20,7 @@ public class EventControllerTest {
     @BeforeEach
     void setup() {
         repository = new TestEventRepository();
-        controller = new EventController(repository);
+        controller = new EventController(null, repository);
     }
 
     @Test
