@@ -71,4 +71,21 @@ public class EventControllerTest {
         List<Event> retrievedEvents = controller.all().getBody();
         assertEquals(expectedEvents, retrievedEvents);
     }
+
+    @Test
+    void removeNonExistingEvent() {
+        Event event = new Event("Party");
+        controller.add(event);
+        String invitationCode = "Fake invitation code";
+        ResponseEntity<Event> response = controller.remove(invitationCode);
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void removeExistingEvent() {
+        Event event = new Event("Party");
+        Event persistedEvent = controller.add(event).getBody();
+        ResponseEntity<Event> response = controller.remove(persistedEvent.getId());
+        assertEquals(event, response.getBody());
+    }
 }

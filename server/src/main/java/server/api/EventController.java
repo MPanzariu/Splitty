@@ -56,4 +56,17 @@ public class EventController {
     ResponseEntity<List<Event>> all() {
         return ResponseEntity.ok(repository.findAll());
     }
+
+    /**
+     * Endpoint for removing an event from the database.
+     * @param id ID of the to be removed event.
+     * @return OK iff event was found in the database. Else a bad request.
+     */
+    @DeleteMapping("/remove/{id}")
+    ResponseEntity<Event> remove(@PathVariable String id) {
+        Optional<Event> event = repository.findById(id);
+        if(event.isEmpty())
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(event.get());
+    }
 }
