@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-
 public class StartupScreenCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -19,6 +18,35 @@ public class StartupScreenCtrl {
     private Label createEventFeedback;
     @FXML
     private Label joinEventFeedback;
+
+    /**
+     * Setter for eventTitleTextBox, it is used only for testing purposes
+     * @param eventTitleTextBox the value to set it to
+     */
+    public void setEventTitleTextBox(TextField eventTitleTextBox) {
+        this.eventTitleTextBox = eventTitleTextBox;
+    }
+    /**
+     * Setter for inviteCodeTextBox, it is used only for testing purposes
+     * @param inviteCodeTextBox the value to set it to
+     */
+    public void setInviteCodeTextBox(TextField inviteCodeTextBox) {
+        this.inviteCodeTextBox = inviteCodeTextBox;
+    }
+    /**
+     * Setter for createEventFeedback, it is used only for testing purposes
+     * @param createEventFeedback the value to set it to
+     */
+    public void setCreateEventFeedback(Label createEventFeedback) {
+        this.createEventFeedback = createEventFeedback;
+    }
+    /**
+     * Setter for joinEventFeedback, it is used only for testing purposes
+     * @param joinEventFeedback the value to set it to
+     */
+    public void setJoinEventFeedback(Label joinEventFeedback) {
+        this.joinEventFeedback = joinEventFeedback;
+    }
 
     /**
      * Constructor
@@ -35,17 +63,25 @@ public class StartupScreenCtrl {
      * Joins the event specified by the user in the text box
      */
     public void joinEvent(){
+        joinEventFeedback.setText("");
         String inviteCode = inviteCodeTextBox.getText();
+        String errorMsg = "Invalid invitation code!";
         if (inviteCode.length() != 6){
-            joinEventFeedback.setText("Invalid invite code!");
+            joinEventFeedback.setText(errorMsg);
+            return;
         }
-        Event event = server.getEvent(inviteCodeTextBox.getText());
-        mainCtrl.joinEvent(event);
+        try{
+            Event event = server.getEvent(inviteCodeTextBox.getText());
+            mainCtrl.joinEvent(event);
+        }catch (jakarta.ws.rs.BadRequestException exception){
+            joinEventFeedback.setText(errorMsg);
+        }
     }
     /**
      * Creates and joins the event specified by the user in the text box
      */
     public void createEvent(){
+        createEventFeedback.setText("");
         String title = eventTitleTextBox.getText();
         if (title.isEmpty()){
             createEventFeedback.setText("Please specify the title!");
