@@ -63,6 +63,7 @@ public class StartupScreenCtrl {
      * Joins the event specified by the user in the text box
      */
     public void joinEvent(){
+
         joinEventFeedback.setText("");
         String inviteCode = inviteCodeTextBox.getText();
         String errorMsg = "Invalid invitation code!";
@@ -73,7 +74,8 @@ public class StartupScreenCtrl {
         try{
             Event event = server.getEvent(inviteCodeTextBox.getText());
             mainCtrl.joinEvent(event);
-        }catch (jakarta.ws.rs.BadRequestException exception){
+            //Build fails when I use BadRequest exception
+        }catch (Exception exception){
             joinEventFeedback.setText(errorMsg);
         }
     }
