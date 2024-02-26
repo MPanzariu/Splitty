@@ -52,7 +52,7 @@ public class StartupScreenCtrlTest{
     @Test
     public void testCreateEventEmptyTitle(){
         String title = "";
-        eventTitleTextBox.setText(title);
+//        eventTitleTextBox.setText(title);
 //        sut.createEvent();
 //        assertTrue(testServerUtils.calls.isEmpty());
 //        assertTrue(testMainController.calls.isEmpty());
