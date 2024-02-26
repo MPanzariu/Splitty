@@ -49,14 +49,13 @@ public class StartupScreenCtrlTest{
         sut.setJoinEventFeedback(joinEventFeedback);
     }
 
-    @Test
+//    @Test
     public void testCreateEventEmptyTitle(){
 //        String title = "";
 //        eventTitleTextBox.setText(title);
 //        sut.createEvent();
 //        assertTrue(testServerUtils.calls.isEmpty());
 //        assertTrue(testMainController.calls.isEmpty());
-        assertTrue(true);
     }
 //
 //    @Test
