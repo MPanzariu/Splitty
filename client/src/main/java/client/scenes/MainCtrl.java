@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -45,5 +46,13 @@ public class MainCtrl {
         //primaryStage.setTitle("Quotes: Adding Quote");
         //primaryStage.setScene(add);
         //add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
+    }
+
+    /**
+     * When called the view changes to the event specified as input.
+     * @param event the event to join
+     */
+    public void joinEvent(Event event){
+        //TODO implement
     }
 }
