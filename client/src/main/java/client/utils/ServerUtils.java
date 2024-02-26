@@ -68,8 +68,9 @@ public class ServerUtils {
 	}
 
 	public Event getEvent(String inviteCode){
+		String path = "api/events/join/" + inviteCode;
 		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/join/" + inviteCode) //invite code is the ID
+				.target(serverURL).path(path) //invite code is the ID
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.get(Event.class);
@@ -78,7 +79,7 @@ public class ServerUtils {
 	public Event createEvent(String title){
 		Event event = new Event(title, new Date());
 		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/add")
+				.target(serverURL).path("api/events/add")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.post(Entity.entity(event, APPLICATION_JSON),Event.class);
