@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 
+import commons.Event;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -63,5 +65,22 @@ public class ServerUtils {
 				.request(APPLICATION_JSON) //
 				.accept(APPLICATION_JSON) //
 				.post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+	}
+
+	public Event getEvent(String inviteCode){
+		return ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/join/" + inviteCode) //invite code is the ID
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.get(Event.class);
+	}
+
+	public Event createEvent(String title){
+		Event event = new Event(title, new Date());
+		return ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/add")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.post(Entity.entity(event, APPLICATION_JSON),Event.class);
 	}
 }
