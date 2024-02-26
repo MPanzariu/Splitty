@@ -1,24 +1,24 @@
-//package client.scenes;
-//
-//import client.utils.ServerUtils;
-//import commons.Event;
-//import javafx.scene.control.Label;
-//import javafx.scene.control.TextField;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.testfx.framework.junit5.ApplicationExtension;
-//
-//import java.util.LinkedList;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//
-//@ExtendWith(ApplicationExtension.class)
-//public class StartupScreenCtrlTest{
+package client.scenes;
+
+import client.utils.ServerUtils;
+import commons.Event;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testfx.framework.junit5.ApplicationExtension;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(ApplicationExtension.class)
+public class StartupScreenCtrlTest{
 //
 //    private StartupScreenCtrl sut;
 //    private TestServerUtils testServerUtils;
@@ -125,4 +125,4 @@
 //            calls.add("join");
 //        }
 //    }
-//}
+}
