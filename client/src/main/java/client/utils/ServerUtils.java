@@ -88,7 +88,6 @@ public class ServerUtils {
 	 */
 	public Event createEvent(String title){
 		Event event = new Event(title, new Date());
-		System.out.println(event);
 		return ClientBuilder.newClient(new ClientConfig())
 				.target(serverURL).path("api/events/add")
 				.request(APPLICATION_JSON)
