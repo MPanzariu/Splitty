@@ -20,27 +20,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import javafx.scene.control.Label;
-
 public class MainCtrl {
 
     private Stage primaryStage;
 
     private StartupScreenCtrl startupScreenCtrl;
-    private Scene overview;
+    private Scene startupScene;
     private Scene add;
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview) {
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
-        this.overview = new Scene(overview.getValue());
+        this.startupScene = new Scene(overview.getValue());
         showOverview();
         primaryStage.show();
     }
 
     public void showOverview() {
         primaryStage.setTitle("Main Menu");
-        primaryStage.setScene(overview);
+        primaryStage.setScene(startupScene);
     }
 
     public void showAdd() {
@@ -56,5 +54,13 @@ public class MainCtrl {
     public void joinEvent(Event event){
         //TODO implement
         System.out.println("Joining event!" + event);
+    }
+
+    /**
+     * Gets startup screen
+     * @return the startup screen
+     */
+    public Scene getMainMenuScene(){
+        return startupScene;
     }
 }
