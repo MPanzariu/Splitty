@@ -55,10 +55,6 @@ public class MainCtrl {
      */
     public void joinEvent(Event event){
         //TODO implement
+        System.out.println("Joining event!" + event);
     }
-
-//    public void addVisitedEvent(Event event){
-//        Label label = new Label(event.getTitle());
-//        primaryStage.setScene(overview.);
-//    }
 }

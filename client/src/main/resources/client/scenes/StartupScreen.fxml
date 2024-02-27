@@ -45,11 +45,12 @@
             <Button layoutX="324.0" layoutY="127.0" mnemonicParsing="false" onAction="#createEvent" text="Create" />
             <Label layoutX="156.0" layoutY="93.0" text="Create new event" />
             <TextField fx:id="eventTitleTextBox" layoutX="156.0" layoutY="127.0" promptText="Title" />
-            <Button layoutX="324.0" layoutY="214.0" mnemonicParsing="false" onAction="#joinEvent" prefHeight="25.0" prefWidth="51.0" text="Join" />
+            <Button layoutX="324.0" layoutY="214.0" mnemonicParsing="false" onAction="#joinEventClicked" prefHeight="25.0" prefWidth="51.0" text="Join" />
             <Label layoutX="156.0" layoutY="180.0" text="Join event" />
             <TextField fx:id="inviteCodeTextBox" layoutX="156.0" layoutY="214.0" promptText="Invite Code" />
             <Label fx:id="createEventFeedback" layoutX="156.0" layoutY="158.0" />
             <Label fx:id="joinEventFeedback" layoutX="156.0" layoutY="246.0" />
+            <VBox fx:id="recentlyViewedEventsVBox" layoutX="33.0" layoutY="67.0" prefHeight="200.0" prefWidth="100.0" />
       </children>
     </AnchorPane>
   </children>

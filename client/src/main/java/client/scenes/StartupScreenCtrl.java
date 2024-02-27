@@ -3,9 +3,14 @@ package client.scenes;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
 
 public class StartupScreenCtrl {
     private final ServerUtils server;
@@ -18,6 +23,8 @@ public class StartupScreenCtrl {
     private Label createEventFeedback;
     @FXML
     private Label joinEventFeedback;
+    @FXML
+    private VBox recentlyViewedEventsVBox;
 
     /**
      * Setter for eventTitleTextBox, it is used only for testing purposes
@@ -62,7 +69,7 @@ public class StartupScreenCtrl {
     /**
      * Joins the event specified by the user in the text box
      */
-    public void joinEvent(){
+    public void joinEventClicked(){
         joinEventFeedback.setText("");
         String inviteCode = inviteCodeTextBox.getText();
         String errorMsg = "Invalid invitation code!";
@@ -72,12 +79,45 @@ public class StartupScreenCtrl {
         }
         try{
             Event event = server.getEvent(inviteCodeTextBox.getText());
-            mainCtrl.joinEvent(event);
+            joinEvent(event);
             //Build fails when I use BadRequest exception
         }catch (Exception exception){
             joinEventFeedback.setText(errorMsg);
         }
     }
+
+    public void joinEvent(Event event){
+        mainCtrl.joinEvent(event);
+        Label eventLabel = generateLabelForEvent(event);
+        recentlyViewedEventsVBox.getChildren().add(eventLabel);
+    }
+
+    public Label generateLabelForEvent(Event event){
+        String eventTitle = event.getTitle();
+        Label label = new Label();
+        label.setText(eventTitle);
+        label.setOnMouseClicked(
+                mouseEvent -> {
+                    joinEvent(event);
+                    removeFromVBox(label.idProperty());
+                    System.out.println("clicked!");
+                });
+        return label;
+    }
+
+    public void removeFromVBox(StringProperty id){
+        List<Node> allNodes = recentlyViewedEventsVBox.getChildren();
+        Node removeNode = null;
+        for (Node node : allNodes){
+            if (node.idProperty().equals(id)){
+                removeNode = node;
+            }
+        }
+        if (removeNode != null){
+            allNodes.remove(removeNode);
+        }
+    }
+
     /**
      * Creates and joins the event specified by the user in the text box
      */
@@ -89,6 +129,7 @@ public class StartupScreenCtrl {
             return;
         }
         Event event = server.createEvent(title);
+        System.out.println(event);
         mainCtrl.joinEvent(event);
     }
 }
