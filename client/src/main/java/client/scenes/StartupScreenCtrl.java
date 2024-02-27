@@ -107,7 +107,11 @@ public class StartupScreenCtrl {
             ImageView imageView = generateRemoveButton(eventLabel);
             HBox hbox = generateHBox(eventLabel, imageView);
             removeFromHistoryIfExists(event);
-            recentlyViewedEventsVBox.getChildren().addFirst(hbox);
+            List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
+            recentlyViewedEvents.addFirst(hbox);
+            if (recentlyViewedEventsVBox.getChildren().size() > 5){
+                recentlyViewedEvents.removeLast();
+            }
         }catch (FileNotFoundException e){
             System.out.println("File was not found!");
         }
