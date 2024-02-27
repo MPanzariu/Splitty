@@ -2,8 +2,10 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import commons.Event;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(ApplicationExtension.class)
+//@ExtendWith(ApplicationExtension.class)
 public class StartupScreenCtrlTest{
 
     private StartupScreenCtrl sut;
@@ -25,6 +27,14 @@ public class StartupScreenCtrlTest{
     private TextField inviteCodeTextBox;
     private Label createEventFeedback;
     private Label joinEventFeedback;
+
+    @BeforeAll
+    public static void init(){
+        Platform.startup(() ->
+        {
+            // This block will be executed on JavaFX Thread
+        });
+    }
 
     @BeforeEach
     public void setup() {
