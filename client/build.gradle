@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id("org.openjfx.javafxplugin") version "0.0.11"
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 application {
@@ -9,7 +9,7 @@ application {
 
 javafx {
     version = "21.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml']
 }
 
 java {
@@ -33,11 +33,11 @@ dependencies {
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
 
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
-	testImplementation 'org.testfx:testfx-junit5:4.0.18'
-	testImplementation 'org.testfx:testfx-core:4.0.18'
-	testImplementation 'org.openjfx:javafx-graphics:21.0.2'
-	testImplementation 'org.openjfx:javafx-controls:21.0.2'
+	implementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
+	implementation 'org.testfx:testfx-junit5:4.0.18'
+	implementation 'org.testfx:testfx-core:4.0.18'
+	implementation 'org.openjfx:javafx-graphics:21.0.2'
+	implementation 'org.openjfx:javafx-controls:21.0.2'
 
 
 }
