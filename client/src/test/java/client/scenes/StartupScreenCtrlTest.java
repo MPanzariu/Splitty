@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(ApplicationExtension.class)
+//@ExtendWith(ApplicationExtension.class)
 public class StartupScreenCtrlTest{
 
     private StartupScreenCtrl sut;
@@ -30,39 +30,38 @@ public class StartupScreenCtrlTest{
     private TextField inviteCodeTextBox;
     private Label createEventFeedback;
     private Label joinEventFeedback;
-/*
-    @BeforeAll
-    public static void init(){
-        Platform.startup(() ->
-        {
-            // This block will be executed on JavaFX Thread
-        });
-    }*/
 
-    @BeforeEach
-    public void setup() {
-        /*this.testServerUtils = new TestServerUtils();
-        this.testMainController =  new TestMainController();
-        sut = new StartupScreenCtrl(this.testServerUtils, this.testMainController);
-        eventTitleTextBox = new TextField();
-        inviteCodeTextBox = new TextField();
-        createEventFeedback = new Label();
-        joinEventFeedback = new Label();
-        sut.setEventTitleTextBox(eventTitleTextBox);
-        sut.setInviteCodeTextBox(inviteCodeTextBox);
-        sut.setCreateEventFeedback(createEventFeedback);
-        sut.setJoinEventFeedback(joinEventFeedback);*/
-    }
+//    @BeforeAll
+//    public static void init(){
+//        Platform.startup(() ->
+//        {
+//            // This block will be executed on JavaFX Thread
+//        });
+//    }
 
-    @Test
-    public void testCreateEventEmptyTitle(){
+//    @BeforeEach
+//    public void setup() {
+//        this.testServerUtils = new TestServerUtils();
+//        this.testMainController =  new TestMainController();
+//        sut = new StartupScreenCtrl(this.testServerUtils, this.testMainController);
+//        eventTitleTextBox = new TextField();
+//        inviteCodeTextBox = new TextField();
+//        createEventFeedback = new Label();
+//        joinEventFeedback = new Label();
+//        sut.setEventTitleTextBox(eventTitleTextBox);
+//        sut.setInviteCodeTextBox(inviteCodeTextBox);
+//        sut.setCreateEventFeedback(createEventFeedback);
+//        sut.setJoinEventFeedback(joinEventFeedback);
+//    }
+//    @Test
+//    public void testCreateEventEmptyTitle(){
 //        String title = "";
 //        eventTitleTextBox.setText(title);
 //        sut.createEvent();
 //        assertTrue(testServerUtils.calls.isEmpty());
 //        assertTrue(testMainController.calls.isEmpty());
 //        assertEquals("Please specify the title!",createEventFeedback.getText());
-    }
+//    }
 
 //    @Test
 //    public void testCreateEventSuccess(){
@@ -113,8 +112,7 @@ public class StartupScreenCtrlTest{
                 return new Event();
             }
             //invalid code
-            //throw new jakarta.ws.rs.BadRequestException();
-            return null;
+            throw new jakarta.ws.rs.BadRequestException();
         }
 
         @Override

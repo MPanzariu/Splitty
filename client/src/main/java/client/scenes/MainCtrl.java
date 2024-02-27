@@ -20,6 +20,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javafx.scene.control.Label;
 
 public class MainCtrl {
 
@@ -55,4 +56,9 @@ public class MainCtrl {
     public void joinEvent(Event event){
         //TODO implement
     }
+
+//    public void addVisitedEvent(Event event){
+//        Label label = new Label(event.getTitle());
+//        primaryStage.setScene(overview.);
+//    }
 }

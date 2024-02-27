@@ -63,7 +63,6 @@ public class StartupScreenCtrl {
      * Joins the event specified by the user in the text box
      */
     public void joinEvent(){
-
         joinEventFeedback.setText("");
         String inviteCode = inviteCodeTextBox.getText();
         String errorMsg = "Invalid invitation code!";
