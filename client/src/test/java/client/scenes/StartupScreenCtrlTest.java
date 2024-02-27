@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 //@ExtendWith(ApplicationExtension.class)
 public class StartupScreenCtrlTest{
@@ -110,7 +113,8 @@ public class StartupScreenCtrlTest{
                 return new Event();
             }
             //invalid code
-            throw new jakarta.ws.rs.BadRequestException();
+            //throw new jakarta.ws.rs.BadRequestException();
+            return null;
         }
 
         @Override
