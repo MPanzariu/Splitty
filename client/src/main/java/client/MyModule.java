@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.utils.ObservableResourceFactory;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -37,6 +38,8 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         Properties properties = loadProperties();
         Names.bindProperties(binder, properties);
+
+        binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddQuoteCtrl.class).in(Scopes.SINGLETON);
