@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
 import static javafx.geometry.Pos.CENTER_LEFT;
 public class StartupScreenCtrl {
@@ -30,6 +31,8 @@ public class StartupScreenCtrl {
     private Label joinEventFeedback;
     @FXML
     private VBox recentlyViewedEventsVBox;
+    private HashMap<Event, HBox> eventHBoxHashMap;
+    private HashMap<HBox, Event> hBoxEventHashMap;
     /**
      * Setter for eventTitleTextBox
      * @param eventTitleTextBox the value to set it to
@@ -76,6 +79,8 @@ public class StartupScreenCtrl {
     public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        eventHBoxHashMap = new HashMap<>();
+        hBoxEventHashMap = new HashMap<>();
     }
     /**
      * Joins the event specified by the user in the text box
@@ -109,7 +114,13 @@ public class StartupScreenCtrl {
             removeFromHistoryIfExists(event);
             List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
             recentlyViewedEvents.addFirst(hbox);
+            eventHBoxHashMap.put(event, hbox);
+            hBoxEventHashMap.put(hbox, event);
             if (recentlyViewedEventsVBox.getChildren().size() > 5){
+                HBox lastHBox = (HBox) recentlyViewedEvents.getLast();
+                Event removedEvent = hBoxEventHashMap.remove(lastHBox);
+                eventHBoxHashMap.remove(removedEvent);
+                hBoxEventHashMap.remove(lastHBox);
                 recentlyViewedEvents.removeLast();
             }
         }catch (FileNotFoundException e){
@@ -121,20 +132,11 @@ public class StartupScreenCtrl {
      * @param event the event to remove the history of
      */
     public void removeFromHistoryIfExists(Event event){
-        List<Node> nodes = recentlyViewedEventsVBox.getChildren();
-        List<HBox> hBoxes = nodes.stream()
-                .filter(x -> x.getClass().equals(HBox.class))
-                .map(x -> (HBox) x).toList();
-        for (HBox hbox : hBoxes){
-            //There is only 1 label in each hbox
-            Label label = hbox.getChildren()
-                    .stream()
-                    .filter(x -> x.getClass().equals(Label.class))
-                    .map(x -> (Label) x)
-                    .toList().get(0);
-            if (label.getText().equals(event.getTitle())){
-                removeFromVBox(hbox.idProperty());
-            }
+        if (eventHBoxHashMap.containsKey(event)){
+            HBox hBox = eventHBoxHashMap.get(event);
+            eventHBoxHashMap.remove(event);
+            hBoxEventHashMap.remove(hBox);
+            recentlyViewedEventsVBox.getChildren().remove(hBox);
         }
     }
 
@@ -146,7 +148,12 @@ public class StartupScreenCtrl {
     public Label generateLabelForEvent(Event event){
         String eventTitle = event.getTitle();
         Label label = new Label();
-        label.setText(eventTitle);
+        StringBuilder sb = new StringBuilder(eventTitle);
+        sb.append(" (");
+        sb.append(event.getId());
+        sb.append(")");
+        label.setText(sb.toString().toLowerCase());
+
         label.setOnMouseClicked(
                 mouseEvent -> {
                     joinEvent(event);
