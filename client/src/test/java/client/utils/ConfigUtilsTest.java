@@ -28,7 +28,7 @@ class ConfigUtilsTest {
     void loadValidPropertiesFromReader() {
         expectedProperties.put("key2", "value2");
         Reader validReader = new StringReader(versionString.concat("\nkey2=value2"));
-        boolean success = ConfigUtils.loadValidPropertiesFromReader(testProperties, validReader);
+        boolean success = ConfigUtils.loadPropertiesFromReader(testProperties, validReader);
         assertTrue(success);
         assertEquals(expectedProperties, testProperties);
     }
@@ -39,7 +39,7 @@ class ConfigUtilsTest {
     @Test
     void loadOutdatedPropertiesFromReader() {
         Reader outOfDateReader = new StringReader("no=versioning");
-        boolean success = ConfigUtils.loadValidPropertiesFromReader(testProperties, outOfDateReader);
+        boolean success = ConfigUtils.loadPropertiesFromReader(testProperties, outOfDateReader);
         assertFalse(success);
     }
 

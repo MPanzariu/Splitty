@@ -14,18 +14,31 @@ import java.util.Properties;
 public class Translation {
     private final ObservableResourceFactory resourceFactory;
     private Locale locale;
-    public static String LANGUAGE_PATH = "lang/";
-    public static String LANGUAGE_PREFIX = "lang_";
+    private static final String LANGUAGE_PATH = "lang/";
+    private static final String LANGUAGE_PREFIX = "lang_";
 
+    /***
+     * Constructor that takes the resourceFactory the Translation encapsulates
+     * @param resourceFactory - the ObservableResourceFactory to be used
+     */
     @Inject
     public Translation(ObservableResourceFactory resourceFactory) {
         this.resourceFactory = resourceFactory;
     }
 
+    /***
+     * Provides a binding for the translated value corresponding to a text key
+     * @param key - the text key (e.g. "startup.label.create")
+     * @return - a live-updating binding for the translated value
+     */
     public ObservableValue<String> getStringBinding(String key) {
         return resourceFactory.getStringBinding(key);
     }
 
+    /***
+     * Changes the language resources supplied to those from a corresponding language file
+     * @param locale - the Local corresponding to the language file to switch to
+     */
     public void changeLanguage(Locale locale) {
         String languageCode = locale.getLanguage();
         String fileName = LANGUAGE_PREFIX.concat(languageCode).concat(".properties");
@@ -54,6 +67,10 @@ public class Translation {
         this.locale = locale;
     }
 
+    /***
+     * Returns the Locale currently in use
+     * @return the Locale currently in use
+     */
     public Locale getLocale() {
         return locale;
     }
