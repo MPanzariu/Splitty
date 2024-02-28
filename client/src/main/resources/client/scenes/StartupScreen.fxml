@@ -48,9 +48,9 @@
             <Button layoutX="284.0" layoutY="181.0" mnemonicParsing="false" onAction="#joinEventClicked" prefHeight="25.0" prefWidth="51.0" text="Join" />
             <Label layoutX="116.0" layoutY="147.0" text="Join event" />
             <TextField fx:id="inviteCodeTextBox" layoutX="116.0" layoutY="181.0" promptText="Invite Code" />
-            <Label fx:id="createEventFeedback" layoutX="156.0" layoutY="158.0" />
-            <Label fx:id="joinEventFeedback" layoutX="156.0" layoutY="246.0" />
-            <VBox fx:id="recentlyViewedEventsVBox" layoutX="119.0" layoutY="225.0" prefHeight="136.0" prefWidth="214.0" />
+            <Label fx:id="createEventFeedback" layoutX="116.0" layoutY="129.0" />
+            <Label fx:id="joinEventFeedback" layoutX="116.0" layoutY="219.0" />
+            <VBox fx:id="recentlyViewedEventsVBox" layoutX="116.0" layoutY="249.0" prefHeight="136.0" prefWidth="214.0" />
       </children>
     </AnchorPane>
   </children>
