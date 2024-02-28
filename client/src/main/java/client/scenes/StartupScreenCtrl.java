@@ -152,6 +152,18 @@ public class StartupScreenCtrl {
                     joinEvent(event);
                     removeFromVBox(label.getParent().idProperty());
                 });
+        label.setOnMouseEntered(
+                mouseEvent -> {
+                    label.setUnderline(true);
+                    mainCtrl.getMainMenuScene().setCursor(Cursor.HAND);
+                }
+        );
+        label.setOnMouseExited(
+                mouseEvent -> {
+                    label.setUnderline(false);
+                    mainCtrl.getMainMenuScene().setCursor(Cursor.DEFAULT);
+                }
+        );
         return label;
     }
 
