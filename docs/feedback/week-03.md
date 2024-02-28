@@ -2,71 +2,64 @@
 
 Mark: Pass
 
-Feedback: You did have a chair and a minute taker.
-
+Feedback: You had a chair and a minute taker. Good job!
 
 #### Agenda 
 
-Mark: Good
+Mark: Sufficient
 
-Feedback: I would like you to look at the feedback provided between meetings and to try and improve upon it. Not using the agenda template provided on Brightspace is something that I did mention in the last feedback. Please use it next time!
+Feedback: The agenda was uploaded to the main branch only a few hours before the meeting. Next time try to upload it at least in the morning of the day of the meeting. Furthermore, you did not improve upon my points from last week. The bulletpoint formatting did not work with the markdown document and none of the points have a description providing some context.
 
-On the other hand, the agenda was uploaded on time (the day before) and you did improve on most of the points and now I believe that the agenda is much easier to read and understand. Well done on that!
+I liked the fact that you decided to let the TA speak at the beginning as my opinion is that I might provide you some information that would be helpful during the meeting. This way no repetition is needed.
 
-From next week I would also expect the meeting to contain a demo of the current state of the application. Adding a small round in which everyone talks about their tasks for the previous week and any difficulties that they have encountered would be advised. I would also recommend adding the TA word at the beginning as it might provide context for some of your topics.
-
+From next week I would also expect the meeting to contain a demo of the current state of the application. Adding a small round in which everyone talks about their tasks for the previous week and any difficulties that they have encountered would be also advised.
 
 #### Performance of the *Previous* Minute Taker
 
-Mark: Good
+Mark: Very Good
 
-Feedback: The minutes file has been uploaded to the main branch of your repository making it easier for everyone to find. In the future try to upload the notes as soon as possible as they might contain very useful information for the team members. For the next weeks, I would suggest using the agenda template and writing the minutes under each of the covered topics. This way you will have a standard template for both documents and it is also easier to understand the context of the notes. Any additional information that you might have (eg. the task distribution) should be added at the end of the document.
+Feedback: You did a great job at uploading the meeting notes on the main branch soon after the meeting. As the noted information is crucial for everyone this helps a lot with knowing who is working on what and what has been discussed during the meeting. The usage of the agenda template as the backbone of the notes is also great as it provides a clear structure and context for the notes. I would suggest that if you have any additional information you should add it at the end of the document.
 
-The amount of notes taken does cover all the discussion topics of the meeting, but I believe that there are some points of improvement. For example, the notes taken for the template project section state "talking about everyone's first insights" which is not very clear. What are those insights? Did anyone encounter problems? What should you look for in the future?
+The amount of notes is great and they cover all the discussion topics of the meeting. Some points of improvement would be to try to avoid vague statements like "divide backlog". For that specific example, you could try to note the strategy that is going to be used. As a note-taker, you are also a member of the meeting and are allowed, even encouraged, to ask questions if something is not clear.
 
-Furthermore, while you did note the assignment of coding tasks for each team member (within the established sub-groups), you did not do that for non-coding related tasks such as the Code of Conduct. It is only stated that "we spit subsections amongst ourselves and ...", which again is not very clear. I do see that you've made a reference to a document where this supposed distribution is more detailed, but it would be great if everyone could find the entire task distribution in one place.
-
-Other great additions were the extra info regarding the merge requests, code reviews, deadlines and such. It would be great if in the future you could find a more structured way of presenting this information alongside a more holistic view of the task assignment.
-
+I also don't see any notes regarding the task distribution. I would suggest that you add this information at the end of the document or under any topic which requires it. However, having a complete view at the end of the document would be very useful for team members to see what everyone is up to. Try to be more specific in the future and avoid statements such as "almost everyone ... (5/6)". Despite this, your notes detail tasks that are realistic and a good fit for the situation in which the team was at that point. They are not overly optimistic, expecting everyone to be a Spring master by the next week, while also setting some expectations.
 
 #### Chair performance
 
-Mark: Good
+Mark: Very Good
 
-Feedback: The chair was very in control during the meeting and followed the agenda very well. I liked the fact that when some team members brought up problems regarding their project, you noticed that fixing the problem was not something that should be done during the meeting and delayed it until after finishing all the proposed topics. You used a great approach to figure out what would everyone want to work on by taking turns. This is a great way to make everyone feel included in the discussion and to make sure that everyone has a say in the project.
+Feedback: I liked that you started with a summary of what was going to be discussed during the meeting. This is a great way to bring everyone up to speed and to check for any last-minute additions. You also did a great job at adapting to my request to discuss everyone's tasks for this week and their performance. I think you've handled the change really well and managed to stick to the rest of the agenda while doing so.
 
-I did notice that more than once you would let people discuss the topic at hand but if it seemed like the initial question would not be answered fully you would press on to make sure that everything was clear.
+You involved everyone in the discussions and made sure that you took their opinions into consideration while guiding the discussion on every topic. You also took notice of people raising their hands to speak and adapted the discussion order based on that. When the discussion deviated from the bullet point at hand you also tried to steer the discussion back while reminding everyone that the current topic is not done yet and that whatever they would like to discuss is scheduled for later in the meeting.
 
-At the end, you summarized what everyone is going to work on this upcoming week, which is very useful for everyone partaking in the meeting. One point of improvement would be to make sure that the discussion does not stop. If this is the case it mostly means that you can move on to another topic, but first check with everyone. As an example, the meeting became very quiet while you were moving the Code of Conduct from Google Docs to Overleaf.
+Another observation that I made is that you prompted people to share their findings (from the proposed research on JavaFX and Spring) with others such that the entire team could gather more knowledge. At the end, you would also try to summarize everything, which is a great approach. You were also exactly on time.
+
+The only point of improvement would be that some people were a bit more quiet than others and I believe that you could've done a bit more to encourage them to speak up. Make sure that they are comfortable with sharing their ideas, but sometimes asking questions could be a useful strategy to improve the distribution during the meeting.
 
 #### Attitude & Relation
 
 Mark: Very Good
 
-Feedback: You've managed to take ownership of the meeting showing. It was amazing to see everyone jump to help people who were encountering problems with the project. It shows that you have developed a great team spirit and even outside of those meetings you are willing to help each other if need be. This could have also seen in the friendly attitude that you had, promoting the apparition of small jokes here and there. It is great to see this kind of interaction between team members.
+Feedback: You took ownership of the meeting and were in full control for the entirety of it. The atmosphere was great and I even heard about certain cases in which people helped each other solve their issues. This shows that you have developed a great teamwork spirit and that you are willing to work together to complete this project.
 
-I liked that when distributing tasks you used other people's expertise in the domain (APIs, front-end, etc.) to estimate the difficulty of the task to divide them more fairly. This sharing of information between team members will help you in the long run.
+During this meeting, there was a slight imbalance in the discussion, with some people not speaking that much. This is something that I believe you as a team should try to work on. Other than that, I observed that people were very willing to share their findings and discuss their ideas. You've had some great discussions that built on top of each other's ideas and that is a great sign of a team that is working well together.
 
-The distribution during the meeting was a bit uneven, with some people speaking more than others. It is not of great concern, but I would encourage you to be on the lookout for such situations as they can quickly escalate. In such a small meeting everyone should try to involve others in the discussion as they can bring valuable information to the table.
+I liked the feedback round at the end of the meeting and the fact that you are proud of the progress that you've made so far is a good sign.
 
 #### Potentially Shippable Product
 
 Mark: Good
 
-Feedback: You did not present the current state of the application through a demo (or some other way like showing GUI pages or whatever). From what I've gathered during your meeting you are doing pretty well on the back-end side of things, with some initial progress on the front-end and the communication. You've mentioned that you do want to finish the majority of the basic requirements this upcoming week, which is a great goal to have but it is also a very ambitious one.
+Feedback: You did not show me a demo of the application so it is somewhat hard for me to gauge how you are doing, but from what I've gotten during the meeting you are making great progress. You've managed to test a lot of the application (also a great way to obtain lines of code) which will prove very useful later on. I've understood that you also implemented the base classes and some back-end APIs.
 
-Currently, your project seems to be progressing at a decent pace that would allow you to deliver a working application by the end of the course. It is great that you've created the back-end controllers and that you are going to work on the services. Make sure to also take care of the databases.
+Using Postman to test your APIs and classes is also a good approach that will help you progress with the project and I believe that reaching a point in which you are able to do that is a good sign.
 
-I would also advise you to prioritize the addition of the checkstyle as the more unchecked code you add the harder it will be to fix it once the checkstyle goes online.
+Having people in the team who are also looking at how the front end could be designed to allow for the language change is great, as that could cause problems in the future if you do not take it into consideration from the start. Overall, I believe you've made some great progress since last week towards your goals and if you continue like this you will have a working application by the end of the course.
 
 #### Work Contribution/Distribution in the Team
 
-Mark: Very Good
+Mark: Excellent
 
-Feedback: Your division into sub-groups seems to have allowed you to work a bit more efficiently towards your goals. I see that everyone was responsible for some part of the application and did manage to complete their tasks, though there were some concerns about the knockout criteria not being met. If any of you are worried about this I propose that you discuss between yourselves how someone can take extra work (maybe even put it in the code of conduct).
+Feedback: Based on the discussion of what everyone had done during the previous week it seems that you have a roughly equal work distribution. this being the first week when people are learning about the framework and the project, discrepancies are bout to appear, but I believe that you are on the right track. Everyone within your team is eager to work and there does not seem to be anyone who is not interested in the success of the project.
 
-You did have a great discussion about the upcoming sprint in which you divided the tasks. The distribution seems to be fair and everyone seems to have been assigned a task with which they are comfortable. I also like the fact that people want to take responsibility for certain parts of the application showcasing commitment, but be careful to also include others in the decision-making process.
-
-Regarding the discussion that arose about in which way you should divide the task, I would encourage every one of you to pick a user story and implement it completely (front-end and back-end). This will provide everyone with a great understanding of how the application works while also somewhat ensuring that everyone is doing their fair share of work. It would also be easier to keep track of the progress of the application as each sprint you could see how many user stories were completed.
-
-I would also encourage everyone to use the time estimate (\spent) features on GitLab such that you can keep track of your workloads. This will also help you in the future when you will have to estimate the time needed for a certain task. Furthermore, try to use GitLab issues to distribute tasks amongst yourselves.
+As stated during the meeting, I would encourage you to use the time estimate features on GitLab to track your work contributions as having every member able to estimate their workload was very useful during the meeting. You are also doing great at using the GitLab issues to track your progress and I would encourage you to continue doing that.
