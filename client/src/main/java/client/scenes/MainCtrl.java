@@ -15,8 +15,6 @@
  */
 package client.scenes;
 
-import client.utils.ObservableResourceFactory;
-import com.google.inject.Inject;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -25,10 +23,6 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
-
-    @Inject
-    ObservableResourceFactory resourceFactory;
-
     private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
 

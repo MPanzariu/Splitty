@@ -18,7 +18,6 @@ package client.scenes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import client.utils.ObservableResourceFactory;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
@@ -37,9 +36,6 @@ public class QuoteOverviewCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     private ObservableList<Quote> data;
-
-    @Inject
-    ObservableResourceFactory resourceFactory;
 
     @FXML
     private TableView<Quote> table;
