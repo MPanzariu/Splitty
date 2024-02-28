@@ -15,22 +15,34 @@
  */
 package client.scenes;
 
+import client.utils.Translation;
+import com.google.inject.Inject;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+
+import javax.inject.Named;
+import java.util.Locale;
 
 public class MainCtrl {
 
     private Stage primaryStage;
     private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
+    @Inject
+    Translation translation;
+    @Inject
+    @Named("client.language")
+    String language;
 
     private AddQuoteCtrl addCtrl;
     private Scene add;
 
     public void initialize(Stage primaryStage, Pair<QuoteOverviewCtrl, Parent> overview,
             Pair<AddQuoteCtrl, Parent> add) {
+        translation.changeLanguage(Locale.forLanguageTag(language));
+
         this.primaryStage = primaryStage;
         this.overviewCtrl = overview.getKey();
         this.overview = new Scene(overview.getValue());

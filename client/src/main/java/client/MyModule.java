@@ -31,7 +31,7 @@ import java.util.Properties;
 public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
-        Properties properties = ConfigUtils.loadProperties();
+        Properties properties = ConfigUtils.easyLoadProperties();
         Names.bindProperties(binder, properties);
 
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
