@@ -16,7 +16,7 @@ public class ConfigUtils {
      * Full method for loading properties from the config file, or generating a default one
      * @return all properties found in the config file
      */
-    public static Properties easyLoadProperties(){
+    public Properties easyLoadProperties(){
         Properties properties = new Properties();
         boolean validConfigLoaded;
 
@@ -50,7 +50,7 @@ public class ConfigUtils {
      * @return true if the file was found and is of the current version
      * false if either condition is not met
      */
-    public static boolean loadPropertiesFromReader(Properties properties, Reader propertyReader){
+    public boolean loadPropertiesFromReader(Properties properties, Reader propertyReader){
         try {
             properties.load(propertyReader);
         } catch (IOException e) {
@@ -65,7 +65,7 @@ public class ConfigUtils {
      * Returns a Properties object with all default values
      * @return a new, up-to-date and valid Properties object with default values
      */
-    public static Properties getDefault(){
+    public Properties getDefault(){
         Properties properties = new Properties();
         properties.setProperty("config.version", String.valueOf(CONFIG_VERSION));
         properties.setProperty("connection.URL", DEFAULT_PROPS_SERVER_URL);
