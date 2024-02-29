@@ -75,6 +75,16 @@ public class EventScreenCtrl implements Initializable{
         System.out.println(event.toString());
     }
 
+    public void editCurrentParticipants(){
+        //TO DO, implement UI for editing exisiting participants
+        System.out.println(event.toString());
+    }
+
+    public void addParticipants(){
+        //TO DO, implement UI for adding participants
+        System.out.println(event.toString());
+    }
+
     public void setEvent(Event event) {
         this.event = event;
         eventNameLabel.setText(event.getTitle());
@@ -94,5 +104,5 @@ public class EventScreenCtrl implements Initializable{
         else participantsLabel.setText(participantsText);
     }
 
-
+    
 }

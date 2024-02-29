@@ -26,7 +26,7 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <Button fx:id="editParticipant" layoutX="302.0" layoutY="117.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="29.0" />
-      <Button fx:id="addParticipant" layoutX="345.0" layoutY="117.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="29.0" />
+      <Button fx:id="editParticipant" layoutX="302.0" layoutY="117.0" mnemonicParsing="false" onAction="#editCurrentParticipants" prefHeight="25.0" prefWidth="29.0" />
+      <Button fx:id="addParticipant" layoutX="345.0" layoutY="117.0" mnemonicParsing="false" onAction="#addParticipants" prefHeight="25.0" prefWidth="29.0" />
    </children>
 </AnchorPane>
