@@ -3,25 +3,43 @@ package server.api;
 import commons.Event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
 
-    EventRepository repository;
+    @Mock
+    EventService eventService;
+    @InjectMocks
     EventController controller;
+    Answer<?> stubCreate;
 
     @BeforeEach
     void setup() {
-        repository = new TestEventRepository();
-        EventService eventService = new EventService(repository, null);
-        controller = new EventController(eventService, repository);
+        EventRepository repository = new TestEventRepository();
+        controller.setRepository(repository);
+
+        stubCreate = (Answer<Event>) invocation -> {
+            Date currentDate = new Date();
+            Event event = new Event(invocation.getArgument(0), currentDate);
+            repository.save(event);
+            return event;
+        };
     }
 
     @Test
@@ -38,6 +56,7 @@ public class EventControllerTest {
 
     @Test
     void addValidEvent() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         String title = "Party";
         ResponseEntity<Event> response = controller.add(title);
         assertNotNull(response.getBody());
@@ -53,6 +72,7 @@ public class EventControllerTest {
 
     @Test
     void joinExistingEvent() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event persistedEvent = controller.add("Party").getBody();
         assertNotNull(persistedEvent);
         ResponseEntity<Event> response = controller.join(persistedEvent.getId());
@@ -64,6 +84,7 @@ public class EventControllerTest {
 
     @Test
     void getMultipleEvents() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event expectedEvent1 = controller.add("Party").getBody();
         Event expectedEvent2 = controller.add("Holiday").getBody();
         assertNotNull(expectedEvent1);
@@ -75,6 +96,7 @@ public class EventControllerTest {
 
     @Test
     void removeNonExistingEvent() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         controller.add("Party");
         String invitationCode = "Fake invitation code";
         ResponseEntity<Event> response = controller.remove(invitationCode);
@@ -83,6 +105,7 @@ public class EventControllerTest {
 
     @Test
     void removeExistingEvent() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event persistedEvent = controller.add("Party").getBody();
         assertNotNull(persistedEvent);
         ResponseEntity<Event> response = controller.remove(persistedEvent.getId());
@@ -91,6 +114,7 @@ public class EventControllerTest {
 
     @Test
     void orderUnorderedListByTitle() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event persistedEvent1 = controller.add("B").getBody();
         Event persistedEvent2 = controller.add("A").getBody();
         ResponseEntity<List<Event>> response = controller.orderByTitle();
@@ -102,6 +126,7 @@ public class EventControllerTest {
 
     @Test
     void orderUnorderedListByCreationDate() {
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event persistedEvent1 = controller.add("First").getBody();
         Event persistedEvent2 = controller.add("Second").getBody();
         assertNotNull(persistedEvent1);

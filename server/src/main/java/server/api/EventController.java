@@ -14,7 +14,7 @@ import java.util.Optional;
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
-    private final EventRepository repository;
+    private EventRepository repository;
     /**
      * Constructor of EventController.
      * @param eventService the EventService used for backend handling of events
@@ -121,5 +121,13 @@ public class EventController {
         List<Event> events = all().getBody();
         events.sort(Comparator.comparing(Event::getCreationDate));
         return ResponseEntity.ok(events);
+    }
+
+    /***
+     * For the purpose of placing a TestEventRepository in the tests
+     * @param repository - the TestEventRepository
+     */
+    public void setRepository(EventRepository repository) {
+        this.repository = repository;
     }
 }
