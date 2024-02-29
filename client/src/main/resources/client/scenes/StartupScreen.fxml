@@ -42,11 +42,11 @@
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="342.0" prefWidth="555.0" VBox.vgrow="ALWAYS">
       <children>
-            <Button layoutX="284.0" layoutY="94.0" mnemonicParsing="false" onAction="#createEvent" text="Create" />
-            <Label layoutX="116.0" layoutY="60.0" text="Create new event" />
+            <Button fx:id="createEventButton" layoutX="284.0" layoutY="94.0" mnemonicParsing="false" onAction="#createEvent" text="Create" />
+            <Label fx:id="createEventLabel" layoutX="116.0" layoutY="60.0" text="Create new event" />
             <TextField fx:id="eventTitleTextBox" layoutX="116.0" layoutY="94.0" promptText="Title" />
-            <Button layoutX="284.0" layoutY="181.0" mnemonicParsing="false" onAction="#joinEventClicked" prefHeight="25.0" prefWidth="51.0" text="Join" />
-            <Label layoutX="116.0" layoutY="147.0" text="Join event" />
+            <Button fx:id="joinEventButton" layoutX="284.0" layoutY="181.0" mnemonicParsing="false" onAction="#joinEventClicked" prefHeight="25.0" prefWidth="51.0" text="Join" />
+            <Label fx:id="joinEventLabel" layoutX="116.0" layoutY="147.0" text="Join event" />
             <TextField fx:id="inviteCodeTextBox" layoutX="116.0" layoutY="181.0" promptText="Invite Code" />
             <Label fx:id="createEventFeedback" layoutX="116.0" layoutY="129.0" />
             <Label fx:id="joinEventFeedback" layoutX="116.0" layoutY="219.0" />

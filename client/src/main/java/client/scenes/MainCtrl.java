@@ -33,6 +33,7 @@ public class MainCtrl {
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
+        this.startupScreenCtrl.bindFields();
         showOverview();
         primaryStage.show();
     }

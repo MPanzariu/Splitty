@@ -1,18 +1,22 @@
 package client.scenes;
 
 import client.utils.ServerUtils;
+import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import javax.sql.rowset.spi.TransactionalWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -31,8 +35,19 @@ public class StartupScreenCtrl {
     private Label joinEventFeedback;
     @FXML
     private VBox recentlyViewedEventsVBox;
+    @FXML
+    private Button joinEventButton;
+    @FXML
+    private Button createEventButton;
+    @FXML
+    private Label createEventLabel;
+    @FXML
+    private Label joinEventLabel;
+
     private HashMap<Event, HBox> eventHBoxHashMap;
     private HashMap<HBox, Event> hBoxEventHashMap;
+
+    private Translation translation;
     /**
      * Setter for eventTitleTextBox
      * @param eventTitleTextBox the value to set it to
@@ -76,21 +91,36 @@ public class StartupScreenCtrl {
      * @param mainCtrl the MainCtrl instance
      */
     @Inject
-    public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.translation = translation;
         eventHBoxHashMap = new HashMap<>();
         hBoxEventHashMap = new HashMap<>();
     }
+
+    /**
+     * Binds the fields to their matching binding
+     */
+    public void bindFields(){
+        eventTitleTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventTitle"));
+        inviteCodeTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventCode"));
+        joinEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.JoinEvent"));
+        createEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.CreateEvent"));
+        joinEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.JoinEvent"));
+        createEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.CreateEvent"));
+        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
+        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
+    }
+
     /**
      * Joins the event specified by the user in the text box
      */
     public void joinEventClicked(){
-        joinEventFeedback.setText("");
+        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
         String inviteCode = inviteCodeTextBox.getText();
-        String errorMsg = "Invalid invitation code!";
         if (inviteCode.length() != 6){
-            joinEventFeedback.setText(errorMsg);
+            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
             return;
         }
         try{
@@ -98,9 +128,10 @@ public class StartupScreenCtrl {
             joinEvent(event);
             //Build fails when I use BadRequest exception
         }catch (Exception exception){
-            joinEventFeedback.setText(errorMsg);
+            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
         }
     }
+
     /**
      * Joins the given event
      * @param event the event to join
@@ -158,6 +189,7 @@ public class StartupScreenCtrl {
                 mouseEvent -> {
                     joinEvent(event);
                     removeFromVBox(label.getParent().idProperty());
+                    joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
                 });
         label.setOnMouseEntered(
                 mouseEvent -> {
@@ -239,10 +271,10 @@ public class StartupScreenCtrl {
      * Creates and joins the event specified by the user in the text box
      */
     public void createEvent(){
-        createEventFeedback.setText("");
+        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
         String title = eventTitleTextBox.getText();
         if (title.isEmpty()){
-            createEventFeedback.setText("Please specify the title!");
+            createEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.UnspecifiedTitle"));
             return;
         }
         Event event = server.createEvent(title);
