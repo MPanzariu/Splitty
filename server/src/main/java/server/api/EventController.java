@@ -71,7 +71,7 @@ public class EventController {
      * @param id ID of the event
      * @return ResponseEntity with the event iff the event can be found. Else return a bad request.
      */
-    @GetMapping("/join/{id}")
+    @GetMapping("/{id}")
     ResponseEntity<Event> join(@PathVariable String id) {
         Optional<Event> event = repository.findById(id);
         if(event.isEmpty())

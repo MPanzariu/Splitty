@@ -16,7 +16,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javax.sql.rowset.spi.TransactionalWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -89,6 +88,7 @@ public class StartupScreenCtrl {
      * Constructor
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
+     * @param translation the Translation to use
      */
     @Inject
     public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
@@ -183,7 +183,7 @@ public class StartupScreenCtrl {
         sb.append(" (");
         sb.append(event.getId());
         sb.append(")");
-        label.setText(sb.toString().toLowerCase());
+        label.setText(sb.toString());
 
         label.setOnMouseClicked(
                 mouseEvent -> {
@@ -227,7 +227,7 @@ public class StartupScreenCtrl {
      */
     public ImageView generateRemoveButton(Label label) throws FileNotFoundException {
         FileInputStream input = null;
-        input = new FileInputStream("src/main/resources/images/x_remove.png");
+        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         int imgSize = 15;
