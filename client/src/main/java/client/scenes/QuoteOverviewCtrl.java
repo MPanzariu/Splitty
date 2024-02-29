@@ -18,6 +18,7 @@ package client.scenes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import client.utils.Translation;
 import com.google.inject.Inject;
 
 import client.utils.ServerUtils;
@@ -36,6 +37,8 @@ public class QuoteOverviewCtrl implements Initializable {
     private final MainCtrl mainCtrl;
 
     private ObservableList<Quote> data;
+    @Inject
+    Translation translation;
 
     @FXML
     private TableView<Quote> table;
@@ -57,6 +60,8 @@ public class QuoteOverviewCtrl implements Initializable {
         colFirstName.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().person.firstName));
         colLastName.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().person.lastName));
         colQuote.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().quote));
+
+        colFirstName.textProperty().bind(translation.getStringBinding("example.name"));
     }
 
     public void addQuote() {

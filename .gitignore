@@ -40,3 +40,4 @@ out/
 ### VS Code ###
 .vscode/
 /splitty.properties
+/client/splitty.properties
