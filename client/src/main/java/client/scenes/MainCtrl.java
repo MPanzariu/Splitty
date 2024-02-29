@@ -25,9 +25,6 @@ public class MainCtrl {
     @Inject
     @Named("client.language")
     String language;
-
-
-
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview) {
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
