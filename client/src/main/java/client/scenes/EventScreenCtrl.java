@@ -4,7 +4,9 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -26,6 +28,8 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button addExpense;
     @FXML
+    private Button allExpensesButton;
+    @FXML
     private Label eventNameLabel;
     @FXML
     private Label participantsLabel;
@@ -41,6 +45,8 @@ public class EventScreenCtrl implements Initializable{
     private ComboBox<String> cBoxParticipantExpenses;
     @FXML
     private ListView<String> listViewExpensesParticipants;
+    @FXML
+    private ListView<String> expensesLogListView;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -51,6 +57,7 @@ public class EventScreenCtrl implements Initializable{
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.event = null;
     }
 
     @Override
@@ -59,6 +66,7 @@ public class EventScreenCtrl implements Initializable{
         participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
+        allExpensesButton.textProperty().bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
@@ -129,6 +137,19 @@ public class EventScreenCtrl implements Initializable{
             Participant current = participantIterator.next();
             cBoxParticipantExpenses.getItems().add(current.getName());
             listViewExpensesParticipants.getItems().add(current.getName());
+        }
+    }
+    public void showAllExpensesSettled(ActionEvent actionEvent) {
+        expensesLogListView.getItems().clear();
+        List<Expense> settledExpenses = event.getSettledExpenses();
+        for(int i = 0; i < settledExpenses.size(); i++){
+            String log = "";
+            log+=settledExpenses.get(i).getOwedTo().getName();
+            log+= " paid ";
+            log+=settledExpenses.get(i).getPriceInCents();
+            log+= " for ";
+            log+=settledExpenses.get(i).getName();
+            expensesLogListView.getItems().add(log);
         }
     }
 }

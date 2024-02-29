@@ -7,9 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
@@ -22,6 +20,12 @@ public class Event{
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Expense> expenses;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Expense> settledExpenses;
+
+    public List<Expense> getSettledExpenses() {
+        return settledExpenses;
+    }
 
     @SuppressWarnings("unused")
     public Event() {}
@@ -32,6 +36,7 @@ public class Event{
         this.expenses = new HashSet<>();
         this.id = generateId();
         this.creationDate = creationDate;
+        this.settledExpenses = new ArrayList<>();
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
