@@ -1,7 +1,6 @@
 package server.api;
 import commons.Event;
 import org.springframework.beans.factory.annotation.Autowired;
-import commons.Expense;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +17,8 @@ public class EventController {
     private final EventRepository repository;
     /**
      * Constructor of EventController.
+     * @param eventService the EventService used for backend handling of events
+     * @param repository the EventRepository storing Events
      */
     @Autowired
     public EventController(EventService eventService, EventRepository repository) {
@@ -46,21 +47,23 @@ public class EventController {
      */
     @PostMapping("/{eventId}")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
-    String participantName) {
+        String participantName) {
         eventService.addParticipantToEvent(participantName, eventId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
      * Endpoint for adding an event. Title needs to be a valid, and any other field gets ignored.
-     * @param event Event that is to be added to the database.
+     * @param eventName - the name of the Event to be created
      * @return The added event iff the title is valid. Else return a bad request.
      */
-    @PostMapping("/add")
-    ResponseEntity<Event> add(@RequestBody Event event) {
-        if(event.getTitle() == null || event.getTitle().isEmpty())
+    @PostMapping("/")
+    ResponseEntity<Event> add(@RequestBody String eventName) {
+        if(eventName==null || eventName.isEmpty()){
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(repository.save(event));
+        }
+        Event createdEvent = eventService.createEvent(eventName);
+        return ResponseEntity.ok(createdEvent);
     }
 
     /**
