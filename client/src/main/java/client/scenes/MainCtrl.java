@@ -16,21 +16,26 @@ public class MainCtrl {
     private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
     private StartupScreenCtrl startupScreenCtrl;
+    private EventScreenCtrl eventScreenCtrl;
     private Scene startupScene;
     private Scene add;
     private AddQuoteCtrl addCtrl;
+    private Scene eventScene;
 
     @Inject
     Translation translation;
     @Inject
     @Named("client.language")
     String language;
-    public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview) {
+
+    public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview, Pair<EventScreenCtrl, Parent> eventUI) {
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.startupScreenCtrl.bindFields();
+        this.eventScene = new Scene(eventUI.getValue());
+        this.eventScreenCtrl = eventUI.getKey();
         showOverview();
         primaryStage.show();
     }
@@ -52,7 +57,9 @@ public class MainCtrl {
      */
     public void joinEvent(Event event){
         //TODO implement
-        System.out.println("Joining event!" + event);
+        primaryStage.setScene(eventScene);
+        eventScreenCtrl.setEvent(event);
+        eventScreenCtrl.setParticipants(event);
     }
 
     /**
