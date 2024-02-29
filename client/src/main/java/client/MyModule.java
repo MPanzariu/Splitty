@@ -15,6 +15,8 @@
  */
 package client;
 
+import client.utils.ConfigUtils;
+import client.utils.ObservableResourceFactory;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -24,41 +26,18 @@ import client.scenes.MainCtrl;
 import client.scenes.QuoteOverviewCtrl;
 import com.google.inject.name.Names;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Properties;
 
 public class MyModule implements Module {
-    private static final String CONFIG_NAME = "splitty.properties";
-    private static final String DEFAULT_PROPS_SERVER_URL = "http://localhost:8080/";
-
     @Override
     public void configure(Binder binder) {
-        Properties properties = loadProperties();
+        Properties properties = ConfigUtils.easyLoadProperties();
         Names.bindProperties(binder, properties);
+
+        binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddQuoteCtrl.class).in(Scopes.SINGLETON);
         binder.bind(QuoteOverviewCtrl.class).in(Scopes.SINGLETON);
-    }
-
-    private Properties loadProperties(){
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(CONFIG_NAME));
-        } catch (IOException ex) {
-            loadDefaults(properties);
-        }
-        return properties;
-    }
-
-    private void loadDefaults(Properties properties){
-        properties.setProperty("serverURL", DEFAULT_PROPS_SERVER_URL);
-        try {
-            properties.store(new FileWriter(CONFIG_NAME), null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

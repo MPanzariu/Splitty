@@ -38,7 +38,7 @@ import javax.inject.Named;
 
 public class ServerUtils {
 
-	@Inject @Named("serverURL")
+	@Inject @Named("connection.URL")
 	private String serverURL;
 
 	public void getQuotesTheHardWay() throws IOException, URISyntaxException {
