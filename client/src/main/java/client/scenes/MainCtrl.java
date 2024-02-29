@@ -41,7 +41,6 @@ public class MainCtrl {
     String language;
 
     private AddQuoteCtrl addCtrl;
-    private Scene add;
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview) {
         translation.changeLanguage(Locale.forLanguageTag(language));
