@@ -8,7 +8,9 @@ import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -22,15 +24,23 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button sendInvites;
     @FXML
+    private Button addExpense;
+    @FXML
     private Label eventNameLabel;
     @FXML
     private Label participantsLabel;
     @FXML
     private Label participantsName;
     @FXML
+    private Label expenseLabel;
+    @FXML
     private Button editParticipant;
     @FXML
     private Button addParticipant;
+    @FXML
+    private ComboBox<String> cBoxParticipantExpenses;
+    @FXML
+    private ListView<String> listViewExpensesParticipants;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -47,6 +57,8 @@ public class EventScreenCtrl implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         sendInvites.textProperty().bind(translation.getStringBinding("Event.Button.SendInvites"));
         participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
+        expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
+        addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
@@ -85,6 +97,11 @@ public class EventScreenCtrl implements Initializable{
         System.out.println(event.toString());
     }
 
+    public void addExpense(){
+        //TO DO, implement UI for adding expenses
+        System.out.println(event.toString());
+    }
+
     public void setEvent(Event event) {
         this.event = event;
         eventNameLabel.setText(event.getTitle());
@@ -104,5 +121,14 @@ public class EventScreenCtrl implements Initializable{
         else participantsLabel.setText(participantsText);
     }
 
-    
+    public void setParticipantsForExpenses(Event event){
+        this.event = event;
+        Set<Participant> participants = event.getParticipants();
+        Iterator<Participant> participantIterator = participants.iterator();
+        while(participantIterator.hasNext()) {
+            Participant current = participantIterator.next();
+            cBoxParticipantExpenses.getItems().add(current.getName());
+            listViewExpensesParticipants.getItems().add(current.getName());
+        }
+    }
 }

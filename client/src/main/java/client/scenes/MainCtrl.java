@@ -60,6 +60,7 @@ public class MainCtrl {
         primaryStage.setScene(eventScene);
         eventScreenCtrl.setEvent(event);
         eventScreenCtrl.setParticipants(event);
+        eventScreenCtrl.setParticipantsForExpenses(event);
     }
 
     /**
