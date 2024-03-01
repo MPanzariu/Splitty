@@ -7,10 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
@@ -19,11 +16,16 @@ public class Event{
     private String id;
     private String title;
     private Date creationDate;
-    private LocalDateTime lastActivity;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Expense> expenses;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Expense> settledExpenses;
+
+    public List<Expense> getSettledExpenses() {
+        return settledExpenses;
+    }
 
     @SuppressWarnings("unused")
     public Event() {}
@@ -34,7 +36,7 @@ public class Event{
         this.expenses = new HashSet<>();
         this.id = generateId();
         this.creationDate = creationDate;
-        this.lastActivity = LocalDateTime.now();
+        this.settledExpenses = new ArrayList<>();
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
@@ -60,13 +62,8 @@ public class Event{
         return id;
     }
 
-    public LocalDateTime getLastActivity(){
-        return lastActivity;
-    }
-
     public void setTitle(String title) {
         this.title = title;
-        this.lastActivity = LocalDateTime.now();
     }
 
     public String getTitle() {
@@ -79,12 +76,10 @@ public class Event{
 
     public void addParticipant(Participant participant){
         participants.add(participant);
-        this.lastActivity = LocalDateTime.now();
     }
 
     public void removeParticipant(Participant participant){
         participants.remove(participant);
-        this.lastActivity = LocalDateTime.now();
     }
 
     public Set<Participant> getParticipants() {
@@ -93,12 +88,10 @@ public class Event{
 
     public void addExpense(Expense expense){
         expenses.add(expense);
-        this.lastActivity = LocalDateTime.now();
     }
 
     public void removeExpense(Expense expense){
         expenses.remove(expense);
-        this.lastActivity = LocalDateTime.now();
     }
 
     public Set<Expense> getExpenses(){
