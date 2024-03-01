@@ -53,6 +53,7 @@ public class MainCtrl {
 
     /**
      * When called the view changes to the event specified as input.
+     * join an event (either used when creating or joining one) and updating the fields in the event screen
      * @param event the event to join
      */
     public void joinEvent(Event event){

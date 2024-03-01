@@ -52,6 +52,12 @@ public class EventScreenCtrl implements Initializable{
     private final Translation translation;
     private Event event;
 
+    /**
+     * Constructor
+     * @param server the ServerUtils instance
+     * @param mainCtrl the MainCtrl instance
+     * @param translation the Translation to use
+     */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
         this.server = server;
@@ -59,6 +65,18 @@ public class EventScreenCtrl implements Initializable{
         this.translation = translation;
         this.event = null;
     }
+
+    /**
+     * Initialize basic features of the application, bind text to be translated,
+     * set images for edit and add participants buttons
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
+     */
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -90,31 +108,52 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * UI for inviting participants that needs to be implemented when the button is pressed
+     */
     public void inviteParticipants(){
         //TO DO, implement UI for inviting participants
         System.out.println(event.toString());
     }
 
+    /**
+     * UI for editing current participants that needs to be implemented when the button is pressed
+     */
     public void editCurrentParticipants(){
         //TO DO, implement UI for editing exisiting participants
         System.out.println(event.toString());
     }
 
+    /**
+     * UI for adding a participant that needs to be implemented when the button is pressed
+     */
     public void addParticipants(){
         //TO DO, implement UI for adding participants
         System.out.println(event.toString());
     }
 
+    /**
+     * UI for adding an expense that needs to be implemented when the button is pressed
+     */
     public void addExpense(){
         //TO DO, implement UI for adding expenses
         System.out.println(event.toString());
     }
 
+    /**
+     * set the name of the event in the event screen
+     * @param event the current event we are at
+     */
     public void setEvent(Event event) {
         this.event = event;
         eventNameLabel.setText(event.getTitle());
     }
 
+    /**
+     * set the participants in the evenet screen that are part of the current event
+     * @param event the current event we are at
+     */
     public void setParticipants(Event event){
         this.event = event;
         String participantsText = "";
@@ -129,6 +168,10 @@ public class EventScreenCtrl implements Initializable{
         else participantsLabel.setText(participantsText);
     }
 
+    /**
+     * show the participants of the current event
+     * @param event the event we are currently looking at
+     */
     public void setParticipantsForExpenses(Event event){
         this.event = event;
         Set<Participant> participants = event.getParticipants();
@@ -139,6 +182,11 @@ public class EventScreenCtrl implements Initializable{
             listViewExpensesParticipants.getItems().add(current.getName());
         }
     }
+
+    /**
+     * the action when we press the "All" button
+     * @param actionEvent on button click event
+     */
     public void showAllExpensesSettled(ActionEvent actionEvent) {
         expensesLogListView.getItems().clear();
         List<Expense> settledExpenses = event.getSettledExpenses();
