@@ -14,7 +14,7 @@
          <font>
             <Font size="18.0" />
          </font></Label>
-      <ComboBox layoutX="169.0" layoutY="127.0" prefHeight="26.0" prefWidth="171.0" />
+      <ComboBox layoutX="169.0" layoutY="127.0" prefHeight="26.0" prefWidth="224.0" />
       <Label layoutX="44.0" layoutY="183.0" text="Purpose">
          <font>
             <Font size="18.0" />
@@ -33,7 +33,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <DatePicker layoutX="169.0" layoutY="308.0" prefHeight="26.0" prefWidth="171.0" />
+      <DatePicker layoutX="169.0" layoutY="308.0" prefHeight="26.0" prefWidth="224.0" />
       <Label layoutX="44.0" layoutY="363.0" text="Split method">
          <font>
             <Font size="18.0" />
@@ -47,6 +47,6 @@
          </font>
       </Label>
       <Button layoutX="367.0" layoutY="556.0" mnemonicParsing="false" text="Cancel" />
-      <Button layoutX="457.0" layoutY="556.0" mnemonicParsing="false" text="Accept" />
+      <Button layoutX="457.0" layoutY="556.0" mnemonicParsing="false" text="Confirm" />
    </children>
 </AnchorPane>
