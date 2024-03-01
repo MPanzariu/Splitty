@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.Date;
+
 
 @Service
 public class EventService {
@@ -20,9 +22,21 @@ public class EventService {
      * @param participantRepository used for
      */
     @Autowired
-    public EventService(EventRepository eventRepository, ParticipantRepository participantRepository) {
+    public EventService(EventRepository eventRepository,
+                        ParticipantRepository participantRepository) {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
+    }
+
+    /***
+     * Creates a new Event based on a given title
+     * @param title - the title of the new Event
+     * @return a full, persisted Event object
+     */
+    public Event createEvent(String title){
+        Date currentDate = new Date();
+        Event event = new Event(title, currentDate);
+        return eventRepository.save(event);
     }
 
     /**

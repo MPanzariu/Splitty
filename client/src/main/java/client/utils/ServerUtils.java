@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.List;
 
 import commons.Event;
@@ -73,7 +72,7 @@ public class ServerUtils {
 	 * @return the event
 	 */
 	public Event getEvent(String inviteCode){
-		String path = "api/events/join/" + inviteCode;
+		String path = "api/events/" + inviteCode;
 		return ClientBuilder.newClient(new ClientConfig())
 				.target(serverURL).path(path) //invite code is the ID
 				.request(APPLICATION_JSON)
@@ -87,11 +86,10 @@ public class ServerUtils {
 	 * @return the event created
 	 */
 	public Event createEvent(String title){
-		Event event = new Event(title, new Date());
 		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/events/add")
+				.target(serverURL).path("api/events/")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
-				.post(Entity.entity(event, APPLICATION_JSON),Event.class);
+				.post(Entity.entity(title, APPLICATION_JSON),Event.class);
 	}
 }
