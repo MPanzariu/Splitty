@@ -30,6 +30,8 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button allExpensesButton;
     @FXML
+    private Button settleDebtsButton;
+    @FXML
     private Label eventNameLabel;
     @FXML
     private Label participantsLabel;
@@ -85,6 +87,7 @@ public class EventScreenCtrl implements Initializable{
         expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
         allExpensesButton.textProperty().bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
+        settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
@@ -150,6 +153,7 @@ public class EventScreenCtrl implements Initializable{
         eventNameLabel.setText(event.getTitle());
     }
 
+
     /**
      * set the participants in the evenet screen that are part of the current event
      * @param event the current event we are at
@@ -199,5 +203,13 @@ public class EventScreenCtrl implements Initializable{
             log+=settledExpenses.get(i).getName();
             expensesLogListView.getItems().add(log);
         }
+    }
+
+    /**
+     * UI for settling current debts
+     * @param actionEvent on button click event
+     */
+    public void settleDebts(ActionEvent actionEvent) {
+        //TO DO, UI for settleDebts button
     }
 }
