@@ -5,6 +5,7 @@ plugins {
 
 application {
     mainClass = 'client.Main'
+	tasks.run.workingDir = rootProject.projectDir
 }
 
 javafx {
