@@ -44,6 +44,8 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button addParticipant;
     @FXML
+    private Button goBackButton;
+    @FXML
     private ComboBox<String> cBoxParticipantExpenses;
     @FXML
     private ListView<String> listViewExpensesParticipants;
@@ -70,7 +72,7 @@ public class EventScreenCtrl implements Initializable{
 
     /**
      * Initialize basic features of the application, bind text to be translated,
-     * set images for edit and add participants buttons
+     * set images for edit, add participants  and go back buttons
      * @param location
      * The location used to resolve relative paths for the root object, or
      * {@code null} if the location is not known.
@@ -106,6 +108,17 @@ public class EventScreenCtrl implements Initializable{
             imageView.setFitHeight(15);
             imageView.setPreserveRatio(true);
             addParticipant.setGraphic(imageView);
+        } catch (FileNotFoundException e) {
+            System.out.println("didn't work");
+            throw new RuntimeException(e);
+        }
+        try{
+            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(15);
+            imageView.setFitHeight(15);
+            imageView.setPreserveRatio(true);
+            goBackButton.setGraphic(imageView);
         } catch (FileNotFoundException e) {
             System.out.println("didn't work");
             throw new RuntimeException(e);
@@ -211,5 +224,13 @@ public class EventScreenCtrl implements Initializable{
      */
     public void settleDebts(ActionEvent actionEvent) {
         //TO DO, UI for settleDebts button
+    }
+
+    /**
+     * go back to the main screen
+     * @param actionEvent when button is clicked
+     */
+    public void switchToMainScreen(ActionEvent actionEvent) {
+        mainCtrl.switchBackToMainScreen();
     }
 }

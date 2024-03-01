@@ -65,6 +65,13 @@ public class MainCtrl {
     }
 
     /**
+     * switch the primary screen to the main screen
+     */
+    public void switchBackToMainScreen(){
+        primaryStage.setScene(startupScene);
+    }
+
+    /**
      * Gets startup screen
      * @return the startup screen
      */
