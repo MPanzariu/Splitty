@@ -1,5 +1,8 @@
 package client.scenes;
 
+import client.utils.ServerUtils;
+import client.utils.Translation;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -11,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
 public class ExpenseScreenCtrl {
+    private final ServerUtils server;
     @FXML
     private Label addEditExpense;
     @FXML
@@ -43,5 +47,12 @@ public class ExpenseScreenCtrl {
     private Button cancel;
     @FXML
     private Button confirm;
-
+    private final MainCtrl mainCtrl;
+    private final Translation translation;
+    @Inject
+    public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+        this.mainCtrl = mainCtrl;
+        this.translation = translation;
+        this.server = server;
+    }
 }

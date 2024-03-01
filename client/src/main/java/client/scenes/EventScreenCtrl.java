@@ -153,8 +153,8 @@ public class EventScreenCtrl implements Initializable{
      * UI for adding an expense that needs to be implemented when the button is pressed
      */
     public void addExpense(){
-        //TO DO, implement UI for adding expenses
-        System.out.println(event.toString());
+        mainCtrl.addExpense();
+        //System.out.println(event.toString());
     }
 
     /**
