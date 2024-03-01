@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="631.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ExpenseScreenCtrl">
+   <children>
+      <Label layoutX="47.0" layoutY="44.0" text="Add/Edit Expense">
+         <font>
+            <Font size="24.0" />
+         </font></Label>
+      <Label layoutX="44.0" layoutY="126.0" text="Paid by">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <ComboBox layoutX="169.0" layoutY="127.0" prefHeight="26.0" prefWidth="171.0" />
+      <Label layoutX="44.0" layoutY="183.0" text="Purpose">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField layoutX="169.0" layoutY="184.0" prefHeight="26.0" prefWidth="224.0" />
+      <Label layoutX="44.0" layoutY="245.0" text="Amount">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField layoutX="169.0" layoutY="246.0" prefHeight="26.0" prefWidth="171.0" />
+      <ComboBox layoutX="340.0" layoutY="246.0" prefHeight="26.0" prefWidth="53.0" />
+      <Label layoutX="44.0" layoutY="307.0" text="Date">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <DatePicker layoutX="169.0" layoutY="308.0" prefHeight="26.0" prefWidth="171.0" />
+      <Label layoutX="44.0" layoutY="363.0" text="Split method">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <CheckBox layoutX="76.0" layoutY="406.0" mnemonicParsing="false" text="Split between all participants" />
+      <CheckBox layoutX="76.0" layoutY="438.0" mnemonicParsing="false" text="Split between certain participants" />
+      <Label layoutX="44.0" layoutY="504.0" text="Expense Type">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button layoutX="367.0" layoutY="556.0" mnemonicParsing="false" text="Cancel" />
+      <Button layoutX="457.0" layoutY="556.0" mnemonicParsing="false" text="Accept" />
+   </children>
+</AnchorPane>
