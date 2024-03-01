@@ -39,14 +39,16 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <CheckBox layoutX="76.0" layoutY="406.0" mnemonicParsing="false" text="Split between all participants" />
-      <CheckBox layoutX="76.0" layoutY="438.0" mnemonicParsing="false" text="Split between certain participants" />
+      <CheckBox layoutX="76.0" layoutY="406.0" mnemonicParsing="false" text="                                                        " />
+      <CheckBox layoutX="76.0" layoutY="438.0" mnemonicParsing="false" text="                                                         " />
       <Label layoutX="44.0" layoutY="504.0" text="Expense Type">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Button layoutX="367.0" layoutY="556.0" mnemonicParsing="false" text="Cancel" />
+      <Button fx:id="cancel" layoutX="367.0" layoutY="556.0" mnemonicParsing="false" onAction="#switchToEventScreen" text="Cancel" />
       <Button layoutX="457.0" layoutY="556.0" mnemonicParsing="false" text="Confirm" />
+      <Label layoutX="99.0" layoutY="406.0" text="Split between all participants" />
+      <Label layoutX="99.0" layoutY="438.0" text="Split between certain participants" />
    </children>
 </AnchorPane>

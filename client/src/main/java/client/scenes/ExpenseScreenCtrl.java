@@ -7,10 +7,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-
+import javafx.scene.control.Label;
 import java.awt.*;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.scene.control.Button;
+import javafx.event.ActionEvent;
 import java.util.concurrent.Callable;
 
 public class ExpenseScreenCtrl {
@@ -40,9 +42,13 @@ public class ExpenseScreenCtrl {
     @FXML
     private Label expenseType;
     @FXML
-    private Checkbox splitBetweenAll;
+    private Checkbox splitBetweenAllCheckBox;
     @FXML
-    private Checkbox splitBetweenCustom;
+    private Label splitBetweenAllLabel;
+    @FXML
+    private Checkbox splitBetweenCustomCheckBox;
+    @FXML
+    private Label getSplitBetweenCustomLabel;
     @FXML
     private Button cancel;
     @FXML
@@ -54,5 +60,28 @@ public class ExpenseScreenCtrl {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
+    }
+
+
+    public void initialize(URL location, ResourceBundle resources) {
+        addEditExpense.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.Add"));
+        paidBy.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.paid"));
+        purpose.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
+        amount.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
+        date.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.date"));
+        splitMethod.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.split"));
+        splitBetweenAllLabel.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.splitAll"));
+        getSplitBetweenCustomLabel.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.splitCustom"));
+    }
+    public void switchToEventScreen(ActionEvent actionEvent) {
+        mainCtrl.switchBackToEventScreen();
     }
 }

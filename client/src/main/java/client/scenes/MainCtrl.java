@@ -87,4 +87,11 @@ public class MainCtrl {
     public void addExpense() {
         primaryStage.setScene(expenseScene);
     }
+
+    /**
+     * switches the primary screen to the EventScreen
+     */
+    public void switchBackToEventScreen() {
+        primaryStage.setScene(eventScene);
+    }
 }
