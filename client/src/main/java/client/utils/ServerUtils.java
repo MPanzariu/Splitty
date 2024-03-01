@@ -24,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import commons.Event;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -32,12 +34,11 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class ServerUtils {
 
-	@Inject @Named("connection.URL")
+	@Inject
+	@Named("connection.URL")
 	private String serverURL;
 
 	public void getQuotesTheHardWay() throws IOException, URISyntaxException {
