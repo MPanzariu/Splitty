@@ -2,12 +2,12 @@ package client.scenes;
 
 import client.utils.Translation;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import javax.inject.Named;
 import java.util.Locale;
 
 public class MainCtrl {
