@@ -1,25 +1,30 @@
 package server.api;
 
 import commons.Event;
+import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import server.database.EventRepository;
 
-import java.util.Comparator;
+
 import java.util.Date;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +34,9 @@ public class EventControllerTest {
     EventService eventService;
     @InjectMocks
     EventController controller;
+    @Captor
+    ArgumentCaptor<String> nameCaptor;
+
     Answer<?> stubCreate;
 
     @BeforeEach
@@ -137,5 +145,59 @@ public class EventControllerTest {
         List<Event> orderedList = List.of(persistedEvent1, persistedEvent2);
         assertEquals(orderedList, response.getBody());
     }
+
+//    @Test
+//    @Transactional
+//    void editTitleExisting(){
+//        Event event = new Event("Title", null);
+//        String id = event.getId();
+//        when(eventService.editTitle(eq(id), anyString())).thenReturn(event);
+//        ResponseEntity<Event> test = controller.editTitle(id, "New Title");
+//        assertEquals(200, test.getStatusCodeValue());
+//        assertEquals("New Title", test.getBody().getTitle());
+//        verify(eventService).editTitle(eq(id), eq("New Title"));
+//    }
+
+    @Test
+    void editTitleNotExisting(){
+        Event event = new Event("Title", null);
+        when(eventService.editTitle(anyString(), anyString())).thenThrow(new EntityNotFoundException(":{"));
+        assertThrows(EntityNotFoundException.class, () -> {
+            controller.editTitle(event.getId(), "New Title");});
+        verify(eventService).editTitle(event.getId(), "New Title");
+    }
+
+    @Test
+    void addParticipantStatus(){
+        Event event = new Event("test", null);
+        doNothing().when(eventService).addParticipantToEvent(anyString(), anyString());
+        ResponseEntity<Void> response = controller.addParticipantToEvent(event.getId(), "John");
+        verify(eventService).addParticipantToEvent(eq(event.getId()), eq("John"));
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNotExistent(){
+        Event event = new Event("test", null);
+        doThrow(new EntityNotFoundException(":{")).when(eventService).addParticipantToEvent(anyString(), anyString());
+        try {
+            controller.addParticipantToEvent(event.getId(), "Participant");
+        } catch (EntityNotFoundException e) {
+            assertThrows(EntityNotFoundException.class, () -> {
+                controller.addParticipantToEvent(event.getId(), "Participant");
+            });
+        }
+        verify(eventService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()), eq("Participant"));
+    }
+
+//    @Test
+//    void addParticipantModification(){
+//        Event event = new Event("test", null);
+//        doNothing().when(eventService).addParticipantToEvent(anyString(), anyString());
+//        controller.addParticipantToEvent(event.getId(), "Andy");
+//        verify(eventService).addParticipantToEvent(eq(event.getId()), eq("Andy"));
+//        Set<Participant> participants = event.getParticipants();
+//        assertEquals(1, participants.size());
+//    }
 
 }

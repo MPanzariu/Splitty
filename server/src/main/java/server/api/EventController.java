@@ -32,7 +32,7 @@ public class EventController {
      * @param newTitle the new title
      * @return returns "ok" if the operation succeeds
      */
-    @PutMapping("/events/{eventId}")
+    @PutMapping("/{participantId}")
     public ResponseEntity<Event> editTitle(@PathVariable String eventId,
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
@@ -45,10 +45,10 @@ public class EventController {
      * @param participantName the name of the participant we will add
      * @return returns the status of the operation
      */
-    @PostMapping("/{eventId}")
+    @PostMapping("/")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
         String participantName) {
-        eventService.addParticipantToEvent(participantName, eventId);
+        eventService.addParticipantToEvent(eventId, participantName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
