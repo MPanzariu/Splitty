@@ -153,7 +153,7 @@ public class EventScreenCtrl implements Initializable{
      * UI for adding an expense that needs to be implemented when the button is pressed
      */
     public void addExpense(){
-        mainCtrl.addExpense();
+        mainCtrl.switchToAddExpense();
         //System.out.println(event.toString());
     }
 
@@ -166,9 +166,17 @@ public class EventScreenCtrl implements Initializable{
         eventNameLabel.setText(event.getTitle());
     }
 
+    /**
+     *
+     * @return the event
+     */
+    public Event getEvent() {
+        return this.event;
+    }
+
 
     /**
-     * set the participants in the evenet screen that are part of the current event
+     * set the participants in the event screen that are part of the current event
      * @param event the current event we are at
      */
     public void setParticipants(Event event){

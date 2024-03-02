@@ -84,7 +84,8 @@ public class MainCtrl {
         return startupScene;
     }
 
-    public void addExpense() {
+    public void switchToAddExpense() {
+        expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(expenseScene);
     }
 
@@ -92,6 +93,10 @@ public class MainCtrl {
      * switches the primary screen to the EventScreen
      */
     public void switchBackToEventScreen() {
+        expenseScreenCtrl.resetAmount();
+        expenseScreenCtrl.resetPurpose();
+        expenseScreenCtrl.resetDate();
+        expenseScreenCtrl.resetCurrency();
         primaryStage.setScene(eventScene);
     }
 }
