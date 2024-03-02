@@ -21,6 +21,7 @@ Agenda Items:
 	-everyone should work on both front-hand and backhand
 	-the agenda should be updated based on what was talked about during the meeting 
 - Talking Points: (Inform/brainstorm/decision making/discuss)
+
 - <Agenda-item 1> Sprint review (5 min)
 	-Kornel: setting up the entities (took 1h 30m)
 		   Changed the id of the Event(around 1h)
@@ -33,14 +34,16 @@ Agenda Items:
      	   Created new “issues”.
 	-Glafkos: worked on the title for the event title
 		   Worked on some tests.
-    -Matei: added some changes in the EventController
+    -Matei: added some changes in the EventController 
 	       Made class EventService
     -Iustin: ParticipantController
                ParticipantService
+
 - <Agenda-item 2> Code of Conduct (2 min)
 	-add the template into Latex
       -make it a pdf
       -finish it before Wednesday night
+
 - <Agenda-item 3> UI, division of tasks, estimates (16 min)
 	-(Kornel) set-up the localization method (for switching between languages)
 	-(Giorgos) working on the start-screen and tests for the UI
@@ -52,18 +55,22 @@ Agenda Items:
 What to start on:
 	-Creating the overview after the start screen
 -working on WebSocket (sometime…)
+
 - <Agenda-item 4> Live language switch (3 min)
 	-should start working earlier
 	-Kornel has a brief understanding
+
 - <Agenda-item 5> Setting up Postman, start visualizing the database (2 min)
 	-doesn’t work yet
 	-Spring doesn’t allow us to generate the IDs in the way we do now
     -We can use a tool that let’s us create custom IDs as opposed to auto-generating them
+
 - <Agenda-item 6> Q&A with the TA  (2 min)
     - Summarize action points: Who , what , when? (2 min)
 - Feedback round: What went well and what can be improved next time? (1 min)
 	-sending the agenda earlier
 	-showing more activity on Git Lab
+
 - Planned meeting duration != actual duration? Where/why did you mis -estimate? (1 min)
 - Question round: Does anyone have anything to add before the meeting closes? (2 min)
 - Closure (1 min)
