@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +33,23 @@ public class EventController {
      * @param newTitle the new title
      * @return returns "ok" if the operation succeeds
      */
-    @PutMapping("/{participantId}")
+    @PutMapping("/{eventId}")
     public ResponseEntity<Event> editTitle(@PathVariable String eventId,
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
         return ResponseEntity.ok(updatedEvent);
+    }
+
+    /**
+     * Orders the events by last modification
+     * @return
+     */
+    @GetMapping("ordered/lastActivity")
+    ResponseEntity<List<Event>> orderByLastActivity(){
+        List<Event> events = all().getBody();
+        assert events != null;
+        Collections.sort(events, Comparator.comparing(Event::getLastActivity).reversed());
+        return ResponseEntity.ok(events);
     }
 
     /**
@@ -45,7 +58,7 @@ public class EventController {
      * @param participantName the name of the participant we will add
      * @return returns the status of the operation
      */
-    @PostMapping("/")
+    @PostMapping("/{eventId}{participantId}")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
         String participantName) {
         eventService.addParticipantToEvent(eventId, participantName);
@@ -112,6 +125,7 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+
     /**
      * Endopoint for giving all events ordered by creation date.
      * @return List of all events ordered by creation date
@@ -122,7 +136,6 @@ public class EventController {
         events.sort(Comparator.comparing(Event::getCreationDate));
         return ResponseEntity.ok(events);
     }
-
     /***
      * For the purpose of placing a TestEventRepository in the tests
      * @param repository - the TestEventRepository
@@ -130,4 +143,6 @@ public class EventController {
     public void setRepository(EventRepository repository) {
         this.repository = repository;
     }
+
+
 }

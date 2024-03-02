@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import server.database.EventRepository;
+import server.database.ParticipantRepository;
 
 
 import java.util.Date;
@@ -146,16 +148,58 @@ public class EventControllerTest {
         assertEquals(orderedList, response.getBody());
     }
 
+    /**
+     * Tests last activity for constructor
+     */
+    @Test
+    void orderUnorderedListByLastActivityStandard(){
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
+        Event event1 = controller.add("event1").getBody();
+        Event event2 = controller.add("event2").getBody();
+        Event event3 = controller.add("event3").getBody();
+        ResponseEntity<List<Event>> response = controller.orderByLastActivity();
+        assert event3 != null;
+        assert event2 != null;
+        assert event1 != null;
+        List<Event> list = List.of(event3, event2, event1);
+        assertEquals(list, response.getBody());
+    }
+
+    /**
+     * tests last activity with methods
+     */
+    @Test
+    void orderUnorderedListByLastActivitySetters(){
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
+        Event event1 = controller.add("event1").getBody();
+        Event event2 = controller.add("event2").getBody();
+        Event event3 = controller.add("event3").getBody();
+        assert event2 != null;
+        assert event3 != null;
+        assert event1 != null;
+        event2.setTitle("newTitle");
+        event3.addExpense(new Expense());
+        event1.addParticipant(new Participant());
+        ResponseEntity<List<Event>> response = controller.orderByLastActivity();
+        List<Event> list = List.of(event1, event3, event2);
+        assertEquals(list, response.getBody());
+    }
+
 //    @Test
 //    @Transactional
 //    void editTitleExisting(){
+//        EventRepository erepository = mock(EventRepository.class);
+//        ParticipantRepository prepository= mock(ParticipantRepository.class);
+//        EventService service = new EventService(erepository, prepository);
+//        EventController eventController = new EventController(service, erepository);
 //        Event event = new Event("Title", null);
+//        erepository.save(event);
 //        String id = event.getId();
-//        when(eventService.editTitle(eq(id), anyString())).thenReturn(event);
-//        ResponseEntity<Event> test = controller.editTitle(id, "New Title");
+//        when(service.editTitle(id, eq("New Title"))).thenReturn(event);
+//        ResponseEntity<Event> test = eventController.editTitle(id, "New Title");
 //        assertEquals(200, test.getStatusCodeValue());
 //        assertEquals("New Title", test.getBody().getTitle());
-//        verify(eventService).editTitle(eq(id), eq("New Title"));
+//        verify(service).editTitle(id, eq("New Title"));
 //    }
 
     /**
