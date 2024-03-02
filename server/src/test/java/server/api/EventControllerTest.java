@@ -158,6 +158,9 @@ public class EventControllerTest {
 //        verify(eventService).editTitle(eq(id), eq("New Title"));
 //    }
 
+    /**
+     * tests trying to edit the title of an event which does not exist
+     */
     @Test
     void editTitleNotExisting(){
         Event event = new Event("Title", null);
@@ -167,6 +170,9 @@ public class EventControllerTest {
         verify(eventService).editTitle(event.getId(), "New Title");
     }
 
+    /**
+     * tests the http status after adding a participant
+     */
     @Test
     void addParticipantStatus(){
         Event event = new Event("test", null);
@@ -176,6 +182,9 @@ public class EventControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
+    /**
+     * tests adding a participant to an event which does not exist
+     */
     @Test
     void addParticipantNotExistent(){
         Event event = new Event("test", null);
