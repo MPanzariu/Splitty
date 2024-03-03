@@ -1,23 +1,32 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import server.database.EventRepository;
+import server.database.ParticipantRepository;
+
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +36,9 @@ public class EventControllerTest {
     EventService eventService;
     @InjectMocks
     EventController controller;
+    @Captor
+    ArgumentCaptor<String> nameCaptor;
+
     Answer<?> stubCreate;
 
     @BeforeEach
@@ -135,4 +147,110 @@ public class EventControllerTest {
         List<Event> orderedList = List.of(persistedEvent1, persistedEvent2);
         assertEquals(orderedList, response.getBody());
     }
+
+    /**
+     * Tests last activity for constructor
+     */
+    @Test
+    void orderUnorderedListByLastActivityStandard(){
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
+        Event event1 = controller.add("event1").getBody();
+        Event event2 = controller.add("event2").getBody();
+        Event event3 = controller.add("event3").getBody();
+        ResponseEntity<List<Event>> response = controller.orderByLastActivity();
+        assert event3 != null;
+        assert event2 != null;
+        assert event1 != null;
+        List<Event> list = List.of(event3, event2, event1);
+        assertEquals(list, response.getBody());
+    }
+
+    /**
+     * tests last activity with methods
+     */
+    @Test
+    void orderUnorderedListByLastActivitySetters(){
+        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
+        Event event1 = controller.add("event1").getBody();
+        Event event2 = controller.add("event2").getBody();
+        Event event3 = controller.add("event3").getBody();
+        assert event2 != null;
+        assert event3 != null;
+        assert event1 != null;
+        event2.setTitle("newTitle");
+        event3.addExpense(new Expense());
+        event1.addParticipant(new Participant());
+        ResponseEntity<List<Event>> response = controller.orderByLastActivity();
+        List<Event> list = List.of(event1, event3, event2);
+        assertEquals(list, response.getBody());
+    }
+
+//    @Test
+//    @Transactional
+//    void editTitleExisting(){
+//        EventRepository erepository = mock(EventRepository.class);
+//        ParticipantRepository prepository= mock(ParticipantRepository.class);
+//        EventService service = new EventService(erepository, prepository);
+//        EventController eventController = new EventController(service, erepository);
+//        Event event = new Event("Title", null);
+//        erepository.save(event);
+//        String id = event.getId();
+//        when(service.editTitle(id, eq("New Title"))).thenReturn(event);
+//        ResponseEntity<Event> test = eventController.editTitle(id, "New Title");
+//        assertEquals(200, test.getStatusCodeValue());
+//        assertEquals("New Title", test.getBody().getTitle());
+//        verify(service).editTitle(id, eq("New Title"));
+//    }
+
+    /**
+     * tests trying to edit the title of an event which does not exist
+     */
+    @Test
+    void editTitleNotExisting(){
+        Event event = new Event("Title", null);
+        when(eventService.editTitle(anyString(), anyString())).thenThrow(new EntityNotFoundException(":{"));
+        assertThrows(EntityNotFoundException.class, () -> {
+            controller.editTitle(event.getId(), "New Title");});
+        verify(eventService).editTitle(event.getId(), "New Title");
+    }
+
+    /**
+     * tests the http status after adding a participant
+     */
+    @Test
+    void addParticipantStatus(){
+        Event event = new Event("test", null);
+        doNothing().when(eventService).addParticipantToEvent(anyString(), anyString());
+        ResponseEntity<Void> response = controller.addParticipantToEvent(event.getId(), "John");
+        verify(eventService).addParticipantToEvent(eq(event.getId()), eq("John"));
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    /**
+     * tests adding a participant to an event which does not exist
+     */
+    @Test
+    void addParticipantNotExistent(){
+        Event event = new Event("test", null);
+        doThrow(new EntityNotFoundException(":{")).when(eventService).addParticipantToEvent(anyString(), anyString());
+        try {
+            controller.addParticipantToEvent(event.getId(), "Participant");
+        } catch (EntityNotFoundException e) {
+            assertThrows(EntityNotFoundException.class, () -> {
+                controller.addParticipantToEvent(event.getId(), "Participant");
+            });
+        }
+        verify(eventService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()), eq("Participant"));
+    }
+
+//    @Test
+//    void addParticipantModification(){
+//        Event event = new Event("test", null);
+//        doNothing().when(eventService).addParticipantToEvent(anyString(), anyString());
+//        controller.addParticipantToEvent(event.getId(), "Andy");
+//        verify(eventService).addParticipantToEvent(eq(event.getId()), eq("Andy"));
+//        Set<Participant> participants = event.getParticipants();
+//        assertEquals(1, participants.size());
+//    }
+
 }
