@@ -76,4 +76,21 @@ public class ExpenseService {
         event.removeExpense(expense);
         eventRepository.save(event);
     }
+
+    /**
+     * Edit the expense
+     * @param id ID of the expense
+     * @param newExpense The new expense
+     * @return The updated expense
+     */
+    public Expense editExpense(long id, Expense newExpense) {
+        Expense expense = expenseRepository.findById(id) //
+                .orElseThrow(() -> new EntityNotFoundException("Expense not found!"));
+        expense.setEvent(newExpense.getEvent());
+        expense.setDate(newExpense.getDate());
+        expense.setName(newExpense.getName());
+        expense.setOwedTo(newExpense.getOwedTo());
+        expense.setPriceInCents(newExpense.getPriceInCents());
+        return expenseRepository.save(expense);
+    }
 }

@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Expense;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -55,5 +56,22 @@ class ExpenseControllerTest {
         for (int i = 0; i < mockExpenses.size(); i++)
             assertEquals(mockExpenses.get(i), returnedExpenses.get(i));
     }
+
+    @Test
+    public void editExistingExpenseTest() {
+        Expense expected = new Expense();
+        when(expenseService.editExpense(anyLong(), any())).thenReturn(expected);
+        ResponseEntity<Expense> response = expenseController.editExpense(1L, expected);
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    public void editNonExistingExpenseTest() {
+        Expense expected = new Expense();
+        when(expenseService.editExpense(anyLong(), any())).thenThrow(new EntityNotFoundException("test"));
+        ResponseEntity<Expense> response = expenseController.editExpense(1L, expected);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
     //Need to add tests for the delete method
 }
