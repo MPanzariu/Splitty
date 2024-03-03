@@ -24,7 +24,12 @@ public class MainCtrl {
     private AddQuoteCtrl addCtrl;
     private Scene eventScene;
     private Scene expenseScene;
+
+    private Scene participantScene;
+    private ParticipantScreenCtrl participantScreenCtrl;
+
     private Scene editTitleScene;
+
 
     @Inject
     Translation translation;
@@ -34,7 +39,10 @@ public class MainCtrl {
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
-                           Pair<EditTitleCtrl, Parent> editTitlePair) {
+
+                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair) {
+
+
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
@@ -43,8 +51,13 @@ public class MainCtrl {
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
+
+        this.participantScene = new Scene(participantUI.getValue());
+        this.participantScreenCtrl = participantUI.getKey();
+
         this.editTitleCtrl = editTitlePair.getKey();
         this.editTitleScene = new Scene(editTitlePair.getValue());
+
         showOverview();
         primaryStage.show();
     }
@@ -108,4 +121,16 @@ public class MainCtrl {
         expenseScreenCtrl.resetCurrency();
         primaryStage.setScene(eventScene);
     }
+
+    public void switchToAddParticipant() {
+        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
+        primaryStage.setScene(participantScene);
+    }
+
+    public void switchToAddParticipantExistent() {
+        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
+        participantScreenCtrl.setParticipant(participantScreenCtrl.getParticipant());
+        primaryStage.setScene(participantScene);
+    }
+
 }
