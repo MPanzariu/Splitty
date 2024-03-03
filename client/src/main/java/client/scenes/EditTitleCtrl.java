@@ -3,6 +3,7 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
+import commons.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ public class EditTitleCtrl implements Initializable {
     ServerUtils server;
     MainCtrl mainCtrl;
     Translation translation;
+    Event event;
 
     @Inject
     public EditTitleCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
@@ -41,11 +43,17 @@ public class EditTitleCtrl implements Initializable {
         this.confirm.textProperty().bind(translation.getStringBinding("editTitle.confirmButton"));
     }
 
-    public void confirm() {
+    public void setEvent(Event event) {
+        this.event = event;
+    }
 
+    public void confirm() {
+        Event newEvent = server.editTitle(event.getId(), event.getTitle());
+        event.setTitle(newEvent.getTitle());
+        mainCtrl.joinEvent(event);
     }
 
     public void cancel() {
-
+        mainCtrl.joinEvent(event);
     }
 }
