@@ -11,6 +11,11 @@
             <Font size="24.0" />
          </font>
       </Label>
+      <Button fx:id="editTitle" layoutX="350.0" layoutY="63.0" mnemonicParsing="false" onAction="#editTitle" prefHeight="25.0" prefWidth="25.0" text="Send Invites">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
       <Button fx:id="sendInvites" layoutX="425.0" layoutY="63.0" mnemonicParsing="false" onAction="#inviteParticipants" prefHeight="25.0" prefWidth="102.0" text="Send Invites">
          <font>
             <Font size="14.0" />

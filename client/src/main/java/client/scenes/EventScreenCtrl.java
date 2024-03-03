@@ -139,6 +139,13 @@ public class EventScreenCtrl implements Initializable{
     }
 
     /**
+     * Open the title editing screen.
+     */
+    public void editTitle() {
+        mainCtrl.openEditTitle();
+    }
+
+    /**
      * UI for inviting participants that needs to be implemented when the button is pressed
      */
     public void inviteParticipants(){
