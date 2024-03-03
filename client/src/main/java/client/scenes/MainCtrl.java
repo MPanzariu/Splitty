@@ -18,11 +18,13 @@ public class MainCtrl {
     private StartupScreenCtrl startupScreenCtrl;
     private EventScreenCtrl eventScreenCtrl;
     private ExpenseScreenCtrl expenseScreenCtrl;
+    private EditTitleCtrl editTitleCtrl;
     private Scene startupScene;
     private Scene add;
     private AddQuoteCtrl addCtrl;
     private Scene eventScene;
     private Scene expenseScene;
+    private Scene editTitleScene;
 
     @Inject
     Translation translation;
@@ -31,7 +33,8 @@ public class MainCtrl {
     String language;
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
-                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI) {
+                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
+                           Pair<EditTitleCtrl, Parent> editTitlePair) {
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
@@ -40,6 +43,8 @@ public class MainCtrl {
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
+        this.editTitleCtrl = editTitlePair.getKey();
+        this.editTitleScene = new Scene(editTitlePair.getValue());
         showOverview();
         primaryStage.show();
     }
@@ -86,6 +91,11 @@ public class MainCtrl {
     public void switchToAddExpense() {
         expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(expenseScene);
+    }
+
+    public void openEditTitle() {
+        editTitleCtrl.setEvent(eventScreenCtrl.getEvent());
+        primaryStage.setScene(editTitleScene);
     }
 
     /**

@@ -93,4 +93,18 @@ public class ServerUtils {
 				.accept(APPLICATION_JSON)
 				.post(Entity.entity(title, APPLICATION_JSON),Event.class);
 	}
+
+	/**
+	 * Sends a PUT request to change the event with the given ID the given title.
+	 * @param id Invitation code of the event
+	 * @param title Title of the event
+	 * @return Event with a new title
+	 */
+	public Event editTitle(String id, String title) {
+		return ClientBuilder.newClient(new ClientConfig()) //
+				.target(serverURL).path("api/events/" + id) //
+				.request(APPLICATION_JSON) //
+				.accept(APPLICATION_JSON) //
+				.put(Entity.entity(title, APPLICATION_JSON), Event.class);
+	}
 }
