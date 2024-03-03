@@ -1,5 +1,6 @@
 package server.api;
 import commons.Expense;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +64,16 @@ public class ExpenseController {
     public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable ("id") Long id) {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Expense> editExpense(@PathVariable long id, @RequestBody Expense expense) {
+        try{
+            Expense updatedExpense = expenseService.editExpense(id, expense);
+            return ResponseEntity.ok(updatedExpense);
+        } catch(EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
