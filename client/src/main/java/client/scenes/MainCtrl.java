@@ -17,10 +17,12 @@ public class MainCtrl {
     private Scene overview;
     private StartupScreenCtrl startupScreenCtrl;
     private EventScreenCtrl eventScreenCtrl;
+    private ExpenseScreenCtrl expenseScreenCtrl;
     private Scene startupScene;
     private Scene add;
     private AddQuoteCtrl addCtrl;
     private Scene eventScene;
+    private Scene expenseScene;
 
     @Inject
     Translation translation;
@@ -28,13 +30,16 @@ public class MainCtrl {
     @Named("client.language")
     String language;
 
-    public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview, Pair<EventScreenCtrl, Parent> eventUI) {
+    public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
+                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI) {
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.eventScene = new Scene(eventUI.getValue());
         this.eventScreenCtrl = eventUI.getKey();
+        this.expenseScene = new Scene(expenseUI.getValue());
+        this.expenseScreenCtrl = expenseUI.getKey();
         showOverview();
         primaryStage.show();
     }
@@ -76,5 +81,21 @@ public class MainCtrl {
      */
     public Scene getMainMenuScene(){
         return startupScene;
+    }
+
+    public void switchToAddExpense() {
+        expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
+        primaryStage.setScene(expenseScene);
+    }
+
+    /**
+     * switches the primary screen to the EventScreen
+     */
+    public void switchBackToEventScreen() {
+        expenseScreenCtrl.resetAmount();
+        expenseScreenCtrl.resetPurpose();
+        expenseScreenCtrl.resetDate();
+        expenseScreenCtrl.resetCurrency();
+        primaryStage.setScene(eventScene);
     }
 }
