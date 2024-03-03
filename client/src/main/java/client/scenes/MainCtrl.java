@@ -23,6 +23,8 @@ public class MainCtrl {
     private AddQuoteCtrl addCtrl;
     private Scene eventScene;
     private Scene expenseScene;
+    private Scene participantScene;
+    private ParticipantScreenCtrl participantScreenCtrl;
 
     @Inject
     Translation translation;
@@ -31,7 +33,8 @@ public class MainCtrl {
     String language;
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
-                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI) {
+                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
+                           Pair<ParticipantScreenCtrl, Parent> participantUI) {
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
@@ -40,6 +43,8 @@ public class MainCtrl {
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
+        this.participantScene = new Scene(participantUI.getValue());
+        this.participantScreenCtrl = participantUI.getKey();
         showOverview();
         primaryStage.show();
     }
@@ -98,4 +103,16 @@ public class MainCtrl {
         expenseScreenCtrl.resetCurrency();
         primaryStage.setScene(eventScene);
     }
+
+    public void switchToAddParticipant() {
+        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
+        primaryStage.setScene(participantScene);
+    }
+
+    public void switchToAddParticipantExistent() {
+        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
+        participantScreenCtrl.setParticipant(participantScreenCtrl.getParticipant());
+        primaryStage.setScene(participantScene);
+    }
+
 }

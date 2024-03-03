@@ -137,16 +137,14 @@ public class EventScreenCtrl implements Initializable{
      * UI for editing current participants that needs to be implemented when the button is pressed
      */
     public void editCurrentParticipants(){
-        //TO DO, implement UI for editing exisiting participants
-        System.out.println(event.toString());
+        mainCtrl.switchToAddParticipantExistent();
     }
 
     /**
      * UI for adding a participant that needs to be implemented when the button is pressed
      */
     public void addParticipants(){
-        //TO DO, implement UI for adding participants
-        System.out.println(event.toString());
+        mainCtrl.switchToAddParticipant();
     }
 
     /**
