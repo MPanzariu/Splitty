@@ -38,7 +38,7 @@ public class EditTitleCtrl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.label.textProperty().bind(translation.getStringBinding("editTitle.label"));
-        this.title.textProperty().bind(translation.getStringBinding("editTitle.promptText"));
+        this.title.promptTextProperty().bind(translation.getStringBinding("editTitle.promptText"));
         this.cancel.textProperty().bind(translation.getStringBinding("editTitle.cancelButton"));
         this.confirm.textProperty().bind(translation.getStringBinding("editTitle.confirmButton"));
     }
@@ -48,12 +48,14 @@ public class EditTitleCtrl implements Initializable {
     }
 
     public void confirm() {
-        Event newEvent = server.editTitle(event.getId(), event.getTitle());
+        Event newEvent = server.editTitle(event.getId(), title.getText());
         event.setTitle(newEvent.getTitle());
+        title.clear();
         mainCtrl.joinEvent(event);
     }
 
     public void cancel() {
+        title.clear();
         mainCtrl.joinEvent(event);
     }
 }

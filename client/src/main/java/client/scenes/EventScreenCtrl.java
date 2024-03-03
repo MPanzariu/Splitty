@@ -7,6 +7,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
 import java.io.FileInputStream;
@@ -90,6 +92,7 @@ public class EventScreenCtrl implements Initializable{
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
         allExpensesButton.textProperty().bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
         settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        initializeEditTitle();
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
@@ -123,6 +126,16 @@ public class EventScreenCtrl implements Initializable{
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
+    }
+
+    private void initializeEditTitle() {
+        eventNameLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(mouseEvent.getClickCount() == 2)
+                    mainCtrl.openEditTitle();
+            }
+        });
     }
 
     /**
