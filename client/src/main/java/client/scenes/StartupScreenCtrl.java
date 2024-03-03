@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -18,10 +19,13 @@ import javafx.scene.layout.VBox;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
+
 import static javafx.geometry.Pos.CENTER_LEFT;
-public class StartupScreenCtrl {
+public class StartupScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     @FXML
@@ -102,7 +106,8 @@ public class StartupScreenCtrl {
     /**
      * Binds the fields to their matching binding
      */
-    public void bindFields(){
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         eventTitleTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventTitle"));
         inviteCodeTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventCode"));
         joinEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.JoinEvent"));
@@ -281,4 +286,6 @@ public class StartupScreenCtrl {
         System.out.println(event);
         joinEvent(event);
     }
+
+
 }
