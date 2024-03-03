@@ -9,10 +9,7 @@ import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -24,7 +21,7 @@ import java.util.*;
 
 public class EventScreenCtrl implements Initializable{
     @FXML
-    private Button sendInvites;
+    private TextField invitationCode;
     @FXML
     private Button addExpense;
     @FXML
@@ -84,7 +81,7 @@ public class EventScreenCtrl implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        sendInvites.textProperty().bind(translation.getStringBinding("Event.Button.SendInvites"));
+        invitationCode.setEditable(false);
         participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
@@ -164,6 +161,7 @@ public class EventScreenCtrl implements Initializable{
     public void setEvent(Event event) {
         this.event = event;
         eventNameLabel.setText(event.getTitle());
+        invitationCode.setText(event.getId());
     }
 
     /**

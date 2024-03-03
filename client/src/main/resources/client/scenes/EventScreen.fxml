@@ -11,11 +11,11 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="sendInvites" layoutX="425.0" layoutY="63.0" mnemonicParsing="false" onAction="#inviteParticipants" prefHeight="25.0" prefWidth="102.0" text="Send Invites">
+      <TextField fx:id="invitationCode" layoutX="500.0" layoutY="62.0" prefHeight="35.0" prefWidth="237.0" text="Event">
          <font>
-            <Font size="14.0" />
+            <Font size="24.0" />
          </font>
-      </Button>
+      </TextField>
       <Label fx:id="participantsName" layoutX="160.0" layoutY="116.0" prefHeight="27.0" prefWidth="139.0" text="Participants">
          <font>
             <Font size="18.0" />
