@@ -85,8 +85,8 @@ public class ExpenseScreenCtrl implements Initializable{
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        currency.setItems(FXCollections.observableArrayList("EUR"));
-       choosePayer.setItems(gettingTheParticipants());
+        currency.setItems(FXCollections.observableArrayList("", "EUR"));
+        choosePayer.setItems(gettingTheParticipants());
         binds();
     }
 
@@ -142,9 +142,22 @@ public class ExpenseScreenCtrl implements Initializable{
      * @param actionEvent the action of clicking the button
      */
     public void switchToEventScreen(ActionEvent actionEvent) {
-        mainCtrl.switchBackToEventScreen();
+        resetAmount();
+        resetPurpose();
+        resetDate();
+        resetCurrency();
+        mainCtrl.joinEvent(currentEvent);
     }
 
+    /**
+     * resets all the fields in the expenseScreen
+     */
+    public void resetAll() {
+        resetAmount();
+        resetPurpose();
+        resetDate();
+        resetCurrency();
+    }
     /**
      * resets the amount inserted in the amount TextField
      */
@@ -176,6 +189,7 @@ public class ExpenseScreenCtrl implements Initializable{
 
     /**
      * Creates a new expense based on the information provided
+     * and adds it to the backend
      * in the ExpenseScreen
      * @return the created expense
      */
@@ -194,11 +208,14 @@ public class ExpenseScreenCtrl implements Initializable{
         Date expenseDate = Date.valueOf(datePicker.getValue());
         Participant participant =
             new Participant(choosePayer.getValue(), currentEvent);
-        return new Expense(name, priceInCents, expenseDate, currentEvent, participant);
+        return server.addExpense(currentEvent.getId(),
+            new Expense(name, priceInCents, expenseDate, currentEvent, participant));
     }
-
+    /**
+     * Needs revision
+     */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
-        mainCtrl.switchBackToEventScreen();
+        mainCtrl.joinEvent(currentEvent);
     }
 
     //TODO: 1.Fixing the bindings
