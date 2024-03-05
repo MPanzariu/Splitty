@@ -9,6 +9,7 @@ import commons.Participant;
 import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,12 +21,12 @@ import java.awt.*;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.util.*;
+
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class ExpenseScreenCtrl implements Initializable{
@@ -85,9 +86,20 @@ public class ExpenseScreenCtrl implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currency.setItems(FXCollections.observableArrayList("EUR"));
-//        ObservableSet <String> participantsNames = new ObservableSetWrapper<>();
-//        choosePayer = new Obs;
+       choosePayer.setItems(gettingTheParticipants());
         binds();
+    }
+
+    public ObservableList<String> gettingTheParticipants() {
+        if(participants == null)
+            participants = new HashSet<>();
+        Iterator<Participant> iterator = participants.iterator();
+        List<String> names = new ArrayList<>();
+        while(iterator.hasNext()) {
+            Participant participant = iterator.next();
+            names.add(participant.getName());
+        }
+        return FXCollections.observableArrayList(names);
     }
 
     public void binds() {
@@ -189,8 +201,8 @@ public class ExpenseScreenCtrl implements Initializable{
         mainCtrl.switchBackToEventScreen();
     }
 
-
-    //TODO: 1.Adding the expense to the EventScreen
+    //TODO: 1.Fixing the bindings
     //TODO: 2.Getting the participant that paid (after the participant UI is implemented)
-    //TODO: 3.Making the user able to choose between participants that can pay(for the custom participants button)
+    //TODO: 3.Adding the expense to the EventScreen
+    //TODO: 4.Making the user able to choose between participants that can pay(for the custom participants button)
 }
