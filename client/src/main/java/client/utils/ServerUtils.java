@@ -183,7 +183,6 @@ public class ServerUtils {
 			.request(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.put(Entity.entity(expense, APPLICATION_JSON), Expense.class);
-		}
-	//TODO Test weather or not the methods actually work in cae of problems like(expense doesn't exist)
 	}
+	//TODO Test weather or not the methods actually work in cae of problems like(expense doesn't exist)
 }
