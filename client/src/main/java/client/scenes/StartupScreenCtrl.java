@@ -72,14 +72,14 @@ public class StartupScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        eventTitleTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventTitle"));
-        inviteCodeTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventCode"));
-        joinEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.JoinEvent"));
-        createEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.CreateEvent"));
-        joinEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.JoinEvent"));
-        createEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.CreateEvent"));
-        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
+        bindTextBox(eventTitleTextBox, "Startup.TextBox.EventTitle");
+        bindTextBox(inviteCodeTextBox, "Startup.TextBox.EventCode");
+        bindLabel(joinEventLabel, "Startup.Label.JoinEvent");
+        bindLabel(createEventLabel, "Startup.Label.CreateEvent");
+        bindButton(joinEventButton, "Startup.Button.JoinEvent");
+        bindButton(createEventButton, "Startup.Button.CreateEvent");
+        bindLabel(joinEventFeedback, "empty");
+        bindLabel(createEventFeedback, "empty");
     }
 
     /**
@@ -252,6 +252,15 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
+     * Gets the text from a given textfield
+     * @param textBox the textfield to get the text from
+     * @return String the text from the textfield
+     */
+    public String getTextBoxText(TextField textBox){
+        return textBox.getText();
+    }
+
+    /**
      * Binds a label to a given string binding
      * @param label the label to bind
      * @param key the key for the translator
@@ -262,16 +271,20 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
-     * Get text from a given textbox
+     * Binds a textfield to a given string binding
+     * @param textBox the textfield to bind
+     * @param key the translator key
      */
-    public String getTextBoxText(TextField textBox){
-        return textBox.getText();
+    public void bindTextBox(TextField textBox, String key) {
+        textBox.promptTextProperty().bind(translation.getStringBinding(key));
     }
 
     /**
-     * Binds a textfield to a given string binding
+     * Binds a button to a given string binding
+     * @param button the button to bind
+     * @param key the translator key
      */
-    public void bindTextBox(TextField textBox, String key) {
-        textBox.textProperty().bind(translation.getStringBinding(key));
+    public void bindButton(Button button, String key) {
+        button.textProperty().bind(translation.getStringBinding(key));
     }
 }

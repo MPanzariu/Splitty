@@ -3,6 +3,7 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,18 @@ public class StartupScreenCtrlTest{
         sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null);
 
     }
+
+    @Test
+    public void testInitialization(){
+        assertTrue(sut.labelBindings.isEmpty());
+        assertTrue(sut.textBoxBindings.isEmpty());
+        assertTrue(sut.buttonBindings.isEmpty());
+        sut.initialize(null, null);
+        assertEquals(4, sut.labelBindings.size());
+        assertEquals(2, sut.textBoxBindings.size());
+        assertEquals(2, sut.buttonBindings.size());
+    }
+
     @Test
     public void testCreateEventEmptyTitle(){
         String title = "";
@@ -110,6 +123,8 @@ public class StartupScreenCtrlTest{
         public List<String> joinEventCalls = new ArrayList<>();
 
         public List<String> labelBindings = new ArrayList<>();
+        public List<String> textBoxBindings = new ArrayList<>();
+        public List<String> buttonBindings = new ArrayList<>();
         /**
          * Constructor
          *
@@ -129,6 +144,18 @@ public class StartupScreenCtrlTest{
         @Override
         public void bindLabel(Label label,String str){
             labelBindings.add(str);
+            return;
+        }
+
+        @Override
+        public void bindTextBox(TextField textBox, String str){
+            textBoxBindings.add(str);
+            return;
+        }
+
+        @Override
+        public void bindButton(Button button, String str){
+            buttonBindings.add(str);
             return;
         }
 
