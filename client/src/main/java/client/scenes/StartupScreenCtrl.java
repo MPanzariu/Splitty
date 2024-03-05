@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import jakarta.ws.rs.BadRequestException;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -110,8 +111,7 @@ public class StartupScreenCtrl implements Initializable {
         try{
             Event event = server.getEvent(inviteCode);
             joinEvent(event);
-            //Build fails when I use BadRequest exception
-        }catch (Exception exception){
+        }catch (BadRequestException exception){
             bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
     }
