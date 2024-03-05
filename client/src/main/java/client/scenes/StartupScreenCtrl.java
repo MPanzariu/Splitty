@@ -83,6 +83,21 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
+     * Creates and joins the event specified by the user in the text box
+     */
+    public void createEvent(){
+        bindLabel(createEventFeedback, "empty");
+        String title = getTextBoxText(eventTitleTextBox);
+        if (title.isEmpty()){
+            bindLabel(createEventFeedback, "Startup.Label.UnspecifiedTitle");
+            return;
+        }
+        Event event = server.createEvent(title);
+        System.out.println(event);
+        joinEvent(event);
+    }
+
+    /**
      * Joins the event specified by the user in the text box
      */
     public void joinEventClicked(){
@@ -100,7 +115,6 @@ public class StartupScreenCtrl implements Initializable {
             bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
     }
-
     /**
      * Joins the given event
      * @param event the event to join
@@ -127,6 +141,7 @@ public class StartupScreenCtrl implements Initializable {
             System.out.println("File was not found!");
         }
     }
+
     /**
      * Removes the HBox containing the event given if it exists already in the history
      * @param event the event to remove the history of
@@ -138,6 +153,17 @@ public class StartupScreenCtrl implements Initializable {
             hBoxEventHashMap.remove(hBox);
             if (hBox != null){
                 removeFromVBox(hBox.idProperty());
+            }
+        }else{
+            for (Event e : eventHBoxHashMap.keySet()){
+                if (e.getId().equals(event.getId())){
+                    HBox hBox = eventHBoxHashMap.get(e);
+                    eventHBoxHashMap.remove(e);
+                    hBoxEventHashMap.remove(hBox);
+                    if (hBox != null){
+                        removeFromVBox(hBox.idProperty());
+                    }
+                }
             }
         }
     }
@@ -176,7 +202,6 @@ public class StartupScreenCtrl implements Initializable {
         );
         return label;
     }
-
     /**
      * Generates the HBox for the history (which will contain the label and image)
      * @param label the label to display
@@ -238,27 +263,13 @@ public class StartupScreenCtrl implements Initializable {
             allNodes.remove(removeNode);
         }
     }
+
     /**
      * Returns the history nodes that are in recentlyViewedEventsVBox
      * @return a list with the nodes
      */
     public List<Node> getHistoryNodes(){
         return recentlyViewedEventsVBox.getChildren();
-    }
-
-    /**
-     * Creates and joins the event specified by the user in the text box
-     */
-    public void createEvent(){
-        bindLabel(createEventFeedback, "empty");
-        String title = getTextBoxText(eventTitleTextBox);
-        if (title.isEmpty()){
-            bindLabel(createEventFeedback, "Startup.Label.UnspecifiedTitle");
-            return;
-        }
-        Event event = server.createEvent(title);
-        System.out.println(event);
-        joinEvent(event);
     }
 
     /**
