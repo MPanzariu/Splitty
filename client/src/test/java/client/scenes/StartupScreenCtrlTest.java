@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,33 +53,35 @@ public class StartupScreenCtrlTest{
         assertFalse(sut.labelBindings.isEmpty());
         assertTrue(sut.labelBindings.contains("Startup.Label.InvalidCode"));
     }
-//
-//    @Test
-//    public void testJoinEventInvalidCode(){
-//        String inviteCode = "aaaaab";
-//        inviteCodeTextBox.setText(inviteCode);
-//        sut.joinEventClicked();
-//        assertEquals(1, testServerUtils.calls.size());
-//        //assertEquals(1, testMainController.calls.size());
-//        //assertEquals("Invalid invitation code!",joinEventFeedback.getText());
-//    }
-//
-//    @Test
-//    public void testJoinEventValidCode(){
-//        String inviteCode = "aaaaaa";
-//        inviteCodeTextBox.setText(inviteCode);
-//        sut.joinEventClicked();
-//        assertEquals(1, testServerUtils.calls.size());
-//        assertEquals(1, testMainController.calls.size());
-//    }
+
+    @Test
+    public void testJoinEventInvalidCode(){
+        //The only valid code is "aaaaaa"
+        String inviteCode = "aaaaab";
+        sut.textBoxText = inviteCode;
+        sut.joinEventClicked();
+        assertEquals(1, testServerUtils.calls.size());
+        assertFalse(sut.labelBindings.isEmpty());
+        assertTrue(sut.labelBindings.contains("Startup.Label.InvalidCode"));
+    }
+
+    @Test
+    public void testJoinEventValidCode(){
+        String inviteCode = "aaaaaa";
+        sut.textBoxText = inviteCode;
+        sut.joinEventClicked();
+        assertEquals(1, testServerUtils.calls.size());
+        assertFalse(sut.joinEventCalls.isEmpty());
+    }
 
     private class TestServerUtils extends ServerUtils{
         public List<String> calls = new LinkedList<>();
+        public String validInvitationCode = "aaaaaa";
         @Override
         public Event getEvent(String inviteCode){
             calls.add("getEvent: " + inviteCode);
             //valid code
-            if(inviteCode.equals("aaaaaa")){
+            if(inviteCode.equals(validInvitationCode)){
                 return new Event();
             }
             //invalid code
