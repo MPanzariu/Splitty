@@ -47,10 +47,6 @@ public class StartupScreenCtrl implements Initializable {
     private Label joinEventLabel;
 
     private List<AbstractMap.SimpleEntry<Event, HBox>> eventsAndHBoxes;
-/*
-    private HashMap<Event, HBox> eventHBoxHashMap;
-    private HashMap<HBox, Event> hBoxEventHashMap;
-*/
     private Translation translation;
 
     /**
@@ -64,9 +60,6 @@ public class StartupScreenCtrl implements Initializable {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
-        /*
-        eventHBoxHashMap = new HashMap<>();
-        hBoxEventHashMap = new HashMap<>();*/
         eventsAndHBoxes = new ArrayList<>();
     }
 
@@ -138,23 +131,21 @@ public class StartupScreenCtrl implements Initializable {
             removeFromHistoryIfExists(event);
             List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
             recentlyViewedEvents.addFirst(hbox);
-            /*
-            eventHBoxHashMap.put(event, hbox);
-            hBoxEventHashMap.put(hbox, event);*/
             eventsAndHBoxes.add(new AbstractMap.SimpleEntry<>(event, hbox));
             if (recentlyViewedEventsVBox.getChildren().size() > 5){
                 HBox lastHBox = (HBox) recentlyViewedEvents.getLast();
                 Event removedEvent = getEntryFromEventHbox(lastHBox).getKey();
-//                eventHBoxHashMap.remove(removedEvent);
-//                hBoxEventHashMap.remove(lastHBox);
-//                recentlyViewedEvents.removeLast();
                 removeFromHistoryIfExists(removedEvent);
             }
         }catch (FileNotFoundException e){
             System.out.println("File was not found!");
         }
     }
-
+    /**
+     * Gets the entry from the eventHBoxHashMap
+     * @param event the event to get the entry for
+     * @return the entry
+     */
     public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(Event event){
         for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
             if (entry.getKey().equals(event)){
@@ -163,6 +154,11 @@ public class StartupScreenCtrl implements Initializable {
         }
         return null;
     }
+    /**
+     * Gets the entry from the eventHBoxHashMap
+     * @param hBox the HBox to get the entry for
+     * @return the entry
+     */
     public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(HBox hBox){
         for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
             if (entry.getValue().equals(hBox)){
@@ -172,6 +168,13 @@ public class StartupScreenCtrl implements Initializable {
         return null;
     }
 
+    /**
+     * Getter for eventsAndHBoxes
+     * @return eventsAndHBoxes
+     */
+    public List<AbstractMap.SimpleEntry<Event, HBox>> getEventsAndHBoxes() {
+        return eventsAndHBoxes;
+    }
 
     /**
      * Removes the HBox containing the event given if it exists already in the history
@@ -186,18 +189,6 @@ public class StartupScreenCtrl implements Initializable {
                 removeFromVBox(hBox.idProperty());
             }
         }
-//       else{
-//            for (Event e : eventHBoxHashMap.keySet()){
-//                if (e.getId().equals(event.getId())){
-//                    HBox hBox = eventHBoxHashMap.get(e);
-//                    eventHBoxHashMap.remove(e);
-//                    hBoxEventHashMap.remove(hBox);
-//                    if (hBox != null){
-//                        removeFromVBox(hBox.idProperty());
-//                    }
-//                }
-//            }
-//        }
     }
 
     /**
@@ -341,22 +332,9 @@ public class StartupScreenCtrl implements Initializable {
         button.textProperty().bind(translation.getStringBinding(key));
     }
 
-//    /**
-//     * Getter for eventHBoxHashMap
-//     * @return eventHBoxHashMap
-//     */
-//    public HashMap<Event, HBox> getEventHBoxHashMap() {
-//        return eventHBoxHashMap;
-//    }
-//
-//    /**
-//     * Getter for hBoxEventHashMap
-//     * @return hBoxEventHashMap
-//     */
-//    public HashMap<HBox, Event> gethBoxEventHashMap() {
-//        return hBoxEventHashMap;
-//    }
-
+    /**
+     * Refreshes the events in the history
+     */
     public void refreshEvents(){
         List<String> eventIds = new ArrayList<>();
         List<Map.Entry<Event, HBox>> entries = new ArrayList<>();
