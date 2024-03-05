@@ -51,42 +51,6 @@ public class StartupScreenCtrl implements Initializable {
     private HashMap<HBox, Event> hBoxEventHashMap;
 
     private Translation translation;
-    /**
-     * Setter for eventTitleTextBox
-     * @param eventTitleTextBox the value to set it to
-     */
-    public void setEventTitleTextBox(TextField eventTitleTextBox) {
-        this.eventTitleTextBox = eventTitleTextBox;
-    }
-    /**
-     * Setter for inviteCodeTextBox
-     * @param inviteCodeTextBox the value to set it to
-     */
-    public void setInviteCodeTextBox(TextField inviteCodeTextBox) {
-        this.inviteCodeTextBox = inviteCodeTextBox;
-    }
-    /**
-     * Setter for createEventFeedback
-     * @param createEventFeedback the value to set it to
-     */
-    public void setCreateEventFeedback(Label createEventFeedback) {
-        this.createEventFeedback = createEventFeedback;
-    }
-    /**
-     * Setter for joinEventFeedback
-     * @param joinEventFeedback the value to set it to
-     */
-    public void setJoinEventFeedback(Label joinEventFeedback) {
-        this.joinEventFeedback = joinEventFeedback;
-    }
-
-    /**
-     * Setter for recentlyViewedEventsVBox
-     * @param recentlyViewedEventsVBox the value to set it to
-     */
-    public void setRecentlyViewedEventsVBox(VBox recentlyViewedEventsVBox) {
-        this.recentlyViewedEventsVBox = recentlyViewedEventsVBox;
-    }
 
     /**
      * Constructor
@@ -122,19 +86,18 @@ public class StartupScreenCtrl implements Initializable {
      * Joins the event specified by the user in the text box
      */
     public void joinEventClicked(){
-
-        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        String inviteCode = inviteCodeTextBox.getText();
+        bindLabel(joinEventFeedback, "empty");
+        String inviteCode = getTextBoxText(inviteCodeTextBox);
         if (inviteCode.length() != 6){
-            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
+            bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
             return;
         }
         try{
-            Event event = server.getEvent(inviteCodeTextBox.getText());
+            Event event = server.getEvent(inviteCode);
             joinEvent(event);
             //Build fails when I use BadRequest exception
         }catch (Exception exception){
-            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
+            bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
     }
 
@@ -305,4 +268,10 @@ public class StartupScreenCtrl implements Initializable {
         return textBox.getText();
     }
 
+    /**
+     * Binds a textfield to a given string binding
+     */
+    public void bindTextBox(TextField textBox, String key) {
+        textBox.textProperty().bind(translation.getStringBinding(key));
+    }
 }

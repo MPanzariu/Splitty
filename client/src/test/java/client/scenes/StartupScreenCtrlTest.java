@@ -3,22 +3,17 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
-import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 public class StartupScreenCtrlTest{
 
@@ -49,16 +44,16 @@ public class StartupScreenCtrlTest{
         assertEquals(testServerUtils.calls.size(), 1);
         assertEquals(sut.joinEventCalls.size(), 1);
     }
-//
-//    @Test
-//    public void testJoinEventInvalidLength(){
-//        String inviteCode = "invalid";
-//        inviteCodeTextBox.setText(inviteCode);
-//        sut.joinEventClicked();
-//        assertEquals(0, testServerUtils.calls.size());
-//        assertEquals(0, testMainController.calls.size());
-//        assertEquals("Invalid invitation code!",joinEventFeedback.getText());
-//    }
+    @Test
+    public void testJoinEventInvalidLength(){
+        String inviteCode = "invalid";
+        sut.textBoxText = inviteCode;
+        sut.joinEventClicked();
+        assertEquals(0, testServerUtils.calls.size());
+        assertEquals(0, testMainController.calls.size());
+        assertFalse(sut.labelBindings.isEmpty());
+        assertTrue(sut.labelBindings.contains("Startup.Label.InvalidCode"));
+    }
 //
 //    @Test
 //    public void testJoinEventInvalidCode(){
@@ -113,6 +108,7 @@ public class StartupScreenCtrlTest{
         public String textBoxText;
         public List<String> joinEventCalls = new ArrayList<>();
 
+        public List<String> labelBindings = new ArrayList<>();
         /**
          * Constructor
          *
@@ -131,6 +127,7 @@ public class StartupScreenCtrlTest{
 
         @Override
         public void bindLabel(Label label,String str){
+            labelBindings.add(str);
             return;
         }
 
