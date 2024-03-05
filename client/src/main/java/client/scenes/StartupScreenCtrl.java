@@ -136,7 +136,9 @@ public class StartupScreenCtrl implements Initializable {
             HBox hBox = eventHBoxHashMap.get(event);
             eventHBoxHashMap.remove(event);
             hBoxEventHashMap.remove(hBox);
-            recentlyViewedEventsVBox.getChildren().remove(hBox);
+            if (hBox != null){
+                removeFromVBox(hBox.idProperty());
+            }
         }
     }
 
@@ -225,10 +227,10 @@ public class StartupScreenCtrl implements Initializable {
      * @param id the given id
      */
     public void removeFromVBox(StringProperty id){
-        List<Node> allNodes = recentlyViewedEventsVBox.getChildren();
+        List<Node> allNodes = getHistoryNodes();
         Node removeNode = null;
         for (Node node : allNodes){
-            if (node.idProperty() != null && node.idProperty().equals(id)){
+            if (node != null && node.idProperty() != null && node.idProperty().equals(id)){
                 removeNode = node;
             }
         }
@@ -236,6 +238,14 @@ public class StartupScreenCtrl implements Initializable {
             allNodes.remove(removeNode);
         }
     }
+    /**
+     * Returns the history nodes that are in recentlyViewedEventsVBox
+     * @return a list with the nodes
+     */
+    public List<Node> getHistoryNodes(){
+        return recentlyViewedEventsVBox.getChildren();
+    }
+
     /**
      * Creates and joins the event specified by the user in the text box
      */
@@ -286,5 +296,21 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void bindButton(Button button, String key) {
         button.textProperty().bind(translation.getStringBinding(key));
+    }
+
+    /**
+     * Getter for eventHBoxHashMap
+     * @return eventHBoxHashMap
+     */
+    public HashMap<Event, HBox> getEventHBoxHashMap() {
+        return eventHBoxHashMap;
+    }
+
+    /**
+     * Getter for hBoxEventHashMap
+     * @return hBoxEventHashMap
+     */
+    public HashMap<HBox, Event> gethBoxEventHashMap() {
+        return hBoxEventHashMap;
     }
 }

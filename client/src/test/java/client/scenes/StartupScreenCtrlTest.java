@@ -3,13 +3,16 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,6 +90,24 @@ public class StartupScreenCtrlTest{
         assertFalse(sut.joinEventCalls.isEmpty());
     }
 
+    @Test
+    public void testRemoveFromVboxNull(){
+        sut.removeFromVBox(null);
+    }
+
+    @Test
+    public void testRemoveFromHistoryIfExists(){
+        HBox hBox = null;
+        Event event = new Event();
+        sut.gethBoxEventHashMap().put(hBox, event);
+        sut.getEventHBoxHashMap().put(event, hBox);
+        assertFalse(sut.gethBoxEventHashMap().isEmpty());
+        assertFalse(sut.getEventHBoxHashMap().isEmpty());
+        sut.removeFromHistoryIfExists(event);
+        assertTrue(sut.gethBoxEventHashMap().isEmpty());
+        assertTrue(sut.getEventHBoxHashMap().isEmpty());
+    }
+
     private class TestServerUtils extends ServerUtils{
         public List<String> calls = new LinkedList<>();
         public String validInvitationCode = "aaaaaa";
@@ -125,6 +146,8 @@ public class StartupScreenCtrlTest{
         public List<String> labelBindings = new ArrayList<>();
         public List<String> textBoxBindings = new ArrayList<>();
         public List<String> buttonBindings = new ArrayList<>();
+        public HashMap<HBox, Event> hBoxEventHashMap;
+        public HashMap<Event, HBox> eventHBoxHashMap;
         /**
          * Constructor
          *
@@ -162,6 +185,11 @@ public class StartupScreenCtrlTest{
         @Override
         public void joinEvent(Event event){
             joinEventCalls.add(event.toString());
+        }
+
+        @Override
+        public List<Node> getHistoryNodes(){
+            return new ArrayList<>();
         }
     }
 }
