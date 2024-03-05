@@ -122,6 +122,7 @@ public class StartupScreenCtrl implements Initializable {
      * Joins the event specified by the user in the text box
      */
     public void joinEventClicked(){
+
         joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
         String inviteCode = inviteCodeTextBox.getText();
         if (inviteCode.length() != 6){
@@ -276,10 +277,10 @@ public class StartupScreenCtrl implements Initializable {
      * Creates and joins the event specified by the user in the text box
      */
     public void createEvent(){
-        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        String title = eventTitleTextBox.getText();
+        bindLabel(createEventFeedback, "empty");
+        String title = getTextBoxText(eventTitleTextBox);
         if (title.isEmpty()){
-            createEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.UnspecifiedTitle"));
+            bindLabel(createEventFeedback, "Startup.Label.UnspecifiedTitle");
             return;
         }
         Event event = server.createEvent(title);
@@ -287,5 +288,21 @@ public class StartupScreenCtrl implements Initializable {
         joinEvent(event);
     }
 
+    /**
+     * Binds a label to a given string binding
+     * @param label the label to bind
+     * @param key the key for the translator
+     */
+
+    public void bindLabel(Label label, String key){
+        label.textProperty().bind(translation.getStringBinding(key));
+    }
+
+    /**
+     * Get text from a given textbox
+     */
+    public String getTextBoxText(TextField textBox){
+        return textBox.getText();
+    }
 
 }

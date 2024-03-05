@@ -1,76 +1,54 @@
-//package client.scenes;
-//
-//import client.utils.ServerUtils;
-//import commons.Event;
-//import javafx.application.Platform;
-//import javafx.scene.control.Label;
-//import javafx.scene.control.TextField;
-//import javafx.scene.layout.VBox;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//
-//import java.util.LinkedList;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-////@ExtendWith(ApplicationExtension.class)
-//public class StartupScreenCtrlTest{
-//
-//    private StartupScreenCtrl sut;
-//    private TestServerUtils testServerUtils;
-//    private TestMainController testMainController;
-//    private TextField eventTitleTextBox;
-//
-//    private TextField inviteCodeTextBox;
-//    private Label createEventFeedback;
-//    private Label joinEventFeedback;
-//    private VBox reventlyViewedEventsVBox;
-//
-////    @BeforeAll
-////    public static void init(){
-////        Platform.startup(() ->
-////        {
-////            // This block will be executed on JavaFX Thread
-////        });
-////    }
-//
-//    @BeforeEach
-//    public void setup() {
-//        this.testServerUtils = new TestServerUtils();
-//        this.testMainController =  new TestMainController();
-//        sut = new StartupScreenCtrl(this.testServerUtils, this.testMainController);
-//        eventTitleTextBox = new TextField();
-//        inviteCodeTextBox = new TextField();
-//        createEventFeedback = new Label();
-//        joinEventFeedback = new Label();
-//        reventlyViewedEventsVBox = new VBox();
-//        sut.setEventTitleTextBox(eventTitleTextBox);
-//        sut.setInviteCodeTextBox(inviteCodeTextBox);
-//        sut.setCreateEventFeedback(createEventFeedback);
-//        sut.setJoinEventFeedback(joinEventFeedback);
-//        sut.setRecentlyViewedEventsVBox(reventlyViewedEventsVBox);
-//    }
-//    @Test
-//    public void testCreateEventEmptyTitle(){
-//        String title = "";
-//        eventTitleTextBox.setText(title);
-//        sut.createEvent();
-//        assertTrue(testServerUtils.calls.isEmpty());
-//        assertTrue(testMainController.calls.isEmpty());
-//        assertEquals("Please specify the title!",createEventFeedback.getText());
-//    }
-//
-//    @Test
-//    public void testCreateEventSuccess(){
-//        String title = "title";
-//        eventTitleTextBox.setText(title);
-//        sut.createEvent();
-//        assertEquals(1, testServerUtils.calls.size());
-//        assertEquals(1, testMainController.calls.size());
-//        assertNotEquals("Please specify the title!",createEventFeedback.getText());
-//    }
+package client.scenes;
+
+import client.utils.ServerUtils;
+import client.utils.Translation;
+import commons.Event;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+public class StartupScreenCtrlTest{
+
+    private TestStartupScreenCtrl sut;
+    private TestServerUtils testServerUtils;
+    private TestMainController testMainController;
+    @BeforeEach
+    public void setup() {
+        this.testServerUtils = new TestServerUtils();
+        this.testMainController =  new TestMainController();
+        sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null);
+
+    }
+    @Test
+    public void testCreateEventEmptyTitle(){
+        String title = "";
+        sut.textBoxText = title;
+        sut.createEvent();
+        assertTrue(sut.joinEventCalls.isEmpty());
+        assertTrue(testServerUtils.calls.isEmpty());
+    }
+
+    @Test
+    public void testCreateEventSuccess(){
+        String title = "title";
+        sut.textBoxText = title;
+        sut.createEvent();
+        assertEquals(testServerUtils.calls.size(), 1);
+        assertEquals(sut.joinEventCalls.size(), 1);
+    }
 //
 //    @Test
 //    public void testJoinEventInvalidLength(){
@@ -100,34 +78,65 @@
 //        assertEquals(1, testServerUtils.calls.size());
 //        assertEquals(1, testMainController.calls.size());
 //    }
-//
-//    private class TestServerUtils extends ServerUtils{
-//        public List<String> calls = new LinkedList<>();
-//        @Override
-//        public Event getEvent(String inviteCode){
-//            calls.add("getEvent: " + inviteCode);
-//            //valid code
-//            if(inviteCode.equals("aaaaaa")){
-//                return new Event();
-//            }
-//            //invalid code
-//            throw new jakarta.ws.rs.BadRequestException();
-//        }
-//
-//        @Override
-//        public Event createEvent(String inviteCode){
-//            calls.add("createEvent: " + inviteCode);
-//            return new Event();
-//        }
-//    }
-//
-//    private class TestMainController extends MainCtrl{
-//        public List<String> calls = new LinkedList<>();
-//        public Event lastEvent;
-//        @Override
-//        public void joinEvent(Event event){
-//            lastEvent = event;
-//            calls.add("join");
-//        }
-//    }
-//}
+
+    private class TestServerUtils extends ServerUtils{
+        public List<String> calls = new LinkedList<>();
+        @Override
+        public Event getEvent(String inviteCode){
+            calls.add("getEvent: " + inviteCode);
+            //valid code
+            if(inviteCode.equals("aaaaaa")){
+                return new Event();
+            }
+            //invalid code
+            throw new jakarta.ws.rs.BadRequestException();
+        }
+
+        @Override
+        public Event createEvent(String inviteCode){
+            calls.add("createEvent: " + inviteCode);
+            return new Event();
+        }
+    }
+
+    private class TestMainController extends MainCtrl{
+        public List<String> calls = new LinkedList<>();
+        public Event lastEvent;
+        @Override
+        public void joinEvent(Event event){
+            lastEvent = event;
+            calls.add("join");
+        }
+    }
+
+    private class TestStartupScreenCtrl extends StartupScreenCtrl{
+        public String textBoxText;
+        public List<String> joinEventCalls = new ArrayList<>();
+
+        /**
+         * Constructor
+         *
+         * @param server      the ServerUtils instance
+         * @param mainCtrl    the MainCtrl instance
+         * @param translation the Translation to use
+         */
+        public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+            super(server, mainCtrl, translation);
+        }
+
+        @Override
+        public String getTextBoxText(TextField textBox){
+            return textBoxText;
+        }
+
+        @Override
+        public void bindLabel(Label label,String str){
+            return;
+        }
+
+        @Override
+        public void joinEvent(Event event){
+            joinEventCalls.add(event.toString());
+        }
+    }
+}
