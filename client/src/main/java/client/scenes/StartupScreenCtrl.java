@@ -5,6 +5,7 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -42,6 +43,8 @@ public class StartupScreenCtrl implements Initializable {
     private Button joinEventButton;
     @FXML
     private Button createEventButton;
+    @FXML
+    private Button managementOverviewButton;
     @FXML
     private Label createEventLabel;
     @FXML
@@ -116,6 +119,7 @@ public class StartupScreenCtrl implements Initializable {
         createEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.CreateEvent"));
         joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
         createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
+        managementOverviewButton.textProperty().bind(translation.getStringBinding("Startup.Button.Management.Overview"));
     }
 
     /**
@@ -288,4 +292,7 @@ public class StartupScreenCtrl implements Initializable {
     }
 
 
+    public void goToTheManagementOverview(ActionEvent actionEvent) {
+        mainCtrl.switchToMnagamentOverviewPasswordScreen();
+    }
 }

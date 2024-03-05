@@ -29,6 +29,8 @@ public class MainCtrl {
     private ParticipantScreenCtrl participantScreenCtrl;
 
     private Scene editTitleScene;
+    private Scene managementOvervirewPasswordScene;
+    private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
 
 
     @Inject
@@ -40,7 +42,8 @@ public class MainCtrl {
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
 
-                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair) {
+                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair,
+                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI) {
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -57,6 +60,8 @@ public class MainCtrl {
 
         this.editTitleCtrl = editTitlePair.getKey();
         this.editTitleScene = new Scene(editTitlePair.getValue());
+
+        this.managementOvervirewPasswordScene = new Scene(managementOverviewPassworrdUI.getValue());
 
         showOverview();
         primaryStage.show();
@@ -133,4 +138,7 @@ public class MainCtrl {
         primaryStage.setScene(participantScene);
     }
 
+    public void switchToMnagamentOverviewPasswordScreen(){
+        primaryStage.setScene(managementOvervirewPasswordScene);
+    }
 }

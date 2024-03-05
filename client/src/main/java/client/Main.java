@@ -47,6 +47,7 @@ public class Main extends Application {
         var participantScreen = FXML.load(ParticipantScreenCtrl.class, "client", "scenes", "ParticipantScreen.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         var editTitle = FXML.load(EditTitleCtrl.class, "client", "scenes", "EditTitle.fxml");
-        mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle);
+        var managementOverviewPassword = FXML.load(ManagementOverviewPasswordCtrl.class, "client", "scenes", "ManagementOverviewPassword.fxml");
+        mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle, managementOverviewPassword);
     }
 }
