@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,9 +31,13 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     private Label participantsLabel;
     @FXML
+    private Label expensesLabel;
+    @FXML
     private ListView eventsListView;
     @FXML
     private ListView participantsListView;
+    @FXML
+    private ListView expensesListview;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -65,6 +70,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         MOTitle.textProperty().bind(translation.getStringBinding("MOSCtrl.Title"));
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
+        expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
             ImageView imageView = new ImageView(image);
@@ -104,6 +110,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
 
     /**
      * update the listview for the participants when you select an event from the listview
+     * update the listview for the expenses when you select an event from the listview
      * @param mouseEvent when you click on an element of the participantsListview, do an action
      */
     public void selectEvent(MouseEvent mouseEvent) {
@@ -125,10 +132,16 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         }
         if(current!=null){
             Set<Participant> participants = current.getParticipants();
+            Set<Expense> expenses = current.getExpenses();
             Iterator<Participant> participantIterator = participants.iterator();
+            Iterator<Expense> expenseIterator= expenses.iterator();
             while(participantIterator.hasNext()){
                 Participant toAdd = participantIterator.next();
                 participantsListView.getItems().add(toAdd.getName());
+            }
+            while(expenseIterator.hasNext()){
+                Expense nextExpense = expenseIterator.next();
+                expensesListview.getItems().add(nextExpense.toString());
             }
             System.out.println("it worked but no participants (yet)");
         }
