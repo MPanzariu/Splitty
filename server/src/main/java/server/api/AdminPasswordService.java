@@ -5,18 +5,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.Random;
 
 @Service
 public class AdminPasswordService {
-    static final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
+    static final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
     static final int passwordLength = 20;
     String password = "";
-    public String generatePassword() {
+    public AdminPasswordService(){}
+    private String generatePassword() {
         Random random = new Random();
         for (int i = 0; i < passwordLength; i++) {
             password += passwordChars[random.nextInt(passwordChars.length)];
@@ -30,5 +28,9 @@ public class AdminPasswordService {
             this.password = generatePassword();
             log.info(password);
         };
+    }
+    public boolean passwordChecker(String inputPassword){
+        if(inputPassword.equals(this.password))return true;
+        else return false;
     }
 }
