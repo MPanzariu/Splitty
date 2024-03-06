@@ -115,4 +115,13 @@ public class ServerUtils {
 				.accept(APPLICATION_JSON)
 				.get(Boolean.class);
 	}
+
+	public List<Event> retrieveAllEvents(){
+		List<Event> events = ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/events/all")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.get(new GenericType<List<Event>>(){});
+		return events;
+	}
 }

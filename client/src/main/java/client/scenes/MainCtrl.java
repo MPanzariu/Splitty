@@ -31,6 +31,7 @@ public class MainCtrl {
     private Scene editTitleScene;
     private Scene managementOvervirewPasswordScene;
     private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
+    private Scene managementOverviewScreenScene;
 
 
     @Inject
@@ -43,7 +44,7 @@ public class MainCtrl {
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
 
                            Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair,
-                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI) {
+                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI, Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI) {
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -62,6 +63,7 @@ public class MainCtrl {
         this.editTitleScene = new Scene(editTitlePair.getValue());
 
         this.managementOvervirewPasswordScene = new Scene(managementOverviewPassworrdUI.getValue());
+        this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
 
         showOverview();
         primaryStage.show();
@@ -89,6 +91,7 @@ public class MainCtrl {
         eventScreenCtrl.setEvent(event);
         eventScreenCtrl.setParticipants(event);
         eventScreenCtrl.setParticipantsForExpenses(event);
+        primaryStage.setTitle("Event Screen");
     }
 
     /**
@@ -96,6 +99,7 @@ public class MainCtrl {
      */
     public void switchBackToMainScreen(){
         primaryStage.setScene(startupScene);
+        primaryStage.setTitle("Main Menu");
     }
 
     /**
@@ -140,5 +144,10 @@ public class MainCtrl {
 
     public void switchToMnagamentOverviewPasswordScreen(){
         primaryStage.setScene(managementOvervirewPasswordScene);
+        primaryStage.setTitle("Log in");
+    }
+    public void switchToManagementOverviewScreen(){
+        primaryStage.setScene(managementOverviewScreenScene);
+        primaryStage.setTitle("Management Overview");
     }
 }

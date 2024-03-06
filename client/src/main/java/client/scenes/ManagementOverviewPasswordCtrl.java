@@ -63,7 +63,8 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
             passwordField.clear();
         }
         else{
-            System.out.println("To be implemented");
+            passwordField.clear();
+            mainCtrl.switchToManagementOverviewScreen();
         }
     }
 
