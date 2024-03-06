@@ -36,12 +36,29 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+
+    /**
+     * Constructor
+     * @param server the ServerUtils instance
+     * @param mainCtrl the MainCtrl instance
+     * @param translation the Translation to use
+     */
     @Inject
     public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
     }
+    /**
+     * Initialize basic features for the Management Overview Screen
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
+     */
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,10 +79,18 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         refreshListView();
     }
 
+    /**
+     * switch back to main Screen
+     * @param actionEvent when button is pressed, go back to the main screen
+     */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
     }
 
+    /**
+     * show all the current events in the list view, can be modified to show
+     * dates in case it is needed to.
+     */
     public void refreshListView(){
         List<Event> events = server.retrieveAllEvents();
         for(int i = 0; i < events.size(); i++){
@@ -77,6 +102,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * update the listview for the participants when you select an event from the listview
+     * @param mouseEvent when you click on an element of the participantsListview, do an action
+     */
     public void selectEvent(MouseEvent mouseEvent) {
         List<Event> events = server.retrieveAllEvents();
         participantsListView.getItems().clear();

@@ -108,6 +108,11 @@ public class ServerUtils {
 				.put(Entity.entity(title, APPLICATION_JSON), Event.class);
 	}
 
+	/**
+	 * checks if a password matches with the one randomly generated
+	 * @param inputPassword the password the user inputs to log in to the management overview
+	 * @return a boolean, true or false whether the password matches or not
+	 */
 	public Boolean checkPassword(String inputPassword){
 		return ClientBuilder.newClient(new ClientConfig())
 				.target(serverURL).path("api/password/" + inputPassword)
@@ -116,6 +121,10 @@ public class ServerUtils {
 				.get(Boolean.class);
 	}
 
+	/**
+	 * retrieves all events from the server
+	 * @return all the events from the server
+	 */
 	public List<Event> retrieveAllEvents(){
 		List<Event> events = ClientBuilder.newClient(new ClientConfig())
 				.target(serverURL).path("api/events/all")

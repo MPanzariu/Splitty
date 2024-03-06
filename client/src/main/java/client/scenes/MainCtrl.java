@@ -142,10 +142,17 @@ public class MainCtrl {
         primaryStage.setScene(participantScene);
     }
 
+    /**
+     * switch to the log in page for the management overview
+     */
     public void switchToMnagamentOverviewPasswordScreen(){
         primaryStage.setScene(managementOvervirewPasswordScene);
         primaryStage.setTitle("Log in");
     }
+
+    /**
+     * go to the management overview screen
+     */
     public void switchToManagementOverviewScreen(){
         primaryStage.setScene(managementOverviewScreenScene);
         primaryStage.setTitle("Management Overview");

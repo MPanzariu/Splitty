@@ -291,7 +291,10 @@ public class StartupScreenCtrl implements Initializable {
         joinEvent(event);
     }
 
-
+    /**
+     * switch to the management overview password (log in) scene
+     * @param actionEvent on button press go to another scene
+     */
     public void goToTheManagementOverview(ActionEvent actionEvent) {
         mainCtrl.switchToMnagamentOverviewPasswordScreen();
     }

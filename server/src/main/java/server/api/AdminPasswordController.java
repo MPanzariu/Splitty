@@ -8,10 +8,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/password")
 public class AdminPasswordController {
     AdminPasswordService adminPasswordService;
+
+    /**
+     * Constructor
+     * @param adminPasswordService service for the admin password
+     */
     @Autowired
     public AdminPasswordController(AdminPasswordService adminPasswordService) {
         this.adminPasswordService = adminPasswordService;
     }
+
+    /**
+     * check if the user has the correct password
+     * @param inputPassword the password we want to check
+     * @return a boolean, true or false, if the password is correct or not
+     */
     @GetMapping("/{inputPassword}")
     ResponseEntity<Boolean> checkPassword(@PathVariable String inputPassword){
         if(adminPasswordService.passwordChecker(inputPassword)){
