@@ -27,6 +27,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import commons.Event;
+import commons.Participant;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -106,5 +107,19 @@ public class ServerUtils {
 				.request(APPLICATION_JSON) //
 				.accept(APPLICATION_JSON) //
 				.put(Entity.entity(title, APPLICATION_JSON), Event.class);
+	}
+
+	/**
+	 * Requests the server to add a participant.
+	 * @param id ID of the event
+	 * @param participantName Name of the participant to add
+	 * @return The participant added by the server
+	 */
+	public Participant addParticipant(String id, String participantName) {
+		return ClientBuilder.newClient(new ClientConfig()) //
+				.target(serverURL).path("api/events/" + id) //
+				.request(APPLICATION_JSON) //
+				.accept(APPLICATION_JSON) //
+				.post(Entity.entity(participantName, APPLICATION_JSON), Participant.class);
 	}
 }

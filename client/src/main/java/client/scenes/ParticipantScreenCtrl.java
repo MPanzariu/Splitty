@@ -67,7 +67,9 @@ public class ParticipantScreenCtrl {
     }
 
     public void confirmEdit(ActionEvent actionEvent) {
-        event.addParticipant(addParticipant());
+        Participant participant = addParticipant();
+        server.addParticipant(event.getId(), participant.getName());
+        event.addParticipant(participant);
         mainCtrl.joinEvent(event);
     }
 
