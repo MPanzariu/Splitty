@@ -163,7 +163,7 @@ public class ExpenseScreenCtrl implements Initializable{
         //change in case of wanting to implement another date system
         Date expenseDate = Date.valueOf(datePicker.getValue());
         Participant participant =
-            new Participant(choosePayer.getValue(), currentEvent);
+            new Participant(choosePayer.getValue());
         return new Expense(name, priceInCents, expenseDate, currentEvent, participant);
     }
 

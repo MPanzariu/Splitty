@@ -35,10 +35,11 @@ public class ParticipantServiceTest {
     @Test
     public void testRemoveParticipantFromEvent() {
         Event mockEvent = new Event("Sample Event", null);
-        Participant mockParticipant = new Participant("John Doe", mockEvent);
+        Participant mockParticipant = new Participant("John Doe");
         mockEvent.addParticipant(mockParticipant);
         when(participantRepository.findById(anyLong())).thenReturn(Optional.of(mockParticipant));
-        participantService.removeParticipant(mockParticipant.getId());
+        when(eventRepository.findById(mockEvent.getId())).thenReturn(Optional.of(mockEvent));
+        participantService.removeParticipant(mockEvent.getId(), mockParticipant.getId());
         assertFalse(mockEvent.getParticipants().contains(mockParticipant));
         verify(eventRepository).save(mockEvent);
     }
@@ -50,14 +51,15 @@ public class ParticipantServiceTest {
     @Test
     public void testRemoveMultipleParticipantsFromEvent() {
         Event mockEvent = new Event("Sample Event", null);
-        Participant mockParticipant1 = new Participant("Participant One", mockEvent);
-        Participant mockParticipant2 = new Participant("Participant Two", mockEvent);
+        Participant mockParticipant1 = new Participant(0, "Participant One");
+        Participant mockParticipant2 = new Participant(1, "Participant Two");
         mockEvent.addParticipant(mockParticipant1);
         mockEvent.addParticipant(mockParticipant2);
         when(participantRepository.findById(mockParticipant1.getId())).thenReturn(Optional.of(mockParticipant1));
         when(participantRepository.findById(mockParticipant2.getId())).thenReturn(Optional.of(mockParticipant2));
-        participantService.removeParticipant(mockParticipant1.getId());
-        participantService.removeParticipant(mockParticipant2.getId());
+        when(eventRepository.findById(mockEvent.getId())).thenReturn(Optional.of(mockEvent));
+        participantService.removeParticipant(mockEvent.getId(), mockParticipant1.getId());
+        participantService.removeParticipant(mockEvent.getId(), mockParticipant2.getId());
         assertFalse(mockEvent.getParticipants().contains(mockParticipant1));
         assertFalse(mockEvent.getParticipants().contains(mockParticipant2));
         verify(eventRepository, times(2)).save(mockEvent);
@@ -70,8 +72,9 @@ public class ParticipantServiceTest {
     @Test
     public void removeNonexistentParticipantThrowsException() {
         long nonexistentEventId = 999L;
+        String eventId = "";
         try{
-            participantService.removeParticipant(nonexistentEventId);
+            participantService.removeParticipant(eventId, nonexistentEventId);
             fail("Expected EntityNotFoundException not thrown");
         } catch (EntityNotFoundException ex) {
             assertEquals("Participant not found", ex.getMessage());
@@ -85,8 +88,8 @@ public class ParticipantServiceTest {
     @Test
     public void checkEditParticipantToEvent() {
         Event mockEvent = new Event("Sample Event", null);
-        Participant mockParticipant = new Participant("John Doe", mockEvent);
-        Participant updatedDetails = new Participant("Jane Doe", mockEvent);
+        Participant mockParticipant = new Participant("John Doe");
+        Participant updatedDetails = new Participant("Jane Doe");
         when(participantRepository.findById(mockParticipant.getId())).thenReturn(Optional.of(mockParticipant));
         when(participantRepository.save(any(Participant.class))).thenReturn(updatedDetails);
         Participant result = participantService.editParticipant(mockParticipant.getId(), updatedDetails);
@@ -99,7 +102,7 @@ public class ParticipantServiceTest {
      */
     @Test
     public void editParticipantToEventNonExistentEventCheck() {
-        Participant updatedDetails = new Participant("Jane Doe", null);
+        Participant updatedDetails = new Participant("Jane Doe");
         assertThrows(EntityNotFoundException.class, () -> {
             participantService.editParticipant(updatedDetails.getId(), updatedDetails);
         }, "Should throw EntityNotFoundException for a nonexistent event.");
@@ -113,7 +116,7 @@ public class ParticipantServiceTest {
     public void editParticipantToEventNonExistentParticipantCheck() {
         String participantName = "Jane Doe";
         Event mockEvent = new Event("Sample Event", null);
-        Participant mockParticipant = new Participant(participantName, mockEvent);
+        Participant mockParticipant = new Participant(participantName);
         assertThrows(EntityNotFoundException.class, () -> participantService.editParticipant(mockParticipant.getId(), mockParticipant));
     }
 }

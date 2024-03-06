@@ -87,7 +87,7 @@ public class ParticipantScreenCtrl {
         catch (IllegalArgumentException e) {
             System.out.println(":<");
         }
-        Participant participant = new Participant(name, event);
+        Participant participant = new Participant(name);
         //remember email iban bic when available
         return participant;
     }

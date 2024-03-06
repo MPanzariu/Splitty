@@ -34,11 +34,12 @@ public class ParticipantController {
     /**
      * handles the DELETE request in a RESTful way
      * @param participantId the eliminated participant
+     * @param eventId ID of the event the participant is part of
      * @return a response entity object with a HTTP 200 OK status
      */
-    @DeleteMapping("/{participantId}")
-    public ResponseEntity<?> removeParticipant(@PathVariable Long participantId) {
-        participantService.removeParticipant(participantId);
+    @DeleteMapping("/{eventId}/{participantId}")
+    public ResponseEntity<?> removeParticipant(@PathVariable String eventId, @PathVariable Long participantId) {
+        participantService.removeParticipant(eventId, participantId);
         return ResponseEntity.ok().build();
     }
 }

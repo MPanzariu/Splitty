@@ -58,7 +58,7 @@ public class EventController {
      * @param participantName the name of the participant we will add
      * @return returns the status of the operation
      */
-    @PostMapping("/{eventId}{participantId}")
+    @PostMapping("/{eventId}")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
         String participantName) {
         eventService.addParticipantToEvent(eventId, participantName);
