@@ -23,7 +23,7 @@ public class ExpenseController {
      * @param expense maps the expense to the specific even specified by the ID
      * @return the status of the task
      */
-    @PostMapping("/{eventId}/added-expense")
+    @PostMapping("/{eventId}/expenses")
     public ResponseEntity<Void> addExpenseToEvent(@PathVariable String eventId, @RequestBody
     Expense expense) {
         expenseService.addExpense(eventId, expense);
@@ -50,8 +50,8 @@ public class ExpenseController {
      * @return the sum of all the expenses for a specific event
      */
     @GetMapping("/{eventId}/total-expenses")
-    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable String eventId) {
-        double totalExpenses = expenseService.calculateTotalExpenses(eventId);
+    public ResponseEntity<Integer> calculateTotalExpensesForEvent(@PathVariable String eventId) {
+        int totalExpenses = expenseService.calculateTotalExpenses(eventId);
         return ResponseEntity.ok(totalExpenses);
     }
 

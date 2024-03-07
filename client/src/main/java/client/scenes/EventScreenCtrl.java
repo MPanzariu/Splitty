@@ -232,7 +232,10 @@ public class EventScreenCtrl implements Initializable{
         List<Expense> settledExpenses = event.getSettledExpenses();
         for(int i = 0; i < settledExpenses.size(); i++){
             String log = "";
-            log+=settledExpenses.get(i).getOwedTo().getName();
+            // null check used in-development because Participant functionality isn't there yet!
+            Participant owedTo = settledExpenses.get(i).getOwedTo();
+            if(owedTo==null) log += "null";
+            else log += owedTo.getName();
             log+= " paid ";
             log+=settledExpenses.get(i).getPriceInCents();
             log+= " for ";

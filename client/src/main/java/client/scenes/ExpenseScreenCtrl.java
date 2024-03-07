@@ -2,15 +2,12 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import com.sun.javafx.collections.ObservableSetWrapper;
 import commons.Expense;
 import commons.Event;
 import commons.Participant;
 import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -20,14 +17,12 @@ import javafx.scene.control.TextField;
 import java.awt.*;
 import java.net.URL;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.*;
 
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class ExpenseScreenCtrl implements Initializable{
     private final ServerUtils server;
@@ -212,8 +207,14 @@ public class ExpenseScreenCtrl implements Initializable{
         int priceInCents = (int) Math.ceil(price * 100);
         //change in case of wanting to implement another date system
         Date expenseDate = Date.valueOf(datePicker.getValue());
-        Participant participant =
-            new Participant(choosePayer.getValue(), currentEvent);
+
+        // this has to be a participant that actually exists in the database
+        // you can not in fact just create a new one
+        //
+        /*Participant participant =
+            new Participant(choosePayer.getValue(), currentEvent);*/
+        // I'd suggest doing something with currentEvent.getParticipants()
+        Participant participant = null;
         System.out.println(currentEvent.getId());
         return server.addExpense(currentEvent.getId(),
             new Expense(name, priceInCents, expenseDate, currentEvent, participant));
