@@ -59,12 +59,11 @@ public class EventService {
      * @param participantName the name of the participant we want to add
      * @param eventId the event to which we want to add a participant
      */
-    public void addParticipantToEvent (String participantName, String eventId) {
+    public void addParticipantToEvent (String eventId, String participantName) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-        Participant participant = new Participant(participantName, event);
+        Participant participant = new Participant(participantName);
         event.addParticipant(participant);
-        participantRepository.save(participant);
         eventRepository.save(event);
     }
 

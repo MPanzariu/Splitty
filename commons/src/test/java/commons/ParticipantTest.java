@@ -12,9 +12,8 @@ public class ParticipantTest {
     @Test
     public void checkConstructor() {
         Event e = new Event();
-        var p = new Participant("name", e);
+        var p = new Participant("name");
         assertEquals("name", p.getName());
-        assertEquals(e, p.getEvent());
         assertTrue(p.getExpensesOwedTo().isEmpty());
     }
 
@@ -24,7 +23,7 @@ public class ParticipantTest {
     @Test
     public void setterGetterNameTest(){
         Event e = new Event();
-        var p = new Participant("name", e);
+        var p = new Participant("name");
         assertEquals("name", p.getName());
         p.setName("new name");
         assertEquals("new name", p.getName());
@@ -36,7 +35,7 @@ public class ParticipantTest {
     @Test
     public void expensesTest(){
         Event e = new Event();
-        var p = new Participant("name", e);
+        var p = new Participant("name");
         assertTrue(p.getExpensesOwedTo().isEmpty());
         Expense ex = new Expense();
         p.addExpense(ex);
@@ -50,8 +49,8 @@ public class ParticipantTest {
     @Test
     public void equalsHashCode() {
         Event e = new Event();
-        var a = new Participant("name", e);
-        var b = new Participant("name", e);
+        var a = new Participant("name");
+        var b = new Participant("name");
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
     }
@@ -61,8 +60,8 @@ public class ParticipantTest {
     @Test
     public void notEqualsHashCode() {
         Event e = new Event();
-        var a = new Participant("name", e);
-        var b = new Participant("new name", e);
+        var a = new Participant("name");
+        var b = new Participant("new name");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
@@ -71,11 +70,7 @@ public class ParticipantTest {
      */
     @Test
     public void hasToString() {
-        Event e = new Event();
-        var actual = new Participant("name", e).toString();
-        assertTrue(actual.contains(Event.class.getSimpleName()));
-        assertTrue(actual.contains("\n"));
-        assertTrue(actual.contains("event"));
+        var actual = new Participant("name").toString();
         assertTrue(actual.contains("expensesOwedTo"));
         assertTrue(actual.contains("id"));
     }

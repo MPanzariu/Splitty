@@ -160,7 +160,7 @@ public class EventScreenCtrl implements Initializable{
      * UI for adding a participant that needs to be implemented when the button is pressed
      */
     public void addParticipants(){
-        mainCtrl.switchToAddParticipant();
+        mainCtrl.switchToAddParticipant(event);
     }
 
     /**

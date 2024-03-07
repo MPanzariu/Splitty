@@ -46,17 +46,18 @@ public class ParticipantControllerTest {
     }
 
     /**
-     * simulate the delete request and check if receieves the status OK after the deletion
+     * simulate the delete request and check if receives the status OK after the deletion
      * mimicking a call to a REST API
      * @throws Exception if the expected status is not OK or something went wrong in the test
      */
     @Test
     public void removeParticipant_ShouldReturnOk() throws Exception {
         long participantId = 1L;
+        String eventId = "invitationCode";
 
-        doNothing().when(participantService).removeParticipant(participantId);
+        doNothing().when(participantService).removeParticipant(eventId, participantId);
 
-        mockMvc.perform(delete("/api/participants/{participantId}", participantId)
+        mockMvc.perform(delete("/api/participants/{eventId}/{participantId}", eventId, participantId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -67,7 +68,7 @@ public class ParticipantControllerTest {
      */
     @Test
     public void editParticipantOkResponseFromServer() {
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
+        Participant participantDetails = new Participant("Jane Doe");
         given(participantService.editParticipant(anyLong(), any(Participant.class)))
                 .willReturn(participantDetails);
         ResponseEntity<Participant> response = participantController.editParticipant(participantDetails.getId(), participantDetails);
@@ -81,7 +82,7 @@ public class ParticipantControllerTest {
     @Test
     public void editParticipantNonExistent() {
         Long nonExistentId = 999L;
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
+        Participant participantDetails = new Participant("Jane Doe");
 
         given(participantService.editParticipant(eq(nonExistentId), any(Participant.class)))
                 .willThrow(new EntityNotFoundException("Participant not found"));
@@ -96,14 +97,14 @@ public class ParticipantControllerTest {
     @Test
     public void editParticipantVerifyDetails() {
         Long participantId = 1L;
-        Participant participantDetails = new Participant("Jane Doe", new Event("Sample Event", null));
+        Participant participantDetails = new Participant("Jane Doe");
         given(participantService.editParticipant(eq(participantId), any(Participant.class)))
                 .willAnswer(invocation -> invocation.getArgument(1));
         ResponseEntity<Participant> response = participantController.editParticipant(participantId, participantDetails);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(participantDetails.getName(), response.getBody().getName());
         verify(participantService).editParticipant(eq(participantId), argThat(
-                p -> "Jane Doe".equals(p.getName()) && "Sample Event".equals(p.getEvent().getTitle())
+                p -> "Jane Doe".equals(p.getName())
         ));
     }
 }

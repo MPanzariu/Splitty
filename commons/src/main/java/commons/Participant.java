@@ -16,17 +16,25 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
-    @ManyToOne()
-    private Event event;
     @OneToMany(mappedBy = "owedTo", orphanRemoval = true)
     private Set<Expense> expensesOwedTo;
 
     @SuppressWarnings("unused")
     public Participant() {}
 
-    public Participant(String name, Event event) {
+    public Participant(String name) {
         this.name = name;
-        this.event = event;
+        this.expensesOwedTo = new HashSet<>();
+    }
+
+    /**
+     * Constructor used for testing where ID's need to be set.
+     * @param id ID of the participant
+     * @param name Name of the participant
+     */
+    public Participant(long id, String name) {
+        this.id = id;
+        this.name = name;
         this.expensesOwedTo = new HashSet<>();
     }
 
@@ -40,10 +48,6 @@ public class Participant {
 
     public String getName() {
         return name;
-    }
-
-    public Event getEvent() {
-        return event;
     }
 
     public void addExpense(Expense expense){

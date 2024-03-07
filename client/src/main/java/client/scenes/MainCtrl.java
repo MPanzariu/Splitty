@@ -120,8 +120,8 @@ public class MainCtrl {
         primaryStage.setScene(editTitleScene);
     }
 
-    public void switchToAddParticipant() {
-        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
+    public void switchToAddParticipant(Event event) {
+        participantScreenCtrl.setEvent(event);
         primaryStage.setScene(participantScene);
     }
 

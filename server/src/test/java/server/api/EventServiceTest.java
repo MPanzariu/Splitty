@@ -64,9 +64,8 @@ public class EventServiceTest {
         Participant participant = new Participant();
         when(mockEventRepository.findById(anyString())).
                 thenReturn(Optional.of(event));
-        when(mockParticipantRepository.save(any(Participant.class)))
-                .thenReturn(participant);
         mockEventService.addParticipantToEvent("Name Surname", event.getId());
+        verify(mockEventRepository).save(event);
         Set<Participant> participants = event.getParticipants();
         assertEquals(1, participants.size());
     }

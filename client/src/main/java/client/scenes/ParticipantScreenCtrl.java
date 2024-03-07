@@ -67,9 +67,14 @@ public class ParticipantScreenCtrl {
     }
 
     public void confirmEdit(ActionEvent actionEvent) {
+        Participant participant = addParticipant();
+        server.addParticipant(event.getId(), participant.getName());
+        event.addParticipant(participant);
+        mainCtrl.joinEvent(event);
     }
 
     public void cancel(ActionEvent actionEvent) {
+        mainCtrl.joinEvent(event);
     }
 
     public Participant addParticipant(){
@@ -82,7 +87,7 @@ public class ParticipantScreenCtrl {
         catch (IllegalArgumentException e) {
             System.out.println(":<");
         }
-        Participant participant = new Participant(name, event);
+        Participant participant = new Participant(name);
         //remember email iban bic when available
         return participant;
     }

@@ -30,10 +30,11 @@ public class ParticipantService {
      * throw an exception
      * @param participantId the participant we want to remove
      */
-    public void removeParticipant(Long participantId) {
+    public void removeParticipant(String eventId, Long participantId) {
         Participant participant = participantRepository.findById(participantId)
                 .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
-        Event event = participant.getEvent();
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         event.removeParticipant(participant);
         eventRepository.save(event);
     }
