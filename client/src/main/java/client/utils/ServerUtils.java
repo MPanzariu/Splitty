@@ -111,6 +111,7 @@ public class ServerUtils {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Sends a POST request to add an expense to a specific event
 	 * @param eventId the id of the specific event
 	 * @param expense the expense to be added
@@ -186,4 +187,30 @@ public class ServerUtils {
 	}
 	
 	//TODO Test weather or not the methods actually work in cae of problems like(expense doesn't exist)
+	/**
+	 * checks if a password matches with the one randomly generated
+	 * @param inputPassword the password the user inputs to log in to the management overview
+	 * @return a boolean, true or false whether the password matches or not
+	 */
+	public Boolean checkPassword(String inputPassword){
+		return ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/password/" + inputPassword)
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.get(Boolean.class);
+	}
+
+	/**
+	 * retrieves all events from the server
+	 * @return all the events from the server
+	 */
+	public List<Event> retrieveAllEvents(){
+		List<Event> events = ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/events/all")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.get(new GenericType<List<Event>>(){});
+		return events;
+	}
 }
+
