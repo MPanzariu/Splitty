@@ -29,6 +29,9 @@ public class MainCtrl {
     private ParticipantScreenCtrl participantScreenCtrl;
 
     private Scene editTitleScene;
+    private Scene managementOvervirewPasswordScene;
+    private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
+    private Scene managementOverviewScreenScene;
 
 
     @Inject
@@ -40,7 +43,8 @@ public class MainCtrl {
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
 
-                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair) {
+                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair,
+                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI, Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI) {
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -57,12 +61,14 @@ public class MainCtrl {
 
         this.editTitleCtrl = editTitlePair.getKey();
         this.editTitleScene = new Scene(editTitlePair.getValue());
-
-        showOverview();
+        showMainScreen();
+        this.managementOvervirewPasswordScene = new Scene(managementOverviewPassworrdUI.getValue());
+        this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         primaryStage.show();
     }
 
-    public void showOverview() {
+    public void showMainScreen() {
+        startupScreenCtrl.refreshEvents();
         primaryStage.setTitle("Main Menu");
         primaryStage.setScene(startupScene);
     }
@@ -84,6 +90,7 @@ public class MainCtrl {
         eventScreenCtrl.setEvent(event);
         eventScreenCtrl.setParticipants(event);
         eventScreenCtrl.setParticipantsForExpenses(event);
+        primaryStage.setTitle("Event Screen");
     }
 
     /**
@@ -91,6 +98,7 @@ public class MainCtrl {
      */
     public void switchBackToMainScreen(){
         primaryStage.setScene(startupScene);
+        primaryStage.setTitle("Main Menu");
     }
 
     /**
@@ -102,6 +110,7 @@ public class MainCtrl {
     }
 
     public void switchToAddExpense() {
+        expenseScreenCtrl.resetAll();
         expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(expenseScene);
     }
@@ -109,17 +118,6 @@ public class MainCtrl {
     public void openEditTitle() {
         editTitleCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(editTitleScene);
-    }
-
-    /**
-     * switches the primary screen to the EventScreen
-     */
-    public void switchBackToEventScreen() {
-        expenseScreenCtrl.resetAmount();
-        expenseScreenCtrl.resetPurpose();
-        expenseScreenCtrl.resetDate();
-        expenseScreenCtrl.resetCurrency();
-        primaryStage.setScene(eventScene);
     }
 
     public void switchToAddParticipant(Event event) {
@@ -133,4 +131,19 @@ public class MainCtrl {
         primaryStage.setScene(participantScene);
     }
 
+    /**
+     * switch to the log in page for the management overview
+     */
+    public void switchToMnagamentOverviewPasswordScreen(){
+        primaryStage.setScene(managementOvervirewPasswordScene);
+        primaryStage.setTitle("Log in");
+    }
+
+    /**
+     * go to the management overview screen
+     */
+    public void switchToManagementOverviewScreen(){
+        primaryStage.setScene(managementOverviewScreenScene);
+        primaryStage.setTitle("Management Overview");
+    }
 }

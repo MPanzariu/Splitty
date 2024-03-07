@@ -4,7 +4,9 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import jakarta.ws.rs.BadRequestException;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -20,9 +22,7 @@ import javafx.scene.layout.VBox;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 public class StartupScreenCtrl implements Initializable {
@@ -43,50 +43,14 @@ public class StartupScreenCtrl implements Initializable {
     @FXML
     private Button createEventButton;
     @FXML
+    private Button managementOverviewButton;
+    @FXML
     private Label createEventLabel;
     @FXML
     private Label joinEventLabel;
 
-    private HashMap<Event, HBox> eventHBoxHashMap;
-    private HashMap<HBox, Event> hBoxEventHashMap;
-
+    private List<AbstractMap.SimpleEntry<Event, HBox>> eventsAndHBoxes;
     private Translation translation;
-    /**
-     * Setter for eventTitleTextBox
-     * @param eventTitleTextBox the value to set it to
-     */
-    public void setEventTitleTextBox(TextField eventTitleTextBox) {
-        this.eventTitleTextBox = eventTitleTextBox;
-    }
-    /**
-     * Setter for inviteCodeTextBox
-     * @param inviteCodeTextBox the value to set it to
-     */
-    public void setInviteCodeTextBox(TextField inviteCodeTextBox) {
-        this.inviteCodeTextBox = inviteCodeTextBox;
-    }
-    /**
-     * Setter for createEventFeedback
-     * @param createEventFeedback the value to set it to
-     */
-    public void setCreateEventFeedback(Label createEventFeedback) {
-        this.createEventFeedback = createEventFeedback;
-    }
-    /**
-     * Setter for joinEventFeedback
-     * @param joinEventFeedback the value to set it to
-     */
-    public void setJoinEventFeedback(Label joinEventFeedback) {
-        this.joinEventFeedback = joinEventFeedback;
-    }
-
-    /**
-     * Setter for recentlyViewedEventsVBox
-     * @param recentlyViewedEventsVBox the value to set it to
-     */
-    public void setRecentlyViewedEventsVBox(VBox recentlyViewedEventsVBox) {
-        this.recentlyViewedEventsVBox = recentlyViewedEventsVBox;
-    }
 
     /**
      * Constructor
@@ -99,8 +63,7 @@ public class StartupScreenCtrl implements Initializable {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
-        eventHBoxHashMap = new HashMap<>();
-        hBoxEventHashMap = new HashMap<>();
+        eventsAndHBoxes = new ArrayList<>();
     }
 
     /**
@@ -108,41 +71,62 @@ public class StartupScreenCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        eventTitleTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventTitle"));
-        inviteCodeTextBox.promptTextProperty().bind(translation.getStringBinding("Startup.TextBox.EventCode"));
-        joinEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.JoinEvent"));
-        createEventLabel.textProperty().bind(translation.getStringBinding("Startup.Label.CreateEvent"));
-        joinEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.JoinEvent"));
-        createEventButton.textProperty().bind(translation.getStringBinding("Startup.Button.CreateEvent"));
-        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
+        bindTextBox(eventTitleTextBox, "Startup.TextBox.EventTitle");
+        bindTextBox(inviteCodeTextBox, "Startup.TextBox.EventCode");
+        bindLabel(joinEventLabel, "Startup.Label.JoinEvent");
+        bindLabel(createEventLabel, "Startup.Label.CreateEvent");
+        bindButton(joinEventButton, "Startup.Button.JoinEvent");
+        bindButton(createEventButton, "Startup.Button.CreateEvent");
+        bindLabel(joinEventFeedback, "empty");
+        bindLabel(createEventFeedback, "empty");
+    }
+
+    /**
+     * Creates and joins the event specified by the user in the text box
+     */
+    public void createEvent(){
+        bindLabel(createEventFeedback, "empty");
+        String title = getTextBoxText(eventTitleTextBox);
+        if (title.isEmpty()){
+            bindLabel(createEventFeedback, "Startup.Label.UnspecifiedTitle");
+            return;
+        }
+        Event event = server.createEvent(title);
+        System.out.println(event);
+        joinEvent(event);
     }
 
     /**
      * Joins the event specified by the user in the text box
      */
     public void joinEventClicked(){
-        joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        String inviteCode = inviteCodeTextBox.getText();
+        bindLabel(joinEventFeedback, "empty");
+        String inviteCode = getTextBoxText(inviteCodeTextBox);
         if (inviteCode.length() != 6){
-            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
+            bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
             return;
         }
         try{
-            Event event = server.getEvent(inviteCodeTextBox.getText());
+            Event event = server.getEvent(inviteCode);
             joinEvent(event);
-            //Build fails when I use BadRequest exception
-        }catch (Exception exception){
-            joinEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.InvalidCode"));
+        }catch (BadRequestException exception){
+            bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
     }
-
     /**
      * Joins the given event
      * @param event the event to join
      */
     public void joinEvent(Event event){
         mainCtrl.joinEvent(event);
+        addToHistory(event);
+    }
+
+    /**
+     * Adds the event to the history
+     * @param event the event to add to the history
+     */
+    private void addToHistory(Event event) {
         Label eventLabel = generateLabelForEvent(event);
         try{
             ImageView imageView = generateRemoveButton(eventLabel);
@@ -150,29 +134,63 @@ public class StartupScreenCtrl implements Initializable {
             removeFromHistoryIfExists(event);
             List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
             recentlyViewedEvents.addFirst(hbox);
-            eventHBoxHashMap.put(event, hbox);
-            hBoxEventHashMap.put(hbox, event);
+            eventsAndHBoxes.add(new AbstractMap.SimpleEntry<>(event, hbox));
             if (recentlyViewedEventsVBox.getChildren().size() > 5){
                 HBox lastHBox = (HBox) recentlyViewedEvents.getLast();
-                Event removedEvent = hBoxEventHashMap.remove(lastHBox);
-                eventHBoxHashMap.remove(removedEvent);
-                hBoxEventHashMap.remove(lastHBox);
-                recentlyViewedEvents.removeLast();
+                Event removedEvent = getEntryFromEventHbox(lastHBox).getKey();
+                removeFromHistoryIfExists(removedEvent);
             }
         }catch (FileNotFoundException e){
             System.out.println("File was not found!");
         }
     }
     /**
+     * Gets the entry from the eventHBoxHashMap
+     * @param event the event to get the entry for
+     * @return the entry
+     */
+    public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(Event event){
+        for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
+            if (entry.getKey().equals(event)){
+                return entry;
+            }
+        }
+        return null;
+    }
+    /**
+     * Gets the entry from the eventHBoxHashMap
+     * @param hBox the HBox to get the entry for
+     * @return the entry
+     */
+    public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(HBox hBox){
+        for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
+            if (entry.getValue().equals(hBox)){
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Getter for eventsAndHBoxes
+     * @return eventsAndHBoxes
+     */
+    public List<AbstractMap.SimpleEntry<Event, HBox>> getEventsAndHBoxes() {
+        return eventsAndHBoxes;
+    }
+
+    /**
      * Removes the HBox containing the event given if it exists already in the history
      * @param event the event to remove the history of
      */
     public void removeFromHistoryIfExists(Event event){
-        if (eventHBoxHashMap.containsKey(event)){
-            HBox hBox = eventHBoxHashMap.get(event);
-            eventHBoxHashMap.remove(event);
-            hBoxEventHashMap.remove(hBox);
-            recentlyViewedEventsVBox.getChildren().remove(hBox);
+        AbstractMap.SimpleEntry<Event, HBox> entry = getEntryFromEventHbox(event);
+        if (getEntryFromEventHbox(event) != null){
+            HBox hBox = entry.getValue();
+            eventsAndHBoxes.remove(entry);
+            if (hBox != null){
+                removeFromVBox(hBox.idProperty());
+            }
         }
     }
 
@@ -210,7 +228,6 @@ public class StartupScreenCtrl implements Initializable {
         );
         return label;
     }
-
     /**
      * Generates the HBox for the history (which will contain the label and image)
      * @param label the label to display
@@ -261,10 +278,10 @@ public class StartupScreenCtrl implements Initializable {
      * @param id the given id
      */
     public void removeFromVBox(StringProperty id){
-        List<Node> allNodes = recentlyViewedEventsVBox.getChildren();
+        List<Node> allNodes = getHistoryNodes();
         Node removeNode = null;
         for (Node node : allNodes){
-            if (node.idProperty() != null && node.idProperty().equals(id)){
+            if (node != null && node.idProperty() != null && node.idProperty().equals(id)){
                 removeNode = node;
             }
         }
@@ -272,20 +289,81 @@ public class StartupScreenCtrl implements Initializable {
             allNodes.remove(removeNode);
         }
     }
+
     /**
-     * Creates and joins the event specified by the user in the text box
+     * Returns the history nodes that are in recentlyViewedEventsVBox
+     * @return a list with the nodes
      */
-    public void createEvent(){
-        createEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
-        String title = eventTitleTextBox.getText();
-        if (title.isEmpty()){
-            createEventFeedback.textProperty().bind(translation.getStringBinding("Startup.Label.UnspecifiedTitle"));
-            return;
-        }
-        Event event = server.createEvent(title);
-        System.out.println(event);
-        joinEvent(event);
+    public List<Node> getHistoryNodes(){
+        return recentlyViewedEventsVBox.getChildren();
     }
 
+    /**
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 833b81c2e5c1e80bbaf816d8eb68a37ccc806abb
+     * Gets the text from a given textfield
+     * @param textBox the textfield to get the text from
+     * @return String the text from the textfield
+     */
+    public String getTextBoxText(TextField textBox){
+        return textBox.getText();
+    }
 
+    /**
+     * Binds a label to a given string binding
+     * @param label the label to bind
+     * @param key the key for the translator
+     */
+
+    public void bindLabel(Label label, String key){
+        label.textProperty().bind(translation.getStringBinding(key));
+    }
+
+    /**
+     * Binds a textfield to a given string binding
+     * @param textBox the textfield to bind
+     * @param key the translator key
+     */
+    public void bindTextBox(TextField textBox, String key) {
+        textBox.promptTextProperty().bind(translation.getStringBinding(key));
+    }
+
+    /**
+     * Binds a button to a given string binding
+     * @param button the button to bind
+     * @param key the translator key
+     */
+    public void bindButton(Button button, String key) {
+        button.textProperty().bind(translation.getStringBinding(key));
+    }
+
+    /**
+     * Refreshes the events in the history
+     */
+    public void refreshEvents() {
+        List<String> eventIds = new ArrayList<>();
+        List<Map.Entry<Event, HBox>> entries = new ArrayList<>();
+        for (Map.Entry<Event, HBox> entry : eventsAndHBoxes) {
+            eventIds.add(entry.getKey().getId());
+            entries.add(entry);
+        }
+        for (Map.Entry<Event, HBox> entry : entries) {
+            removeFromHistoryIfExists(entry.getKey());
+        }
+        eventsAndHBoxes.clear();
+        recentlyViewedEventsVBox.getChildren().clear();
+        for (String id : eventIds) {
+            Event event = server.getEvent(id);
+            addToHistory(event);
+        }
+    }
+    /**
+     * switch to the management overview password (log in) scene
+     * @param actionEvent on button press go to another scene
+     */
+    public void goToTheManagementOverview(ActionEvent actionEvent) {
+        mainCtrl.switchToMnagamentOverviewPasswordScreen();
+    }
 }

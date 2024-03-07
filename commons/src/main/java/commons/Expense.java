@@ -2,6 +2,7 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -18,6 +19,7 @@ public class Expense{
     private int priceInCents;
     private Date date;
     @ManyToOne()
+    @JsonIgnore
     private Event event;
     @ManyToOne()
     private Participant owedTo;

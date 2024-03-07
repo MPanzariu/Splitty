@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -233,7 +232,10 @@ public class EventScreenCtrl implements Initializable{
         List<Expense> settledExpenses = event.getSettledExpenses();
         for(int i = 0; i < settledExpenses.size(); i++){
             String log = "";
-            log+=settledExpenses.get(i).getOwedTo().getName();
+            // null check used in-development because Participant functionality isn't there yet!
+            Participant owedTo = settledExpenses.get(i).getOwedTo();
+            if(owedTo==null) log += "null";
+            else log += owedTo.getName();
             log+= " paid ";
             log+=settledExpenses.get(i).getPriceInCents();
             log+= " for ";
@@ -255,6 +257,6 @@ public class EventScreenCtrl implements Initializable{
      * @param actionEvent when button is clicked
      */
     public void switchToMainScreen(ActionEvent actionEvent) {
-        mainCtrl.switchBackToMainScreen();
+        mainCtrl.showMainScreen();
     }
 }

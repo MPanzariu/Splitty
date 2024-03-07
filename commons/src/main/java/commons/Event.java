@@ -18,7 +18,7 @@ public class Event{
     private String title;
     private Date creationDate;
     private LocalDateTime lastActivity;
-    @OneToMany(orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(mappedBy = "event", orphanRemoval = true)
     private Set<Expense> expenses;

@@ -50,8 +50,8 @@ public class ExpenseController {
      * @return the sum of all the expenses for a specific event
      */
     @GetMapping("/{eventId}/total-expenses")
-    public ResponseEntity<Double> calculateTotalExpensesForEvent(@PathVariable String eventId) {
-        double totalExpenses = expenseService.calculateTotalExpenses(eventId);
+    public ResponseEntity<Integer> calculateTotalExpensesForEvent(@PathVariable String eventId) {
+        int totalExpenses = expenseService.calculateTotalExpenses(eventId);
         return ResponseEntity.ok(totalExpenses);
     }
 
