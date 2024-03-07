@@ -119,7 +119,7 @@ public class ServerUtils {
 	public Expense addExpense(String eventId, Expense expense) {
 		return ClientBuilder.newClient()
 			.target(serverURL)
-			.path("api/expenses/" + eventId + "/added-expenses")
+			.path("api/expenses/" + eventId + "/expenses")
 			.request(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
