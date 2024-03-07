@@ -109,10 +109,16 @@ public class ExpenseScreenCtrl implements Initializable{
             .bind(translation.getStringBinding("Expense.Label.Display.paid"));
         purpose.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
+        expensePurpose.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
         amount.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
+        sum.promptTextProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.amount"));
         date.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.date"));
+        datePicker.promptTextProperty()
+                .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
         splitMethod.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.split"));
         splitBetweenAllLabel.textProperty()
@@ -208,6 +214,7 @@ public class ExpenseScreenCtrl implements Initializable{
         Date expenseDate = Date.valueOf(datePicker.getValue());
         Participant participant =
             new Participant(choosePayer.getValue(), currentEvent);
+        System.out.println(currentEvent.getId());
         return server.addExpense(currentEvent.getId(),
             new Expense(name, priceInCents, expenseDate, currentEvent, participant));
     }
@@ -215,6 +222,7 @@ public class ExpenseScreenCtrl implements Initializable{
      * Needs revision
      */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
+        System.out.println(createNewExpense());
         mainCtrl.joinEvent(currentEvent);
     }
 
