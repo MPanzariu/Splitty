@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -41,6 +42,8 @@ public class StartupScreenCtrl implements Initializable {
     private Button joinEventButton;
     @FXML
     private Button createEventButton;
+    @FXML
+    private Button managementOverviewButton;
     @FXML
     private Label createEventLabel;
     @FXML
@@ -296,6 +299,7 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
+<<<<<<< HEAD
      * Gets the text from a given textfield
      * @param textBox the textfield to get the text from
      * @return String the text from the textfield
@@ -335,10 +339,10 @@ public class StartupScreenCtrl implements Initializable {
     /**
      * Refreshes the events in the history
      */
-    public void refreshEvents(){
+    public void refreshEvents() {
         List<String> eventIds = new ArrayList<>();
         List<Map.Entry<Event, HBox>> entries = new ArrayList<>();
-        for (Map.Entry<Event, HBox> entry : eventsAndHBoxes){
+        for (Map.Entry<Event, HBox> entry : eventsAndHBoxes) {
             eventIds.add(entry.getKey().getId());
             entries.add(entry);
         }
@@ -347,9 +351,16 @@ public class StartupScreenCtrl implements Initializable {
         }
         eventsAndHBoxes.clear();
         recentlyViewedEventsVBox.getChildren().clear();
-        for (String id : eventIds){
+        for (String id : eventIds) {
             Event event = server.getEvent(id);
             addToHistory(event);
         }
+    }
+    /**
+     * switch to the management overview password (log in) scene
+     * @param actionEvent on button press go to another scene
+     */
+    public void goToTheManagementOverview(ActionEvent actionEvent) {
+        mainCtrl.switchToMnagamentOverviewPasswordScreen();
     }
 }
