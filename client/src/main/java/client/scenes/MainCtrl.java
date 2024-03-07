@@ -111,6 +111,7 @@ public class MainCtrl {
     }
 
     public void switchToAddExpense() {
+        expenseScreenCtrl.resetAll();
         expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(expenseScene);
     }
@@ -118,17 +119,6 @@ public class MainCtrl {
     public void openEditTitle() {
         editTitleCtrl.setEvent(eventScreenCtrl.getEvent());
         primaryStage.setScene(editTitleScene);
-    }
-
-    /**
-     * switches the primary screen to the EventScreen
-     */
-    public void switchBackToEventScreen() {
-        expenseScreenCtrl.resetAmount();
-        expenseScreenCtrl.resetPurpose();
-        expenseScreenCtrl.resetDate();
-        expenseScreenCtrl.resetCurrency();
-        primaryStage.setScene(eventScene);
     }
 
     public void switchToAddParticipant() {
