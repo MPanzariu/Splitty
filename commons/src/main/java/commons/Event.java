@@ -7,6 +7,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,6 +43,55 @@ public class Event{
         this.creationDate = creationDate;
         this.settledExpenses = new ArrayList<>();
         this.lastActivity = LocalDateTime.now();
+    }
+
+    private final static int precision = 4;
+    private final static long scale = (long) Math.pow(10, precision);
+    /**
+     * Calculates the share owed to (credit) per Participant for all expenses, split equally
+     * @return a Map of participants to the amount they are owed (credit)
+     */
+    public HashMap<Participant,Integer> getOwedShares(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        BigDecimal initialBalance = BigDecimal.valueOf(0);
+
+        for (Participant participant:
+                participants) {
+            creditMap.put(participant, initialBalance);
+        }
+
+        for (Expense expense:
+             expenses) {
+            BigInteger costScaled = BigInteger.valueOf(scale * expense.getPriceInCents());
+            BigDecimal totalCost = new BigDecimal(costScaled, precision);
+            Participant owedTo = expense.getOwedTo();
+
+            BigDecimal owedToBalance = creditMap.get(owedTo);
+            creditMap.put(owedTo, (owedToBalance.add(totalCost)));
+            splitEqually(creditMap, totalCost);
+        }
+        return roundMap(creditMap);
+    }
+
+    private HashMap<Participant, Integer> roundMap(HashMap<Participant, BigDecimal> creditMap) {
+        HashMap<Participant, Integer> roundedMap = new HashMap<>();
+        for(Map.Entry<Participant, BigDecimal> entry:
+            creditMap.entrySet()){
+            Integer roundedValue = entry.getValue().intValue();
+            roundedMap.put(entry.getKey(), roundedValue);
+        }
+        return roundedMap;
+    }
+
+    private void splitEqually(HashMap<Participant, BigDecimal> creditMap, BigDecimal totalCost) {
+        BigDecimal peopleToDivideBy = BigDecimal.valueOf(participants.size());
+        BigDecimal sharePerPerson = totalCost.divide(peopleToDivideBy, RoundingMode.HALF_UP);
+        for (Participant participant:
+                participants) {
+            BigDecimal balance = creditMap.get(participant);
+            balance = balance.subtract(sharePerPerson);
+            creditMap.put(participant, balance);
+        }
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
