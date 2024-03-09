@@ -28,13 +28,25 @@ public class Event{
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense> settledExpenses;
 
+    /***
+     * Getter for the List of settled Expenses
+     * @return A List of settled Expenses
+     */
     public List<Expense> getSettledExpenses() {
         return settledExpenses;
     }
 
+    /***
+     * Constructor for object mappers
+     */
     @SuppressWarnings("unused")
     public Event() {}
 
+    /***
+     * Constructor with a known title and date
+     * @param title Event title
+     * @param creationDate Event creation date
+     */
     public Event(String title, Date creationDate) {
         this.title = title;
         this.participants = new HashSet<>();
@@ -129,6 +141,10 @@ public class Event{
     static final int codeLength = 6;
     // 32^6 = 1,073,741,824 combinations
 
+    /***
+     * Generates a random Event ID
+     * @return a codeLength length ID consisting of human-readable characters
+     */
     public static String generateId(){
         int maxRandomBound = validCharacters.length;
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -143,69 +159,124 @@ public class Event{
         return stringBuilder.toString();
     }
 
+    /***
+     * Getter for Event ID
+     * @return Event ID
+     */
     public String getId() {
         return id;
     }
 
+    /***
+     * Setter for Event title
+     * @param title the new Event title
+     */
     public void setTitle(String title) {
         this.title = title;
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Getter for Event title
+     * @return Event title
+     */
     public String getTitle() {
         return title;
     }
 
+    /***
+     * Getter for Event creation date
+     * @return Event creation date
+     */
     public Date getCreationDate() {
         return creationDate;
     }
 
+    /***
+     * Adds a Participant to the Participant set
+     * @param participant the Participant to add
+     */
     public void addParticipant(Participant participant){
         participants.add(participant);
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Removes a Participant from the Participant set
+     * @param participant the Participant to remove
+     */
     public void removeParticipant(Participant participant){
         participants.remove(participant);
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Getter for Event Participant Set
+     * @return Event Participant Set
+     */
     public Set<Participant> getParticipants() {
         return participants;
     }
 
+    /***
+     * Adds an Expense to the Expense set
+     * @param expense the Expense to add
+     */
     public void addExpense(Expense expense){
         expenses.add(expense);
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Removes an Expense from the Expense set
+     * @param expense the Expense to remove
+     */
     public void removeExpense(Expense expense){
         expenses.remove(expense);
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Getter for Event Expense Set
+     * @return Event Expense Set
+     */
     public Set<Expense> getExpenses(){
         return expenses;
     }
 
+    /***
+     * Getter for Event last date of activity
+     * @return Event last date of activity
+     */
     public LocalDateTime getLastActivity(){
         return lastActivity;
     }
 
+    /***
+     * Equals method using EqualsBuilder
+     * @param obj the Object to compare equality to
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);
     }
 
+    /***
+     * HashCode method using HashCodeBuilder
+     * @return a hashcode for the Event
+     */
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
     }
 
+    /***
+     * String representation method using HashCodeBuilder
+     * @return a String representation of the Event
+     */
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
-
-
 }
