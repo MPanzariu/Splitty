@@ -2,6 +2,7 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -61,6 +62,7 @@ public class Event{
      * Calculates the total spending for the event
      * @return an int of the total cost of the event, in cents
      */
+    @JsonIgnore
     public int getTotalSpending(){
         return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
     }
@@ -69,6 +71,7 @@ public class Event{
      * Calculates the total spending per person
      * @return A Map of participants to the amount of expenses attributed to them
      */
+    @JsonIgnore
     public HashMap<Participant,Integer> getSpendingPerPerson() {
         HashMap<Participant, Integer> spendingMap = new HashMap<>();
 
@@ -93,6 +96,7 @@ public class Event{
      * Calculates the share owed to (credit) per Participant for all expenses, split equally
      * @return a Map of participants to the amount they are owed (credit)
      */
+    @JsonIgnore
     public HashMap<Participant,Integer> getOwedShares(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
         BigDecimal initialBalance = BigDecimal.valueOf(0);
