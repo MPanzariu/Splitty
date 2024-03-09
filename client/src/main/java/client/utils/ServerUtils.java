@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -129,10 +130,9 @@ public class ServerUtils {
 	 * Sends a POST request to add an expense to a specific event
 	 * @param eventId the id of the specific event
 	 * @param expense the expense to be added
-	 * @return the expense that was added
 	 */
-	public Expense addExpense(String eventId, Expense expense) {
-		return ClientBuilder.newClient()
+	public void addExpense(String eventId, Expense expense) {
+		ClientBuilder.newClient()
 				.target(serverURL)
 				.path("api/expenses/" + eventId + "/expenses")
 				.request(APPLICATION_JSON)
@@ -145,12 +145,12 @@ public class ServerUtils {
 	 * @param eventId the id of the event for which we want to get the expenses
 	 * @return the list of expenses for the specific event
 	 */
-	public List<Expense> getExpensesForEvent(String eventId) {
+	public Set<Expense> getExpensesForEvent(String eventId) {
 		return ClientBuilder.newClient()
 				.target(serverURL).path("api/expenses/" + eventId + "/expenses")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
-				.get(new GenericType<List<Expense>>() {});
+				.get(new GenericType<Set<Expense>>() {});
 	}
 
 	/**

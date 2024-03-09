@@ -53,6 +53,8 @@ public class EventScreenCtrl implements Initializable{
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private Event event;
+    private Set<Expense> expenses;
+    private Set<Participant> participants;
 
     /**
      * Constructor
@@ -66,6 +68,8 @@ public class EventScreenCtrl implements Initializable{
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.event = null;
+        this.participants = null;
+        this.expenses =  null;
     }
 
     /**
@@ -134,6 +138,23 @@ public class EventScreenCtrl implements Initializable{
         });
     }
 
+    /***
+     * Updates all data viewed
+     * @param event the Event to extract data from
+     * @param expenses the Expenses to display
+     * @param participants the Participants to display
+     */
+    public void refresh(Event event,
+                        Set<Expense> expenses,
+                        Set<Participant> participants){
+        this.event = event;
+        this.expenses = expenses;
+        this.participants = participants;
+        updateEventText();
+        updateParticipants();
+        updateParticipantsDropdown();
+    }
+
     /**
      * Open the title editing screen.
      */
@@ -145,8 +166,7 @@ public class EventScreenCtrl implements Initializable{
      * UI for inviting participants that needs to be implemented when the button is pressed
      */
     public void inviteParticipants(){
-        //TO DO, implement UI for inviting participants
-        System.out.println(event.toString());
+        //TODO: implement UI for inviting participants
     }
 
     /**
@@ -160,7 +180,7 @@ public class EventScreenCtrl implements Initializable{
      * UI for adding a participant that needs to be implemented when the button is pressed
      */
     public void addParticipants(){
-        mainCtrl.switchToAddParticipant(event);
+        mainCtrl.switchToAddParticipant();
     }
 
     /**
@@ -168,56 +188,39 @@ public class EventScreenCtrl implements Initializable{
      */
     public void addExpense(){
         mainCtrl.switchToAddExpense();
-        //System.out.println(event.toString());
     }
 
     /**
      * set the name of the event in the event screen
-     * @param event the current event we are at
      */
-    public void setEvent(Event event) {
-        this.event = event;
+    private void updateEventText() {
         eventNameLabel.setText(event.getTitle());
         invitationCode.setText(event.getId());
     }
 
     /**
-     *
-     * @return the event
-     */
-    public Event getEvent() {
-        return this.event;
-    }
-
-
-    /**
      * set the participants in the event screen that are part of the current event
-     * @param event the current event we are at
      */
-    public void setParticipants(Event event){
-        this.event = event;
-        String participantsText = "";
-        Set<Participant> participants = event.getParticipants();
+    private void updateParticipants(){
+        StringBuilder participantsText = new StringBuilder();
         Iterator<Participant> participantIterator = participants.iterator();
         while(participantIterator.hasNext()){
             Participant current = participantIterator.next();
-            if(participantIterator.hasNext())participantsText += current.getName() + ", ";
-            else participantsText += current.getName();
+            if(participantIterator.hasNext()) participantsText.
+                    append(current.getName()).append(", ");
+            else participantsText.append(current.getName());
         }
-        if(participantsText.equals(""))participantsLabel.setText("There are no participants");
-        else participantsLabel.setText(participantsText);
+        if(participantsText.toString().isEmpty()) {
+            participantsLabel.setText("There are no participants");
+        }
+        else participantsLabel.setText(participantsText.toString());
     }
 
     /**
      * show the participants of the current event
-     * @param event the event we are currently looking at
      */
-    public void setParticipantsForExpenses(Event event){
-        this.event = event;
-        Set<Participant> participants = event.getParticipants();
-        Iterator<Participant> participantIterator = participants.iterator();
-        while(participantIterator.hasNext()) {
-            Participant current = participantIterator.next();
+    private void updateParticipantsDropdown(){
+        for (Participant current : participants) {
             cBoxParticipantExpenses.getItems().add(current.getName());
             listViewExpensesParticipants.getItems().add(current.getName());
         }
@@ -229,17 +232,16 @@ public class EventScreenCtrl implements Initializable{
      */
     public void showAllExpensesSettled(ActionEvent actionEvent) {
         expensesLogListView.getItems().clear();
-        List<Expense> settledExpenses = event.getSettledExpenses();
-        for(int i = 0; i < settledExpenses.size(); i++){
+        for(Expense expense: expenses){
             String log = "";
             // null check used in-development because Participant functionality isn't there yet!
-            Participant owedTo = settledExpenses.get(i).getOwedTo();
+            Participant owedTo = expense.getOwedTo();
             if(owedTo==null) log += "null";
             else log += owedTo.getName();
             log+= " paid ";
-            log+=settledExpenses.get(i).getPriceInCents();
+            log+=expense.getPriceInCents();
             log+= " for ";
-            log+=settledExpenses.get(i).getName();
+            log+=expense.getName();
             expensesLogListView.getItems().add(log);
         }
     }
@@ -249,7 +251,7 @@ public class EventScreenCtrl implements Initializable{
      * @param actionEvent on button click event
      */
     public void settleDebts(ActionEvent actionEvent) {
-        //TO DO, UI for settleDebts button
+        //TODO: UI for settleDebts button
     }
 
     /**

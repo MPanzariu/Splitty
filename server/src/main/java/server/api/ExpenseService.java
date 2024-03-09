@@ -72,7 +72,6 @@ public class ExpenseService {
         Expense expense = expenseRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Expense not found"));
         Event event = expense.getEvent();
-        event.getSettledExpenses().add(expense);
         event.removeExpense(expense);
         eventRepository.save(event);
     }
