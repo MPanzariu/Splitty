@@ -45,6 +45,28 @@ public class Event{
         this.lastActivity = LocalDateTime.now();
     }
 
+    /***
+     * Calculates the total spending per person
+     * @return A Map of participants to the amount of expenses attributed to them
+     */
+    public HashMap<Participant,Integer> getSpendingPerPerson() {
+        HashMap<Participant, Integer> spendingMap = new HashMap<>();
+
+        for (Participant participant:
+                participants) {
+            spendingMap.put(participant, 0);
+        }
+
+        for (Expense expense:
+                expenses) {
+            Participant spender = expense.getOwedTo();
+            Integer balance = spendingMap.get(spender);
+            spendingMap.put(spender, (balance+expense.getPriceInCents()));
+        }
+
+        return spendingMap;
+    }
+
     private final static int precision = 4;
     private final static long scale = (long) Math.pow(10, precision);
     /**

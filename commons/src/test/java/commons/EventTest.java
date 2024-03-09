@@ -176,4 +176,55 @@ public class EventTest {
         assertEquals(0, result.get(participant1));
         assertEquals(0, result.get(participant2));
     }
+
+    /***
+     * All expenses should be added up per participant
+     * p1: 0
+     * p2: 10
+     * p3: 20 + 30
+     */
+    @Test
+    public void spendingBasicTest(){
+        int cents = 100;
+        Participant participant2 = new Participant("Zestial");
+        Participant participant3 = new Participant("Carmine");
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+        event.addParticipant(participant3);
+
+
+        Expense expense1 = new Expense();
+        expense1.setPriceInCents(10*cents);
+        expense1.setOwedTo(participant2);
+        event.addExpense(expense1);
+
+        Expense expense2 = new Expense();
+        expense2.setPriceInCents(20*cents);
+        expense2.setOwedTo(participant3);
+        event.addExpense(expense2);
+
+        Expense expense3 = new Expense();
+        expense3.setPriceInCents(30*cents);
+        expense3.setOwedTo(participant3);
+        event.addExpense(expense3);
+
+        var result = event.getSpendingPerPerson();
+        assertEquals(0, result.get(participant1));
+        assertEquals(10*cents, result.get(participant2));
+        assertEquals(50*cents, result.get(participant3));
+    }
+
+    @Test
+    public void zeroSpendingTest(){
+        Participant participant2 = new Participant("Rosie");
+        Participant participant3 = new Participant("Velvette");
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+        event.addParticipant(participant3);
+
+        var result = event.getSpendingPerPerson();
+        assertEquals(0, result.get(participant1));
+        assertEquals(0, result.get(participant2));
+        assertEquals(0, result.get(participant3));
+    }
 }
