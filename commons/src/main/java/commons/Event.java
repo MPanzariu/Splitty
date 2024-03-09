@@ -46,6 +46,14 @@ public class Event{
     }
 
     /***
+     * Calculates the total spending for the event
+     * @return an int of the total cost of the event, in cents
+     */
+    public int getTotalSpending(){
+        return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
+    }
+
+    /***
      * Calculates the total spending per person
      * @return A Map of participants to the amount of expenses attributed to them
      */

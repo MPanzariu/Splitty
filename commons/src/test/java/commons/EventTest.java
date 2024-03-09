@@ -192,7 +192,6 @@ public class EventTest {
         event.addParticipant(participant2);
         event.addParticipant(participant3);
 
-
         Expense expense1 = new Expense();
         expense1.setPriceInCents(10*cents);
         expense1.setOwedTo(participant2);
@@ -226,5 +225,31 @@ public class EventTest {
         assertEquals(0, result.get(participant1));
         assertEquals(0, result.get(participant2));
         assertEquals(0, result.get(participant3));
+    }
+
+    @Test
+    public void sumBasicTest(){
+        int cents = 100;
+
+        Expense expense1 = new Expense();
+        expense1.setPriceInCents(10*cents);
+        event.addExpense(expense1);
+
+        Expense expense2 = new Expense();
+        expense2.setPriceInCents(20*cents);
+        event.addExpense(expense2);
+
+        Expense expense3 = new Expense();
+        expense3.setPriceInCents(30*cents);
+        event.addExpense(expense3);
+
+        var result = event.getTotalSpending();
+        assertEquals((10+20+30)*cents, result);
+    }
+
+    @Test
+    public void noExpenseTest(){
+        var result = event.getTotalSpending();
+        assertEquals(0, result);
     }
 }
