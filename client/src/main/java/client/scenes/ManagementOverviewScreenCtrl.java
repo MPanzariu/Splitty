@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +44,9 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private ListView expensesListview;
     @FXML
     private Button sortButton;
+    @FXML
+    private ComboBox<StringProperty> orderTypeComboBox;
+    private ObservableList<StringProperty> orderTypes = FXCollections.observableArrayList();
     private ObservableList<Event> events = FXCollections.observableArrayList();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -76,6 +82,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
         sortButton.textProperty().bind(translation.getStringBinding("ManagementOverview.Button.ascending"));
+        initializeOrderTypes();
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
             ImageView imageView = new ImageView(image);
@@ -104,6 +111,32 @@ public class ManagementOverviewScreenCtrl implements Initializable {
                     setText("Title: " + event.getTitle() + ", ID: " + event.getId());
             }
         });
+    }
+
+    /**
+     * Initialize the ComboBox which contains all the ways that events can be ordered by.
+     */
+    private void initializeOrderTypes() {
+        SimpleStringProperty title = new SimpleStringProperty();
+        title.bind(translation.getStringBinding("ManagementOverview.ComboBox.title"));
+        SimpleStringProperty creationDate = new SimpleStringProperty();
+        creationDate.bind(translation.getStringBinding("ManagementOverview.ComboBox.creationDate"));
+        SimpleStringProperty lastActivity = new SimpleStringProperty();
+        lastActivity.bind(translation.getStringBinding("ManagementOverview.ComboBox.lastActivity"));
+        orderTypes.setAll(title, creationDate, lastActivity);
+        orderTypeComboBox.setItems(orderTypes);
+        Callback<ListView<StringProperty>, ListCell<StringProperty>> cellFactory = listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(StringProperty string, boolean empty) {
+                super.updateItem(string, empty);
+                if(string != null) {
+                    setText(string.getValue());
+                }
+            }
+        };
+        orderTypeComboBox.setButtonCell(cellFactory.call(null));
+        orderTypeComboBox.setCellFactory(cellFactory);
+        orderTypeComboBox.getSelectionModel().select(0);
     }
 
     /**
