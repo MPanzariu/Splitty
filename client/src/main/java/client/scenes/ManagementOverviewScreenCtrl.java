@@ -6,12 +6,13 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -33,11 +34,14 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     private Label expensesLabel;
     @FXML
-    private ListView eventsListView;
+    private ListView<Event> eventsListView;
     @FXML
     private ListView participantsListView;
     @FXML
     private ListView expensesListview;
+    @FXML
+    private Button sortButton;
+    private ObservableList<Event> events = FXCollections.observableArrayList();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -71,6 +75,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
+        sortButton.textProperty().bind(translation.getStringBinding("ManagementOverview.Button.ascending"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
             ImageView imageView = new ImageView(image);
@@ -82,7 +87,41 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Initialize a ListView with all events.
+     */
+    public void initializeAllEvents() {
         refreshListView();
+        events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()));
+        eventsListView.setItems(events);
+        eventsListView.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Event event, boolean empty) {
+                super.updateItem(event, empty);
+                if(event != null)
+                    setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+            }
+        });
+    }
+
+    /**
+     * Orders event by their title.
+     * If the events are ordered ascending, then they will be ordered descending, and vice versa.
+     * The titles are considered as lowercase strings while sorting.
+     */
+    public void orderEventsByTitle() {
+        String order = sortButton.getText();
+        ObservableValue<String> ascending = translation.getStringBinding("ManagementOverview.Button.ascending");
+        ObservableValue<String> descending = translation.getStringBinding("ManagementOverview.Button.descending");
+        if(order.equals(ascending.getValue())) {
+            events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()).reversed());
+            sortButton.textProperty().bind(descending);
+        } else {
+            events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()));
+            sortButton.textProperty().bind(ascending);
+        }
     }
 
     /**
@@ -97,15 +136,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * show all the current events in the list view, can be modified to show
      * dates in case it is needed to.
      */
-    public void refreshListView(){
-        List<Event> events = server.retrieveAllEvents();
-        for(int i = 0; i < events.size(); i++){
-            Event current = events.get(i);
-            String input = "";
-            input+="Name: \"" +  current.getTitle() + "\"";
-            input+=", ID: \"" + current.getId() + "\"";
-            eventsListView.getItems().add(input);
-        }
+    public void refreshListView() {
+        events.setAll(server.retrieveAllEvents());
     }
 
     /**
