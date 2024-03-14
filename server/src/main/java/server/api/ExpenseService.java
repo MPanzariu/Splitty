@@ -52,7 +52,7 @@ public class ExpenseService {
     /**
      * The method return the list of all the expenses for a specified event
      * @param eventId the id by which we find the event
-     * @return a list of all the expenses of the specific event
+     * @return a set of all the expenses of the specific event
      */
     public Set<Expense> getAllExpenses(String eventId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
