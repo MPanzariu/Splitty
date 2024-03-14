@@ -53,9 +53,6 @@ public class EventScreenCtrl implements Initializable{
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private Event event;
-    private Set<Expense> expenses;
-    private Set<Participant> participants;
-
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -68,8 +65,6 @@ public class EventScreenCtrl implements Initializable{
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.event = null;
-        this.participants = null;
-        this.expenses =  null;
     }
 
     /**
@@ -141,15 +136,9 @@ public class EventScreenCtrl implements Initializable{
     /***
      * Updates all data viewed
      * @param event the Event to extract data from
-     * @param expenses the Expenses to display
-     * @param participants the Participants to display
      */
-    public void refresh(Event event,
-                        Set<Expense> expenses,
-                        Set<Participant> participants){
+    public void refresh(Event event){
         this.event = event;
-        this.expenses = expenses;
-        this.participants = participants;
         updateEventText();
         updateParticipants();
         updateParticipantsDropdown();
@@ -203,7 +192,7 @@ public class EventScreenCtrl implements Initializable{
      */
     private void updateParticipants(){
         StringBuilder participantsText = new StringBuilder();
-        Iterator<Participant> participantIterator = participants.iterator();
+        Iterator<Participant> participantIterator = event.getParticipants().iterator();
         while(participantIterator.hasNext()){
             Participant current = participantIterator.next();
             if(participantIterator.hasNext()) participantsText.
@@ -220,7 +209,9 @@ public class EventScreenCtrl implements Initializable{
      * show the participants of the current event
      */
     private void updateParticipantsDropdown(){
-        for (Participant current : participants) {
+        cBoxParticipantExpenses.getItems().clear();
+        listViewExpensesParticipants.getItems().clear();
+        for (Participant current : event.getParticipants()) {
             cBoxParticipantExpenses.getItems().add(current.getName());
             listViewExpensesParticipants.getItems().add(current.getName());
         }
@@ -232,7 +223,7 @@ public class EventScreenCtrl implements Initializable{
      */
     public void showAllExpensesSettled(ActionEvent actionEvent) {
         expensesLogListView.getItems().clear();
-        for(Expense expense: expenses){
+        for(Expense expense: event.getExpenses()){
             String log = "";
             // null check used in-development because Participant functionality isn't there yet!
             Participant owedTo = expense.getOwedTo();

@@ -5,14 +5,11 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import java.util.Locale;
-import java.util.Set;
 
 public class MainCtrl {
 
@@ -96,8 +93,7 @@ public class MainCtrl {
      */
     public void switchToEventScreen(){
         Event event = server.getEvent(eventCode);
-        Set<Expense> expenses = server.getExpensesForEvent(eventCode);
-        eventScreenCtrl.refresh(event, expenses, event.getParticipants());
+        eventScreenCtrl.refresh(event);
         primaryStage.setScene(eventScene);
         primaryStage.setTitle("Event Screen");
     }

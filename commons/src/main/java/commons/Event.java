@@ -25,7 +25,7 @@ public class Event{
     private LocalDateTime lastActivity;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
-    @OneToMany(mappedBy = "event", orphanRemoval = true)
+    @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = {"event"})
     private Set<Expense> expenses;
 

@@ -212,9 +212,11 @@ public class ExpenseScreenCtrl implements Initializable{
         /*Participant participant =
             new Participant(choosePayer.getValue(), currentEvent);*/
         // I'd suggest doing something with currentEvent.getParticipants()
-        Participant participant = null;
+        Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
+        Participant participant = participantIterator.hasNext()
+                ? participantIterator.next() : null;
         server.addExpense(currentEvent.getId(),
-            new Expense(name, priceInCents, expenseDate, currentEvent, participant));
+            new Expense(name, priceInCents, expenseDate, participant));
     }
     /**
      * Needs revision
