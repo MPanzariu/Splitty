@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +23,15 @@ import java.net.URL;
 import java.util.*;
 
 public class ManagementOverviewScreenCtrl implements Initializable {
+    @FXML
+    public TextField backupEventIDTextField;
+    @FXML
+    public Button importButton;
+    @FXML
+    public Label backupLabel;
+    @FXML
+    public Button exportButton;
+
     @FXML
     private Button homeScreenButton;
     @FXML
@@ -71,6 +81,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
+        importButton.textProperty().bind(translation.getStringBinding("MOSCtrl.ImportButton"));
+        exportButton.textProperty().bind(translation.getStringBinding("MOSCtrl.ExportButton"));
+        backupLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.BackupLabel"));
+        backupEventIDTextField.promptTextProperty().bind(translation.getStringBinding("MOSCtrl.BackupEventIDTextField"));
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
             ImageView imageView = new ImageView(image);
@@ -82,7 +96,31 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
+        importButton.setOnMouseClicked(
+                event -> {
+                    importButtonClicked();
+                }
+        );
+        exportButton.setOnMouseClicked(
+                event -> {
+                    exportButtonClicked();
+                }
+        );
         refreshListView();
+    }
+
+    /**
+     * Export the event to a backup file
+     */
+    private void exportButtonClicked() {
+
+    }
+
+    /**
+     * Import the event from a backup file
+     */
+    private void importButtonClicked() {
+
     }
 
     /**
