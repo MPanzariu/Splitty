@@ -17,7 +17,7 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
-    @OneToMany(cascade= CascadeType.ALL, mappedBy = "owedTo", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owedTo", orphanRemoval = true)
     @JsonIgnoreProperties(value = {"owedTo"})
     private Set<Expense> expensesOwedTo;
 

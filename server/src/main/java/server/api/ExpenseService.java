@@ -88,9 +88,12 @@ public class ExpenseService {
     public Expense editExpense(long id, Expense newExpense) {
         Expense expense = expenseRepository.findById(id) //
                 .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
+        long extractedParticipantId = newExpense.getOwedTo().getId();
+        Participant participant = participantRepository.findById(extractedParticipantId)
+                .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
         expense.setDate(newExpense.getDate());
         expense.setName(newExpense.getName());
-        expense.setOwedTo(newExpense.getOwedTo());
+        expense.setOwedTo(participant);
         expense.setPriceInCents(newExpense.getPriceInCents());
         return expenseRepository.save(expense);
     }
