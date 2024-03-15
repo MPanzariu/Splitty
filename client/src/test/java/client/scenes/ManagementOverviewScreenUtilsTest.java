@@ -125,4 +125,48 @@ public class ManagementOverviewScreenUtilsTest {
         assertEquals("Ascending", utils.getOrder().getValue());
         assertTrue(utils.getOrder().isBound());
     }
+
+    /**
+     * Testing getter and setters for events field.
+     */
+    @Test
+    public void getAndSetEvents() {
+        Event e = new Event("Party", null);
+        ObservableList<Event> expected = FXCollections.observableArrayList(e);
+        utils.setEvents(expected);
+        assertEquals(expected, utils.getEvents());
+    }
+
+    /**
+     * Testing getter and binder for ascending field.
+     */
+    @Test
+    public void getAndBindAscending() {
+        SimpleStringProperty ascending = new SimpleStringProperty("New");
+        utils.bindAscending(ascending);
+        assertEquals(ascending.getValue(), utils.getAscending().getValue());
+        assertTrue(utils.getAscending().isBound());
+    }
+
+    /**
+     * Testing getting and binding the descending field.
+     */
+    @Test
+    public void getAndBindDescending() {
+        SimpleStringProperty descending = new SimpleStringProperty("New");
+        utils.bindDescending(descending);
+        assertEquals(descending.getValue(), utils.getDescending().getValue());
+        assertTrue(utils.getDescending().isBound());
+    }
+
+    /**
+     * Testing getting and binding the order field.
+     */
+    @Test
+    public void getAndBindOrder() {
+        SimpleStringProperty order = new SimpleStringProperty("New");
+        utils.bindOrder(order);
+        assertEquals("New", utils.getOrder().getValue());
+        assertTrue(utils.getOrder().isBound());
+    }
 }

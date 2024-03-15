@@ -97,6 +97,9 @@ public class ManagementOverviewUtils {
     public StringProperty getOrder() {
         return order;
     }
+    public void bindOrder(StringProperty order) {
+        this.order.bind(order);
+    }
 
     public void setEvents(ObservableList<Event> events) {
         this.events.setAll(events);
