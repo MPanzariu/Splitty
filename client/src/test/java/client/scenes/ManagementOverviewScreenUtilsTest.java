@@ -4,6 +4,8 @@ import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -168,5 +170,28 @@ public class ManagementOverviewScreenUtilsTest {
         utils.bindOrder(order);
         assertEquals("New", utils.getOrder().getValue());
         assertTrue(utils.getOrder().isBound());
+    }
+
+    /**
+     * Participants of the given event should be returned as an observable list.
+     */
+    @Test
+    public void initializeParticipants() {
+        Event e = new Event("Party", null);
+        Participant p = new Participant("Jack");
+        e.addParticipant(p);
+        ObservableList<Participant> actual = utils.initializeParticipantsList(e);
+        ObservableList<Participant> expected = FXCollections.observableArrayList(p);
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void initializeExpenses() {
+        Event event = new Event("Party", null);
+        Expense expense = new Expense("Drinks", 100, null, null, null);
+        event.addExpense(expense);
+        ObservableList<Expense> actual = utils.initializeExpenseList(event);
+        ObservableList<Expense> expected = FXCollections.observableArrayList(expense);
+        assertEquals(expected, actual);
     }
 }

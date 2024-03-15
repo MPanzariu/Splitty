@@ -2,6 +2,8 @@ package client.utils;
 
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -73,6 +75,24 @@ public class ManagementOverviewUtils {
             events.sort(Comparator.comparing(event -> event.getTitle().toLowerCase()));
             order.bind(ascending);
         }
+    }
+
+    /**
+     * Initializes the list of participants.
+     * @param event Selected event
+     * @return Observable list of the selects event's participant
+     */
+    public ObservableList<Participant> initializeParticipantsList(Event event) {
+        return FXCollections.observableArrayList(event.getParticipants());
+    }
+
+    /**
+     * Initializes the list of expenses
+     * @param event Selected event
+     * @return Observable list of the event's expenses
+     */
+    public ObservableList<Expense> initializeExpenseList(Event event) {
+        return FXCollections.observableArrayList(event.getExpenses());
     }
 
     public ObservableList<Event> getEvents() {

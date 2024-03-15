@@ -8,13 +8,13 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import java.io.FileInputStream;
@@ -36,9 +36,9 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     private ListView<Event> eventsListView;
     @FXML
-    private ListView participantsListView;
+    private ListView<Participant> participantsListView;
     @FXML
-    private ListView expensesListview;
+    private ListView<Expense> expensesListView;
     @FXML
     private Button sortButton;
     @FXML
@@ -111,6 +111,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
                 }
             }
         });
+        eventsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldEvent, newEvent) -> {
+            participantsListView.setItems(utils.initializeParticipantsList(newEvent));
+            expensesListView.setItems(utils.initializeExpenseList(newEvent));
+        });
     }
 
     /**
@@ -154,45 +158,5 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
-    }
-
-    /**
-     * update the listview for the participants when you select an event from the listview
-     * update the listview for the expenses when you select an event from the listview
-     * @param mouseEvent when you click on an element of the participantsListview, do an action
-     */
-    public void selectEvent(MouseEvent mouseEvent) {
-        List<Event> events = server.retrieveAllEvents();
-        participantsListView.getItems().clear();
-        String input = mouseEvent.getPickResult().toString();
-        Scanner sc = new Scanner(input);
-        sc.useDelimiter("\"");
-        sc.next();
-        sc.next();
-        sc.next();
-        sc.next();
-        String eventId = sc.next();
-        Event current = null;
-        for(int i = 0; i < events.size(); i++){
-            current = events.get(i);
-            if(current.getId().equals(eventId))break;
-            else current = null;
-        }
-        if(current!=null){
-            Set<Participant> participants = current.getParticipants();
-            Set<Expense> expenses = current.getExpenses();
-            Iterator<Participant> participantIterator = participants.iterator();
-            Iterator<Expense> expenseIterator= expenses.iterator();
-            while(participantIterator.hasNext()){
-                Participant toAdd = participantIterator.next();
-                participantsListView.getItems().add(toAdd.getName());
-            }
-            while(expenseIterator.hasNext()){
-                Expense nextExpense = expenseIterator.next();
-                expensesListview.getItems().add(nextExpense.toString());
-            }
-            System.out.println("it worked but no participants (yet)");
-        }
-        else System.out.println("No event with this ID");
     }
 }
