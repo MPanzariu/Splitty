@@ -1,16 +1,13 @@
 package client.scenes;
 
+import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -46,11 +43,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private Button sortButton;
     @FXML
     private ComboBox<StringProperty> orderTypeComboBox;
-    private ObservableList<StringProperty> orderTypes = FXCollections.observableArrayList();
-    private ObservableList<Event> events = FXCollections.observableArrayList();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final ManagementOverviewUtils utils;
 
     /**
      * Constructor
@@ -59,10 +55,12 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * @param translation the Translation to use
      */
     @Inject
-    public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                                        ManagementOverviewUtils utils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.utils = utils;
     }
     /**
      * Initialize basic features for the Management Overview Screen
@@ -81,7 +79,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
-        sortButton.textProperty().bind(translation.getStringBinding("ManagementOverview.Button.ascending"));
+        initializeSortButton();
         initializeOrderTypes();
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
@@ -100,36 +98,40 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * Initialize a ListView with all events.
      */
     public void initializeAllEvents() {
-        refreshListView();
-        events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()));
-        eventsListView.setItems(events);
+        eventsListView.setItems(utils.retrieveEvents());
         eventsListView.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Event event, boolean empty) {
                 super.updateItem(event, empty);
-                if(event != null)
+                if(empty || event == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
                     setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                }
             }
         });
     }
 
     /**
+     * Initializes the sort button.
+     */
+    public void initializeSortButton() {
+        sortButton.textProperty().bind(utils.bindSortButton());
+    }
+
+    /**
      * Initialize the ComboBox which contains all the ways that events can be ordered by.
      */
-    private void initializeOrderTypes() {
-        SimpleStringProperty title = new SimpleStringProperty();
-        title.bind(translation.getStringBinding("ManagementOverview.ComboBox.title"));
-        SimpleStringProperty creationDate = new SimpleStringProperty();
-        creationDate.bind(translation.getStringBinding("ManagementOverview.ComboBox.creationDate"));
-        SimpleStringProperty lastActivity = new SimpleStringProperty();
-        lastActivity.bind(translation.getStringBinding("ManagementOverview.ComboBox.lastActivity"));
-        orderTypes.setAll(title, creationDate, lastActivity);
-        orderTypeComboBox.setItems(orderTypes);
-        Callback<ListView<StringProperty>, ListCell<StringProperty>> cellFactory = listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(StringProperty string, boolean empty) {
+    public void initializeOrderTypes() {
+        orderTypeComboBox.setItems(utils.setOrderTypes());
+        Callback<ListView<StringProperty>, ListCell<StringProperty>> cellFactory = l -> new ListCell<>() {
+            public void updateItem(StringProperty string, boolean empty) {
                 super.updateItem(string, empty);
-                if(string != null) {
+                if (empty || string == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
                     setText(string.getValue());
                 }
             }
@@ -140,21 +142,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     }
 
     /**
-     * Orders event by their title.
-     * If the events are ordered ascending, then they will be ordered descending, and vice versa.
-     * The titles are considered as lowercase strings while sorting.
+     * Sort button handler.
      */
     public void orderEventsByTitle() {
-        String order = sortButton.getText();
-        ObservableValue<String> ascending = translation.getStringBinding("ManagementOverview.Button.ascending");
-        ObservableValue<String> descending = translation.getStringBinding("ManagementOverview.Button.descending");
-        if(order.equals(ascending.getValue())) {
-            events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()).reversed());
-            sortButton.textProperty().bind(descending);
-        } else {
-            events.sort(Comparator.comparing((Event e) -> e.getTitle().toLowerCase()));
-            sortButton.textProperty().bind(ascending);
-        }
+        utils.sortEventsByTitle(sortButton.getText());
     }
 
     /**
@@ -163,14 +154,6 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
-    }
-
-    /**
-     * show all the current events in the list view, can be modified to show
-     * dates in case it is needed to.
-     */
-    public void refreshListView() {
-        events.setAll(server.retrieveAllEvents());
     }
 
     /**
