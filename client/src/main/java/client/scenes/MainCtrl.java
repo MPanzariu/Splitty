@@ -14,7 +14,6 @@ import java.util.Locale;
 public class MainCtrl {
 
     private Stage primaryStage;
-    private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
     private StartupScreenCtrl startupScreenCtrl;
     private EventScreenCtrl eventScreenCtrl;
@@ -22,7 +21,6 @@ public class MainCtrl {
     private EditTitleCtrl editTitleCtrl;
     private Scene startupScene;
     private Scene add;
-    private AddQuoteCtrl addCtrl;
     private Scene eventScene;
     private Scene expenseScene;
 
@@ -79,12 +77,6 @@ public class MainCtrl {
         startupScreenCtrl.refreshEvents();
         primaryStage.setTitle("Main Menu");
         primaryStage.setScene(startupScene);
-    }
-
-    public void showAdd() {
-        //primaryStage.setTitle("Quotes: Adding Quote");
-        //primaryStage.setScene(add);
-        //add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
     }
 
     /**
