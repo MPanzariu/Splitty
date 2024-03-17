@@ -13,7 +13,10 @@ import javafx.collections.ObservableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,15 +24,37 @@ import static org.mockito.Mockito.*;
 
 public class ManagementOverviewScreenUtilsTest {
 
-    Translation translation;
-    ServerUtils server;
-    ManagementOverviewUtils utils;
+    private Translation translation;
+    private ServerUtils server;
+    private ManagementOverviewUtils utils;
+    private Event e1;
+    private Event e2;
+    private Event e3;
+    private StringProperty ascending;
+    private StringProperty descending;
+    private StringProperty title;
+    private StringProperty creationDate;
+    private StringProperty lastActivity;
 
     @BeforeEach
     public void setup() {
         translation = mock(Translation.class);
         server = mock(ServerUtils.class);
         utils = new ManagementOverviewUtils(translation, server);
+        e1 = new Event("Party", new Date(0));
+        e2 = new Event("Holiday", new Date(5));
+        e3 = new Event("party", new Date(2));
+        ascending = new SimpleStringProperty("Ascending");
+        descending = new SimpleStringProperty("Descending");
+        title = new SimpleStringProperty("Title");
+        creationDate = new SimpleStringProperty("Creation Date");
+        lastActivity = new SimpleStringProperty("Last Activity");
+        utils.setEvents(FXCollections.observableArrayList(e1, e2, e3));
+        utils.bindAscending(ascending);
+        utils.bindDescending(descending);
+        utils.bindTitle(title);
+        utils.bindCreationDate(creationDate);
+        utils.bindLastActivity(lastActivity);
     }
 
     /**
@@ -37,9 +62,6 @@ public class ManagementOverviewScreenUtilsTest {
      */
     @Test
     public void setOrderTypes() {
-        StringProperty title = new SimpleStringProperty("Title");
-        StringProperty creationDate = new SimpleStringProperty("Creation Date");
-        StringProperty lastActivity = new SimpleStringProperty("Last Activity");
         when(translation.getStringBinding("ManagementOverview.ComboBox.title"))
                 .thenReturn(title);
         when(translation.getStringBinding("ManagementOverview.ComboBox.creationDate"))
@@ -60,11 +82,8 @@ public class ManagementOverviewScreenUtilsTest {
      */
     @Test
     public void retrieveEvents() {
-        Event event1 = new Event("Party", null);
-        Event event2 = new Event("Holiday", null);
-        Event event3 = new Event("party", null);
-        when(server.retrieveAllEvents()).thenReturn(List.of(event1, event2, event3));
-        ObservableList<Event> expected = FXCollections.observableArrayList(event2, event1, event3);
+        when(server.retrieveAllEvents()).thenReturn(List.of(e1, e2, e3));
+        ObservableList<Event> expected = FXCollections.observableArrayList(e2, e1, e3);
         ObservableList<Event> actual = utils.retrieveEvents();
         assertEquals(expected, actual);
         assertEquals(expected, utils.getEvents());
@@ -89,42 +108,108 @@ public class ManagementOverviewScreenUtilsTest {
     }
 
     /**
-     * When button is set at ascending order, then the event list should be ordered in descending order.
+     * When button is set at ascending order, then the event list should be sorted by title in descending order.
      * Make sure that the order field is bound to the new state.
      */
     @Test
     public void sortEventsByTitleInDescendingOrder() {
-        Event e1 = new Event("Party", null);
-        Event e2 = new Event("Holiday", null);
-        Event e3 = new Event("party", null);
-        utils.setEvents(FXCollections.observableArrayList(e1, e2, e3));
-        utils.bindAscending(new SimpleStringProperty("Ascending"));
-        utils.bindDescending(new SimpleStringProperty("Descending"));
-        utils.sortEventsByTitle("Ascending");
+        utils.bindOrder(descending);
+        utils.sortEvents(title);
         ObservableList<Event> actual = utils.getEvents();
         ObservableList<Event> expected = FXCollections.observableArrayList(e1, e3, e2);
         assertEquals(expected, actual);
-        assertEquals("Descending", utils.getOrder().getValue());
-        assertTrue(utils.getOrder().isBound());
     }
 
     /**
-     * When the button is at descending order, then the event list should be ordered in ascending order.
+     * When the button is at descending order, then the event list should be sorted by title in ascending order.
      * Make sure that the order field is bound to the new state.
      */
     @Test
     public void sortEventsByTitleInAscendingOrder() {
-        Event e1 = new Event("Party", null);
-        Event e2 = new Event("Holiday", null);
-        Event e3 = new Event("party", null);
-        utils.setEvents(FXCollections.observableArrayList(e2, e1, e3));
-        utils.bindAscending(new SimpleStringProperty("Ascending"));
-        utils.bindDescending(new SimpleStringProperty("Descending"));
-        utils.sortEventsByTitle("Descending");
+        utils.bindOrder(ascending);
+        utils.sortEvents(title);
         ObservableList<Event> actual = utils.getEvents();
         ObservableList<Event> expected = FXCollections.observableArrayList(e2, e1, e3);
         assertEquals(expected, actual);
-        assertEquals("Ascending", utils.getOrder().getValue());
+    }
+
+    /**
+     * Sorts events by creation date in ascending order
+     */
+    @Test
+    public void sortEventsByCreationDateInAscendingOrder() {
+        utils.bindOrder(ascending);
+        utils.sortEvents(creationDate);
+        assertEquals(FXCollections.observableArrayList(e1, e3, e2), utils.getEvents());
+    }
+
+    /**
+     * Sorts events by creation date in descending order
+     */
+    @Test
+    public void sortEventsByCreationDateInDescendingOrder() {
+        utils.bindOrder(descending);
+        utils.sortEvents(creationDate);
+        assertEquals(FXCollections.observableArrayList(e2, e3, e1), utils.getEvents());
+    }
+
+    /**
+     * Sorts events by last activity in ascending order
+     */
+    @Test
+    public void sortEventsByLastActivityInAscendingOrder() {
+        e1.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 1));
+        e2.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 2));
+        e3.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 3));
+        utils.bindOrder(ascending);
+        utils.sortEvents(lastActivity);
+        assertEquals(FXCollections.observableArrayList(e1, e2, e3), utils.getEvents());
+    }
+
+    /**
+     * Sorts events by last activity in descending order
+     */
+    @Test
+    public void sortEventsByLastActivityInDescendingOrder() {
+        e1.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 1));
+        e2.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 2));
+        e3.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 3));
+        utils.bindOrder(descending);
+        utils.sortEvents(lastActivity);
+        assertEquals(FXCollections.observableArrayList(e3, e2, e1), utils.getEvents());
+    }
+
+    /**
+     * Events are ordered in the same order that has been set
+     */
+    @Test
+    public void sortEventsSameOrder() {
+        utils.bindOrder(ascending);
+        utils.sortEventsSameOrder(title);
+        assertEquals(FXCollections.observableArrayList(e2, e1, e3), utils.getEvents());
+    }
+
+    /**
+     * If order is ascending then events will be sorted in descending order
+     */
+    @Test
+    public void sortEventsFromAscendingToDescending() {
+        utils.bindOrder(ascending);
+        utils.sortEventsOtherOrder(title);
+        assertEquals(FXCollections.observableArrayList(e1, e3, e2), utils.getEvents());
+        assertEquals(utils.getOrder().getValue(), descending.getValue());
+        assertTrue(utils.getOrder().isBound());
+    }
+
+    /**
+     * If order is descending then events will be sorted in ascending order
+     */
+    @Test
+    public void sortEventsFromDescendingToAscending() {
+        utils.bindOrder(descending);
+        utils.sortEventsOtherOrder(title);
+        assertEquals(FXCollections.observableArrayList(e2, e1, e3), utils.getEvents());
+        assertEquals(utils.getOrder().getValue(), ascending.getValue());
         assertTrue(utils.getOrder().isBound());
     }
 

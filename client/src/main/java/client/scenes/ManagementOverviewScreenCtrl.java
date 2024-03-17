@@ -8,7 +8,6 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -143,13 +142,15 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         orderTypeComboBox.setButtonCell(cellFactory.call(null));
         orderTypeComboBox.setCellFactory(cellFactory);
         orderTypeComboBox.getSelectionModel().select(0);
+        orderTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldString, newString) ->
+                utils.sortEventsSameOrder(newString));
     }
 
     /**
      * Sort button handler.
      */
-    public void orderEventsByTitle() {
-        utils.sortEventsByTitle(sortButton.getText());
+    public void orderEvents() {
+        utils.sortEventsOtherOrder(orderTypeComboBox.getValue());
     }
 
     /**

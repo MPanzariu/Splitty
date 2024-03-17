@@ -19,6 +19,10 @@ public class ManagementOverviewUtils {
     private final SimpleStringProperty ascending = new SimpleStringProperty();
     private final SimpleStringProperty descending = new SimpleStringProperty();
     private final StringProperty order = new SimpleStringProperty();
+    private final StringProperty title = new SimpleStringProperty();
+    private final StringProperty creationDate = new SimpleStringProperty();
+    private final StringProperty lastActivity = new SimpleStringProperty();
+
 
     @Inject
     public ManagementOverviewUtils(Translation translation, ServerUtils server) {
@@ -31,9 +35,6 @@ public class ManagementOverviewUtils {
      * @return an ObservableList which contains all the order types, each bound to their own translation.
      */
     public ObservableList<StringProperty> setOrderTypes() {
-        StringProperty title = new SimpleStringProperty();
-        StringProperty creationDate = new SimpleStringProperty();
-        StringProperty lastActivity = new SimpleStringProperty();
         title.bind(translation.getStringBinding("ManagementOverview.ComboBox.title"));
         creationDate.bind(translation.getStringBinding("ManagementOverview.ComboBox.creationDate"));
         lastActivity.bind(translation.getStringBinding("ManagementOverview.ComboBox.lastActivity"));
@@ -62,19 +63,44 @@ public class ManagementOverviewUtils {
     }
 
     /**
-     * Orders event by their title.
-     * If the events are sorted in ascending order, then they will be sorted in descending order, and vice versa.
-     * The titles are considered as lowercase strings while sorting.
-     * @param text Text of the sort button
+     * Sort events according to the comparator and the current order
+     * @param comparator Comparator to sort events with
      */
-    public void sortEventsByTitle(String text) {
-        if(text.equals(ascending.getValue())) {
-            events.sort(Comparator.comparing((Event event) -> event.getTitle().toLowerCase()).reversed());
-            order.bind(descending);
-        } else if(text.equals(descending.getValue())) {
-            events.sort(Comparator.comparing(event -> event.getTitle().toLowerCase()));
-            order.bind(ascending);
-        }
+    public void sortEventsByComparator(Comparator<Event> comparator) {
+        if(order.getValue().equals(ascending.getValue()))
+            events.sort(comparator);
+        else if(order.getValue().equals(descending.getValue()))
+            events.sort(comparator.reversed());
+    }
+
+    /**
+     * Sorts events
+     * @param property Property that determines how to sort the events
+     */
+    public void sortEvents(StringProperty property) {
+        if(property.getValue().equals(title.getValue()))
+            sortEventsByComparator(Comparator.comparing(event -> event.getTitle().toLowerCase()));
+        else if(property.getValue().equals(creationDate.getValue()))
+            sortEventsByComparator(Comparator.comparing(Event::getCreationDate));
+        else if(property.getValue().equals(lastActivity.getValue()))
+            sortEventsByComparator(Comparator.comparing(Event::getLastActivity));
+    }
+
+    /**
+     * Sort events by the same order
+     * @param property Property to sort by
+     */
+    public void sortEventsSameOrder(StringProperty property) {
+        sortEvents(property);
+    }
+
+    /**
+     * Sort events in ascending order if the current order descending, and vice versa
+     * @param property Property to sort by
+     */
+    public void sortEventsOtherOrder(StringProperty property) {
+        order.bind(order.getValue().equals(ascending.getValue()) ? descending : ascending);
+        sortEvents(property);
     }
 
     /**
@@ -123,5 +149,17 @@ public class ManagementOverviewUtils {
 
     public void setEvents(ObservableList<Event> events) {
         this.events.setAll(events);
+    }
+
+    public void bindTitle(StringProperty title) {
+        this.title.bind(title);
+    }
+
+    public void bindCreationDate(StringProperty creationDate) {
+        this.creationDate.bind(creationDate);
+    }
+
+    public void bindLastActivity(StringProperty lastActivity) {
+        this.lastActivity.bind(lastActivity);
     }
 }
