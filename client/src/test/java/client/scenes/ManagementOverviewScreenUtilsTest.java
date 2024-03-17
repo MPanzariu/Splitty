@@ -273,7 +273,7 @@ public class ManagementOverviewScreenUtilsTest {
     @Test
     public void initializeExpenses() {
         Event event = new Event("Party", null);
-        Expense expense = new Expense("Drinks", 100, null, null, null);
+        Expense expense = new Expense("Drinks", 100, null, null);
         event.addExpense(expense);
         ObservableList<Expense> actual = utils.initializeExpenseList(event);
         ObservableList<Expense> expected = FXCollections.observableArrayList(expense);
