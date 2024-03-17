@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -13,7 +14,6 @@ import java.util.Locale;
 public class MainCtrl {
 
     private Stage primaryStage;
-    private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
     private StartupScreenCtrl startupScreenCtrl;
     private EventScreenCtrl eventScreenCtrl;
@@ -21,7 +21,6 @@ public class MainCtrl {
     private EditTitleCtrl editTitleCtrl;
     private Scene startupScene;
     private Scene add;
-    private AddQuoteCtrl addCtrl;
     private Scene eventScene;
     private Scene expenseScene;
 
@@ -34,12 +33,19 @@ public class MainCtrl {
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
 
-
-    @Inject
-    Translation translation;
+    private final Translation translation;
     @Inject
     @Named("client.language")
-    String language;
+    private String language;
+    private final ServerUtils server;
+    private String eventCode;
+
+    @Inject
+    public MainCtrl(Translation translation, ServerUtils server) {
+        this.translation = translation;
+        this.server = server;
+        this.eventCode = null;
+    }
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
@@ -75,23 +81,14 @@ public class MainCtrl {
         primaryStage.setScene(startupScene);
     }
 
-    public void showAdd() {
-        //primaryStage.setTitle("Quotes: Adding Quote");
-        //primaryStage.setScene(add);
-        //add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-    }
-
     /**
      * When called the view changes to the event specified as input.
      * join an event (either used when creating or joining one) and updating the fields in the event screen
-     * @param event the event to join
      */
-    public void joinEvent(Event event){
-        //TODO implement
+    public void switchToEventScreen(){
+        Event event = server.getEvent(eventCode);
+        eventScreenCtrl.refresh(event);
         primaryStage.setScene(eventScene);
-        eventScreenCtrl.setEvent(event);
-        eventScreenCtrl.setParticipants(event);
-        eventScreenCtrl.setParticipantsForExpenses(event);
         primaryStage.setTitle("Event Screen");
     }
 
@@ -112,25 +109,26 @@ public class MainCtrl {
     }
 
     public void switchToAddExpense() {
+        Event event = server.getEvent(eventCode);
         expenseScreenCtrl.resetAll();
-        expenseScreenCtrl.setEvent(eventScreenCtrl.getEvent());
+        expenseScreenCtrl.refresh(event);
         primaryStage.setScene(expenseScene);
     }
 
     public void openEditTitle() {
-        editTitleCtrl.setEvent(eventScreenCtrl.getEvent());
+        Event event = server.getEvent(eventCode);
+        editTitleCtrl.refresh(event);
         primaryStage.setScene(editTitleScene);
     }
 
-    public void switchToAddParticipant(Event event) {
-        participantScreenCtrl.setEvent(event);
+    public void switchToAddParticipant() {
+        Event event = server.getEvent(eventCode);
+        participantScreenCtrl.refresh(event);
         primaryStage.setScene(participantScene);
     }
 
     public void switchToAddParticipantExistent() {
-        participantScreenCtrl.setEvent(participantScreenCtrl.getEvent());
-        participantScreenCtrl.setParticipant(participantScreenCtrl.getParticipant());
-        primaryStage.setScene(participantScene);
+        //TODO: Implement editing participants
     }
 
     /**
@@ -148,5 +146,9 @@ public class MainCtrl {
         primaryStage.setScene(managementOverviewScreenScene);
         primaryStage.setTitle("Management Overview");
         managementOverviewScreenCtrl.initializeAllEvents();
+    }
+
+    public void switchEvents(String eventCode) {
+        this.eventCode = eventCode;
     }
 }
