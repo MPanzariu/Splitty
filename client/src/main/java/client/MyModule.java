@@ -16,6 +16,7 @@
 package client;
 
 import client.utils.ConfigUtils;
+import client.utils.ManagementOverviewUtils;
 import client.utils.ObservableResourceFactory;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -33,6 +34,7 @@ public class MyModule implements Module {
         Names.bindProperties(binder, properties);
 
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
+        binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }
