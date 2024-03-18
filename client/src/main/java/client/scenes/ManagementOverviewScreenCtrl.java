@@ -93,11 +93,11 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
-        importButton.textProperty().bind(translation.getStringBinding("MOSCtrl.ImportButton"));
-        exportButton.textProperty().bind(translation.getStringBinding("MOSCtrl.ExportButton"));
-        backupLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.BackupLabel"));
-        backupEventIDTextField.promptTextProperty().bind(translation.getStringBinding("MOSCtrl.BackupEventIDTextField"));
-        backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        bindButton(exportButton, "MOSCtrl.ExportButton");
+        bindButton(importButton, "MOSCtrl.ImportButton");
+        bindLabel(backupLabel, "MOSCtrl.BackupLabel");
+        bindTextField(backupEventIDTextField, "MOSCtrl.BackupEventIDTextField");
+        bindLabel(backupEventFeedbackLabel, "empty");
         initializeSortButton();
         initializeOrderTypes();
         try{
@@ -183,17 +183,44 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     }
 
     /**
+     * Binds a string to a label
+     * @param label the label
+     * @param s the string
+     */
+    public void bindLabel(Label label, String s){
+        label.textProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
+     * Binds a string to a textfield
+     * @param textField the textfield
+     * @param s the string
+     */
+    public void bindTextField(TextField textField, String s) {
+        textField.promptTextProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
+     * Binds a string to a button
+     * @param button the button
+     * @param s the string
+     */
+    public void bindButton(Button button, String s) {
+        button.textProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
      * Export the event to a backup file
      */
     @FXML
-    private void exportButtonClicked() {
-        backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+    public void exportButtonClicked() {
+        bindLabel(backupEventFeedbackLabel, "empty");
         String eventId = getTextBoxText(backupEventIDTextField);
         Event event;
         try{
             event = server.getEvent(eventId);
         }catch (Exception e){
-            backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.EventNotFound"));
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.EventNotFound");
             return;
         }
         ObjectMapper objectMapper = new ObjectMapper();
@@ -203,7 +230,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             File backupFile = new File(String.format("./backups/%s.json", eventId));
             objectMapper.writeValue(backupFile, event);
             System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
-            backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.SuccessExport"));
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -213,8 +240,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * Import the event from a backup file
      */
     @FXML
-    private void importButtonClicked() {
-        backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+    public void importButtonClicked() {
+        bindLabel(backupEventFeedbackLabel, "empty");
         String eventId = getTextBoxText(backupEventIDTextField);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -223,13 +250,13 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             File backupFile = new File(String.format("./backups/%s.json", eventId));
             Event event = objectMapper.readValue(backupFile, Event.class);
             System.out.println("Read from file: " + event);
-            backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.SuccessImport"));
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
             Event responseEvent = server.addEvent(event);
             initializeAllEvents();
 
         } catch (IOException e) {
             e.printStackTrace();
-            backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.ErrorImportingEvent"));
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");
         }
     }
 
