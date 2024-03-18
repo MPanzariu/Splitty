@@ -40,6 +40,10 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    public Event saveEvent(Event event){
+        return eventRepository.save(event);
+    }
+
     /**
      * edit the title of an event
      * @param eventId the event whose title we want to edit
