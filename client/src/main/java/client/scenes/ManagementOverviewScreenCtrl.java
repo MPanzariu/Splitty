@@ -4,6 +4,7 @@ import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -196,6 +197,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             return;
         }
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         try {
             // Write object to JSON file
             File backupFile = new File(String.format("./backups/%s.json", eventId));
@@ -215,7 +217,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
         String eventId = getTextBoxText(backupEventIDTextField);
         ObjectMapper objectMapper = new ObjectMapper();
-
+        objectMapper.registerModule(new JavaTimeModule());
         try {
             // Read JSON data from file and deserialize it into object
             File backupFile = new File(String.format("./backups/%s.json", eventId));
@@ -223,6 +225,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             System.out.println("Read from file: " + event);
             backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.SuccessImport"));
             Event responseEvent = server.addEvent(event);
+            initializeAllEvents();
 
         } catch (IOException e) {
             e.printStackTrace();
