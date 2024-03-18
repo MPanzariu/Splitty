@@ -226,15 +226,4 @@ public class ServerUtils {
 				.get(new GenericType<List<Event>>(){});
 		return events;
 	}
-
-	/**
-	 * Sends an event to be added to the database
-	 */
-	public Event addEvent(Event event){
-		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/events/")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.put(Entity.entity(event, APPLICATION_JSON),Event.class);
-	}
 }

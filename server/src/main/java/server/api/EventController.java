@@ -144,18 +144,5 @@ public class EventController {
         this.repository = repository;
     }
 
-    /**
-     * Endpoint for adding an event.
-     * @param event - the event to be added
-     * @return The added event.
-     */
-    @PutMapping("/")
-    ResponseEntity<Event> add(@RequestBody Event event) {
-        if(event==null || event.getTitle().isEmpty() || event.getTitle()==null){
-            return ResponseEntity.badRequest().build();
-        }
-        Event createdEvent = eventService.saveEvent(event);
-        return ResponseEntity.ok(createdEvent);
-    }
 
 }
