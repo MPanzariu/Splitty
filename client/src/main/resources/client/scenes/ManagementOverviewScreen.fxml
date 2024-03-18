@@ -37,7 +37,8 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Button fx:id="exportButton" layoutX="788.0" layoutY="110.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="88.0" text="Export" />
-      <Button fx:id="importButton" layoutX="894.0" layoutY="110.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="88.0" text="Import" />
+      <Button fx:id="exportButton" layoutX="788.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#exportButtonClicked" prefHeight="25.0" prefWidth="88.0" text="Export" />
+      <Button fx:id="importButton" layoutX="894.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#importButtonClicked" prefHeight="25.0" prefWidth="88.0" text="Import" />
+      <Label fx:id="backupEventFeedbackLabel" layoutX="606.0" layoutY="146.0" text="Label" />
    </children>
 </AnchorPane>
