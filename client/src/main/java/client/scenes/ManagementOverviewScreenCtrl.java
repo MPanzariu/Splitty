@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,24 +8,21 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
-import jakarta.ws.rs.BadRequestException;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ResourceBundle;
 
 public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
@@ -49,14 +47,19 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     private Label expensesLabel;
     @FXML
-    private ListView eventsListView;
+    private ListView<Event> eventsListView;
     @FXML
-    private ListView participantsListView;
+    private ListView<Participant> participantsListView;
     @FXML
-    private ListView expensesListview;
+    private ListView<Expense> expensesListView;
+    @FXML
+    private Button sortButton;
+    @FXML
+    private ComboBox<StringProperty> orderTypeComboBox;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final ManagementOverviewUtils utils;
 
     /**
      * Constructor
@@ -65,10 +68,12 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * @param translation the Translation to use
      */
     @Inject
-    public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                                        ManagementOverviewUtils utils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.utils = utils;
     }
     /**
      * Initialize basic features for the Management Overview Screen
@@ -92,6 +97,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         backupLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.BackupLabel"));
         backupEventIDTextField.promptTextProperty().bind(translation.getStringBinding("MOSCtrl.BackupEventIDTextField"));
         backupEventFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        initializeSortButton();
+        initializeOrderTypes();
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
             ImageView imageView = new ImageView(image);
@@ -103,7 +110,66 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
-        refreshListView();
+    }
+
+    /**
+     * Initialize a ListView with all events.
+     */
+    public void initializeAllEvents() {
+        eventsListView.setItems(utils.retrieveEvents());
+        eventsListView.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Event event, boolean empty) {
+                super.updateItem(event, empty);
+                if(empty || event == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                }
+            }
+        });
+        eventsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldEvent, newEvent) -> {
+            participantsListView.setItems(utils.initializeParticipantsList(newEvent));
+            expensesListView.setItems(utils.initializeExpenseList(newEvent));
+        });
+    }
+
+    /**
+     * Initializes the sort button.
+     */
+    public void initializeSortButton() {
+        sortButton.textProperty().bind(utils.bindSortButton());
+    }
+
+    /**
+     * Initialize the ComboBox which contains all the ways that events can be ordered by.
+     */
+    public void initializeOrderTypes() {
+        orderTypeComboBox.setItems(utils.setOrderTypes());
+        Callback<ListView<StringProperty>, ListCell<StringProperty>> cellFactory = l -> new ListCell<>() {
+            public void updateItem(StringProperty string, boolean empty) {
+                super.updateItem(string, empty);
+                if (empty || string == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(string.getValue());
+                }
+            }
+        };
+        orderTypeComboBox.setButtonCell(cellFactory.call(null));
+        orderTypeComboBox.setCellFactory(cellFactory);
+        orderTypeComboBox.getSelectionModel().select(0);
+        orderTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldString, newString) ->
+                utils.sortEventsSameOrder(newString));
+    }
+
+    /**
+     * Sort button handler.
+     */
+    public void orderEvents() {
+        utils.sortEventsOtherOrder(orderTypeComboBox.getValue());
     }
 
     /**
@@ -170,60 +236,5 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
-    }
-
-    /**
-     * show all the current events in the list view, can be modified to show
-     * dates in case it is needed to.
-     */
-    public void refreshListView(){
-        List<Event> events = server.retrieveAllEvents();
-        for(int i = 0; i < events.size(); i++){
-            Event current = events.get(i);
-            String input = "";
-            input+="Name: \"" +  current.getTitle() + "\"";
-            input+=", ID: \"" + current.getId() + "\"";
-            eventsListView.getItems().add(input);
-        }
-    }
-
-    /**
-     * update the listview for the participants when you select an event from the listview
-     * update the listview for the expenses when you select an event from the listview
-     * @param mouseEvent when you click on an element of the participantsListview, do an action
-     */
-    public void selectEvent(MouseEvent mouseEvent) {
-        List<Event> events = server.retrieveAllEvents();
-        participantsListView.getItems().clear();
-        String input = mouseEvent.getPickResult().toString();
-        Scanner sc = new Scanner(input);
-        sc.useDelimiter("\"");
-        sc.next();
-        sc.next();
-        sc.next();
-        sc.next();
-        String eventId = sc.next();
-        Event current = null;
-        for(int i = 0; i < events.size(); i++){
-            current = events.get(i);
-            if(current.getId().equals(eventId))break;
-            else current = null;
-        }
-        if(current!=null){
-            Set<Participant> participants = current.getParticipants();
-            Set<Expense> expenses = current.getExpenses();
-            Iterator<Participant> participantIterator = participants.iterator();
-            Iterator<Expense> expenseIterator= expenses.iterator();
-            while(participantIterator.hasNext()){
-                Participant toAdd = participantIterator.next();
-                participantsListView.getItems().add(toAdd.getName());
-            }
-            while(expenseIterator.hasNext()){
-                Expense nextExpense = expenseIterator.next();
-                expensesListview.getItems().add(nextExpense.toString());
-            }
-            System.out.println("it worked but no participants (yet)");
-        }
-        else System.out.println("No event with this ID");
     }
 }

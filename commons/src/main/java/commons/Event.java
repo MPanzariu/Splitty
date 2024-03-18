@@ -2,6 +2,7 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -24,18 +25,10 @@ public class Event{
     private LocalDateTime lastActivity;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
-    @OneToMany(mappedBy = "event", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties(value = {"event"})
     private Set<Expense> expenses;
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Expense> settledExpenses;
 
-    /***
-     * Getter for the List of settled Expenses
-     * @return A List of settled Expenses
-     */
-    public List<Expense> getSettledExpenses() {
-        return settledExpenses;
-    }
 
     /***
      * Constructor for object mappers
@@ -54,7 +47,6 @@ public class Event{
         this.expenses = new HashSet<>();
         this.id = generateId();
         this.creationDate = creationDate;
-        this.settledExpenses = new ArrayList<>();
         this.lastActivity = LocalDateTime.now();
     }
 
@@ -254,6 +246,9 @@ public class Event{
      */
     public LocalDateTime getLastActivity(){
         return lastActivity;
+    }
+    public void setLastActivity(LocalDateTime lastActivity) {
+        this.lastActivity = lastActivity;
     }
 
     /***

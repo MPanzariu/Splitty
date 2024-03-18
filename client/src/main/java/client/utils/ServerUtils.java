@@ -17,12 +17,8 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -32,7 +28,6 @@ import commons.Expense;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
-import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -43,32 +38,6 @@ public class ServerUtils {
 	@Inject
 	@Named("connection.URL")
 	private String serverURL;
-
-	public void getQuotesTheHardWay() throws IOException, URISyntaxException {
-		var url = new URI("http://localhost:8080/api/quotes").toURL();
-		var is = url.openConnection().getInputStream();
-		var br = new BufferedReader(new InputStreamReader(is));
-		String line;
-		while ((line = br.readLine()) != null) {
-			System.out.println(line);
-		}
-	}
-
-	public List<Quote> getQuotes() {
-		return ClientBuilder.newClient(new ClientConfig()) //
-				.target(serverURL).path("api/quotes") //
-				.request(APPLICATION_JSON) //
-				.accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
-	}
-
-	public Quote addQuote(Quote quote) {
-		return ClientBuilder.newClient(new ClientConfig()) //
-				.target(serverURL).path("api/quotes") //
-				.request(APPLICATION_JSON) //
-				.accept(APPLICATION_JSON) //
-				.post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
-	}
 
 	/**
 	 * Gets the event from the server based on the invite code
@@ -129,12 +98,11 @@ public class ServerUtils {
 	 * Sends a POST request to add an expense to a specific event
 	 * @param eventId the id of the specific event
 	 * @param expense the expense to be added
-	 * @return the expense that was added
 	 */
-	public Expense addExpense(String eventId, Expense expense) {
-		return ClientBuilder.newClient()
+	public void addExpense(String eventId, Expense expense) {
+		ClientBuilder.newClient()
 				.target(serverURL)
-				.path("api/expenses/" + eventId + "/expenses")
+				.path("api/events/" + eventId + "/expenses")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
@@ -145,12 +113,12 @@ public class ServerUtils {
 	 * @param eventId the id of the event for which we want to get the expenses
 	 * @return the list of expenses for the specific event
 	 */
-	public List<Expense> getExpensesForEvent(String eventId) {
+	public Set<Expense> getExpensesForEvent(String eventId) {
 		return ClientBuilder.newClient()
-				.target(serverURL).path("api/expenses/" + eventId + "/expenses")
+				.target(serverURL).path("api/events/" + eventId + "/expenses")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
-				.get(new GenericType<List<Expense>>() {});
+				.get(new GenericType<Set<Expense>>() {});
 	}
 
 	/**
@@ -161,7 +129,7 @@ public class ServerUtils {
 	 */
 	public double getTotalExpensesForEvent(String eventId) {
 		return ClientBuilder.newClient()
-				.target(serverURL).path("api/expenses/" + eventId + "/total-expenses")
+				.target(serverURL).path("api/events/" + eventId + "/total-expenses")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.get(Double.class);
@@ -169,12 +137,13 @@ public class ServerUtils {
 
 	/**
 	 * Sends a DELETE request to delete the specific expense
+	 * @param eventId the id of the event to delete the Expense from
 	 * @param expenseId the id of the expense we want to delete
 	 */
-	public void deleteExpenseForEvent(String expenseId) {
+	public void deleteExpenseForEvent(String eventId, String expenseId) {
 		Response response = ClientBuilder.newClient()
 				.target(serverURL)
-				.path("api/expenses/" + expenseId)
+				.path("api/events/" + eventId + "/expenses/" + expenseId)
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.delete();
@@ -187,14 +156,14 @@ public class ServerUtils {
 
 	/**
 	 * Sends a PUT request to modify an existing expense
-	 * @param expenseId the id of the expense we want to change
+	 * @param eventId the id of the Event tied to the expense
 	 * @param expense the expense we want the current expense to be updated to
 	 * @return the new expense
 	 */
-	public Expense editExpense(String expenseId, Expense expense) {
+	public Expense editExpense(String eventId, Expense expense) {
 		return ClientBuilder.newClient()
 				.target(serverURL)
-				.path("api/expenses" + expenseId)
+				.path("api/events/" + eventId + "/expenses/" + expense.getId())
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.put(Entity.entity(expense, APPLICATION_JSON), Expense.class);

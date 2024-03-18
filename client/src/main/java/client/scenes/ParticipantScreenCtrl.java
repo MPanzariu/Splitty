@@ -7,6 +7,7 @@ import commons.Event;
 import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -14,7 +15,7 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ParticipantScreenCtrl {
+public class ParticipantScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -43,8 +44,6 @@ public class ParticipantScreenCtrl {
 
     private Event event;
 
-    private Participant participant;
-
 
     @Inject
     public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
@@ -54,6 +53,7 @@ public class ParticipantScreenCtrl {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
+        title.textProperty().bind(translation.getStringBinding("Participants.Label.title"));
         abortButton.textProperty().bind(translation.getStringBinding("Participants.Button.abort"));
         okButton.textProperty().bind(translation.getStringBinding("Participants.Button.ok"));
         emailField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.email"));
@@ -69,12 +69,11 @@ public class ParticipantScreenCtrl {
     public void confirmEdit(ActionEvent actionEvent) {
         Participant participant = addParticipant();
         server.addParticipant(event.getId(), participant.getName());
-        event.addParticipant(participant);
-        mainCtrl.joinEvent(event);
+        mainCtrl.switchToEventScreen();
     }
 
     public void cancel(ActionEvent actionEvent) {
-        mainCtrl.joinEvent(event);
+        mainCtrl.switchToEventScreen();
     }
 
     public Participant addParticipant(){
@@ -82,7 +81,7 @@ public class ParticipantScreenCtrl {
         String email = emailField.getText();
         String iban = ibanField.getText();
         try {
-            int bic = Integer.parseInt(String.valueOf(bicField));
+            int bic = Integer.parseInt(String.valueOf(bicField.getText()));
         }
         catch (IllegalArgumentException e) {
             System.out.println(":<");
@@ -92,7 +91,7 @@ public class ParticipantScreenCtrl {
         return participant;
     }
 
-    public void editParticipant(Participant participant){
+    public void editParticipant(){
         String name = nameField.getText();
         String email = emailField.getText();
         String iban = ibanField.getText();
@@ -102,22 +101,11 @@ public class ParticipantScreenCtrl {
         catch (IllegalArgumentException e) {
             System.out.println(":<");
         }
-        participant.setName(name);
+
+        //TODO: Editing participants
     }
 
-    public void setEvent (Event event){
+    public void refresh(Event event){
         this.event = event;
-    }
-
-    public void setParticipant(Participant participant){
-        this.participant = participant;
-    }
-
-    public Event getEvent() {
-        return this.event;
-    }
-
-    public Participant getParticipant() {
-        return this.participant;
     }
 }
