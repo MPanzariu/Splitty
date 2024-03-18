@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ManagementOverviewScreenCtrl implements Initializable {
+    protected ObjectMapper objectMapper;
     @FXML
     public TextField backupEventIDTextField;
     @FXML
@@ -75,6 +76,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
+        objectMapper = new ObjectMapper();
     }
     /**
      * Initialize basic features for the Management Overview Screen
@@ -223,7 +225,6 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.EventNotFound");
             return;
         }
-        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // Write object to JSON file
@@ -232,7 +233,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
         } catch (IOException e) {
-            e.printStackTrace();
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorExportingEvent");
+            System.out.printf("Error exporting event %s%n", eventId);
         }
     }
 
@@ -247,17 +249,26 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // Read JSON data from file and deserialize it into object
-            File backupFile = new File(String.format("./backups/%s.json", eventId));
+            File backupFile = readFile(eventId);
             Event event = objectMapper.readValue(backupFile, Event.class);
             System.out.println("Read from file: " + event);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
-            Event responseEvent = server.addEvent(event);
+            server.addEvent(event);
             initializeAllEvents();
 
         } catch (IOException e) {
-            e.printStackTrace();
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");
+            System.out.printf("Error importing event %s%n", eventId);
         }
+    }
+
+    /**
+     * Reads a backup file given an event id, if it exists
+     * @param eventId the event id
+     * @return File the backup file
+     */
+    public File readFile(String eventId) {
+        return new File(String.format("./backups/%s.json", eventId));
     }
 
     /**
