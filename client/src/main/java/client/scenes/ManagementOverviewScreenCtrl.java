@@ -245,7 +245,6 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     public void importButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
         String eventId = getTextBoxText(backupEventIDTextField);
-        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // Read JSON data from file and deserialize it into object

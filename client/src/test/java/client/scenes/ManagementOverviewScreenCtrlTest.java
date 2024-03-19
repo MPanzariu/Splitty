@@ -3,6 +3,8 @@ package client.scenes;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
@@ -17,8 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -72,22 +73,51 @@ class ManagementOverviewScreenCtrlTest {
         when(server.getEvent(anyString())).thenReturn(event);
 
         try {
-            doThrow(new IOException()).when(objectMapper).writeValue(any(File.class), any());
+            doThrow(new IOException()).when(objectMapper).writeValue(any(File.class), (Class<Event>) any());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        managementOverviewScreenCtrl.setObjectMapper(objectMapper);
         managementOverviewScreenCtrl.textBoxText = "AAAAAA";
         managementOverviewScreenCtrl.exportButtonClicked();
         assertTrue(managementOverviewScreenCtrl.bindings.contains("MOSCtrl.ErrorExportingEvent"));
     }
 
+    @Test
+    public void importInvalidEventID(){
+        managementOverviewScreenCtrl.textBoxText = "invalidcode";
+        try {
+            when(objectMapper.readValue(any(File.class), (Class<Event>) any())).thenThrow(new IOException());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        managementOverviewScreenCtrl.setObjectMapper(objectMapper);
+        managementOverviewScreenCtrl.importButtonClicked();
+        assertTrue(managementOverviewScreenCtrl.bindings.contains("MOSCtrl.ErrorImportingEvent"));
+        assertFalse(managementOverviewScreenCtrl.bindings.contains("MOSCtrl.SuccessImport"));
+    }
 
-
+    @Test
+    public void importValid(){
+        managementOverviewScreenCtrl.textBoxText = "AAAAAA";
+        Event event = new Event("test", new Date());
+        try {
+            when(objectMapper.readValue(any(File.class), (Class<Event>) any())).thenReturn(event);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        managementOverviewScreenCtrl.setObjectMapper(objectMapper);
+        assertEquals(0, managementOverviewScreenCtrl.initializeAllEventsCalls);
+        managementOverviewScreenCtrl.importButtonClicked();
+        assertTrue(managementOverviewScreenCtrl.bindings.contains("MOSCtrl.SuccessImport"));
+        assertEquals(1, managementOverviewScreenCtrl.initializeAllEventsCalls);
+    }
 
 
     private class TestManagementOverviewScreenCtrl extends ManagementOverviewScreenCtrl{
         public String textBoxText;
         public ArrayList<String> bindings;
+        public int initializeAllEventsCalls;
 
         /**
          * Constructor
@@ -100,6 +130,7 @@ class ManagementOverviewScreenCtrlTest {
         public TestManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ManagementOverviewUtils utils) {
             super(server, mainCtrl, translation, utils);
             bindings = new ArrayList<>();
+            initializeAllEventsCalls = 0;
         }
 
         @Override
@@ -127,10 +158,10 @@ class ManagementOverviewScreenCtrlTest {
         public void setObjectMapper(ObjectMapper objectMapper){
             this.objectMapper = objectMapper;
         }
-
-//        @Override
-//        public File readFile(String eventId){
-//            return mock(File.class);
-//        }
+        @Override
+        public void initializeAllEvents(){
+            initializeAllEventsCalls+=1;
+            return;
+        }
     }
 }
