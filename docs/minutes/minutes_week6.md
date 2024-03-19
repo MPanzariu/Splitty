@@ -52,7 +52,7 @@ Agenda Items:
           - Generate an empty language template: Will be discussed in the future
     3. Websockets, long polling, and the app data lifecycle `[brainstorm]` **(8 min)**
         - Data flow 
-          - The app needs to have up-to-date information shown. We need to implement websockets and long polling. Most teams use long polling for most stuff. Methods in the backend use normal http requests and do not need to be changed. Websockets are faster and less resource intensive than long polling so it may be better to use them rather than long polling.
+          - The app needs to have up-to-date information shown. We need to implement websockets and long polling. Most teams use web sockets for most stuff, and long polling for a minor feature (like checking if the connection is still active), but both need to be implemented to pass the basic requirements. Methods in the backend that use normal http requests (PUT and DELETE) and do not need to be changed (however GET methods may need to be updated). Websockets are faster and less resource intensive than long polling so it may be better to use them rather than long polling.
           - What happens when two people edit the same object at the same time?
             - We can merge the changes together, e.g. if one client changes the title and the other the date both should be changed. 
             - Error messages should be shown if there are conflicting changes. We could lock changes to an event if the event is being edited by someone but that would impact performance.
