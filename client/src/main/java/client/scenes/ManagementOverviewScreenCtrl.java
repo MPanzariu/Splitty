@@ -110,6 +110,36 @@ public class ManagementOverviewScreenCtrl implements Initializable {
                 }
             }
         });
+        participantsListView.setCellFactory(listView -> new ListCell<>(){
+            @Override
+            protected void updateItem(Participant participant, boolean empty){
+                super.updateItem(participant, empty);
+                if(empty || participant == null){
+                    setText(null);
+                    setGraphic(null);
+                }
+                else{
+                    setText("Participant: " + participant.getName());
+                }
+            }
+        });
+        expensesListView.setCellFactory(listView -> new ListCell<>(){
+            @Override
+            protected void updateItem(Expense expense, boolean empty){
+                super.updateItem(expense, empty);
+                if(empty || expense == null){
+                    setText(null);
+                    setGraphic(null);
+                }
+                else{
+                    String expenseString = expense.getOwedTo().getName() + " paid ";
+                    expenseString+=(float)(expense.getPriceInCents()/100) + " euro for ";
+                    expenseString+=expense.getName() + " on ";
+                    expenseString+=expense.getDate().toString();
+                    setText(expenseString);
+                }
+            }
+        });
         eventsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldEvent, newEvent) -> {
             participantsListView.setItems(utils.initializeParticipantsList(newEvent));
             expensesListView.setItems(utils.initializeExpenseList(newEvent));
