@@ -111,7 +111,8 @@ public class EventController {
         Optional<Event> event = repository.findById(id);
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(event.get());
+        repository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**
