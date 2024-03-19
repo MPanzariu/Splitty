@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<AnchorPane prefHeight="503.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.DeleteEventsScreenCtrl">
+   <children>
+      <Label fx:id="selectWhichEventsToDelete" layoutX="45.0" layoutY="27.0" prefHeight="39.0" prefWidth="542.0" text="Select which events you want to delete">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

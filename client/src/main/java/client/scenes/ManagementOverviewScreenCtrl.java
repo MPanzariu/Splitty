@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import java.io.FileInputStream;
@@ -42,6 +43,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private Button sortButton;
     @FXML
     private ComboBox<StringProperty> orderTypeComboBox;
+    @FXML
+    private Button deleteEventsButton;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -78,6 +81,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
+        deleteEventsButton.textProperty().bind(translation.getStringBinding("MOSCtrl.Delete.Events.Button"));
         initializeSortButton();
         initializeOrderTypes();
         try{
@@ -159,5 +163,9 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
+    }
+
+    public void goToDeleteEventsScreen(MouseEvent mouseEvent) {
+        mainCtrl.switchToDeleteEventsScreen();
     }
 }
