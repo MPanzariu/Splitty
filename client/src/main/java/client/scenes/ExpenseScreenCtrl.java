@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import java.awt.*;
 import java.net.URL;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 import javafx.event.ActionEvent;
@@ -62,11 +63,20 @@ public class ExpenseScreenCtrl implements Initializable{
     private Button cancel;
     @FXML
     private Button confirm;
+    @FXML
+    private Label errorParticipants;
+    @FXML
+    private Label errorNoPurpose;
+    @FXML
+    Label errorAmount;
+    @FXML
+    Label errorDate;
+    @FXML
+    Label errorSplitMethod;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
 
-    private boolean confirmExpense;
 
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
@@ -141,6 +151,16 @@ public class ExpenseScreenCtrl implements Initializable{
             .bind(translation.getStringBinding("Expense.Button.Confirm"));
         expenseType.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
+        errorParticipants.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        errorNoPurpose.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        errorAmount.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        errorDate.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        errorSplitMethod.textProperty()
+            .bind(translation.getStringBinding("empty"));
     }
 
     /**
@@ -216,7 +236,10 @@ public class ExpenseScreenCtrl implements Initializable{
         }
         int priceInCents = (int) Math.ceil(price * 100);
         //change in case of wanting to implement another date system
-        Date expenseDate = Date.valueOf(datePicker.getValue());
+        LocalDate date = datePicker.getValue();
+        Date expenseDate = null;
+        if(date != null)
+            expenseDate = Date.valueOf(datePicker.getValue());
 
         // this has to be a participant that actually exists in the database
         // you can not in fact just create a new one
@@ -242,17 +265,38 @@ public class ExpenseScreenCtrl implements Initializable{
      * Needs revision
      */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
+        boolean toAdd = true;
         Expense expense = createNewExpense();
-        if(expense.getOwedTo() == null)
-            return;
-        if(expense.getName() == null || expense.getName().isEmpty())
-            return;
-        if(expense.getPriceInCents() == 0)
-            return;
-        if(expense.getDate() == null)
-            return;
-        addExpenseToTheServer(expense);
-        mainCtrl.switchToEventScreen();
+        if(expense.getOwedTo() == null) {
+            errorParticipants.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.NoParticipants"));
+            toAdd = false;
+        }
+        if(expense.getName() == null || expense.getName().isEmpty()) {
+            errorNoPurpose.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.NoPurpose"));
+            toAdd = false;
+        }
+        if(expense.getPriceInCents() == 0) {
+            errorAmount.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.InvalidAmount"));
+            toAdd = false;
+        }
+        if(expense.getDate() == null) {
+            errorDate.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.InvalidDate"));
+            toAdd = false;
+        }
+        if(!splitBetweenCustomCheckBox.isSelected()
+            && !splitBetweenAllCheckBox.isSelected()){
+            errorSplitMethod.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.InvalidSplitMethod"));
+            toAdd = false;
+        }
+        if(toAdd) {
+            addExpenseToTheServer(expense);
+            mainCtrl.switchToEventScreen();
+        }
     }
 
     //TODO: 1.Fixing the bindings
