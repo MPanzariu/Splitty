@@ -217,15 +217,13 @@ public class ExpenseScreenCtrl implements Initializable{
         //change in case of wanting to implement another date system
         Date expenseDate = Date.valueOf(datePicker.getValue());
 
-        // this has to be a participant that actually exists in the database
-        // you can not in fact just create a new one
-        //
-        /*Participant participant =
-            new Participant(choosePayer.getValue(), currentEvent);*/
-        // I'd suggest doing something with currentEvent.getParticipants()
+        String participantName = choosePayer.getValue();
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
-        Participant participant = participantIterator.hasNext()
-                ? participantIterator.next() : null;
+        Participant participant = null;
+        while(participantIterator.hasNext()){
+            participant = participantIterator.next();
+            if(participant.getName().equals(participantName)) break;
+        }
         server.addExpense(currentEvent.getId(),
             new Expense(name, priceInCents, expenseDate, participant));
     }
