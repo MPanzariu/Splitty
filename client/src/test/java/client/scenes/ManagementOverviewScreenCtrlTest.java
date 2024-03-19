@@ -125,7 +125,7 @@ class ManagementOverviewScreenCtrlTest {
          * @param server      the ServerUtils instance
          * @param mainCtrl    the MainCtrl instance
          * @param translation the Translation to use
-         * @param utils
+         * @param utils       the ManagementOverviewUtils to use
          */
         public TestManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ManagementOverviewUtils utils) {
             super(server, mainCtrl, translation, utils);
