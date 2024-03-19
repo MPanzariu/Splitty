@@ -66,6 +66,8 @@ public class ExpenseScreenCtrl implements Initializable{
     private Event currentEvent;
     private final Translation translation;
 
+    private boolean confirmExpense;
+
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
                               Translation translation) {
@@ -200,10 +202,9 @@ public class ExpenseScreenCtrl implements Initializable{
 
     /**
      * Creates a new expense based on the information provided
-     * and adds it to the backend
      * in the ExpenseScreen
      */
-    public void createNewExpense() {
+    public Expense createNewExpense() {
         String name = expensePurpose.getText();
         String priceInMoney = sum.getText();
         double price = 0;
@@ -226,14 +227,31 @@ public class ExpenseScreenCtrl implements Initializable{
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = participantIterator.hasNext()
                 ? participantIterator.next() : null;
-        server.addExpense(currentEvent.getId(),
-            new Expense(name, priceInCents, expenseDate, participant));
+
+            return new Expense(name, priceInCents, expenseDate, participant);
+    }
+
+    /**
+     * Adds the specified expense to the server
+     * @param expense the provided expense
+     */
+    public void addExpenseToTheServer(Expense expense) {
+        server.addExpense(currentEvent.getId(), expense);
     }
     /**
      * Needs revision
      */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
-        createNewExpense();
+        Expense expense = createNewExpense();
+        if(expense.getOwedTo() == null)
+            return;
+        if(expense.getName() == null || expense.getName().isEmpty())
+            return;
+        if(expense.getPriceInCents() == 0)
+            return;
+        if(expense.getDate() == null)
+            return;
+        addExpenseToTheServer(expense);
         mainCtrl.switchToEventScreen();
     }
 
