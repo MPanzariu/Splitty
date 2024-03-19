@@ -112,7 +112,7 @@ public class EventController {
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
         repository.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(event.get());
     }
 
     /**
