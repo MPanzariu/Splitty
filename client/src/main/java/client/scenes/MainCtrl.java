@@ -156,6 +156,7 @@ public class MainCtrl {
     public void switchToDeleteEventsScreen(){
         primaryStage.setScene(deleteEventsScene);
         primaryStage.setTitle("Events Removal");
+        deleteEventsScreenCtrl.initializeEventsCheckList();
     }
 
     public void switchEvents(String eventCode) {
