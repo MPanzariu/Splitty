@@ -2,7 +2,6 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -26,7 +25,6 @@ public class Event{
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties(value = {"event"})
     private Set<Expense> expenses;
 
 

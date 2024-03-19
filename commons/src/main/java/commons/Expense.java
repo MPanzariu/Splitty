@@ -2,7 +2,8 @@ package commons;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Date;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Expense.class)
 public class Expense{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,7 +22,6 @@ public class Expense{
     private Date date;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"expensesOwedTo"})
     private Participant owedTo;
 
     @SuppressWarnings("unused")
