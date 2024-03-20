@@ -34,6 +34,9 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private SettleDebtsScreenCtrl settleDebtsScreenCtrl;
     private Scene settleDebtsScene;
+    private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
+    private Scene deleteEventsScene;
+
     private final Translation translation;
     @Inject
     @Named("client.language")
@@ -55,7 +58,8 @@ public class MainCtrl {
                            Pair<EditTitleCtrl, Parent> editTitlePair,
                            Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPasswordUI,
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
-                           Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI){
+                           Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
+                           Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -79,6 +83,8 @@ public class MainCtrl {
 
         this.settleDebtsScreenCtrl = settleDebtsUI.getKey();
         this.settleDebtsScene = new Scene(settleDebtsUI.getValue());
+        this.deleteEventsScene = new Scene(deleteEvenetsScreenUI.getValue());
+        this.deleteEventsScreenCtrl = deleteEvenetsScreenUI.getKey();
         primaryStage.show();
     }
 
@@ -103,6 +109,7 @@ public class MainCtrl {
      * switch the primary screen to the main screen
      */
     public void switchBackToMainScreen(){
+        startupScreenCtrl.refreshEvents();
         primaryStage.setScene(startupScene);
         primaryStage.setTitle("Main Menu");
     }
@@ -169,6 +176,12 @@ public class MainCtrl {
      * Replace the event being viewed
      * @param eventCode the event code to use
      */
+    public void switchToDeleteEventsScreen(){
+        primaryStage.setScene(deleteEventsScene);
+        primaryStage.setTitle("Events Removal");
+        deleteEventsScreenCtrl.initializeEventsCheckList();
+    }
+
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
     }
