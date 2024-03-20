@@ -41,5 +41,6 @@ dependencies {
 	testImplementation 'org.openjfx:javafx-controls:21.0.2'
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:LATEST'
 }

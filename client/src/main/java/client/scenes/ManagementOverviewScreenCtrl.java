@@ -3,6 +3,8 @@ package client.scenes;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -17,12 +19,26 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ResourceBundle;
 
 public class ManagementOverviewScreenCtrl implements Initializable {
+    protected ObjectMapper objectMapper;
+    @FXML
+    public TextField backupEventIDTextField;
+    @FXML
+    public Button importButton;
+    @FXML
+    public Label backupLabel;
+    @FXML
+    public Label backupEventFeedbackLabel;
+    @FXML
+    public Button exportButton;
+
     @FXML
     private Button homeScreenButton;
     @FXML
@@ -63,6 +79,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
+        objectMapper = new ObjectMapper();
     }
     /**
      * Initialize basic features for the Management Overview Screen
@@ -81,6 +98,11 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
+        bindButton(exportButton, "MOSCtrl.ExportButton");
+        bindButton(importButton, "MOSCtrl.ImportButton");
+        bindLabel(backupLabel, "MOSCtrl.BackupLabel");
+        bindTextField(backupEventIDTextField, "MOSCtrl.BackupEventIDTextField");
+        bindLabel(backupEventFeedbackLabel, "empty");
         deleteEventsButton.textProperty().bind(translation.getStringBinding("MOSCtrl.Delete.Events.Button"));
         initializeSortButton();
         initializeOrderTypes();
@@ -185,6 +207,101 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void orderEvents() {
         utils.sortEventsOtherOrder(orderTypeComboBox.getValue());
+    }
+
+    /**
+     * Gets the text from a given textfield
+     * @param textBox the textfield to get the text from
+     * @return String the text from the textfield
+     */
+    public String getTextBoxText(TextField textBox){
+        return textBox.getText();
+    }
+
+    /**
+     * Binds a string to a label
+     * @param label the label
+     * @param s the string
+     */
+    public void bindLabel(Label label, String s){
+        label.textProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
+     * Binds a string to a textfield
+     * @param textField the textfield
+     * @param s the string
+     */
+    public void bindTextField(TextField textField, String s) {
+        textField.promptTextProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
+     * Binds a string to a button
+     * @param button the button
+     * @param s the string
+     */
+    public void bindButton(Button button, String s) {
+        button.textProperty().bind(translation.getStringBinding(s));
+    }
+
+    /**
+     * Export the event to a backup file
+     */
+    @FXML
+    public void exportButtonClicked() {
+        bindLabel(backupEventFeedbackLabel, "empty");
+        String eventId = getTextBoxText(backupEventIDTextField);
+        Event event;
+        try{
+            event = server.getEvent(eventId);
+        }catch (Exception e){
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.EventNotFound");
+            return;
+        }
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            // Write object to JSON file
+            File backupFile = new File(String.format("./backups/%s.json", eventId));
+            objectMapper.writeValue(backupFile, event);
+            System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
+        } catch (IOException e) {
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorExportingEvent");
+            System.out.printf("Error exporting event %s%n", eventId);
+        }
+    }
+
+    /**
+     * Import the event from a backup file
+     */
+    @FXML
+    public void importButtonClicked() {
+        bindLabel(backupEventFeedbackLabel, "empty");
+        String eventId = getTextBoxText(backupEventIDTextField);
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            // Read JSON data from file and deserialize it into object
+            File backupFile = readFile(eventId);
+            Event event = objectMapper.readValue(backupFile, Event.class);
+            System.out.println("Read from file: " + event);
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
+            server.addEvent(event);
+            initializeAllEvents();
+
+        } catch (IOException e) {
+            bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");
+            System.out.printf("Error importing event %s%n", eventId);
+        }
+    }
+
+    /**
+     * Reads a backup file given an event id, if it exists
+     * @param eventId the event id
+     * @return File the backup file
+     */
+    public File readFile(String eventId) {
+        return new File(String.format("./backups/%s.json", eventId));
     }
 
     /**

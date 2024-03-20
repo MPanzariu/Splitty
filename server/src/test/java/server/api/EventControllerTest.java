@@ -50,7 +50,15 @@ public class EventControllerTest {
 
     @Test
     void addEventTitleIsNull() {
-        ResponseEntity<Event> response = controller.add(null);
+        String nullString = null;
+        ResponseEntity<Event> response = controller.add(nullString);
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void addEventIsNull() {
+        Event nullEvent = null;
+        ResponseEntity<Event> response = controller.add(nullEvent);
         assertEquals(BAD_REQUEST, response.getStatusCode());
     }
 

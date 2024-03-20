@@ -197,6 +197,16 @@ public class ServerUtils {
 	}
 
 	/**
+	 * Sends an event to be added to the database
+	 */
+	public Event addEvent(Event event){
+		return ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/events/")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.put(Entity.entity(event, APPLICATION_JSON),Event.class);
+	}
+	/**
 	 * delete an event using it's ID
 	 * @param eventId the id of the event we want to delete
 	 */
