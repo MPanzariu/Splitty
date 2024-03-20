@@ -195,4 +195,18 @@ public class ServerUtils {
 				.get(new GenericType<List<Event>>(){});
 		return events;
 	}
+
+	public void deleteEvent(String eventId){
+		Response response = ClientBuilder.newClient()
+				.target(serverURL)
+				.path("api/events/remove/" + eventId)
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.delete();
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+			System.out.println("Event deleted successfully.");
+		} else {
+			System.out.println("Failed to delete event. Status code: " + response.getStatus());
+		}
+	}
 }

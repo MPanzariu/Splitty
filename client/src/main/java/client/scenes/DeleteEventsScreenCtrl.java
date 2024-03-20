@@ -5,12 +5,15 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.net.URL;
+import java.util.*;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class DeleteEventsScreenCtrl implements Initializable {
     @FXML
@@ -19,6 +22,9 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private ListView<Event> checkEventsListView;
     @FXML
     private Button deleteSelectedEvenetsButton;
+    @FXML
+    private Label noEventsSelectedLabel;
+    private Map<Event, Boolean> eventSelectionMap = new HashMap<>();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -66,9 +72,48 @@ public class DeleteEventsScreenCtrl implements Initializable {
                     setGraphic(null);
                 } else {
                     checkBox.setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                    checkBox.setOnAction(e -> eventSelectionMap.put(event, checkBox.isSelected()));
+                    if (!eventSelectionMap.containsKey(event)) {
+                        eventSelectionMap.put(event, false);
+                    }
+                    checkBox.setSelected(eventSelectionMap.get(event));
                     setGraphic(checkBox);
                 }
             }
         });
+    }
+
+    public void deleteSelectedEvents(ActionEvent actionEvent) {
+        if(!eventSelectionMap.containsValue(true)){
+            noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.No.Events.Selected.Label"));
+            System.out.println("No events selected");
+        }
+        else {
+            Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationDialog.setTitle("Delete Confirmation");
+            confirmationDialog.setHeaderText("Delete Selected Events");
+            confirmationDialog.setContentText("Are you sure you want to delete the selected events?");
+            ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+            ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+            confirmationDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+            Optional<ButtonType> result = confirmationDialog.showAndWait();
+            if (result.isPresent() && result.get() == buttonTypeYes) {
+                List<Event> selectedEvents = eventSelectionMap.entrySet().stream()
+                        .filter(Map.Entry::getValue)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+                checkEventsListView.getItems().removeAll(selectedEvents);
+                for (int i = 0; i < selectedEvents.size(); i++) {
+                    Event current = selectedEvents.get(i);
+                    server.deleteEvent(current.getId());
+                    System.out.println("The following event has been deleted: " + current.getTitle());
+                }
+                noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deleted.Sucessfully"));
+                eventSelectionMap.clear();
+            } else {
+                noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deletion.Cancel"));
+                System.out.println("Deletion cancelled.");
+            }
+        }
     }
 }
