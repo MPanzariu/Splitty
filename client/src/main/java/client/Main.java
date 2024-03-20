@@ -45,6 +45,7 @@ public class Main extends Application {
         var editTitle = FXML.load(EditTitleCtrl.class, "client", "scenes", "EditTitle.fxml");
         var managementOverviewPassword = FXML.load(ManagementOverviewPasswordCtrl.class, "client", "scenes", "ManagementOverviewPassword.fxml");
         var managementOverviewScreen = FXML.load(ManagementOverviewScreenCtrl.class, "client", "scenes", "ManagementOverviewScreen.fxml");
-        mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle, managementOverviewPassword, managementOverviewScreen);
+        var settleDebtsScreen = FXML.load(SettleDebtsScreenCtrl.class, "client", "scenes", "SettleDebtsScreen.fxml");
+        mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle, managementOverviewPassword, managementOverviewScreen, settleDebtsScreen);
     }
 }

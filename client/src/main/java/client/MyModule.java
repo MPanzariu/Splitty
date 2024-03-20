@@ -18,6 +18,7 @@ package client;
 import client.utils.ConfigUtils;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ObservableResourceFactory;
+import client.utils.Translation;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -33,6 +34,7 @@ public class MyModule implements Module {
         Properties properties = new ConfigUtils().easyLoadProperties();
         Names.bindProperties(binder, properties);
 
+        binder.bind(Translation.class).in(Scopes.SINGLETON);
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
 

@@ -32,7 +32,8 @@ public class MainCtrl {
     private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
-
+    private SettleDebtsScreenCtrl settleDebtsScreenCtrl;
+    private Scene settleDebtsScene;
     private final Translation translation;
     @Inject
     @Named("client.language")
@@ -48,10 +49,13 @@ public class MainCtrl {
     }
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
-                           Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
-
-                           Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair,
-                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI, Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI) {
+                           Pair<EventScreenCtrl, Parent> eventUI,
+                           Pair<ExpenseScreenCtrl, Parent> expenseUI,
+                           Pair<ParticipantScreenCtrl, Parent> participantUI,
+                           Pair<EditTitleCtrl, Parent> editTitlePair,
+                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPasswordUI,
+                           Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
+                           Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -69,9 +73,12 @@ public class MainCtrl {
         this.editTitleCtrl = editTitlePair.getKey();
         this.editTitleScene = new Scene(editTitlePair.getValue());
         showMainScreen();
-        this.managementOvervirewPasswordScene = new Scene(managementOverviewPassworrdUI.getValue());
+        this.managementOvervirewPasswordScene = new Scene(managementOverviewPasswordUI.getValue());
         this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         this.managementOverviewScreenCtrl = managementOverviewScreenUI.getKey();
+
+        this.settleDebtsScreenCtrl = settleDebtsUI.getKey();
+        this.settleDebtsScene = new Scene(settleDebtsUI.getValue());
         primaryStage.show();
     }
 
@@ -146,6 +153,13 @@ public class MainCtrl {
         primaryStage.setScene(managementOverviewScreenScene);
         primaryStage.setTitle("Management Overview");
         managementOverviewScreenCtrl.initializeAllEvents();
+    }
+
+    public void switchToSettleScreen() {
+        Event event = server.getEvent(eventCode);
+        settleDebtsScreenCtrl.refresh(event);
+        primaryStage.setScene(settleDebtsScene);
+        primaryStage.setTitle("Settle Debts");
     }
 
     public void switchEvents(String eventCode) {

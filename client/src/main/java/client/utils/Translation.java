@@ -59,12 +59,10 @@ public class Translation {
                 return;
             }
         }
-
+        this.locale = locale;
         @SuppressWarnings({"unchecked", "rawtypes"})
         Map<String, String> map = new HashMap<String, String>((Map) languageProperties);
         resourceFactory.setResources(map);
-
-        this.locale = locale;
     }
 
     /***
