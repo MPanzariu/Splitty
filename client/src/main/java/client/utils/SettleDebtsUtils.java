@@ -6,6 +6,8 @@ import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
+import java.text.DecimalFormat;
+
 
 public class SettleDebtsUtils {
 
@@ -74,7 +76,8 @@ public class SettleDebtsUtils {
                                    int amount,
                                    Participant participantOwedTo) {
         int amountPositive = Math.abs(amount);
-        String formattedPrice = amountPositive / 100.0 + "\u20ac";
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        String formattedPrice = decimalFormat.format(amountPositive / 100.0) + "\u20ac";
 
         String name = participantOwes.getName();
         StringBuilder result = new StringBuilder(name);
