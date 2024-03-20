@@ -83,8 +83,8 @@ public class MainCtrl {
 
         this.settleDebtsScreenCtrl = settleDebtsUI.getKey();
         this.settleDebtsScene = new Scene(settleDebtsUI.getValue());
-        this.deleteEventsScene = new Scene(deleteEvenetsScreenUI.getValue());
-        this.deleteEventsScreenCtrl = deleteEvenetsScreenUI.getKey();
+        this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
+        this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
         primaryStage.show();
     }
 
@@ -172,16 +172,16 @@ public class MainCtrl {
         primaryStage.setTitle("Settle Debts");
     }
 
-    /***
-     * Replace the event being viewed
-     * @param eventCode the event code to use
-     */
     public void switchToDeleteEventsScreen(){
         primaryStage.setScene(deleteEventsScene);
         primaryStage.setTitle("Events Removal");
         deleteEventsScreenCtrl.initializeEventsCheckList();
     }
 
+    /***
+     * Replace the event being viewed
+     * @param eventCode the event code to use
+     */
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
     }
