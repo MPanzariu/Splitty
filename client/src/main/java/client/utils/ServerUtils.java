@@ -196,6 +196,10 @@ public class ServerUtils {
 		return events;
 	}
 
+	/**
+	 * delete an event using it's ID
+	 * @param eventId the id of the event we want to delete
+	 */
 	public void deleteEvent(String eventId){
 		Response response = ClientBuilder.newClient()
 				.target(serverURL)
@@ -210,6 +214,9 @@ public class ServerUtils {
 		}
 	}
 
+	/**
+	 * delete all the events in the database
+	 */
 	public void deleteAllEvents(){
 		Response response = ClientBuilder.newClient()
 				.target(serverURL)

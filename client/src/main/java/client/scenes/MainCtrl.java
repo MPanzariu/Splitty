@@ -101,6 +101,7 @@ public class MainCtrl {
      * switch the primary screen to the main screen
      */
     public void switchBackToMainScreen(){
+        startupScreenCtrl.refreshEvents();
         primaryStage.setScene(startupScene);
         primaryStage.setTitle("Main Menu");
     }

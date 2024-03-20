@@ -165,6 +165,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         mainCtrl.switchBackToMainScreen();
     }
 
+    /**
+     * switch to the delete event screen
+     * @param mouseEvent when button is pressed, go to the delete event screen
+     */
     public void goToDeleteEventsScreen(MouseEvent mouseEvent) {
         mainCtrl.switchToDeleteEventsScreen();
     }

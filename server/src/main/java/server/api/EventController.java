@@ -115,6 +115,11 @@ public class EventController {
         return ResponseEntity.ok(event.get());
     }
 
+    /**
+     * endpoint for deleting all the events
+     * @return a string telling us whether we successfully deleted all events or that there was no events
+     * to be deleted
+     */
     @DeleteMapping("/delete/all")
     ResponseEntity<String> deleteAll(){
         if(repository.findAll().isEmpty()){

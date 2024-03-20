@@ -80,6 +80,10 @@ public class DeleteEventsScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * initialize an event list view with checkboxes
+     * keep the selected events in a hash-map
+     */
     public void initializeEventsCheckList() {
         checkEventsListView.setItems(utils.retrieveEvents());
         checkEventsListView.setCellFactory(listView -> new ListCell<>() {
@@ -103,6 +107,11 @@ public class DeleteEventsScreenCtrl implements Initializable {
         });
     }
 
+    /**
+     * delete all the selected events
+     * popup for checking whether the admin wants to proceed or not
+     * @param actionEvent on click, delete all the selected events
+     */
     public void deleteSelectedEvents(ActionEvent actionEvent) {
         if(!eventSelectionMap.containsValue(true)){
             noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.No.Events.Selected.Label"));
@@ -137,6 +146,11 @@ public class DeleteEventsScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * delete all the existent events from the database
+     * popup for confirmation of the action
+     * @param actionEvent on click delete all the events
+     */
     public void deleteAllEvents(ActionEvent actionEvent) {
         Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationDialog.setTitle("Delete All Confirmation");
@@ -156,7 +170,12 @@ public class DeleteEventsScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * go to the managament overview screen
+     * @param actionEvent on button press go back to the management overview screen
+     */
     public void goBackToManagementOverview(ActionEvent actionEvent) {
+        noEventsSelectedLabel.textProperty().bind(translation.getStringBinding(""));
         mainCtrl.switchToManagementOverviewScreen();
     }
 }
