@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="503.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.DeleteEventsScreenCtrl">
+   <children>
+      <Label fx:id="selectWhichEventsToDelete" layoutX="45.0" layoutY="27.0" prefHeight="39.0" prefWidth="542.0" text="Select which events you want to delete">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ListView fx:id="checkEventsListView" layoutX="45.0" layoutY="66.0" prefHeight="416.0" prefWidth="367.0" />
+      <Button fx:id="deleteSelectedEvenetsButton" layoutX="474.0" layoutY="66.0" mnemonicParsing="false" onAction="#deleteSelectedEvents" prefHeight="50.0" prefWidth="268.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Label fx:id="noEventsSelectedLabel" layoutX="474.0" layoutY="134.0" prefHeight="39.0" prefWidth="268.0">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Button fx:id="deleteAllEventsButton" layoutX="469.0" layoutY="402.0" mnemonicParsing="false" onAction="#deleteAllEvents" prefHeight="50.0" prefWidth="268.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="goBackButton" layoutX="7.0" layoutY="457.0" mnemonicParsing="false" onAction="#goBackToManagementOverview" prefHeight="30.0" prefWidth="32.0" />
+   </children>
+</AnchorPane>
