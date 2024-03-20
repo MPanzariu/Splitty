@@ -143,7 +143,8 @@ public class SettleDebtsScreenCtrl implements Initializable {
     private Label generateDebtLabel(Participant participantOwes,
                                     int amount, Participant participantOwedTo) {
         Label label = new Label();
-        String debtString = utils.createDebtString(participantOwes, amount, participantOwedTo);
+        String debtString = utils.createDebtString(participantOwes.getName(),
+                amount, "NOT IMPLEMENTED");
         label.setText(debtString);
         return label;
     }

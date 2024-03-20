@@ -72,15 +72,14 @@ public class SettleDebtsUtils {
      * @param participantOwedTo the participant receiving money
      * @return a String stating who owes who and how much
      */
-    public String createDebtString(Participant participantOwes,
+    public String createDebtString(String participantOwes,
                                    int amount,
-                                   Participant participantOwedTo) {
+                                   String participantOwedTo) {
         int amountPositive = Math.abs(amount);
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         String formattedPrice = decimalFormat.format(amountPositive / 100.0) + "\u20ac";
 
-        String name = participantOwes.getName();
-        StringBuilder result = new StringBuilder(name);
+        StringBuilder result = new StringBuilder(participantOwes);
         if(amount==0) result.append(" owes nothing!");
         else if(amount<0){
             result.append(" owes ");

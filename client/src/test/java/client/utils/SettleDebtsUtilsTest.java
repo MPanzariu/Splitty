@@ -46,24 +46,24 @@ class SettleDebtsUtilsTest {
 
     @Test
     void stringPositive() {
-        var result = sut.createDebtString(participant1, 7, participant2);
-        assertTrue(result.contains(participant1.getName()));
+        var result = sut.createDebtString("A", 7, "B");
+        assertTrue(result.contains("A"));
         assertTrue(result.contains("is owed"));
         assertTrue(result.contains("0.07"));
     }
 
     @Test
     void stringNegative() {
-        var result = sut.createDebtString(participant1, -7, participant2);
-        assertTrue(result.contains(participant1.getName()));
+        var result = sut.createDebtString("A", -7, "B");
+        assertTrue(result.contains("A"));
         assertTrue(result.contains("owes"));
         assertTrue(result.contains("0.07"));
     }
 
     @Test
     void stringZero() {
-        var result = sut.createDebtString(participant1, 0, participant2);
-        assertTrue(result.contains(participant1.getName()));
+        var result = sut.createDebtString("A", 0, "B");
+        assertTrue(result.contains("A"));
         assertTrue(result.contains("owes"));
         assertFalse(result.contains("to"));
     }
