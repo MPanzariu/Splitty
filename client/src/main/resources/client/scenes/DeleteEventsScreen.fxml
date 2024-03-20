@@ -21,5 +21,11 @@
          <font>
             <Font size="14.0" />
          </font></Label>
+      <Button fx:id="deleteAllEventsButton" layoutX="469.0" layoutY="402.0" mnemonicParsing="false" onAction="#deleteAllEvents" prefHeight="50.0" prefWidth="268.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="goBackButton" layoutX="7.0" layoutY="457.0" mnemonicParsing="false" onAction="#goBackToManagementOverview" prefHeight="30.0" prefWidth="32.0" />
    </children>
 </AnchorPane>

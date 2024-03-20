@@ -115,6 +115,15 @@ public class EventController {
         return ResponseEntity.ok(event.get());
     }
 
+    @DeleteMapping("/delete/all")
+    ResponseEntity<String> deleteAll(){
+        if(repository.findAll().isEmpty()){
+            return ResponseEntity.ok("No events do be deleted");
+        }
+        repository.deleteAll();
+        return ResponseEntity.ok("Successfully deleted all the events");
+    }
+
     /**
      * Endpoint for giving an ordered list of events by title.
      * @return A list of events ordered by title

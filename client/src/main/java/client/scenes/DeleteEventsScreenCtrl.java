@@ -9,7 +9,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 import java.util.ResourceBundle;
@@ -24,6 +28,10 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private Button deleteSelectedEvenetsButton;
     @FXML
     private Label noEventsSelectedLabel;
+    @FXML
+    private Button deleteAllEventsButton;
+    @FXML
+    private Button goBackButton;
     private Map<Event, Boolean> eventSelectionMap = new HashMap<>();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -58,6 +66,18 @@ public class DeleteEventsScreenCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         selectWhichEventsToDelete.textProperty().bind(translation.getStringBinding("DES.Select.Delete"));
         deleteSelectedEvenetsButton.textProperty().bind(translation.getStringBinding("DES.Delete.Selected.Events.Button"));
+        deleteAllEventsButton.textProperty().bind(translation.getStringBinding("DES.Delete.All.Events"));
+        try{
+            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(15);
+            imageView.setFitHeight(15);
+            imageView.setPreserveRatio(true);
+            goBackButton.setGraphic(imageView);
+        } catch (FileNotFoundException e) {
+            System.out.println("didn't work");
+            throw new RuntimeException(e);
+        }
     }
 
     public void initializeEventsCheckList() {
@@ -115,5 +135,28 @@ public class DeleteEventsScreenCtrl implements Initializable {
                 System.out.println("Deletion cancelled.");
             }
         }
+    }
+
+    public void deleteAllEvents(ActionEvent actionEvent) {
+        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationDialog.setTitle("Delete All Confirmation");
+        confirmationDialog.setHeaderText("Delete All Events");
+        confirmationDialog.setContentText("Are you sure you want to delete all the events?");
+        ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+        ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+        confirmationDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+        Optional<ButtonType> result = confirmationDialog.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeYes) {
+            server.deleteAllEvents();
+            checkEventsListView.getItems().clear();
+            eventSelectionMap.clear();
+            System.out.println("Everything was deleted successfully!");
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
+    }
+
+    public void goBackToManagementOverview(ActionEvent actionEvent) {
+        mainCtrl.switchToManagementOverviewScreen();
     }
 }

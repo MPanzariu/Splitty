@@ -209,4 +209,18 @@ public class ServerUtils {
 			System.out.println("Failed to delete event. Status code: " + response.getStatus());
 		}
 	}
+
+	public void deleteAllEvents(){
+		Response response = ClientBuilder.newClient()
+				.target(serverURL)
+				.path("api/events/delete/all")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.delete();
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+			System.out.println("All events deleted successfully.");
+		} else {
+			System.out.println("Failed to delete all events. Status code: " + response.getStatus());
+		}
+	}
 }
