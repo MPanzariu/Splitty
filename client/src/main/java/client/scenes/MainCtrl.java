@@ -155,6 +155,9 @@ public class MainCtrl {
         managementOverviewScreenCtrl.initializeAllEvents();
     }
 
+    /***
+     * Switch to the Debt Settle Screen
+     */
     public void switchToSettleScreen() {
         Event event = server.getEvent(eventCode);
         settleDebtsScreenCtrl.refresh(event);
@@ -162,6 +165,10 @@ public class MainCtrl {
         primaryStage.setTitle("Settle Debts");
     }
 
+    /***
+     * Replace the event being viewed
+     * @param eventCode the event code to use
+     */
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
     }

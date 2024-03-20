@@ -5,7 +5,7 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -30,22 +30,46 @@ public class SettleDebtsScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final SettleDebtsUtils utils;
-    public Label settleDebtsLabel;
-    public Button goBackButton;
-    public VBox settleVBox;
+    @FXML
+    private Label settleDebtsLabel;
+    @FXML
+    private Button goBackButton;
+    @FXML
+    private VBox settleVBox;
     private Event event;
 
+    /***
+     * Constructor for the SettleDebtsScreen
+     * @param mainCtrl the Main controller to use
+     * @param translation the translation to use
+     * @param utils the server utilities to use
+     */
     @Inject
-    public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation, SettleDebtsUtils utils) {
+    public SettleDebtsScreenCtrl(MainCtrl mainCtrl,
+                                 Translation translation, SettleDebtsUtils utils) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.event = null;
     }
+
+    /***
+     * Initializes the controller
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        settleDebtsLabel.textProperty()
+                .bind(translation.getStringBinding("SettleDebts.Label.title"));
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            Image image = new Image(
+                    new FileInputStream("client/src/main/resources/images/goBack.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -56,7 +80,10 @@ public class SettleDebtsScreenCtrl implements Initializable {
         }
     }
 
-    public void populateVBox(){
+    /***
+     * Populates the VBox with all the debts
+     */
+    private void populateVBox(){
         List<Node> children = settleVBox.getChildren();
         children.clear();
         var owedShares = event.getOwedShares();
@@ -113,19 +140,27 @@ public class SettleDebtsScreenCtrl implements Initializable {
         return button;
     }
 
-    private Label generateDebtLabel(Participant participantOwes, int amount, Participant participantOwedTo) {
+    private Label generateDebtLabel(Participant participantOwes,
+                                    int amount, Participant participantOwedTo) {
         Label label = new Label();
         String debtString = utils.createDebtString(participantOwes, amount, participantOwedTo);
         label.setText(debtString);
         return label;
     }
 
+    /***
+     * Replaces the Event data
+     * @param event the new event data to use
+     */
     public void refresh(Event event){
         this.event = event;
         populateVBox();
     }
 
-    public void switchToEventScreen(ActionEvent actionEvent) {
+    /***
+     * Switches back to the event screen
+     */
+    public void switchToEventScreen() {
         mainCtrl.switchToEventScreen();
     }
 }

@@ -6,9 +6,6 @@ import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 
 public class SettleDebtsUtils {
 
@@ -44,6 +41,14 @@ public class SettleDebtsUtils {
     }
 
 
+    /***
+     * Generates the onClick action for a button that settles a particular debt
+     * @param participantOwes the participant sending money
+     * @param amount the amount in cents
+     * @param participantOwedTo the participant receiving money
+     * @param eventId the corresponding event
+     * @return the action a button should perform to settle the debt
+     */
     public EventHandler<ActionEvent> createSettleAction(Participant participantOwes,
                                   int amount,
                                   Participant participantOwedTo, String eventId){
@@ -58,13 +63,18 @@ public class SettleDebtsUtils {
         return onClick;
     }
 
+    /***
+     * Generates a string representation of a debt
+     * @param participantOwes the participant owing money
+     * @param amount the amount owed
+     * @param participantOwedTo the participant receiving money
+     * @return a String stating who owes who and how much
+     */
     public String createDebtString(Participant participantOwes,
                                    int amount,
                                    Participant participantOwedTo) {
-        Locale locale = translation.getLocale();
-        NumberFormat format = NumberFormat.getCurrencyInstance(locale);
         int amountPositive = Math.abs(amount);
-        String formattedPrice = format.format(amountPositive / 100.0);
+        String formattedPrice = amountPositive / 100.0 + "\u20ac";
 
         String name = participantOwes.getName();
         StringBuilder result = new StringBuilder(name);
