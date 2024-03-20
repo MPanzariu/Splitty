@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import java.io.File;
@@ -58,6 +59,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private Button sortButton;
     @FXML
     private ComboBox<StringProperty> orderTypeComboBox;
+    @FXML
+    private Button deleteEventsButton;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -100,6 +103,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         bindLabel(backupLabel, "MOSCtrl.BackupLabel");
         bindTextField(backupEventIDTextField, "MOSCtrl.BackupEventIDTextField");
         bindLabel(backupEventFeedbackLabel, "empty");
+        deleteEventsButton.textProperty().bind(translation.getStringBinding("MOSCtrl.Delete.Events.Button"));
         initializeSortButton();
         initializeOrderTypes();
         try{
@@ -129,6 +133,36 @@ public class ManagementOverviewScreenCtrl implements Initializable {
                     setGraphic(null);
                 } else {
                     setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                }
+            }
+        });
+        participantsListView.setCellFactory(listView -> new ListCell<>(){
+            @Override
+            protected void updateItem(Participant participant, boolean empty){
+                super.updateItem(participant, empty);
+                if(empty || participant == null){
+                    setText(null);
+                    setGraphic(null);
+                }
+                else{
+                    setText("Participant: " + participant.getName());
+                }
+            }
+        });
+        expensesListView.setCellFactory(listView -> new ListCell<>(){
+            @Override
+            protected void updateItem(Expense expense, boolean empty){
+                super.updateItem(expense, empty);
+                if(empty || expense == null){
+                    setText(null);
+                    setGraphic(null);
+                }
+                else{
+                    String expenseString = expense.getOwedTo().getName() + " paid ";
+                    expenseString+=(float)(expense.getPriceInCents()/100) + " euro for ";
+                    expenseString+=expense.getName() + " on ";
+                    expenseString+=expense.getDate().toString();
+                    setText(expenseString);
                 }
             }
         });
@@ -276,5 +310,13 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      */
     public void goBackToHomeScreen(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
+    }
+
+    /**
+     * switch to the delete event screen
+     * @param mouseEvent when button is pressed, go to the delete event screen
+     */
+    public void goToDeleteEventsScreen(MouseEvent mouseEvent) {
+        mainCtrl.switchToDeleteEventsScreen();
     }
 }

@@ -32,6 +32,8 @@ public class MainCtrl {
     private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
+    private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
+    private Scene deleteEventsScene;
 
     private final Translation translation;
     @Inject
@@ -51,7 +53,8 @@ public class MainCtrl {
                            Pair<EventScreenCtrl, Parent> eventUI, Pair<ExpenseScreenCtrl, Parent> expenseUI,
 
                            Pair<ParticipantScreenCtrl, Parent> participantUI, Pair<EditTitleCtrl, Parent> editTitlePair,
-                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI, Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI) {
+                           Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPassworrdUI, Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
+                           Pair<DeleteEventsScreenCtrl, Parent> deleteEvenetsScreenUI) {
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -72,6 +75,8 @@ public class MainCtrl {
         this.managementOvervirewPasswordScene = new Scene(managementOverviewPassworrdUI.getValue());
         this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         this.managementOverviewScreenCtrl = managementOverviewScreenUI.getKey();
+        this.deleteEventsScene = new Scene(deleteEvenetsScreenUI.getValue());
+        this.deleteEventsScreenCtrl = deleteEvenetsScreenUI.getKey();
         primaryStage.show();
     }
 
@@ -96,6 +101,7 @@ public class MainCtrl {
      * switch the primary screen to the main screen
      */
     public void switchBackToMainScreen(){
+        startupScreenCtrl.refreshEvents();
         primaryStage.setScene(startupScene);
         primaryStage.setTitle("Main Menu");
     }
@@ -146,6 +152,12 @@ public class MainCtrl {
         primaryStage.setScene(managementOverviewScreenScene);
         primaryStage.setTitle("Management Overview");
         managementOverviewScreenCtrl.initializeAllEvents();
+    }
+
+    public void switchToDeleteEventsScreen(){
+        primaryStage.setScene(deleteEventsScene);
+        primaryStage.setTitle("Events Removal");
+        deleteEventsScreenCtrl.initializeEventsCheckList();
     }
 
     public void switchEvents(String eventCode) {
