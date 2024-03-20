@@ -299,10 +299,6 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 833b81c2e5c1e80bbaf816d8eb68a37ccc806abb
      * Gets the text from a given textfield
      * @param textBox the textfield to get the text from
      * @return String the text from the textfield

@@ -140,7 +140,7 @@ public class ServerUtils {
 	 * @param eventId the id of the event to delete the Expense from
 	 * @param expenseId the id of the expense we want to delete
 	 */
-	public void deleteExpenseForEvent(String eventId, String expenseId) {
+	public void deleteExpenseForEvent(String eventId, Long expenseId) {
 		Response response = ClientBuilder.newClient()
 				.target(serverURL)
 				.path("api/events/" + eventId + "/expenses/" + expenseId)

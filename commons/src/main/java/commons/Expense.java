@@ -84,4 +84,11 @@ public class Expense{
         return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
 
+    public String stringOnScreen() {
+        if(owedTo != null)
+            return owedTo.getName() + " paid " + (double) priceInCents / 100 + " for " + name;
+        else
+            return null + " paid " + (double) priceInCents / 100 + " for " + name;
+    }
+
 }

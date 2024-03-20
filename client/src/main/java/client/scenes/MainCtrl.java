@@ -108,6 +108,14 @@ public class MainCtrl {
         return startupScene;
     }
 
+    /**
+     * Gets the EventScreen
+     * @return the Event screen
+     */
+    public Scene getEventScene() {
+        return eventScene;
+    }
+
     public void switchToAddExpense() {
         Event event = server.getEvent(eventCode);
         expenseScreenCtrl.resetAll();

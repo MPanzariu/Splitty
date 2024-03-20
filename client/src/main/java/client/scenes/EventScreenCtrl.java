@@ -10,15 +10,19 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
+
+import static javafx.geometry.Pos.CENTER_LEFT;
 
 public class EventScreenCtrl implements Initializable{
     @FXML
@@ -48,7 +52,7 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private ListView<String> listViewExpensesParticipants;
     @FXML
-    private ListView<String> expensesLogListView;
+    private ListView<HBox> expensesLogListView;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -221,21 +225,42 @@ public class EventScreenCtrl implements Initializable{
      * the action when we press the "All" button
      * @param actionEvent on button click event
      */
-    public void showAllExpensesSettled(ActionEvent actionEvent) {
+    public void showExpenses(ActionEvent actionEvent) throws FileNotFoundException {
         expensesLogListView.getItems().clear();
-        for(Expense expense: event.getExpenses()){
-            String log = "";
-            // null check used in-development because Participant functionality isn't there yet!
-            Participant owedTo = expense.getOwedTo();
-            if(owedTo==null) log += "null";
-            else log += owedTo.getName();
-            log+= " paid ";
-            log+=expense.getPriceInCents();
-            log+= " for ";
-            log+=expense.getName();
-            expensesLogListView.getItems().add(log);
+        for(Expense expense: event.getExpenses()) {
+            String log = expense.stringOnScreen();
+            Label expenseText = new Label(log);
+            HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
+            expenseBox.setAlignment(CENTER_LEFT);
+            expensesLogListView.getItems().add(expenseBox);
         }
     }
+
+    public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
+        FileInputStream input = null;
+        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        Image image = new Image(input);
+        ImageView imageView = new ImageView(image);
+        int imgSize = 15;
+        imageView.setFitHeight(imgSize);
+        imageView.setFitWidth(imgSize);
+        imageView.setPickOnBounds(true);
+        imageView.setOnMouseEntered(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.HAND);
+        });
+        imageView.setOnMouseExited(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
+        });
+        imageView.setOnMouseClicked(mouseEvent -> {
+            removeFromList(expenseId);
+        });
+        return imageView;
+    }
+
+    public void removeFromList(long id) {
+        server.deleteExpenseForEvent(event.getId(), id);
+    }
+
 
     /**
      * UI for settling current debts
@@ -243,6 +268,13 @@ public class EventScreenCtrl implements Initializable{
      */
     public void settleDebts(ActionEvent actionEvent) {
         //TODO: UI for settleDebts button
+    }
+
+    public HBox generateHBox(Label label, ImageView imageView){
+        HBox hbox = new HBox(imageView, label);
+        hbox.setSpacing(10);
+        hbox.setAlignment(CENTER_LEFT);
+        return hbox;
     }
 
     /**
