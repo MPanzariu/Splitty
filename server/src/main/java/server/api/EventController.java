@@ -111,7 +111,22 @@ public class EventController {
         Optional<Event> event = repository.findById(id);
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
+        repository.deleteById(id);
         return ResponseEntity.ok(event.get());
+    }
+
+    /**
+     * endpoint for deleting all the events
+     * @return a string telling us whether we successfully deleted all events or that there was no events
+     * to be deleted
+     */
+    @DeleteMapping("/delete/all")
+    ResponseEntity<String> deleteAll(){
+        if(repository.findAll().isEmpty()){
+            return ResponseEntity.ok("No events do be deleted");
+        }
+        repository.deleteAll();
+        return ResponseEntity.ok("Successfully deleted all the events");
     }
 
     /**
@@ -144,5 +159,18 @@ public class EventController {
         this.repository = repository;
     }
 
+    /**
+     * Endpoint for adding an event.
+     * @param event - the event to be added
+     * @return The added event.
+     */
+    @PutMapping("/")
+    ResponseEntity<Event> add(@RequestBody Event event) {
+        if(event==null || event.getTitle().isEmpty() || event.getTitle()==null){
+            return ResponseEntity.badRequest().build();
+        }
+        Event createdEvent = eventService.saveEvent(event);
+        return ResponseEntity.ok(createdEvent);
+    }
 
 }
