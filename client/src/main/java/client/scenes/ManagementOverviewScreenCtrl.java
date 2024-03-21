@@ -251,6 +251,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void exportButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
+        backupEventFeedbackLabel.getStyleClass().remove("successText");
+        if (!backupEventFeedbackLabel.getStyleClass().contains("errorText")){
+            backupEventFeedbackLabel.getStyleClass().add("errorText");
+        }
         String eventId = getTextBoxText(backupEventIDTextField);
         Event event;
         try{
@@ -266,6 +270,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             objectMapper.writeValue(backupFile, event);
             System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
+            backupEventFeedbackLabel.getStyleClass().remove("errorText");
+            if (!backupEventFeedbackLabel.getStyleClass().contains("successText")){
+                backupEventFeedbackLabel.getStyleClass().add("successText");
+            }
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorExportingEvent");
             System.out.printf("Error exporting event %s%n", eventId);
@@ -278,6 +286,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void importButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
+        backupEventFeedbackLabel.getStyleClass().remove("successText");
+        if (!backupEventFeedbackLabel.getStyleClass().contains("errorText")){
+            backupEventFeedbackLabel.getStyleClass().add("errorText");
+        }
         String eventId = getTextBoxText(backupEventIDTextField);
         objectMapper.registerModule(new JavaTimeModule());
         try {
@@ -288,6 +300,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
             server.addEvent(event);
             initializeAllEvents();
+            backupEventFeedbackLabel.getStyleClass().remove("errorText");
+            if (!backupEventFeedbackLabel.getStyleClass().contains("successText")){
+                backupEventFeedbackLabel.getStyleClass().add("successText");
+            }
 
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");

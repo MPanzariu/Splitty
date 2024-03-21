@@ -115,6 +115,10 @@ public class DeleteEventsScreenCtrl implements Initializable {
     public void deleteSelectedEvents(ActionEvent actionEvent) {
         if(!eventSelectionMap.containsValue(true)){
             noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.No.Events.Selected.Label"));
+            noEventsSelectedLabel.getStyleClass().remove("successText");
+            if (!noEventsSelectedLabel.getStyleClass().contains("errorText")){
+                noEventsSelectedLabel.getStyleClass().add("errorText");
+            }
             System.out.println("No events selected");
         }
         else {
@@ -138,10 +142,18 @@ public class DeleteEventsScreenCtrl implements Initializable {
                     System.out.println("The following event has been deleted: " + current.getTitle());
                 }
                 noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deleted.Sucessfully"));
+                noEventsSelectedLabel.getStyleClass().remove("errorText");
+                if (!noEventsSelectedLabel.getStyleClass().contains("successText")){
+                    noEventsSelectedLabel.getStyleClass().add("successText");
+                }
                 eventSelectionMap.clear();
             } else {
                 noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deletion.Cancel"));
                 System.out.println("Deletion cancelled.");
+                noEventsSelectedLabel.getStyleClass().remove("successText");
+                if (!noEventsSelectedLabel.getStyleClass().contains("errorText")){
+                    noEventsSelectedLabel.getStyleClass().add("errorText");
+                }
             }
         }
     }
