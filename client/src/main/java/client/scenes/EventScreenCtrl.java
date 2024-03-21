@@ -242,7 +242,7 @@ public class EventScreenCtrl implements Initializable{
      * @param actionEvent on button click event
      */
     public void settleDebts(ActionEvent actionEvent) {
-        //TODO: UI for settleDebts button
+        mainCtrl.switchToSettleScreen();
     }
 
     /**
