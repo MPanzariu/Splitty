@@ -4,6 +4,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.database.EventRepository;
@@ -25,6 +26,7 @@ public class ExpenseService {
      * @param eventRepository the repository containing the events
      * @param participantRepository the repository containing the participants
      */
+    @Autowired
     public ExpenseService(ExpenseRepository expenseRepository, EventRepository eventRepository,
                           ParticipantRepository participantRepository) {
         this.expenseRepository = expenseRepository;
@@ -72,7 +74,7 @@ public class ExpenseService {
      * @param eventId the id of the corresponding event
      * @param id the id of the expense to be deleted
      */
-    public void deleteExpense(String eventId, long id) {
+    public void deleteExpense(String eventId, Long id) {
         Expense expense = expenseRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
         Event event = eventRepository.findById(eventId)
@@ -90,7 +92,7 @@ public class ExpenseService {
     public Expense editExpense(long id, Expense newExpense) {
         Expense expense = expenseRepository.findById(id) //
                 .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
-        if(expense.getOwedTo()!=null){
+        if(expense.getOwedTo() != null){
             long extractedParticipantId = newExpense.getOwedTo().getId();
             Participant participant = participantRepository.findById(extractedParticipantId)
                     .orElseThrow(() -> new EntityNotFoundException("Participant not found"));

@@ -16,6 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ExpenseServiceTest {
@@ -64,5 +65,6 @@ class ExpenseServiceTest {
             .thenReturn(Optional.of(mockExpense));
         mockExpenseService.deleteExpense(mockEvent.getId(), mockExpense.getId());
         assertFalse(mockEvent.getExpenses().contains(mockExpense));
+        verify(mockEventRepository).save(mockEvent);
     }
 }

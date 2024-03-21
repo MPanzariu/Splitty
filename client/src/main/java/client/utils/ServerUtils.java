@@ -140,14 +140,14 @@ public class ServerUtils {
 	 * @param eventId the id of the event to delete the Expense from
 	 * @param expenseId the id of the expense we want to delete
 	 */
-	public void deleteExpenseForEvent(String eventId, String expenseId) {
+	public void deleteExpenseForEvent(String eventId, Long expenseId) {
 		Response response = ClientBuilder.newClient()
 				.target(serverURL)
 				.path("api/events/" + eventId + "/expenses/" + expenseId)
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.delete();
-		if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 			System.out.println("Expense deleted successfully.");
 		} else {
 			System.out.println("Failed to delete expense. Status code: " + response.getStatus());
