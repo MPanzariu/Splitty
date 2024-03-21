@@ -21,7 +21,7 @@ public class Expense{
     private int priceInCents;
     private Date date;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
     @SuppressWarnings("unused")
@@ -83,6 +83,13 @@ public class Expense{
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
+    }
+
+    public String stringOnScreen() {
+        if(owedTo != null)
+            return owedTo.getName() + " paid " + (double) priceInCents / 100 + " for " + name;
+        else
+            return null + " paid " + (double) priceInCents / 100 + " for " + name;
     }
 
 }

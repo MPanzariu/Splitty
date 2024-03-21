@@ -19,7 +19,8 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owedTo", orphanRemoval = true)
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "owedTo", orphanRemoval = true)
     private Set<Expense> expensesOwedTo;
 
     @SuppressWarnings("unused")

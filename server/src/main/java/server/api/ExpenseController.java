@@ -1,18 +1,28 @@
 package server.api;
+import commons.Event;
 import commons.Expense;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.database.EventRepository;
+import server.database.ExpenseRepository;
 
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/events")
 public class ExpenseController {
     private final ExpenseService expenseService;
-
-    public ExpenseController(ExpenseService expenseService) {
+    private EventRepository eventRepository;
+    private ExpenseRepository expenseRepository;
+    @Autowired
+    public ExpenseController(ExpenseService expenseService, ExpenseRepository expenseRepository,
+                             EventRepository eventRepository) {
         this.expenseService = expenseService;
+        this.expenseRepository = expenseRepository;
+        this.eventRepository = eventRepository;
     }
 
     /**
@@ -49,8 +59,8 @@ public class ExpenseController {
      * @return a status indicating whether the even was deleted
      */
     @DeleteMapping("/{eventId}/expenses/{id}")
-    public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable String eventId,
-                                                         @PathVariable ("id") Long id) {
+    public ResponseEntity<?> removeExpense(@PathVariable String eventId,
+                                                         @PathVariable Long id) {
         expenseService.deleteExpense(eventId, id);
         return ResponseEntity.ok().build();
     }
