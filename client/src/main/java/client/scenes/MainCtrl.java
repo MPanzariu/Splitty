@@ -66,7 +66,6 @@ public class MainCtrl {
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
-        this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.eventScene = new Scene(eventUI.getValue());
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
@@ -86,6 +85,10 @@ public class MainCtrl {
         this.settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
+        //initialize stylesheets
+        this.startupScene.getStylesheets().add("stylesheets/main.css");
+        this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
+
         primaryStage.show();
     }
 
