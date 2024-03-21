@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -79,6 +80,7 @@ public class StartupScreenCtrl implements Initializable {
         bindButton(createEventButton, "Startup.Button.CreateEvent");
         bindLabel(joinEventFeedback, "empty");
         bindLabel(createEventFeedback, "empty");
+        bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
     }
 
     /**
@@ -207,7 +209,9 @@ public class StartupScreenCtrl implements Initializable {
         sb.append(event.getId());
         sb.append(")");
         label.setText(sb.toString());
-
+        Tooltip joinEventTooltip = new Tooltip();
+        joinEventTooltip.textProperty().bind(translation.getStringBinding("Startup.Tooltip.JoinEvent"));
+        label.setTooltip(joinEventTooltip);
         label.setOnMouseClicked(
                 mouseEvent -> {
                     joinEvent(event);
@@ -256,6 +260,9 @@ public class StartupScreenCtrl implements Initializable {
         imageView.setFitHeight(imgSize);
         imageView.setFitWidth(imgSize);
         imageView.setPickOnBounds(true);
+        Tooltip deleteEventToolTip = new Tooltip();
+        deleteEventToolTip.textProperty().bind(translation.getStringBinding("Startup.Tooltip.DeleteEvent"));
+        Tooltip.install(imageView, deleteEventToolTip);
         imageView.setOnMouseEntered(
                 mouseEvent -> {
                     mainCtrl.getMainMenuScene().setCursor(Cursor.HAND);
@@ -271,6 +278,7 @@ public class StartupScreenCtrl implements Initializable {
                     removeFromVBox(label.getParent().idProperty());
                 }
         );
+
         return imageView;
     }
     /**

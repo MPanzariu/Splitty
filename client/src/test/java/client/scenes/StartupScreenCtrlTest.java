@@ -37,7 +37,7 @@ public class StartupScreenCtrlTest{
         sut.initialize(null, null);
         assertEquals(4, sut.labelBindings.size());
         assertEquals(2, sut.textBoxBindings.size());
-        assertEquals(2, sut.buttonBindings.size());
+        assertEquals(3, sut.buttonBindings.size());
     }
 
     @Test
