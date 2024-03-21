@@ -58,7 +58,7 @@ public class MainCtrl {
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
-        this.startupScene.getStylesheets().add("stylesheets/StartScreen.css");
+        this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.eventScene = new Scene(eventUI.getValue());
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());

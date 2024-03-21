@@ -43,7 +43,7 @@
 
 <VBox prefHeight="359.0" prefWidth="451.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StartupScreenCtrl">
   <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="342.0" prefWidth="555.0" styleClass="backgroundLight" stylesheets="@../../stylesheets/StartScreen.css" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="342.0" prefWidth="555.0" styleClass="backgroundLight" stylesheets="@../../stylesheets/main.css" VBox.vgrow="ALWAYS">
       <children>
             <Button fx:id="createEventButton" layoutX="284.0" layoutY="91.0" mnemonicParsing="false" onAction="#createEvent" prefHeight="25.0" prefWidth="92.0" styleClass="positiveButton" text="Create">
                <graphic>
