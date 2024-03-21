@@ -195,4 +195,49 @@ public class ServerUtils {
 				.get(new GenericType<List<Event>>(){});
 		return events;
 	}
+
+	/**
+	 * Sends an event to be added to the database
+	 */
+	public Event addEvent(Event event){
+		return ClientBuilder.newClient(new ClientConfig())
+				.target(serverURL).path("api/events/")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.put(Entity.entity(event, APPLICATION_JSON),Event.class);
+	}
+	/**
+	 * delete an event using it's ID
+	 * @param eventId the id of the event we want to delete
+	 */
+	public void deleteEvent(String eventId){
+		Response response = ClientBuilder.newClient()
+				.target(serverURL)
+				.path("api/events/remove/" + eventId)
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.delete();
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+			System.out.println("Event deleted successfully.");
+		} else {
+			System.out.println("Failed to delete event. Status code: " + response.getStatus());
+		}
+	}
+
+	/**
+	 * delete all the events in the database
+	 */
+	public void deleteAllEvents(){
+		Response response = ClientBuilder.newClient()
+				.target(serverURL)
+				.path("api/events/delete/all")
+				.request(APPLICATION_JSON)
+				.accept(APPLICATION_JSON)
+				.delete();
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+			System.out.println("All events deleted successfully.");
+		} else {
+			System.out.println("Failed to delete all events. Status code: " + response.getStatus());
+		}
+	}
 }
