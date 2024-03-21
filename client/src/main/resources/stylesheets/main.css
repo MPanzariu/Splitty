@@ -1,3 +1,10 @@
+*{
+    default-positive: #215E7A;
+    default-positive-accent: #153748;
+    default-negative: #A12525;
+    default-light: #F5F5F5;
+}
+
 .button{
     -fx-border-width: 2px;
     -fx-border-color: black;
@@ -6,14 +13,14 @@
     -fx-padding: 5px;
 }
 .backgroundLight{
-    -fx-background-color: #ffffff;
+    -fx-background-color: default-light;
 }
 .positiveButton{
-    -fx-background-color: #215E7A;
-    -fx-text-fill: white;
+    -fx-background-color: default-positive;
+    -fx-text-fill: default-light;
 }
 .positiveButton:hover{
-    -fx-background-color: #153748;
+    -fx-background-color: default-positive-accent;
 }
 
 .button:hover{
@@ -27,6 +34,6 @@
     -fx-font-size: 14px;
 }
 .errorText{
-    -fx-text-fill: #fd0808;
+    -fx-text-fill: default-negative;
     -fx-font-size: 14px;
 }
