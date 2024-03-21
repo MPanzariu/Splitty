@@ -57,3 +57,7 @@
     -fx-text-fill: green;
     -fx-font-size: 14px;
 }
+.sortButton{
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
