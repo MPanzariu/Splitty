@@ -88,7 +88,7 @@ public class ServerUtils {
 	 */
 	public Participant addParticipant(String id, String participantName) {
 		return ClientBuilder.newClient(new ClientConfig()) //
-				.target(serverURL).path("api/events/" + id) //
+				.target(serverURL).path("api/events/" + id + "/participants") //
 				.request(APPLICATION_JSON) //
 				.accept(APPLICATION_JSON) //
 				.post(Entity.entity(participantName, APPLICATION_JSON), Participant.class);
@@ -119,20 +119,6 @@ public class ServerUtils {
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.get(new GenericType<Set<Expense>>() {});
-	}
-
-	/**
-	 * Sends a GET request to get the sum of all the expenses
-	 * @param eventId the event for which we want to retrieve the
-	 * total expenses
-	 * @return a double representing the total expenses
-	 */
-	public double getTotalExpensesForEvent(String eventId) {
-		return ClientBuilder.newClient()
-				.target(serverURL).path("api/events/" + eventId + "/total-expenses")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(Double.class);
 	}
 
 	/**

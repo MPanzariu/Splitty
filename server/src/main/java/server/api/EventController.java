@@ -1,7 +1,6 @@
 package server.api;
 import commons.Event;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
@@ -43,7 +42,7 @@ public class EventController {
     public ResponseEntity<Event> editTitle(@PathVariable String eventId,
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
-        socketService.propagateEventUpdate(updatedEvent);
+        socketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok(updatedEvent);
     }
 
@@ -57,19 +56,6 @@ public class EventController {
         assert events != null;
         Collections.sort(events, Comparator.comparing(Event::getLastActivity).reversed());
         return ResponseEntity.ok(events);
-    }
-
-    /**
-     * Creates a new instance of a participant, which is then tied to an event
-     * @param eventId identifies the id for which we want to add a participant
-     * @param participantName the name of the participant we will add
-     * @return returns the status of the operation
-     */
-    @PostMapping("/{eventId}")
-    public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
-        String participantName) {
-        eventService.addParticipantToEvent(eventId, participantName);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**

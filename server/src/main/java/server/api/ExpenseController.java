@@ -3,6 +3,7 @@ import commons.Expense;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.websockets.WebSocketService;
 
 import java.util.Set;
 
@@ -10,9 +11,16 @@ import java.util.Set;
 @RequestMapping("/api/events")
 public class ExpenseController {
     private final ExpenseService expenseService;
+    private final WebSocketService socketService;
 
-    public ExpenseController(ExpenseService expenseService) {
+    /***
+     * Constructor of the ExpenseController
+     * @param expenseService the ExpenseService handling logic
+     * @param socketService the WebSocketService propagating updates
+     */
+    public ExpenseController(ExpenseService expenseService, WebSocketService socketService) {
         this.expenseService = expenseService;
+        this.socketService = socketService;
     }
 
     /**
@@ -26,6 +34,7 @@ public class ExpenseController {
     public ResponseEntity<Void> addExpenseToEvent(@PathVariable String eventId, @RequestBody
         Expense expense) {
         expenseService.addExpense(eventId, expense);
+        socketService.propagateEventUpdate(eventId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -52,20 +61,23 @@ public class ExpenseController {
     public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable String eventId,
                                                          @PathVariable ("id") Long id) {
         expenseService.deleteExpense(eventId, id);
+        socketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok().build();
     }
 
+    /***
+     * Updates all the fields of an Expense to match submitted data
+     * @param eventId the Event of the expense
+     * @param id the ID of the Expense
+     * @param expense the new Expense data
+     * @return a ResponseEntity of the updated Expense
+     */
     @PutMapping("/{eventId}/expenses/{id}")
-    public ResponseEntity<Expense> editExpense(@PathVariable long id,
+    public ResponseEntity<Expense> editExpense(@PathVariable String eventId,
+                                               @PathVariable long id,
                                                @RequestBody Expense expense) {
-        // This does not need the eventId
-        // but to keep it in line with the mapping (/api/events) it has one
-        // feel free to change if you come up with a better solution
-        // (these changes were made because Expense lost its Event field to fix a bug
-        // which prevents it from knowing its Event on its own
-        // so deleting an Expense now requires the Event ID)
-        // this is the only method here impacted this way
         Expense updatedExpense = expenseService.editExpense(id, expense);
+        socketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok(updatedExpense);
 
     }
