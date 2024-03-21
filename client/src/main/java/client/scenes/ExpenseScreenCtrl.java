@@ -76,6 +76,8 @@ public class ExpenseScreenCtrl implements Initializable{
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
+    private boolean toEdit;
+    private long expenseId;
 
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
@@ -83,6 +85,7 @@ public class ExpenseScreenCtrl implements Initializable{
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
+        this.toEdit = false;
         //currency.setItems(FXCollections.observableArrayList("EUR"));
     }
 
@@ -105,6 +108,10 @@ public class ExpenseScreenCtrl implements Initializable{
                 splitBetweenAllCheckBox.setSelected(false);
             }
         });
+    }
+
+    public void setToEdit(boolean b) {
+        this.toEdit = b;
     }
 
     public ObservableList<String> getParticipantList() {
@@ -262,6 +269,28 @@ public class ExpenseScreenCtrl implements Initializable{
     public void addExpenseToTheServer(Expense expense) {
         server.addExpense(currentEvent.getId(), expense);
     }
+
+    public void setExpense(long id) {
+        Set<Expense> expenses = server.getExpensesForEvent(currentEvent.getId());
+        Expense expense = null;
+        for(Expense exp: expenses){
+            if(exp.getId() == id) {
+                expense = exp;
+                break;
+            }
+        }
+        if(expense == null)
+            return;
+        expensePurpose.setText(expense.getName());
+        sum.setText(String.valueOf((double) expense.getPriceInCents()/100));
+        choosePayer.getEditor().setText(expense.getOwedTo().getName());
+        datePicker.getEditor().setText(String.valueOf(expense.getDate())); //needs revision
+        expenseId = id;
+    }
+
+    public void editExpenseOnServer(long expenseId, Expense expense) {
+        server.editExpense(currentEvent.getId(), expenseId, expense);
+    }
     /**
      * Needs revision
      */
@@ -296,7 +325,11 @@ public class ExpenseScreenCtrl implements Initializable{
             toAdd = false;
         }
         if(toAdd) {
-            addExpenseToTheServer(expense);
+            if(expenseId == 0)
+                addExpenseToTheServer(expense);
+            else {
+                editExpenseOnServer(expenseId, expense);
+            }
             mainCtrl.switchToEventScreen();
         }
     }

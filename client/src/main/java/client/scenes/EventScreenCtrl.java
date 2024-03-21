@@ -229,11 +229,25 @@ public class EventScreenCtrl implements Initializable{
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             String log = expense.stringOnScreen();
-            Label expenseText = new Label(log);
+            Label expenseText = generateExpenseLabel(expense.getId(), log);
             HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
             expenseBox.setAlignment(CENTER_LEFT);
             expensesLogListView.getItems().add(expenseBox);
         }
+    }
+
+    public Label generateExpenseLabel(long expenseId, String expenseTitle) {
+        Label expense = new Label(expenseTitle);
+        expense.setOnMouseEntered(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.HAND);
+        });
+        expense.setOnMouseExited(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
+        });
+        expense.setOnMouseClicked(mouseEvent -> {
+            mainCtrl.switchToEditExpense(expenseId);
+            });
+        return expense;
     }
 
     public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
