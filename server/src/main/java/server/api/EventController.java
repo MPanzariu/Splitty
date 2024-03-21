@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
+import server.websockets.WebSocketService;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,15 +17,20 @@ import java.util.Optional;
 public class EventController {
     private final EventService eventService;
     private EventRepository repository;
+    private final WebSocketService socketService;
     /**
      * Constructor of EventController.
-     * @param eventService the EventService used for backend handling of events
-     * @param repository the EventRepository storing Events
+     *
+     * @param eventService  the EventService used for backend handling of events
+     * @param repository    the EventRepository storing Events
+     * @param socketService the WebSocketService propagating updates
      */
     @Autowired
-    public EventController(EventService eventService, EventRepository repository) {
+    public EventController(EventService eventService, EventRepository repository,
+                           WebSocketService socketService) {
         this.eventService = eventService;
         this.repository = repository;
+        this.socketService = socketService;
     }
 
     /**
@@ -37,6 +43,7 @@ public class EventController {
     public ResponseEntity<Event> editTitle(@PathVariable String eventId,
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
+        socketService.propagateEventUpdate(updatedEvent);
         return ResponseEntity.ok(updatedEvent);
     }
 
