@@ -19,7 +19,7 @@ public class Expense{
     private int priceInCents;
     private Date date;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnoreProperties(value = {"expensesOwedTo"})
     private Participant owedTo;
 

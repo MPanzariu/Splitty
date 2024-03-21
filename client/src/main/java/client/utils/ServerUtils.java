@@ -147,7 +147,7 @@ public class ServerUtils {
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.delete();
-		if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 			System.out.println("Expense deleted successfully.");
 		} else {
 			System.out.println("Failed to delete expense. Status code: " + response.getStatus());
