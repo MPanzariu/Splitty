@@ -1,17 +1,21 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
+import server.database.ExpenseRepository;
+import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
 @Service
 public class ParticipantService {
     private final EventRepository eventRepository;
     private final ParticipantRepository participantRepository;
+    private final ExpenseRepository expenseRepository;
 
     /**
      * constructor
@@ -21,9 +25,11 @@ public class ParticipantService {
      */
     @Autowired
     public ParticipantService(EventRepository eventRepository,
-                              ParticipantRepository participantRepository) {
+                              ParticipantRepository participantRepository,
+                              ExpenseRepository expenseRepository) {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
+        this.expenseRepository = expenseRepository;
     }
 
     /**
@@ -50,6 +56,9 @@ public class ParticipantService {
                 .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        var expenses = expenseRepository.findByOwedTo(participant);
+        for (Expense expense : expenses)
+            event.removeExpense(expense);
         event.removeParticipant(participant);
         eventRepository.save(event);
     }

@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.EventRepository;
+import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
 import java.util.Optional;
@@ -25,6 +27,8 @@ public class ParticipantServiceTest {
 
     @Mock
     private ParticipantRepository participantRepository;
+    @Mock
+    private ExpenseRepository expenseRepository;
 
     @InjectMocks
     private ParticipantService participantService;

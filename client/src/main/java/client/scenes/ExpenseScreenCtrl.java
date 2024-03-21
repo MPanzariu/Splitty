@@ -150,6 +150,10 @@ public class ExpenseScreenCtrl implements Initializable{
             .bind(translation.getStringBinding("Expense.Button.Confirm"));
         expenseType.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
+        bindToEmpty();
+    }
+
+    public void bindToEmpty() {
         errorParticipants.textProperty()
             .bind(translation.getStringBinding("empty"));
         errorNoPurpose.textProperty()
@@ -264,6 +268,7 @@ public class ExpenseScreenCtrl implements Initializable{
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
         boolean toAdd = true;
         Expense expense = createNewExpense();
+        bindToEmpty();
         if(expense.getOwedTo() == null) {
             errorParticipants.textProperty()
                 .bind(translation.getStringBinding("Expense.Label.NoParticipants"));

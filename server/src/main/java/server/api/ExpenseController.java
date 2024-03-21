@@ -58,8 +58,8 @@ public class ExpenseController {
      * @return a status indicating whether the even was deleted
      */
     @DeleteMapping("/{eventId}/expenses/{id}")
-    public ResponseEntity<String> deleteExpenseFromEvent(@PathVariable String eventId,
-                                                         @PathVariable ("id") Long id) {
+    public ResponseEntity<?> removeExpense(@PathVariable String eventId,
+                                                         @PathVariable Long id) {
         expenseService.deleteExpense(eventId, id);
         socketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok().build();
