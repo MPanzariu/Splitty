@@ -41,11 +41,9 @@ public class ParticipantService {
                 .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-        if(expenseRepository != null) {
-            var expenses = expenseRepository.findByOwedTo(participant);
-            for (Expense expense : expenses)
-                event.removeExpense(expense);
-        }
+        var expenses = expenseRepository.findByOwedTo(participant);
+        for (Expense expense : expenses)
+            event.removeExpense(expense);
         event.removeParticipant(participant);
         eventRepository.save(event);
     }
