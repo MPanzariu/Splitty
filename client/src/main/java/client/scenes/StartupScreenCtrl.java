@@ -129,7 +129,7 @@ public class StartupScreenCtrl implements Initializable {
     private void addToHistory(Event event) {
         Label eventLabel = generateLabelForEvent(event);
         try{
-            ImageView imageView = generateRemoveButton(eventLabel);
+            ImageView imageView = generateRemoveButton(eventLabel, event);
             HBox hbox = generateHBox(eventLabel, imageView);
             removeFromHistoryIfExists(event);
             List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
@@ -245,9 +245,10 @@ public class StartupScreenCtrl implements Initializable {
      * Generates an image which when clicked will remove the HBox which contains it.
      * It will also change the cursor of the user while hovering to indicate clickability.
      * @param label the label which will be contained with the image in the HBox
+     * @param event the event to remove
      * @return ImageView with the image
      */
-    public ImageView generateRemoveButton(Label label) throws FileNotFoundException {
+    public ImageView generateRemoveButton(Label label, Event event) throws FileNotFoundException {
         FileInputStream input = null;
         input = new FileInputStream("client/src/main/resources/images/x_remove.png");
         Image image = new Image(input);
@@ -269,6 +270,7 @@ public class StartupScreenCtrl implements Initializable {
         imageView.setOnMouseClicked(
                 mouseEvent -> {
                     removeFromVBox(label.getParent().idProperty());
+                    removeFromHistoryIfExists(event);
                 }
         );
         return imageView;
