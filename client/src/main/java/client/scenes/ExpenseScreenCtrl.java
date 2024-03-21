@@ -77,7 +77,6 @@ public class ExpenseScreenCtrl implements Initializable{
     private Event currentEvent;
     private final Translation translation;
 
-
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
                               Translation translation) {
@@ -245,17 +244,15 @@ public class ExpenseScreenCtrl implements Initializable{
         if(date != null)
             expenseDate = Date.valueOf(datePicker.getValue());
 
-        // this has to be a participant that actually exists in the database
-        // you can not in fact just create a new one
-        //
-        /*Participant participant =
-            new Participant(choosePayer.getValue(), currentEvent);*/
-        // I'd suggest doing something with currentEvent.getParticipants()
+        String participantName = choosePayer.getValue();
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
-        Participant participant = participantIterator.hasNext()
-                ? participantIterator.next() : null;
+        Participant participant = null;
+        while(participantIterator.hasNext()){
+            participant = participantIterator.next();
+            if(participant.getName().equals(participantName)) break;
+        }
 
-            return new Expense(name, priceInCents, expenseDate, participant);
+        return new Expense(name, priceInCents, expenseDate, participant);
     }
 
     /**

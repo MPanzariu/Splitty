@@ -1,0 +1,39 @@
+*{
+    default-positive: #215E7A;
+    default-positive-accent: #153748;
+    default-negative: #A12525;
+    default-light: #F5F5F5;
+}
+
+.button{
+    -fx-border-width: 2px;
+    -fx-border-color: black;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 5px;
+}
+.backgroundLight{
+    -fx-background-color: default-light;
+}
+.positiveButton{
+    -fx-background-color: default-positive;
+    -fx-text-fill: default-light;
+}
+.positiveButton:hover{
+    -fx-background-color: default-positive-accent;
+}
+
+.button:hover{
+    -fx-cursor: hand;
+}
+.h1{
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.text{
+    -fx-font-size: 14px;
+}
+.errorText{
+    -fx-text-fill: default-negative;
+    -fx-font-size: 14px;
+}
