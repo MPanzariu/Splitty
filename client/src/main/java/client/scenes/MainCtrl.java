@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.AppStateManager;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -44,12 +45,14 @@ public class MainCtrl {
     @Named("client.language")
     private String language;
     private final ServerUtils server;
+    private final AppStateManager manager;
     private String eventCode;
 
     @Inject
-    public MainCtrl(Translation translation, ServerUtils server) {
+    public MainCtrl(Translation translation, ServerUtils server, AppStateManager manager) {
         this.translation = translation;
         this.server = server;
+        this.manager = manager;
         this.eventCode = null;
     }
 
@@ -209,5 +212,6 @@ public class MainCtrl {
      */
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
+        manager.test(eventCode);
     }
 }
