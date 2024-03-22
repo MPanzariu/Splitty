@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.SettleDebtsUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
@@ -125,6 +126,7 @@ public class SettleDebtsScreenCtrl implements Initializable {
                                         Participant participantOwedTo) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
+        Styling.applyPositiveButtonStyling(button);
         var onClick = utils.createSettleAction(participantOwes, amount,
                 participantOwedTo, event.getId());
         button.setOnAction(onClick);
@@ -135,6 +137,7 @@ public class SettleDebtsScreenCtrl implements Initializable {
     private Button generateExpandButton(VBox owedToInfoBox) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.expand"));
+        Styling.applyPositiveButtonStyling(button);
         //This can instead be an image button!
         button.setOnAction(null); //When more features are implemented, this can do something!
         return button;
