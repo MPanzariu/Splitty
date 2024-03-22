@@ -54,7 +54,7 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private ComboBox<String> cBoxParticipantExpenses;
     @FXML
-    private ListView<Label> listViewExpensesParticipants;
+    private Label errorInvalidParticipant;
     @FXML
     private ListView<HBox> expensesLogListView;
     @FXML
@@ -99,7 +99,7 @@ public class EventScreenCtrl implements Initializable{
         participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
-        //allExpensesButton.textProperty().bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
+        errorInvalidParticipant.textProperty().bind(translation.getStringBinding("empty"));
         settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
         initializeEditTitle();
         try{
@@ -135,10 +135,28 @@ public class EventScreenCtrl implements Initializable{
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
+        initializeParticipantsCBox();
+    }
+
+    public void initializeParticipantsCBox() {
         cBoxParticipantExpenses.valueProperty()
             .addListener((observable, oldValue, newValue) -> {
-            setButtonsNames(newValue);
-        });
+                boolean validParticipant = false;
+                Set<Participant> participants = event.getParticipants();
+                for(Participant participant: participants)
+                    if(participant.getName().equalsIgnoreCase(newValue)){
+                        validParticipant = true;
+                        break;
+                    }
+                if(validParticipant) {
+                    errorInvalidParticipant.textProperty()
+                        .bind(translation.getStringBinding("empty"));
+                    setButtonsNames(newValue);
+                }
+                else
+                    errorInvalidParticipant.textProperty()
+                        .bind(translation.getStringBinding("Event.Label.Error.InvalidParticipant"));
+            });
     }
 
     private void initializeEditTitle() {
@@ -160,6 +178,8 @@ public class EventScreenCtrl implements Initializable{
         updateEventText();
         updateParticipants();
         updateParticipantsDropdown();
+        errorInvalidParticipant.textProperty()
+                .bind(translation.getStringBinding("empty"));
         buttonsHBox.getChildren().clear();
     }
 
@@ -229,7 +249,7 @@ public class EventScreenCtrl implements Initializable{
      */
     private void updateParticipantsDropdown(){
         cBoxParticipantExpenses.getItems().clear();
-        listViewExpensesParticipants.getItems().clear();
+        //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
             Label participantLabel = createParticipantLabel(current.getName(),
                 current.getId());

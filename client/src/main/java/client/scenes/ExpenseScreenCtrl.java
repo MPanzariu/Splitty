@@ -178,7 +178,9 @@ public class ExpenseScreenCtrl implements Initializable{
         this.currentEvent = event;
         currency.setItems(FXCollections.observableArrayList("", "EUR"));
         choosePayer.setItems(getParticipantList());
+        bindToEmpty();
     }
+
 
     /**
      * When pressing the Cancel button it takes the user
