@@ -52,7 +52,7 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button goBackButton;
     @FXML
-    private ComboBox<Label> cBoxParticipantExpenses;
+    private ComboBox<String> cBoxParticipantExpenses;
     @FXML
     private ListView<Label> listViewExpensesParticipants;
     @FXML
@@ -135,8 +135,10 @@ public class EventScreenCtrl implements Initializable{
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
-//        allExpenses = new Button("All");
-//        buttonsHBox.getChildren().add(allExpenses);
+        cBoxParticipantExpenses.valueProperty()
+            .addListener((observable, oldValue, newValue) -> {
+            setButtonsNames(newValue);
+        });
     }
 
     private void initializeEditTitle() {
@@ -158,6 +160,7 @@ public class EventScreenCtrl implements Initializable{
         updateEventText();
         updateParticipants();
         updateParticipantsDropdown();
+        buttonsHBox.getChildren().clear();
     }
 
     /**
@@ -230,8 +233,7 @@ public class EventScreenCtrl implements Initializable{
         for (Participant current : event.getParticipants()) {
             Label participantLabel = createParticipantLabel(current.getName(),
                 current.getId());
-            cBoxParticipantExpenses.getItems().add(participantLabel);
-            listViewExpensesParticipants.getItems().add(participantLabel);
+            cBoxParticipantExpenses.getItems().add(current.getName());
         }
     }
 
