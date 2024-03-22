@@ -142,12 +142,10 @@ public class MainCtrl {
         Event event = server.getEvent(eventCode);
         expenseScreenCtrl.resetAll();
         expenseScreenCtrl.refresh(event);
-        expenseScreenCtrl.setToEdit(false);
         primaryStage.setScene(expenseScene);
     }
     public void switchToEditExpense(long expenseId) {
         Event event = server.getEvent(eventCode);
-        expenseScreenCtrl.setToEdit(true);
         expenseScreenCtrl.refresh(event);
         expenseScreenCtrl.setExpense(expenseId);
         primaryStage.setScene(expenseScene);
