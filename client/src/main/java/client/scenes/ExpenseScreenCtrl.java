@@ -76,7 +76,6 @@ public class ExpenseScreenCtrl implements Initializable{
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
-    private boolean toEdit;
     private long expenseId;
 
     @Inject
@@ -85,7 +84,6 @@ public class ExpenseScreenCtrl implements Initializable{
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
-        this.toEdit = false;
         //currency.setItems(FXCollections.observableArrayList("EUR"));
     }
 
@@ -110,9 +108,6 @@ public class ExpenseScreenCtrl implements Initializable{
         });
     }
 
-    public void setToEdit(boolean b) {
-        this.toEdit = b;
-    }
 
     public ObservableList<String> getParticipantList() {
         Set<Participant> participants;
@@ -133,6 +128,8 @@ public class ExpenseScreenCtrl implements Initializable{
             .bind(translation.getStringBinding("Expense.Label.Display.Add"));
         paidBy.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.paid"));
+        choosePayer.promptTextProperty()
+                .bind(translation.getStringBinding("Expense.ComboBox.payer"));
         purpose.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
         expensePurpose.promptTextProperty()
@@ -181,7 +178,9 @@ public class ExpenseScreenCtrl implements Initializable{
         this.currentEvent = event;
         currency.setItems(FXCollections.observableArrayList("", "EUR"));
         choosePayer.setItems(getParticipantList());
+        bindToEmpty();
     }
+
 
     /**
      * When pressing the Cancel button it takes the user
@@ -329,6 +328,7 @@ public class ExpenseScreenCtrl implements Initializable{
                 addExpenseToTheServer(expense);
             else {
                 editExpenseOnServer(expenseId, expense);
+                expenseId = 0;
             }
             mainCtrl.switchToEventScreen();
         }

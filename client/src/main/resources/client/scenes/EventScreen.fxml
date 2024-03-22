@@ -49,10 +49,9 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <VBox fx:id="vBoxExpenses" layoutX="160.0" layoutY="220.0" prefHeight="82.0" prefWidth="100.0">
+      <VBox fx:id="vBoxExpenses" layoutX="160.0" layoutY="220.0" prefHeight="26.0" prefWidth="100.0">
          <children>
-            <ComboBox fx:id="cBoxParticipantExpenses" prefWidth="150.0" styleClass="small-text" />
-            <ListView fx:id="listViewExpensesParticipants" prefHeight="200.0" prefWidth="200.0" styleClass="small-text" />
+            <ComboBox fx:id="cBoxParticipantExpenses" editable="true" prefWidth="150.0" styleClass="small-text" />
          </children>
       </VBox>
       <Button fx:id="addExpense" layoutX="386.0" layoutY="198.0" mnemonicParsing="false" onAction="#addExpense" prefHeight="30.0" prefWidth="148.0" text="Add Expense">
@@ -94,5 +93,6 @@
             <String fx:value="small-text" />
          </styleClass></Button>
       <Button fx:id="goBackButton" layoutX="160.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+        <Label fx:id="errorInvalidParticipant" layoutX="160.0" layoutY="246.0" prefHeight="18.0" prefWidth="212.0" />
    </children>
 </AnchorPane>

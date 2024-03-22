@@ -30,7 +30,11 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button addExpense;
     @FXML
-    private Button allExpensesButton;
+    Button allExpenses;
+    @FXML
+    Button fromButton;
+    @FXML
+    Button inButton;
     @FXML
     private Button settleDebtsButton;
     @FXML
@@ -50,14 +54,17 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private ComboBox<String> cBoxParticipantExpenses;
     @FXML
-    private ListView<String> listViewExpensesParticipants;
+    private Label errorInvalidParticipant;
     @FXML
     private ListView<HBox> expensesLogListView;
+    @FXML
+    private HBox buttonsHBox;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private Event event;
     private Map<Long, HBox> hBoxMap;
+    //private Map<Long, >
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -71,6 +78,7 @@ public class EventScreenCtrl implements Initializable{
         this.translation = translation;
         this.event = null;
         this.hBoxMap = new HashMap<>();
+        this.buttonsHBox = new HBox();
     }
 
     /**
@@ -91,7 +99,7 @@ public class EventScreenCtrl implements Initializable{
         participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
-        allExpensesButton.textProperty().bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
+        errorInvalidParticipant.textProperty().bind(translation.getStringBinding("empty"));
         settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
         initializeEditTitle();
         try{
@@ -127,6 +135,28 @@ public class EventScreenCtrl implements Initializable{
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
+        initializeParticipantsCBox();
+    }
+
+    public void initializeParticipantsCBox() {
+        cBoxParticipantExpenses.valueProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                boolean validParticipant = false;
+                Set<Participant> participants = event.getParticipants();
+                for(Participant participant: participants)
+                    if(participant.getName().equalsIgnoreCase(newValue)){
+                        validParticipant = true;
+                        break;
+                    }
+                if(validParticipant) {
+                    errorInvalidParticipant.textProperty()
+                        .bind(translation.getStringBinding("empty"));
+                    setButtonsNames(newValue);
+                }
+                else
+                    errorInvalidParticipant.textProperty()
+                        .bind(translation.getStringBinding("Event.Label.Error.InvalidParticipant"));
+            });
     }
 
     private void initializeEditTitle() {
@@ -148,6 +178,9 @@ public class EventScreenCtrl implements Initializable{
         updateEventText();
         updateParticipants();
         updateParticipantsDropdown();
+        errorInvalidParticipant.textProperty()
+                .bind(translation.getStringBinding("empty"));
+        buttonsHBox.getChildren().clear();
     }
 
     /**
@@ -216,21 +249,63 @@ public class EventScreenCtrl implements Initializable{
      */
     private void updateParticipantsDropdown(){
         cBoxParticipantExpenses.getItems().clear();
-        listViewExpensesParticipants.getItems().clear();
+        //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
+            Label participantLabel = createParticipantLabel(current.getName(),
+                current.getId());
             cBoxParticipantExpenses.getItems().add(current.getName());
-            listViewExpensesParticipants.getItems().add(current.getName());
         }
     }
 
     /**
+     * In the context of this app, when choosing one of the participants
+     * we want to see 3 buttons, 2 of which are related to the name of the participant.
+     * This method generates those buttons and adds them to the hBox
+     * @param name the name from the buttons
+     */
+    public void setButtonsNames(String name) {
+        allExpenses = new Button("All");
+        fromButton = new Button("From " + name);
+        inButton = new Button("Including " + name);
+        buttonsHBox.getChildren().clear();
+        buttonsHBox.getChildren().add(allExpenses);
+        buttonsHBox.getChildren().add(fromButton);
+        buttonsHBox.getChildren().add(inButton);
+    }
+
+    /**
+     * Creates a label for the participant and it
+     * @param participantName the name of the participant we are creating a label for
+     * @param participantId the id of the participant
+     * @return the created label
+     */
+    public Label createParticipantLabel(String participantName, Long participantId) {
+        Label participantLabel = new Label(participantName);
+        participantLabel.setOnMouseEntered(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.HAND);
+        });
+        participantLabel.setOnMouseExited(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
+        });
+        participantLabel.setOnMouseClicked(mouseEvent -> {
+            setButtonsNames(participantName);
+        });
+        return participantLabel;
+    }
+
+    /**
      * the action when we press the "All" button
-     * @param actionEvent on button click event
      */
     public void showExpenses() throws FileNotFoundException {
         showExpenseList();
     }
 
+    /**
+     * Generates a list of hBoxes stating with a human-readable String
+     * that presents a quick overview of the expense presented
+     * @throws FileNotFoundException in case the image is not found,
+     * the method throws an error
+     */
     public void showExpenseList () throws FileNotFoundException {
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
@@ -244,6 +319,13 @@ public class EventScreenCtrl implements Initializable{
         }
     }
 
+    /**
+     * Creates a label that will later be added to the hBox from the expense listview
+     * Furthermore, it allows the client to access set expense and edit it
+     * @param expenseId the id of the expense we are creating a label for
+     * @param expenseTitle the title of the expense
+     * @return the created label
+     */
     public Label generateExpenseLabel(long expenseId, String expenseTitle) {
         Label expense = new Label(expenseTitle);
         expense.setOnMouseEntered(mouseEvent -> {
@@ -258,6 +340,14 @@ public class EventScreenCtrl implements Initializable{
         return expense;
     }
 
+    /**
+     * Generates a remove "button" for the expenses from the listview
+     * Furthermore, it allows the client to remove set event by pressing the 'X'
+     * @param expenseId the id of the expense to be generated
+     * @return the generated button
+     * @throws FileNotFoundException in case the image isn't found,
+     * this exception is thrown
+     */
     public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
         FileInputStream input = null;
         input = new FileInputStream("client/src/main/resources/images/x_remove.png");
@@ -283,9 +373,16 @@ public class EventScreenCtrl implements Initializable{
         return imageView;
     }
 
-    public void removeFromList(long id) throws FileNotFoundException {
-        server.deleteExpenseForEvent(event.getId(), id);
-        HBox hBox = hBoxMap.get(id);
+    /**
+     * Deletes an expense from the server. It also reflects it in the client
+     * by deleting the set expense from the listview
+     * @param expenseId the id of the expense we want to delete
+     * @throws FileNotFoundException in case the file isn't found the exception is thrown
+     */
+    public void removeFromList(long expenseId) throws FileNotFoundException {
+        server.deleteExpenseForEvent(event.getId(), expenseId);
+        HBox hBox = hBoxMap.get(expenseId);
+        hBoxMap.remove(expenseId);
         expensesLogListView.getItems().remove(hBox);
     }
 
