@@ -1,57 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="603.0" prefWidth="760.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventScreenCtrl">
+<AnchorPane prefHeight="660.0" prefWidth="689.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventScreenCtrl">
    <children>
-      <Label fx:id="eventNameLabel" layoutX="160.0" layoutY="62.0" prefHeight="35.0" prefWidth="237.0" text="Event" wrapText="true">
+      <Label fx:id="eventNameLabel" layoutX="160.0" layoutY="30.0" prefHeight="35.0" prefWidth="237.0" styleClass="h1" text="Event" wrapText="true">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="editTitle" layoutX="350.0" layoutY="63.0" mnemonicParsing="false" onAction="#editTitle" prefHeight="25.0" prefWidth="25.0" text="Send Invites">
+      <Button fx:id="editTitle" layoutX="276.0" layoutY="80.0" mnemonicParsing="false" onAction="#editTitle" prefHeight="34.0" prefWidth="111.0" text="Edit title">
          <font>
             <Font size="14.0" />
          </font>
+         <styleClass>
+            <String fx:value="positiveButton" />
+            <String fx:value="small-text" />
+         </styleClass>
       </Button>
-      <TextField fx:id="invitationCode" layoutX="500.0" layoutY="62.0" prefHeight="35.0" prefWidth="237.0" text="Event">
+      <TextField fx:id="invitationCode" layoutX="399.0" layoutY="30.0" prefHeight="51.0" prefWidth="139.0" styleClass="h1" text="Event">
          <font>
             <Font size="24.0" />
          </font>
       </TextField>
-      <Label fx:id="participantsName" layoutX="160.0" layoutY="116.0" prefHeight="27.0" prefWidth="139.0" text="Participants">
+      <Label fx:id="participantsName" layoutX="164.0" layoutY="124.0" prefHeight="27.0" prefWidth="139.0" styleClass="h2" text="Participants">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="participantsLabel" layoutX="160.0" layoutY="150.0" prefHeight="17.0" prefWidth="157.0" text="Label">
+      <Label fx:id="participantsLabel" layoutX="164.0" layoutY="157.0" prefHeight="17.0" prefWidth="157.0" styleClass="small-text" text="Label">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <Button fx:id="editParticipant" layoutX="302.0" layoutY="117.0" mnemonicParsing="false" onAction="#editCurrentParticipants" prefHeight="25.0" prefWidth="29.0" />
-      <Button fx:id="addParticipant" layoutX="345.0" layoutY="117.0" mnemonicParsing="false" onAction="#addParticipants" prefHeight="25.0" prefWidth="29.0" />
-      <Label fx:id="expenseLabel" layoutX="160.0" layoutY="189.0" prefHeight="17.0" prefWidth="111.0" text="Expenses">
+      <Button fx:id="editParticipant" layoutX="306.0" layoutY="125.0" mnemonicParsing="false" onAction="#editCurrentParticipants" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+      <Button fx:id="addParticipant" layoutX="349.0" layoutY="124.0" mnemonicParsing="false" onAction="#addParticipants" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+      <Label fx:id="expenseLabel" layoutX="160.0" layoutY="189.0" prefHeight="17.0" prefWidth="111.0" styleClass="h2" text="Expenses">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
       <VBox fx:id="vBoxExpenses" layoutX="160.0" layoutY="220.0" prefHeight="26.0" prefWidth="100.0">
          <children>
-            <ComboBox fx:id="cBoxParticipantExpenses" editable="true" prefWidth="150.0" promptText="Participant" />
+            <ComboBox fx:id="cBoxParticipantExpenses" editable="true" prefWidth="150.0" styleClass="small-text" />
          </children>
       </VBox>
-      <Button fx:id="addExpense" layoutX="386.0" layoutY="198.0" mnemonicParsing="false" onAction="#addExpense" prefHeight="30.0" prefWidth="148.0" text="Add Expense" />
-      <HBox fx:id="buttonsHBox" layoutX="160.0" layoutY="318.0" prefHeight="25.0" prefWidth="374.0" />
+      <Button fx:id="addExpense" layoutX="386.0" layoutY="198.0" mnemonicParsing="false" onAction="#addExpense" prefHeight="30.0" prefWidth="148.0" text="Add Expense">
+         <styleClass>
+            <String fx:value="positiveButton" />
+            <String fx:value="small-text" />
+         </styleClass></Button>
+      <HBox layoutX="160.0" layoutY="313.0" prefHeight="25.0" prefWidth="374.0">
+         <children>
+            <Button fx:id="allExpensesButton" mnemonicParsing="false" onAction="#showExpenses" prefHeight="25.0" prefWidth="132.0" text="All">
+               <styleClass>
+                  <String fx:value="sortButton" />
+                  <String fx:value="positiveButton" />
+                  <String fx:value="small-text" />
+               </styleClass></Button>
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="131.0" text="Button">
+               <styleClass>
+                  <String fx:value="sortButton" />
+                  <String fx:value="positiveButton" />
+                  <String fx:value="small-text" />
+               </styleClass></Button>
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="128.0" text="Button">
+               <styleClass>
+                  <String fx:value="sortButton" />
+                  <String fx:value="positiveButton" />
+                  <String fx:value="small-text" />
+               </styleClass>
+            </Button>
+         </children>
+      </HBox>
       <VBox layoutX="160.0" layoutY="343.0" prefHeight="200.0" prefWidth="374.0">
          <children>
-            <ListView fx:id="expensesLogListView" prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="expensesLogListView" prefHeight="200.0" prefWidth="200.0" styleClass="small-text" />
          </children>
       </VBox>
-      <Button fx:id="settleDebtsButton" layoutX="399.0" layoutY="554.0" mnemonicParsing="false" onAction="#settleDebts" prefHeight="30.0" prefWidth="139.0" text="Settle Debts" />
-      <Button fx:id="goBackButton" layoutX="29.0" layoutY="557.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="25.0" prefWidth="29.0" />
-      <Label fx:id="errorInvalidParticipant" layoutX="160.0" layoutY="246.0" prefHeight="18.0" prefWidth="212.0" />
+      <Button fx:id="settleDebtsButton" layoutX="399.0" layoutY="554.0" mnemonicParsing="false" onAction="#settleDebts" prefHeight="30.0" prefWidth="139.0" text="Settle Debts">
+         <styleClass>
+            <String fx:value="positiveButton" />
+            <String fx:value="small-text" />
+         </styleClass></Button>
+      <Button fx:id="goBackButton" layoutX="160.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+        <Label fx:id="errorInvalidParticipant" layoutX="160.0" layoutY="246.0" prefHeight="18.0" prefWidth="212.0" />
    </children>
 </AnchorPane>
