@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+
+import java.io.FileNotFoundException;
 import java.util.Locale;
 
 public class MainCtrl {
@@ -99,11 +101,16 @@ public class MainCtrl {
      * When called the view changes to the event specified as input.
      * join an event (either used when creating or joining one) and updating the fields in the event screen
      */
-    public void switchToEventScreen(){
+    public void switchToEventScreen() {
         Event event = server.getEvent(eventCode);
         eventScreenCtrl.refresh(event);
         primaryStage.setScene(eventScene);
         primaryStage.setTitle("Event Screen");
+        try {
+            eventScreenCtrl.showExpenseList();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -135,6 +142,14 @@ public class MainCtrl {
         Event event = server.getEvent(eventCode);
         expenseScreenCtrl.resetAll();
         expenseScreenCtrl.refresh(event);
+        expenseScreenCtrl.setToEdit(false);
+        primaryStage.setScene(expenseScene);
+    }
+    public void switchToEditExpense(long expenseId) {
+        Event event = server.getEvent(eventCode);
+        expenseScreenCtrl.setToEdit(true);
+        expenseScreenCtrl.refresh(event);
+        expenseScreenCtrl.setExpense(expenseId);
         primaryStage.setScene(expenseScene);
     }
 

@@ -57,6 +57,7 @@ public class EventScreenCtrl implements Initializable{
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private Event event;
+    private Map<Long, HBox> hBoxMap;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -69,6 +70,7 @@ public class EventScreenCtrl implements Initializable{
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.event = null;
+        this.hBoxMap = new HashMap<>();
     }
 
     /**
@@ -225,15 +227,35 @@ public class EventScreenCtrl implements Initializable{
      * the action when we press the "All" button
      * @param actionEvent on button click event
      */
-    public void showExpenses(ActionEvent actionEvent) throws FileNotFoundException {
+    public void showExpenses() throws FileNotFoundException {
+        showExpenseList();
+    }
+
+    public void showExpenseList () throws FileNotFoundException {
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             String log = expense.stringOnScreen();
-            Label expenseText = new Label(log);
+            Label expenseText = generateExpenseLabel(expense.getId(), log);
             HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
+            expenseBox.setSpacing(10);
+            hBoxMap.put(expense.getId(), expenseBox);
             expenseBox.setAlignment(CENTER_LEFT);
             expensesLogListView.getItems().add(expenseBox);
         }
+    }
+
+    public Label generateExpenseLabel(long expenseId, String expenseTitle) {
+        Label expense = new Label(expenseTitle);
+        expense.setOnMouseEntered(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.HAND);
+        });
+        expense.setOnMouseExited(mouseEvent -> {
+            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
+        });
+        expense.setOnMouseClicked(mouseEvent -> {
+            mainCtrl.switchToEditExpense(expenseId);
+            });
+        return expense;
     }
 
     public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
@@ -252,13 +274,19 @@ public class EventScreenCtrl implements Initializable{
             mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
         });
         imageView.setOnMouseClicked(mouseEvent -> {
-            removeFromList(expenseId);
+            try {
+                removeFromList(expenseId);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
         return imageView;
     }
 
-    public void removeFromList(long id) {
+    public void removeFromList(long id) throws FileNotFoundException {
         server.deleteExpenseForEvent(event.getId(), id);
+        HBox hBox = hBoxMap.get(id);
+        expensesLogListView.getItems().remove(hBox);
     }
 
 
@@ -268,13 +296,6 @@ public class EventScreenCtrl implements Initializable{
      */
     public void settleDebts(ActionEvent actionEvent) {
         mainCtrl.switchToSettleScreen();
-    }
-
-    public HBox generateHBox(Label label, ImageView imageView){
-        HBox hbox = new HBox(imageView, label);
-        hbox.setSpacing(10);
-        hbox.setAlignment(CENTER_LEFT);
-        return hbox;
     }
 
     /**
