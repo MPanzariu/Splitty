@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
+import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
 @Service
@@ -23,11 +24,25 @@ public class ParticipantService {
      * @param participantRepository used for handling participants
      */
     @Autowired
-    public ParticipantService(EventRepository eventRepository, ParticipantRepository participantRepository,
+    public ParticipantService(EventRepository eventRepository,
+                              ParticipantRepository participantRepository,
                               ExpenseRepository expenseRepository) {
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
         this.expenseRepository = expenseRepository;
+    }
+
+    /**
+     * Add a new participant to an event, add a new participant to the repository
+     * @param participantName the name of the participant we want to add
+     * @param eventId the event to which we want to add a participant
+     */
+    public void addParticipantToEvent(String eventId, String participantName) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        Participant participant = new Participant(participantName);
+        event.addParticipant(participant);
+        eventRepository.save(event);
     }
 
     /**

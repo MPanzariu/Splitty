@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
+import server.websockets.WebSocketService;
 
 
 import java.util.Date;
@@ -28,6 +28,8 @@ public class EventControllerTest {
 
     @Mock
     EventService eventService;
+    @Mock
+    private WebSocketService socketService;
     @InjectMocks
     EventController controller;
     @Captor
@@ -216,35 +218,6 @@ public class EventControllerTest {
         assertThrows(EntityNotFoundException.class, () -> {
             controller.editTitle(event.getId(), "New Title");});
         verify(eventService).editTitle(event.getId(), "New Title");
-    }
-
-    /**
-     * tests the http status after adding a participant
-     */
-    @Test
-    void addParticipantStatus(){
-        Event event = new Event("test", null);
-        doNothing().when(eventService).addParticipantToEvent(anyString(), anyString());
-        ResponseEntity<Void> response = controller.addParticipantToEvent(event.getId(), "John");
-        verify(eventService).addParticipantToEvent(eq(event.getId()), eq("John"));
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    }
-
-    /**
-     * tests adding a participant to an event which does not exist
-     */
-    @Test
-    void addParticipantNotExistent(){
-        Event event = new Event("test", null);
-        doThrow(new EntityNotFoundException(":{")).when(eventService).addParticipantToEvent(anyString(), anyString());
-        try {
-            controller.addParticipantToEvent(event.getId(), "Participant");
-        } catch (EntityNotFoundException e) {
-            assertThrows(EntityNotFoundException.class, () -> {
-                controller.addParticipantToEvent(event.getId(), "Participant");
-            });
-        }
-        verify(eventService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()), eq("Participant"));
     }
 
 //    @Test

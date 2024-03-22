@@ -14,6 +14,7 @@ import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -122,5 +123,30 @@ public class ParticipantServiceTest {
         Event mockEvent = new Event("Sample Event", null);
         Participant mockParticipant = new Participant(participantName);
         assertThrows(EntityNotFoundException.class, () -> participantService.editParticipant(mockParticipant.getId(), mockParticipant));
+    }
+
+    /**
+     * tests whether adding a participant to an existing event works
+     */
+    @Test
+    public void addParticipantsTest(){
+        Event event = new Event("test", null);
+        Participant participant = new Participant();
+        when(eventRepository.findById(anyString())).
+                thenReturn(Optional.of(event));
+        participantService.addParticipantToEvent("Name Surname", event.getId());
+        verify(eventRepository).save(event);
+        Set<Participant> participants = event.getParticipants();
+        assertEquals(1, participants.size());
+    }
+
+    /**
+     * tests whether an exception is raised when trying to add a participant to an event which does not exist
+     */
+    @Test
+    public void addParticipantsNotExistentTest(){
+        Event event = new Event("title", null);
+        assertThrows(EntityNotFoundException.class, () ->
+                participantService.addParticipantToEvent("Participant", event.getId()));
     }
 }

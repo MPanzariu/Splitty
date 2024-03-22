@@ -2,26 +2,25 @@ package server.api;
 import commons.Event;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import server.websockets.WebSocketService;
 
-import java.nio.file.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +30,9 @@ public class ParticipantControllerTest {
 
     @Mock
     private ParticipantService participantService;
+
+    @Mock
+    private WebSocketService socketService;
 
     @InjectMocks
     private ParticipantController participantController;
@@ -46,6 +48,35 @@ public class ParticipantControllerTest {
     }
 
     /**
+     * tests the http status after adding a participant
+     */
+    @Test
+    void addParticipantStatus(){
+        Event event = new Event("test", null);
+        doNothing().when(participantService).addParticipantToEvent(anyString(), anyString());
+        ResponseEntity<Void> response = participantController.addParticipantToEvent(event.getId(), "John");
+        verify(participantService).addParticipantToEvent(eq(event.getId()), eq("John"));
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    /**
+     * tests adding a participant to an event which does not exist
+     */
+    @Test
+    void addParticipantNotExistent(){
+        Event event = new Event("test", null);
+        doThrow(new EntityNotFoundException(":{")).when(participantService).addParticipantToEvent(anyString(), anyString());
+        try {
+            participantController.addParticipantToEvent(event.getId(), "Participant");
+        } catch (EntityNotFoundException e) {
+            assertThrows(EntityNotFoundException.class, () -> {
+                participantController.addParticipantToEvent(event.getId(), "Participant");
+            });
+        }
+        verify(participantService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()), eq("Participant"));
+    }
+
+    /**
      * simulate the delete request and check if receives the status OK after the deletion
      * mimicking a call to a REST API
      * @throws Exception if the expected status is not OK or something went wrong in the test
@@ -57,7 +88,7 @@ public class ParticipantControllerTest {
 
         doNothing().when(participantService).removeParticipant(eventId, participantId);
 
-        mockMvc.perform(delete("/api/participants/{eventId}/{participantId}", eventId, participantId)
+        mockMvc.perform(delete("/api/events/{eventId}/participants/{participantId}", eventId, participantId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -71,7 +102,7 @@ public class ParticipantControllerTest {
         Participant participantDetails = new Participant("Jane Doe");
         given(participantService.editParticipant(anyLong(), any(Participant.class)))
                 .willReturn(participantDetails);
-        ResponseEntity<Participant> response = participantController.editParticipant(participantDetails.getId(), participantDetails);
+        ResponseEntity<Participant> response = participantController.editParticipant("ABC123", participantDetails.getId(), participantDetails);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Jane Doe", response.getBody().getName());
     }
@@ -88,7 +119,7 @@ public class ParticipantControllerTest {
                 .willThrow(new EntityNotFoundException("Participant not found"));
 
         assertThrows(EntityNotFoundException.class, () -> {
-            participantController.editParticipant(nonExistentId, participantDetails);
+            participantController.editParticipant("ABC123", nonExistentId, participantDetails);
         }, "Should throw EntityNotFoundException for a nonexistent participant.");
     }
     /**
@@ -100,7 +131,7 @@ public class ParticipantControllerTest {
         Participant participantDetails = new Participant("Jane Doe");
         given(participantService.editParticipant(eq(participantId), any(Participant.class)))
                 .willAnswer(invocation -> invocation.getArgument(1));
-        ResponseEntity<Participant> response = participantController.editParticipant(participantId, participantDetails);
+        ResponseEntity<Participant> response = participantController.editParticipant("ABC123", participantId, participantDetails);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(participantDetails.getName(), response.getBody().getName());
         verify(participantService).editParticipant(eq(participantId), argThat(

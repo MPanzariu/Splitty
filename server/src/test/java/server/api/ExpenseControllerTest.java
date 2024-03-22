@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import server.websockets.WebSocketService;
 
 import java.util.Set;
 
@@ -23,6 +24,10 @@ class ExpenseControllerTest {
 
     @Mock
     private ExpenseService expenseService;
+
+    @Mock
+    private WebSocketService socketService;
+
     @Test
     public void addExpenseToEventTest() {
         String eventId = "sampleEventId";
@@ -56,7 +61,7 @@ class ExpenseControllerTest {
     public void editExistingExpenseTest() {
         Expense expected = new Expense();
         when(expenseService.editExpense(anyLong(), any())).thenReturn(expected);
-        ResponseEntity<Expense> response = expenseController.editExpense(1L, expected);
+        ResponseEntity<Expense> response = expenseController.editExpense("ABC123", 1L, expected);
         assertEquals(expected, response.getBody());
     }
 
@@ -64,7 +69,7 @@ class ExpenseControllerTest {
     public void editNonExistingExpenseTest() {
         Expense expected = new Expense();
         when(expenseService.editExpense(anyLong(), any())).thenThrow(new EntityNotFoundException("test"));
-        assertThrows(EntityNotFoundException.class, () -> expenseController.editExpense(1L, expected));
+        assertThrows(EntityNotFoundException.class, () -> expenseController.editExpense("ABC123", 1L, expected));
     }
 
     //Need to add tests for the delete method

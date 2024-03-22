@@ -1,10 +1,10 @@
 package server.api;
 import commons.Event;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
+import server.websockets.WebSocketService;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,15 +16,20 @@ import java.util.Optional;
 public class EventController {
     private final EventService eventService;
     private EventRepository repository;
+    private final WebSocketService socketService;
     /**
      * Constructor of EventController.
-     * @param eventService the EventService used for backend handling of events
-     * @param repository the EventRepository storing Events
+     *
+     * @param eventService  the EventService used for backend handling of events
+     * @param repository    the EventRepository storing Events
+     * @param socketService the WebSocketService propagating updates
      */
     @Autowired
-    public EventController(EventService eventService, EventRepository repository) {
+    public EventController(EventService eventService, EventRepository repository,
+                           WebSocketService socketService) {
         this.eventService = eventService;
         this.repository = repository;
+        this.socketService = socketService;
     }
 
     /**
@@ -37,6 +42,7 @@ public class EventController {
     public ResponseEntity<Event> editTitle(@PathVariable String eventId,
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
+        socketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok(updatedEvent);
     }
 
@@ -50,19 +56,6 @@ public class EventController {
         assert events != null;
         Collections.sort(events, Comparator.comparing(Event::getLastActivity).reversed());
         return ResponseEntity.ok(events);
-    }
-
-    /**
-     * Creates a new instance of a participant, which is then tied to an event
-     * @param eventId identifies the id for which we want to add a participant
-     * @param participantName the name of the participant we will add
-     * @return returns the status of the operation
-     */
-    @PostMapping("/{eventId}")
-    public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId, @RequestBody
-        String participantName) {
-        eventService.addParticipantToEvent(eventId, participantName);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
