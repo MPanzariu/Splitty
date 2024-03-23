@@ -45,6 +45,7 @@ public class ParticipantScreenCtrl implements Initializable {
     public Button okButton;
 
     private Event event;
+    private long participantId;
 
 
     @Inject
@@ -70,8 +71,16 @@ public class ParticipantScreenCtrl implements Initializable {
 
     public void confirmEdit(ActionEvent actionEvent) {
         Participant participant = addParticipant();
-        server.addParticipant(event.getId(), participant.getName());
-        mainCtrl.switchToEventScreen();
+        System.out.println(participantId);
+        if(participantId == 0){
+            server.addParticipant(event.getId(), participant.getName());
+            mainCtrl.switchToEventScreen();
+        }
+        else {
+            server.editParticipant(event.getId(), participantId, participant);
+            participantId = 0;
+            mainCtrl.switchToParticipantListScreen();
+        }
     }
 
     public void cancel(ActionEvent actionEvent) {
@@ -93,20 +102,8 @@ public class ParticipantScreenCtrl implements Initializable {
         return participant;
     }
 
-    public void editParticipant(){
-        String name = nameField.getText();
-        String email = emailField.getText();
-        String iban = ibanField.getText();
-        try {
-            int bic = Integer.parseInt(String.valueOf(bicField));
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(":<");
-        }
-    }
-
         public void setParticipant(long id) {
-            Set<Participant> participantList = server.getParticipants(event.getId());
+            Set<Participant> participantList = event.getParticipants();
             Participant participantFin = null;
             for(Participant participant: participantList){
                 if(participant.getId() == id) {
@@ -117,6 +114,7 @@ public class ParticipantScreenCtrl implements Initializable {
             if(participantFin == null)
                 return;
             nameField.setText(participantFin.getName());
+            participantId = id;
         }
 
     public void refresh(Event event){

@@ -25,7 +25,6 @@ import com.google.inject.name.Named;
 import commons.Event;
 import commons.Participant;
 import commons.Expense;
-import jakarta.servlet.http.Part;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -107,38 +106,26 @@ public class ServerUtils {
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.delete();
-		if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 			System.out.println("removed");
 		}
 		else {
-			System.out.println("not removed" + response.getStatus());
+			System.out.println("not removed " + response.getStatus());
 		}
 	}
 
 	/**
-	 *
 	 * @param eventId
 	 * @param participant
-	 * @return
 	 */
-	public Participant editParticipant(String eventId, Participant participant) {
-		return ClientBuilder.newClient()
+	public void editParticipant(String eventId, long participantId, Participant participant) {
+		ClientBuilder.newClient()
 				.target(serverURL)
-				.path("api/events/" + eventId + "/participants/" + participant.getId())
+				.path("api/events/" + eventId + "/participants/" + participantId)
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
 	}
-
-	public Set<Participant> getParticipants(String eventId) {
-		return ClientBuilder.newClient()
-				.target(serverURL).path("api/events/" + eventId + "/participants")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(new GenericType<Set<Participant>>() {});
-	}
-
-
 
 	/**
 	 * Sends a POST request to add an expense to a specific event

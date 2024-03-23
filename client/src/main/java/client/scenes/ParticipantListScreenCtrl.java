@@ -44,13 +44,22 @@ public class ParticipantListScreenCtrl implements Initializable {
     }
 
     public void refresh(Event event) {
-
         this.event = event;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        goBack.textProperty().bind(translation.getStringBinding(""));
+        try{
+            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(15);
+            imageView.setFitHeight(15);
+            imageView.setPreserveRatio(true);
+            goBack.setGraphic(imageView);
+        } catch (FileNotFoundException e) {
+            System.out.println("didn't work");
+            throw new RuntimeException(e);
+        }
     }
 
     public void showParticipantList () throws FileNotFoundException {
@@ -58,6 +67,7 @@ public class ParticipantListScreenCtrl implements Initializable {
         for(Participant participant: event.getParticipants()) {
             Label expenseText = generateParticipantLabel(participant.getId(), participant.getName());
             HBox participantBox = new HBox(generateRemoveButton(participant.getId()), expenseText);
+            participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
             map.put(participant.getId(), participantBox);
             participantBox.setAlignment(CENTER_LEFT);
@@ -75,10 +85,12 @@ public class ParticipantListScreenCtrl implements Initializable {
         imageView.setFitWidth(imgSize);
         imageView.setPickOnBounds(true);
         imageView.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getParticipantScene().setCursor(Cursor.HAND);
+            mainCtrl.getParticipantScene().
+                    setCursor(Cursor.HAND);
         });
         imageView.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getParticipantScene().setCursor(Cursor.DEFAULT);
+            mainCtrl.getParticipantScene().
+                    setCursor(Cursor.DEFAULT);
         });
         imageView.setOnMouseClicked(mouseEvent -> {
             try {
@@ -93,13 +105,15 @@ public class ParticipantListScreenCtrl implements Initializable {
     public Label generateParticipantLabel(long participantId, String name) {
         Label participant = new Label(name);
         participant.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getParticipantScene().setCursor(Cursor.HAND);
+            mainCtrl.getParticipantScene()
+                    .setCursor(Cursor.HAND);
         });
         participant.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getParticipantScene().setCursor(Cursor.DEFAULT);
+            mainCtrl.getParticipantScene()
+                    .setCursor(Cursor.DEFAULT);
         });
         participant.setOnMouseClicked(mouseEvent -> {
-            mainCtrl.switchToAddParticipant();
+            mainCtrl.switchToEditParticipant(participantId);
         });
         return participant;
     }
@@ -114,7 +128,6 @@ public class ParticipantListScreenCtrl implements Initializable {
         map.remove(participantId);
         participantList.getItems().remove(hBox);
     }
-
 
 }
 
