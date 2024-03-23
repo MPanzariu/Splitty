@@ -3,10 +3,7 @@ package client.utils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
@@ -47,7 +44,6 @@ public class WebSocketUtils {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                System.out.println("This should print when a message is received, never does");
                 //noinspection unchecked
                 consumer.accept((T) payload);
             }
@@ -59,7 +55,21 @@ public class WebSocketUtils {
         var stomp = new WebSocketStompClient(client);
         stomp.setMessageConverter(new MappingJackson2MessageConverter());
         try{
-            return stomp.connectAsync(url, new StompSessionHandlerAdapter() {}).get();
+            return stomp.connectAsync(url, new StompSessionHandlerAdapter() {
+                @Override
+                public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                    System.out.println("WEBSOCKET EXCEPTION:");
+                    exception.printStackTrace();
+                    super.handleException(session, command, headers, payload, exception);
+                }
+
+                @Override
+                public void handleTransportError(StompSession session, Throwable exception) {
+                    System.out.println("WEBSOCKET TRANSPORT ERROR:");
+                    exception.printStackTrace();
+                    super.handleTransportError(session, exception);
+                }
+            }).get();
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {

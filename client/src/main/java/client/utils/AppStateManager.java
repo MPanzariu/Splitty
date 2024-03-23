@@ -13,7 +13,6 @@ public class AppStateManager {
     }
 
     public void test(String eventID){
-        System.out.println("Yup, this method gets called!");
         String url = "/topic/events/" + eventID;
         socketUtils.registerForMessages((event) ->{
             System.out.println(event.toString());
