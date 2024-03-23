@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class ParticipantScreenCtrl implements Initializable {
     private final ServerUtils server;
@@ -101,11 +103,23 @@ public class ParticipantScreenCtrl implements Initializable {
         catch (IllegalArgumentException e) {
             System.out.println(":<");
         }
-
-        //TODO: Editing participants
     }
+
+        public void setParticipant(long id) {
+            Set<Participant> participantList = server.getParticipants(event.getId());
+            Participant participantFin = null;
+            for(Participant participant: participantList){
+                if(participant.getId() == id) {
+                    participantFin = participant;
+                    break;
+                }
+            }
+            if(participantFin == null)
+                return;
+            nameField.setText(participantFin.getName());
+        }
 
     public void refresh(Event event){
         this.event = event;
     }
-}
+    }
