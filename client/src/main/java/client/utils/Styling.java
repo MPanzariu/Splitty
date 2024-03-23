@@ -4,38 +4,29 @@ import javafx.scene.Node;
 
 public class Styling {
     /**
-     * Adds the success styling to a node
-     * @param node the node to add the styling to
+     * Applies a styling to a node
+     * @param node the node to apply the styling to
+     * @param style the style to apply
      */
-    public static void addErrorStyling(Node node) {
+    public static void applyStyling(Node node, String style) {
         if (node != null) {
-            node.getStyleClass().remove("successText");
-            if (!node.getStyleClass().contains("errorText")) {
-                node.getStyleClass().add("errorText");
-            }
-        }
-    }
-    /**
-     * Adds the error styling to a node
-     * @param node the node to add the styling to
-     */
-    public static void addSuccessStyling(Node node) {
-        if (node != null) {
-            node.getStyleClass().remove("errorText");
-            if (!node.getStyleClass().contains("successText")) {
-                node.getStyleClass().add("successText");
+            if (!node.getStyleClass().contains(style)) {
+                node.getStyleClass().add(style);
             }
         }
     }
 
     /**
-     * Applies positive button styling to a node
+     * Changes the styling of a node
+     * @param node the node to change the styling of
+     * @param oldStyle the old style to remove
+     * @param newStyle the new style to add
      */
-    public static void applyPositiveButtonStyling(Node node) {
+    public static void changeStyling(Node node, String oldStyle, String newStyle) {
         if (node != null) {
-            if (!node.getStyleClass().contains("positiveButton")) {
-                node.getStyleClass().add("positiveButton");
-            }
+            node.getStyleClass().remove(oldStyle);
+            applyStyling(node, newStyle);
         }
     }
+
 }
