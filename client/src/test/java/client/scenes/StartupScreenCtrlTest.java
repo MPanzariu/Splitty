@@ -129,7 +129,7 @@ public class StartupScreenCtrlTest{
         public List<String> calls = new LinkedList<>();
 
         public TestMainController() {
-            super(null, null, null);
+            super(null, null);
         }
 
         @Override

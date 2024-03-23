@@ -15,7 +15,7 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ParticipantScreenCtrl implements Initializable {
+public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -107,5 +107,14 @@ public class ParticipantScreenCtrl implements Initializable {
 
     public void refresh(Event event){
         this.event = event;
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return false;
     }
 }

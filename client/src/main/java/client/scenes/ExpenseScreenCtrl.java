@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
-import java.awt.*;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -25,7 +24,7 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
-public class ExpenseScreenCtrl implements Initializable{
+public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     @FXML
     private Label addEditExpense;
@@ -179,6 +178,15 @@ public class ExpenseScreenCtrl implements Initializable{
         currency.setItems(FXCollections.observableArrayList("", "EUR"));
         choosePayer.setItems(getParticipantList());
         bindToEmpty();
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return false;
     }
 
 

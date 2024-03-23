@@ -2,6 +2,7 @@ package client.utils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javafx.application.Platform;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -12,8 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class WebSocketUtils {
-    private String serverURL;
-    private StompSession session;
+
+    private final StompSession session;
 
 
     /***
@@ -22,7 +23,6 @@ public class WebSocketUtils {
      */
     @Inject
     public WebSocketUtils(@Named("connection.URL") String serverURL) {
-        this.serverURL = serverURL;
         String url = serverURL.replace("http", "ws") + "websocket";
         this.session = connect(url);
     }
@@ -33,10 +33,12 @@ public class WebSocketUtils {
      * @param destination the URL part (e.g. /topics/events/[ID]
      * @param payloadType the Class of the object being sent across the socket
      * @param <T> the Class of the object to be processed (same as of the payload)
+     * @return the Subscription generated, which can be used to unsubscribe
      */
-    public <T> void registerForMessages(Consumer<T> consumer, String destination,
-                                        Class<T> payloadType){
-        session.subscribe(destination, new StompFrameHandler() {
+    public <T> StompSession.Subscription registerForMessages(Consumer<T> consumer,
+                                                             String destination,
+                                                             Class<T> payloadType){
+        return session.subscribe(destination, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return payloadType;
@@ -45,11 +47,16 @@ public class WebSocketUtils {
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
                 //noinspection unchecked
-                consumer.accept((T) payload);
+                Platform.runLater(() -> consumer.accept((T) payload));
             }
         });
     }
 
+    /***
+     * Establishes the STOMP WebSocket
+     * @param url the server URL to use
+     * @return a StompSession for use in further communication
+     */
     private StompSession connect(String url){
         var client = new StandardWebSocketClient();
         var stomp = new WebSocketStompClient(client);
@@ -57,14 +64,19 @@ public class WebSocketUtils {
         try{
             return stomp.connectAsync(url, new StompSessionHandlerAdapter() {
                 @Override
-                public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                public void handleException(StompSession session,
+                                            StompCommand command,
+                                            StompHeaders headers,
+                                            byte[] payload,
+                                            Throwable exception) {
                     System.out.println("WEBSOCKET EXCEPTION:");
                     exception.printStackTrace();
                     super.handleException(session, command, headers, payload, exception);
                 }
 
                 @Override
-                public void handleTransportError(StompSession session, Throwable exception) {
+                public void handleTransportError(StompSession session,
+                                                 Throwable exception) {
                     System.out.println("WEBSOCKET TRANSPORT ERROR:");
                     exception.printStackTrace();
                     super.handleTransportError(session, exception);
