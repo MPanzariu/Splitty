@@ -6,19 +6,19 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,9 +49,11 @@ public class StartupScreenCtrl implements Initializable {
     private Label createEventLabel;
     @FXML
     private Label joinEventLabel;
-
+    @FXML
+    private ComboBox<Locale> languageIndicator;
     private List<AbstractMap.SimpleEntry<Event, HBox>> eventsAndHBoxes;
     private Translation translation;
+    private final LanguageIndicatorCtrl languageCtrl;
 
     /**
      * Constructor
@@ -60,10 +62,12 @@ public class StartupScreenCtrl implements Initializable {
      * @param translation the Translation to use
      */
     @Inject
-    public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                             LanguageIndicatorCtrl languageCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.languageCtrl = languageCtrl;
         eventsAndHBoxes = new ArrayList<>();
     }
 
@@ -81,6 +85,7 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(joinEventFeedback, "empty");
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     /**
@@ -364,6 +369,7 @@ public class StartupScreenCtrl implements Initializable {
             Event event = server.getEvent(id);
             addToHistory(event);
         }
+        languageCtrl.refresh(languageIndicator);
     }
     /**
      * switch to the management overview password (log in) scene

@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -59,12 +60,14 @@ public class EventScreenCtrl implements Initializable{
     private ListView<HBox> expensesLogListView;
     @FXML
     private HBox buttonsHBox;
+    @FXML
+    private ComboBox<Locale> languageIndicator;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final LanguageIndicatorCtrl languageCtrl;
     private Event event;
     private Map<Long, HBox> hBoxMap;
-    //private Map<Long, >
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -72,13 +75,15 @@ public class EventScreenCtrl implements Initializable{
      * @param translation the Translation to use
      */
     @Inject
-    public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                           LanguageIndicatorCtrl languageCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.event = null;
         this.hBoxMap = new HashMap<>();
         this.buttonsHBox = new HBox();
+        this.languageCtrl = languageCtrl;
     }
 
     /**
@@ -136,6 +141,7 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     public void initializeParticipantsCBox() {
@@ -181,6 +187,7 @@ public class EventScreenCtrl implements Initializable{
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
         buttonsHBox.getChildren().clear();
+        languageCtrl.refresh(languageIndicator);
     }
 
     /**

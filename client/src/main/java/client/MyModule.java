@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.scenes.LanguageIndicatorCtrl;
 import client.utils.ConfigUtils;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ObservableResourceFactory;
@@ -37,6 +38,7 @@ public class MyModule implements Module {
         binder.bind(Translation.class).in(Scopes.SINGLETON);
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
+        binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }
