@@ -95,9 +95,9 @@ public class ServerUtils {
 	}
 
 	/**
-	 *
-	 * @param id
-	 * @param participantId
+	 * method for removing participant from event and server
+	 * @param id id of the event
+	 * @param participantId id of the participant to be removed
 	 */
 	public void removeParticipant(String id, long participantId) {
 		Response response = ClientBuilder.newClient()
@@ -115,8 +115,9 @@ public class ServerUtils {
 	}
 
 	/**
-	 * @param eventId
-	 * @param participant
+	 * edits the participant info in the server
+	 * @param eventId the id of the event
+	 * @param participant the participant to be edited
 	 */
 	public void editParticipant(String eventId, long participantId, Participant participant) {
 		ClientBuilder.newClient()

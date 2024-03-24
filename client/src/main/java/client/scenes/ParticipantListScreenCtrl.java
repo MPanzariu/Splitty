@@ -8,7 +8,6 @@ import commons.Participant;
 import jakarta.servlet.http.Part;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import java.awt.event.ActionEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -16,7 +15,6 @@ import java.util.*;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,6 +33,9 @@ public class ParticipantListScreenCtrl implements Initializable {
     Translation translation;
     private Map<Long, HBox> map;
 
+    /**
+     * constructor for the participant list screen
+     */
     @Inject
     public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
         this.server = server;
@@ -42,11 +43,17 @@ public class ParticipantListScreenCtrl implements Initializable {
         this.translation = translation;
         this.map = new HashMap<>();
     }
-
+    /**
+     * updates the event instance
+     * @param event -> new details
+     */
     public void refresh(Event event) {
         this.event = event;
     }
 
+    /**
+     * initializer for the go back button
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try{
@@ -62,6 +69,9 @@ public class ParticipantListScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * generates the participants in the list in the final form
+     */
     public void showParticipantList () throws FileNotFoundException {
         participantList.getItems().clear();
         for(Participant participant: event.getParticipants()) {
@@ -75,6 +85,11 @@ public class ParticipantListScreenCtrl implements Initializable {
         }
     }
 
+    /**
+     * generates the remove button for each participant
+     * @param participantId the participant for which the remove button is being generated
+     * @return returns the symbol
+     */
     public ImageView generateRemoveButton (long participantId) throws FileNotFoundException {
         FileInputStream input = null;
         input = new FileInputStream("client/src/main/resources/images/x_remove.png");
@@ -102,6 +117,12 @@ public class ParticipantListScreenCtrl implements Initializable {
         return imageView;
     }
 
+    /**
+     * generates label for each participant
+     * clicking the participant leads to the add/edit screen of the participant
+     * @param participantId id of the participant
+     * @param name name of the participant
+     */
     public Label generateParticipantLabel(long participantId, String name) {
         Label participant = new Label(name);
         participant.setOnMouseEntered(mouseEvent -> {
@@ -118,10 +139,16 @@ public class ParticipantListScreenCtrl implements Initializable {
         return participant;
     }
 
+    /**
+     * go back method when the button is clicked
+     */
     public void goBack(javafx.event.ActionEvent actionEvent) {
         mainCtrl.switchToEventScreen();
     }
 
+    /**
+     * removes the participant from the list if deleted
+     */
     public void removeFromList(long participantId) throws FileNotFoundException {
         server.removeParticipant(event.getId(), participantId);
         HBox hBox = map.get(participantId);
