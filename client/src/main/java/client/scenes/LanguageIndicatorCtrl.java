@@ -7,6 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
 import java.util.Locale;
@@ -37,7 +39,20 @@ public class LanguageIndicatorCtrl {
                 }
             }
         };
-        languageIndicator.setButtonCell(cellFactory.call(null));
+        languageIndicator.setButtonCell(new ListCell<>() {
+            @Override
+            public void updateItem(Locale item, boolean empty) {
+                super.updateItem(item, empty);
+                if(item == null || empty) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    ImageView flag = loadFlag(item.getLanguage());
+                    flag.setFitWidth(getWidth());
+                    setGraphic(flag);
+                }
+            }
+        });
         languageIndicator.setCellFactory(cellFactory);
     }
 
@@ -48,5 +63,19 @@ public class LanguageIndicatorCtrl {
     public void refresh(ComboBox<Locale> languageIndicator) {
         languages.setAll(translation.getLocale());
         languageIndicator.getSelectionModel().select(translation.getLocale());
+    }
+
+    /**
+     * Retrieves the flag of the given language
+     * @param lang Language code of the flag
+     * @return ImageView of the language flag
+     */
+    private ImageView loadFlag(String lang) {
+        // Should look if caching is beneficial when adding more languages
+        Image defaultLanguage = new Image("images/" + lang + "_flag.png");
+        ImageView iv = new ImageView();
+        iv.setImage(defaultLanguage);
+        iv.setPreserveRatio(true);
+        return iv;
     }
 }
