@@ -7,17 +7,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Locale;
+import java.util.Properties;
 
 public class LanguageSwitchUtils {
     private final ObservableList<Locale> languages = FXCollections.observableArrayList();
     private final Translation translation;
     private final File dir;
+    private final Properties properties;
 
     @Inject
-    public LanguageSwitchUtils(Translation translation, @Named("dir") File dir) {
+    public LanguageSwitchUtils(Translation translation, @Named("dir") File dir,
+                               @Named("config") Properties properties) {
         this.translation = translation;
         this.dir = dir;
+        this.properties = properties;
     }
 
     /**
@@ -27,9 +33,26 @@ public class LanguageSwitchUtils {
     public void setBehavior(ReadOnlyObjectProperty<Locale> property) {
         property.addListener((observable, oldValue, newValue) -> {
             // Languages will be emptied in refresh() method, which should be ignored.
-            if(newValue != null)
+            if(newValue != null) {
                 translation.changeLanguage(newValue);
+                persistLanguage(newValue);
+            }
         });
+    }
+
+    /**
+     * Writes the language to the config file.
+     * @param language The newly selected language
+     */
+    public void persistLanguage(Locale language) {
+        try {
+            FileWriter writer = new FileWriter(ConfigUtils.CONFIG_NAME);
+            properties.setProperty("client.language", language.getLanguage());
+            properties.store(writer, null);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(ConfigUtils.CONFIG_NAME + " is not found!");
+        }
     }
 
     /**
