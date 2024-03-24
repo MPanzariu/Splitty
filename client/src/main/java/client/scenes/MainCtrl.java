@@ -97,6 +97,7 @@ public class MainCtrl {
         controllerMap.put(ExpenseScreenCtrl.class, expenseScreenCtrl);
         controllerMap.put(EditTitleCtrl.class, editTitleCtrl);
         controllerMap.put(ParticipantScreenCtrl.class, participantScreenCtrl);
+        controllerMap.put(ParticipantListScreenCtrl.class, participantListScreenCtrl);
         controllerMap.put(SettleDebtsScreenCtrl.class, settleDebtsScreenCtrl);
         manager.setControllerMap(controllerMap);
 
@@ -174,14 +175,12 @@ public class MainCtrl {
     }
 
     public void switchToParticipantListScreen() {
-        Event event = server.getEvent(eventCode);
-        participantListScreenCtrl.refresh(event);
+        switchScreens(ParticipantListScreenCtrl.class);
         primaryStage.setScene(participantListScene);
     }
 
     public void switchToEditParticipant(long participantId) {
-        Event event = server.getEvent(eventCode);
-        participantScreenCtrl.refresh(event);
+        switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
         primaryStage.setScene(participantScene);
     }

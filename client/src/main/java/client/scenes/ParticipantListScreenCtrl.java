@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import commons.Event;
 import client.utils.Styling;
 import commons.Participant;
-import jakarta.servlet.http.Part;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import java.io.FileInputStream;
@@ -26,7 +25,7 @@ import javafx.scene.layout.Region;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class ParticipantListScreenCtrl implements Initializable {
+public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshable {
     private Event event;
     @FXML
     public Button goBack;
@@ -53,11 +52,12 @@ public class ParticipantListScreenCtrl implements Initializable {
      */
     public void refresh(Event event) {
         this.event = event;
-        try {
-            showParticipantList();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        showParticipantList();
+    }
+
+    @Override
+    public boolean shouldLiveRefresh() {
+        return true;
     }
 
     /**
@@ -82,7 +82,7 @@ public class ParticipantListScreenCtrl implements Initializable {
     /**
      * generates the participants in the list in the final form
      */
-    public void showParticipantList () throws FileNotFoundException {
+    public void showParticipantList () {
         participantList.getItems().clear();
         for(Participant participant: event.getParticipants()) {
             HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
@@ -103,9 +103,13 @@ public class ParticipantListScreenCtrl implements Initializable {
      * @param participantId the participant for which the remove button is being generated
      * @return returns the symbol
      */
-    public ImageView generateRemoveButton (long participantId) throws FileNotFoundException {
-        FileInputStream input = null;
-        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+    public ImageView generateRemoveButton(long participantId) {
+        FileInputStream input;
+        try {
+            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         int imgSize = 15;
@@ -121,11 +125,7 @@ public class ParticipantListScreenCtrl implements Initializable {
                     setCursor(Cursor.DEFAULT);
         });
         imageView.setOnMouseClicked(mouseEvent -> {
-            try {
-                removeFromList(participantId);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            removeFromList(participantId);
         });
         return imageView;
     }
@@ -166,7 +166,7 @@ public class ParticipantListScreenCtrl implements Initializable {
     /**
      * removes the participant from the list if deleted
      */
-    public void removeFromList(long participantId) throws FileNotFoundException {
+    public void removeFromList(long participantId){
         server.removeParticipant(event.getId(), participantId);
         HBox hBox = map.get(participantId);
         map.remove(participantId);
