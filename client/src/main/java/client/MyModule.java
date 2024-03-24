@@ -24,6 +24,7 @@ import com.google.inject.Scopes;
 import client.scenes.MainCtrl;
 import com.google.inject.name.Names;
 
+import java.io.File;
 import java.util.Properties;
 
 public class MyModule implements Module {
@@ -36,6 +37,7 @@ public class MyModule implements Module {
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
         binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(File.class).annotatedWith(Names.named("dir")).toInstance(new File("lang"));
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }

@@ -1,9 +1,9 @@
 package client.scenes;
 
+import client.utils.LanguageSwitchUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -14,19 +14,23 @@ import javafx.util.Callback;
 import java.util.Locale;
 
 public class LanguageIndicatorCtrl {
-    ObservableList<Locale> languages = FXCollections.observableArrayList();
-    private Translation translation;
+    private final Translation translation;
+    private final LanguageSwitchUtils utils;
 
     @Inject
-    public LanguageIndicatorCtrl(Translation translation) {
+    public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils) {
         this.translation = translation;
+        this.utils = utils;
     }
 
     /**
-     * Initialize language indicator with a list of languages.
+     * Set up the language indicator.
+     * Graphics of the indicator are set here.
+     * Behavior for changing the language is set here.
+     * @param languageIndicator Give language indicator
      */
     public void initializeLanguageIndicator(ComboBox<Locale> languageIndicator) {
-        languageIndicator.setItems(languages);
+        languageIndicator.setItems(utils.getLanguages());
         Callback<ListView<Locale>, ListCell<Locale>> cellFactory = listView -> new ListCell<>() {
             @Override
             public void updateItem(Locale item, boolean empty) {
@@ -54,20 +58,23 @@ public class LanguageIndicatorCtrl {
             }
         });
         languageIndicator.setCellFactory(cellFactory);
+        ReadOnlyObjectProperty<Locale> selectedLanguage = languageIndicator.getSelectionModel().selectedItemProperty();
+        utils.setBehavior(selectedLanguage);
     }
 
     /**
      * Refresh the given language indicator.
+     * Its list view will be updated as well.
      * @param languageIndicator Language Indicator combo box
      */
     public void refresh(ComboBox<Locale> languageIndicator) {
-        languages.setAll(translation.getLocale());
+        utils.refreshLanguages();
         languageIndicator.getSelectionModel().select(translation.getLocale());
     }
 
     /**
      * Retrieves the flag of the given language
-     * @param lang Language code of the flag
+     * @param lang - Language code of the flag
      * @return ImageView of the language flag
      */
     public ImageView loadFlag(String lang) {
