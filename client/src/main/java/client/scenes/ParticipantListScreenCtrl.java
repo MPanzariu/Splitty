@@ -3,7 +3,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
+import client.utils.Styling;
 import commons.Participant;
 import jakarta.servlet.http.Part;
 import javafx.fxml.FXML;
@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
+
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,6 +21,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
@@ -49,6 +53,11 @@ public class ParticipantListScreenCtrl implements Initializable {
      */
     public void refresh(Event event) {
         this.event = event;
+        try {
+            showParticipantList();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -63,6 +72,7 @@ public class ParticipantListScreenCtrl implements Initializable {
             imageView.setFitHeight(15);
             imageView.setPreserveRatio(true);
             goBack.setGraphic(imageView);
+            Styling.applyPositiveButtonStyling(goBack);
         } catch (FileNotFoundException e) {
             System.out.println("didn't work");
             throw new RuntimeException(e);
@@ -75,8 +85,11 @@ public class ParticipantListScreenCtrl implements Initializable {
     public void showParticipantList () throws FileNotFoundException {
         participantList.getItems().clear();
         for(Participant participant: event.getParticipants()) {
-            Label expenseText = generateParticipantLabel(participant.getId(), participant.getName());
-            HBox participantBox = new HBox(generateRemoveButton(participant.getId()), expenseText);
+            HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
+            Region region = new Region();
+            HBox.setHgrow(region, Priority.ALWAYS);
+            HBox participantBox = new HBox(generateRemoveButton(participant.getId()), participantB1, region);
+            participantBox.setAlignment(Pos.CENTER_RIGHT);
             participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
             map.put(participant.getId(), participantBox);
@@ -123,20 +136,24 @@ public class ParticipantListScreenCtrl implements Initializable {
      * @param participantId id of the participant
      * @param name name of the participant
      */
-    public Label generateParticipantLabel(long participantId, String name) {
+    public HBox generateParticipantBox(long participantId, String name) {
+        HBox hbox = new HBox();
+        Region region = new Region();
+        HBox.setHgrow(region, Priority.ALWAYS);
         Label participant = new Label(name);
-        participant.setOnMouseEntered(mouseEvent -> {
+        hbox.getChildren().addAll(participant, region);
+        hbox.setOnMouseEntered(mouseEvent -> {
             mainCtrl.getParticipantScene()
                     .setCursor(Cursor.HAND);
         });
-        participant.setOnMouseExited(mouseEvent -> {
+        hbox.setOnMouseExited(mouseEvent -> {
             mainCtrl.getParticipantScene()
                     .setCursor(Cursor.DEFAULT);
         });
-        participant.setOnMouseClicked(mouseEvent -> {
+        hbox.setOnMouseClicked(mouseEvent -> {
             mainCtrl.switchToEditParticipant(participantId);
         });
-        return participant;
+        return hbox;
     }
 
     /**

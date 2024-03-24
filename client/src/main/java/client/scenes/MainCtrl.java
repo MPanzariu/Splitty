@@ -173,11 +173,6 @@ public class MainCtrl {
         Event event = server.getEvent(eventCode);
         participantListScreenCtrl.refresh(event);
         primaryStage.setScene(participantListScene);
-        try {
-            participantListScreenCtrl.showParticipantList();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void switchToEditParticipant(long participantId) {
