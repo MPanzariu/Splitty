@@ -70,9 +70,9 @@ public class LanguageIndicatorCtrl {
      * @param lang Language code of the flag
      * @return ImageView of the language flag
      */
-    private ImageView loadFlag(String lang) {
+    public ImageView loadFlag(String lang) {
         // Should look if caching is beneficial when adding more languages
-        Image defaultLanguage = new Image("images/" + lang + "_flag.png");
+        Image defaultLanguage = new Image("images/flags/" + lang + "_flag.png");
         ImageView iv = new ImageView();
         iv.setImage(defaultLanguage);
         iv.setPreserveRatio(true);

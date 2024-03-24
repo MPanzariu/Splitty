@@ -16,10 +16,7 @@
 package client;
 
 import client.scenes.LanguageIndicatorCtrl;
-import client.utils.ConfigUtils;
-import client.utils.ManagementOverviewUtils;
-import client.utils.ObservableResourceFactory;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
