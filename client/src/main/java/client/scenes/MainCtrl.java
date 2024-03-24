@@ -27,9 +27,10 @@ public class MainCtrl {
 
     private Scene participantScene;
     private ParticipantScreenCtrl participantScreenCtrl;
-
+    private Scene participantListScene;
     private Scene editTitleScene;
     private Scene managementOvervirewPasswordScene;
+    private ParticipantListScreenCtrl participantListScreenCtrl;
     private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
@@ -37,7 +38,6 @@ public class MainCtrl {
     private Scene settleDebtsScene;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-
     private final Translation translation;
     @Inject
     @Named("client.language")
@@ -60,7 +60,8 @@ public class MainCtrl {
                            Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPasswordUI,
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
-                           Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI){
+                           Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
+                           Pair<ParticipantListScreenCtrl, Parent> participantListUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -71,7 +72,8 @@ public class MainCtrl {
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
-
+        this.participantListScene = new Scene(participantListUI.getValue());
+        this.participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
 
@@ -146,6 +148,10 @@ public class MainCtrl {
         return eventScene;
     }
 
+    public Scene getParticipantScene(){
+        return participantScene;
+    }
+
     public void switchToAddExpense() {
         switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.resetAll();
@@ -167,9 +173,19 @@ public class MainCtrl {
         primaryStage.setScene(participantScene);
     }
 
-    public void switchToAddParticipantExistent() {
-        //TODO: Implement editing participants
+    public void switchToParticipantListScreen() {
+        Event event = server.getEvent(eventCode);
+        participantListScreenCtrl.refresh(event);
+        primaryStage.setScene(participantListScene);
     }
+
+    public void switchToEditParticipant(long participantId) {
+        Event event = server.getEvent(eventCode);
+        participantScreenCtrl.refresh(event);
+        participantScreenCtrl.setParticipant(participantId);
+        primaryStage.setScene(participantScene);
+    }
+
 
     /**
      * switch to the log in page for the management overview

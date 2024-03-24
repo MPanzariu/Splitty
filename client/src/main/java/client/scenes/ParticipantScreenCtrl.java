@@ -11,9 +11,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
@@ -43,8 +43,14 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     public Button okButton;
 
     private Event event;
+    private long participantId;
 
-
+    /**
+     * constructor
+     * @param server -> the server
+     * @param mainCtrl main controller
+     * @param translation for translating buttons and fields
+     */
     @Inject
     public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
         this.server = server;
@@ -52,6 +58,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         this.translation = translation;
     }
 
+    /**
+     *binder for the buttons, fields, labels
+     */
     public void initialize(URL location, ResourceBundle resources) {
         title.textProperty().bind(translation.getStringBinding("Participants.Label.title"));
         abortButton.textProperty().bind(translation.getStringBinding("Participants.Button.abort"));
@@ -66,16 +75,37 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
     }
 
+    /**
+     * method for clicking 'ok' in add/edit participant screen
+     * if the participant is new it is added to the event
+     * otherwise edits the participant
+     */
     public void confirmEdit(ActionEvent actionEvent) {
         Participant participant = addParticipant();
-        server.addParticipant(event.getId(), participant.getName());
-        mainCtrl.switchToEventScreen();
+        System.out.println(participantId);
+        if(participantId == 0){
+            server.addParticipant(event.getId(), participant.getName());
+            mainCtrl.switchToEventScreen();
+        }
+        else {
+            server.editParticipant(event.getId(), participantId, participant);
+            participantId = 0;
+            mainCtrl.switchToParticipantListScreen();
+        }
     }
 
+    /**
+     * takes you back to the event screen if 'abort' is clicked
+     */
     public void cancel(ActionEvent actionEvent) {
         mainCtrl.switchToEventScreen();
     }
 
+    /**
+     * creates an instance of a participant which is being assigned/updated
+     * in the confirm method
+     * @return returns the new participant
+     */
     public Participant addParticipant(){
         String name = nameField.getText();
         String email = emailField.getText();
@@ -91,20 +121,30 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         return participant;
     }
 
-    public void editParticipant(){
-        String name = nameField.getText();
-        String email = emailField.getText();
-        String iban = ibanField.getText();
-        try {
-            int bic = Integer.parseInt(String.valueOf(bicField));
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(":<");
+    /**
+     * sets up the screen when editing a participant
+     * -> selects details of the participant in the current state
+     * @param id -> id of the participant
+     */
+        public void setParticipant(long id) {
+            Set<Participant> participantList = event.getParticipants();
+            Participant participantFin = null;
+            for(Participant participant: participantList){
+                if(participant.getId() == id) {
+                    participantFin = participant;
+                    break;
+                }
+            }
+            if(participantFin == null)
+                return;
+            nameField.setText(participantFin.getName());
+            participantId = id;
         }
 
-        //TODO: Editing participants
-    }
-
+    /**
+     * updates the event instance
+     * @param event -> new details
+     */
     public void refresh(Event event){
         this.event = event;
     }
