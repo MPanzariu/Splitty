@@ -31,7 +31,6 @@ public class WebSocketService {
     public void propagateEventUpdate(String eventID){
         Event updatedEvent = eventRepository.findById(eventID)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-        System.out.println("Does run, and propagates event: " + eventID);
         socketMessenger.convertAndSend(eventUpdateURL(eventID), updatedEvent);
     }
 

@@ -278,7 +278,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     public void setExpense(long id) {
-        Set<Expense> expenses = server.getExpensesForEvent(currentEvent.getId());
+        Set<Expense> expenses = currentEvent.getExpenses();
         Expense expense = null;
         for(Expense exp: expenses){
             if(exp.getId() == id) {

@@ -24,6 +24,7 @@ public class AppStateManager {
     @Inject
     public AppStateManager(WebSocketUtils socketUtils, ServerUtils server) {
         this.socketUtils = socketUtils;
+        socketUtils.startConnection();
         this.server = server;
         this.currentClientSubscription = null;
         this.currentlyOpen = null;
