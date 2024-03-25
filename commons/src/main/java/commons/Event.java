@@ -11,7 +11,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,7 +20,7 @@ public class Event{
     private String id;
     private String title;
     private Date creationDate;
-    private LocalDateTime lastActivity;
+    private Date lastActivity;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,7 +44,7 @@ public class Event{
         this.expenses = new HashSet<>();
         this.id = generateId();
         this.creationDate = creationDate;
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -167,7 +166,7 @@ public class Event{
      */
     public void setTitle(String title) {
         this.title = title;
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -192,7 +191,7 @@ public class Event{
      */
     public void addParticipant(Participant participant){
         participants.add(participant);
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -201,7 +200,7 @@ public class Event{
      */
     public void removeParticipant(Participant participant){
         participants.remove(participant);
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -218,7 +217,7 @@ public class Event{
      */
     public void addExpense(Expense expense){
         expenses.add(expense);
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -227,7 +226,7 @@ public class Event{
      */
     public void removeExpense(Expense expense){
         expenses.remove(expense);
-        this.lastActivity = LocalDateTime.now();
+        this.lastActivity = new Date();
     }
 
     /***
@@ -242,10 +241,10 @@ public class Event{
      * Getter for Event last date of activity
      * @return Event last date of activity
      */
-    public LocalDateTime getLastActivity(){
+    public Date getLastActivity(){
         return lastActivity;
     }
-    public void setLastActivity(LocalDateTime lastActivity) {
+    public void setLastActivity(Date lastActivity) {
         this.lastActivity = lastActivity;
     }
 
