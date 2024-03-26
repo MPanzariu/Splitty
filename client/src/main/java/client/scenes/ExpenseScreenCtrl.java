@@ -288,8 +288,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             participant = participantIterator.next();
             if(participant.getName().equals(participantName)) break;
         }
-
-        return new Expense(name, priceInCents, expenseDate, participant);
+        Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
+        //resultExpense.addParticipantToExpense(currentEvent.getParticipants());
+        return resultExpense;
     }
 
     /**

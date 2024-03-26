@@ -301,13 +301,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * show the participants of the current event
      */
     private void updateParticipantsDropdown(){
-        cBoxParticipantExpenses.getItems().clear();
+        List<String> names = new ArrayList<>();
+        var boxItems = cBoxParticipantExpenses.getItems();
         //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
-            Label participantLabel = createParticipantLabel(current.getName(),
-                current.getId());
-            cBoxParticipantExpenses.getItems().add(current.getName());
+            names.add(current.getName());
         }
+        boxItems.retainAll(names);
+        names.removeAll(boxItems);
+        boxItems.addAll(names);
     }
 
     /**
@@ -354,7 +356,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Button selectedButton = selectedExpenseListButton;
         if(selectedButton==null) selectedButton = allExpenses;
         if(selectedButton==allExpenses) showAllExpenseList();
-        else if(selectedButton==fromButton); //only From someone (unimplemented)
+        else if(selectedButton==fromButton) fromFilter(); //only From someone (unimplemented)
         else; //only Including someone (unimplemented)
     }
 
@@ -367,11 +369,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             HBox expenseBox = null;
-            try {
-                expenseBox = generateExpenseBox(expense);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            expenseBox = generateExpenseBox(expense);
             expensesLogListView.getItems().add(expenseBox);
         }
     }
@@ -383,7 +381,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @throws FileNotFoundException in case the file for the remove button isn't found
      * an exception is thrown
      */
-    public HBox generateExpenseBox(Expense expense) throws FileNotFoundException {
+    public HBox generateExpenseBox(Expense expense) {
         String log = expense.stringOnScreen();
         Label expenseText = generateExpenseLabel(expense.getId(), log);
         ImageView xButton = generateRemoveButton(expense.getId());
@@ -423,9 +421,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @throws FileNotFoundException in case the image isn't found,
      * this exception is thrown
      */
-    public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
+    public ImageView generateRemoveButton (long expenseId) {
         FileInputStream input = null;
-        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        try {
+            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         int imgSize = 15;
@@ -480,10 +482,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     /**
      * Filters the expenses, showing only the ones that were paid by a certain participant
-     * @param actionEvent when From button is pressed
-     * @throws FileNotFoundException in case the file isn't found the exception is thrown
      */
-    public void fromFilter(ActionEvent actionEvent) throws FileNotFoundException {
+    public void fromFilter() {
+        selectedExpenseListButton = fromButton;
         expensesLogListView.getItems().clear();
         String name = cBoxParticipantExpenses.getValue();
         for(Expense expense: event.getExpenses())
@@ -494,20 +495,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Resets all the filters
-     * @param actionEvent when the all button is pressed
-     * @throws FileNotFoundException in case the file isn't found the exception is thrown
-     */
-    public void allFilter(ActionEvent actionEvent) throws FileNotFoundException {
-        showAllExpenseList();
-    }
-
-    /**
      * Filters the expenses, showing the one a certain participant is part of
-     * @param actionEvent when the Including button is pressed
-     * @throws FileNotFoundException in case the file isn't found the exception is thrown
      */
-    public void IncludingFilter(ActionEvent actionEvent) throws FileNotFoundException {
+    public void IncludingFilter() {
+        selectedExpenseListButton = inButton;
         //note: Because for the moment the expenses are split equally between all participants
         //the Including filter is useless since, by definition if someone is part of an event
         //they are part of all the expenses in that event

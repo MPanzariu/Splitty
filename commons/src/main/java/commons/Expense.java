@@ -10,6 +10,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Expense.class)
@@ -24,6 +26,9 @@ public class Expense{
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
+//    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+//    private Set<Participant> participantsInExpense;
+
     @SuppressWarnings("unused")
     public Expense() {}
 
@@ -32,6 +37,7 @@ public class Expense{
         this.priceInCents = priceInCents;
         this.date = date;
         this.owedTo = owedTo;
+        //this.participantsInExpense = new HashSet<>();
     }
 
     public long getId() {
@@ -69,6 +75,13 @@ public class Expense{
     public Participant getOwedTo(){
         return owedTo;
     }
+
+//    public Set<Participant> getParticipantsInExpense() {
+//        return participantsInExpense;
+//    }
+//    public void addParticipantToExpense(Set<Participant> participantSet) {
+//        participantsInExpense.addAll(participantSet);
+//    }
 
     @Override
     public boolean equals(Object obj) {
