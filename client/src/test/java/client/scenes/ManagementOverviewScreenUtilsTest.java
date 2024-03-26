@@ -13,10 +13,8 @@ import javafx.collections.ObservableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -158,9 +156,12 @@ public class ManagementOverviewScreenUtilsTest {
      */
     @Test
     public void sortEventsByLastActivityInAscendingOrder() {
-        e1.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 1));
-        e2.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 2));
-        e3.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 3));
+        Date date1 = new Date(10000);
+        Date date2 = new Date(20000);
+        Date date3 = new Date(30000);
+        e1.setLastActivity(date1);
+        e2.setLastActivity(date2);
+        e3.setLastActivity(date3);
         utils.bindOrder(ascending);
         utils.sortEvents(lastActivity);
         assertEquals(FXCollections.observableArrayList(e1, e2, e3), utils.getEvents());
@@ -171,9 +172,12 @@ public class ManagementOverviewScreenUtilsTest {
      */
     @Test
     public void sortEventsByLastActivityInDescendingOrder() {
-        e1.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 1));
-        e2.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 2));
-        e3.setLastActivity(LocalDateTime.of(0, 1, 1, 0, 3));
+        Date date1 = new Date(10000);
+        Date date2 = new Date(20000);
+        Date date3 = new Date(30000);
+        e1.setLastActivity(date1);
+        e2.setLastActivity(date2);
+        e3.setLastActivity(date3);
         utils.bindOrder(descending);
         utils.sortEvents(lastActivity);
         assertEquals(FXCollections.observableArrayList(e3, e2, e1), utils.getEvents());

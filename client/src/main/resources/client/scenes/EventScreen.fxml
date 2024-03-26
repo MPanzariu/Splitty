@@ -55,7 +55,7 @@
          </styleClass></Button>
       <HBox layoutX="160.0" layoutY="313.0" prefHeight="25.0" prefWidth="374.0">
          <children>
-            <Button fx:id="allExpensesButton" mnemonicParsing="false" onAction="#showExpenses" prefHeight="25.0" prefWidth="132.0" text="All">
+            <Button fx:id="allExpensesButton" mnemonicParsing="false" onAction="#showAllExpenses" prefHeight="25.0" prefWidth="132.0" text="All">
                <styleClass>
                   <String fx:value="sortButton" />
                   <String fx:value="positiveButton" />

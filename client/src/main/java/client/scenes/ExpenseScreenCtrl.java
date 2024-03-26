@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
-import java.awt.*;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -25,7 +24,7 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
-public class ExpenseScreenCtrl implements Initializable{
+public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     @FXML
     private Label addEditExpense;
@@ -181,6 +180,15 @@ public class ExpenseScreenCtrl implements Initializable{
         bindToEmpty();
     }
 
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return false;
+    }
+
 
     /**
      * When pressing the Cancel button it takes the user
@@ -270,7 +278,7 @@ public class ExpenseScreenCtrl implements Initializable{
     }
 
     public void setExpense(long id) {
-        Set<Expense> expenses = server.getExpensesForEvent(currentEvent.getId());
+        Set<Expense> expenses = currentEvent.getExpenses();
         Expense expense = null;
         for(Expense exp: expenses){
             if(exp.getId() == id) {

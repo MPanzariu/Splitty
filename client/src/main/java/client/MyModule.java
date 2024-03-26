@@ -39,6 +39,8 @@ public class MyModule implements Module {
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
         binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
         binder.bind(File.class).annotatedWith(Names.named("dir")).toInstance(new File(Translation.LANGUAGE_PATH));
+        binder.bind(WebSocketUtils.class).in(Scopes.SINGLETON);
+        binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }
