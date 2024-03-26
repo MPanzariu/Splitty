@@ -76,13 +76,13 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
      * @param actionEvent on button press
      */
     public void logInCheck(ActionEvent actionEvent) {
-        String inputPassword = passwordField.getText();
+        String inputPassword = getPasswordFieldText(passwordField);
         if(inputPassword == null || inputPassword.isEmpty() || !server.checkPassword(inputPassword)){
-            logInFeedback.textProperty().bind(translation.getStringBinding("MOPCtrl.Log.In.Feedback"));
-            passwordField.clear();
+            bindLabel(logInFeedback, "MOPCtrl.Log.In.Feedback");
+            clearPasswordField();
         }
         else{
-            passwordField.clear();
+            clearPasswordField();
             mainCtrl.switchToManagementOverviewScreen();
         }
     }
@@ -93,5 +93,30 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
      */
     public void goBackToMain(ActionEvent actionEvent) {
         mainCtrl.switchBackToMainScreen();
+    }
+
+    /**
+     * Gets the text from the passwordField
+     * @param passwordField the passwordField
+     * @return the text from the passwordField
+     */
+    public String getPasswordFieldText(PasswordField passwordField){
+        return passwordField.getText();
+    }
+
+    /**
+     * Binds a label to a string
+     * @param label the label to bind to
+     * @param str the binding's name
+     */
+    public void bindLabel(Label label, String str){
+        label.textProperty().bind(translation.getStringBinding(str));
+    }
+
+    /**
+     * Clears the passwordField
+     */
+    public void clearPasswordField(){
+        passwordField.clear();
     }
 }
