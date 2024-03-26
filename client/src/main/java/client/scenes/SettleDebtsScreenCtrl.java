@@ -123,7 +123,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private TextArea generateParticipantText(Participant participant){
         TextArea text = new TextArea(participant.getBankDetails());
         text.setEditable(false);
-        text.setPrefRowCount(4);
+        if(participant.hasBankAccount()) text.setPrefRowCount(4);
+        else text.setPrefRowCount(1);
         text.setFont(new Font(14));
         Styling.applyStyling(text, "backgroundLight");
         return text;

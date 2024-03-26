@@ -108,14 +108,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Participant addParticipant(){
         String name = nameField.getText();
+        String accountHolder = null;
         String email = emailField.getText();
         String iban = ibanField.getText();
-        try {
-            int bic = Integer.parseInt(String.valueOf(bicField.getText()));
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(":<");
-        }
+        String bic = bicField.getText();
+
         Participant participant = new Participant(name);
         //remember email iban bic when available
         return participant;
