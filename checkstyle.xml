@@ -45,7 +45,7 @@
         <module name="MethodLength">
             <property name="severity" value="warning"/>
             <property name="tokens" value="METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF"/>
-            <property name="max" value="50"/>
+            <property name="max" value="80"/>
         </module>
         <module name="VisibilityModifier">
             <property name="severity" value="warning"/>
@@ -104,7 +104,7 @@
     <module name="LineLength">
         <property name="severity" value="warning"/>
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="100"/>
+        <property name="max" value="150"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 
