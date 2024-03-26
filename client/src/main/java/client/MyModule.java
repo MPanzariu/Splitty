@@ -36,6 +36,8 @@ public class MyModule implements Module {
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
         binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(WebSocketUtils.class).in(Scopes.SINGLETON);
+        binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }

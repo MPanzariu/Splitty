@@ -25,17 +25,17 @@ import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class EventScreenCtrl implements Initializable{
+public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
     private TextField invitationCode;
     @FXML
     private Button addExpense;
     @FXML
-    Button allExpenses;
+    private Button allExpenses;
     @FXML
-    Button fromButton;
+    private Button fromButton;
     @FXML
-    Button inButton;
+    private Button inButton;
     @FXML
     private Button settleDebtsButton;
     @FXML
@@ -68,6 +68,7 @@ public class EventScreenCtrl implements Initializable{
     private final LanguageIndicatorCtrl languageCtrl;
     private Event event;
     private Map<Long, HBox> hBoxMap;
+    private Button selectedExpenseListButton;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -84,6 +85,7 @@ public class EventScreenCtrl implements Initializable{
         this.hBoxMap = new HashMap<>();
         this.buttonsHBox = new HBox();
         this.languageCtrl = languageCtrl;
+        this.selectedExpenseListButton = null;
     }
 
     /**
@@ -184,10 +186,20 @@ public class EventScreenCtrl implements Initializable{
         updateEventText();
         updateParticipants();
         updateParticipantsDropdown();
+        refreshExpenseList();
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
         buttonsHBox.getChildren().clear();
         languageCtrl.refresh(languageIndicator);
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return true;
     }
 
     /**
@@ -303,26 +315,38 @@ public class EventScreenCtrl implements Initializable{
     /**
      * the action when we press the "All" button
      */
-    public void showExpenses() throws FileNotFoundException {
-        showExpenseList();
+    public void showAllExpenses(){
+        this.selectedExpenseListButton = allExpenses;
+        refreshExpenseList();
+    }
+
+    private void refreshExpenseList() {
+        Button selectedButton = selectedExpenseListButton;
+        if(selectedButton==null) selectedButton = allExpenses;
+        if(selectedButton==allExpenses) showAllExpenseList();
+        else if(selectedButton==fromButton); //only From someone (unimplemented)
+        else; //only Including someone (unimplemented)
     }
 
     /**
      * Generates a list of hBoxes stating with a human-readable String
      * that presents a quick overview of the expense presented
-     * @throws FileNotFoundException in case the image is not found,
      * the method throws an error
      */
-    public void showExpenseList () throws FileNotFoundException {
+    public void showAllExpenseList (){
         expensesLogListView.getItems().clear();
-        for(Expense expense: event.getExpenses()) {
-            String log = expense.stringOnScreen();
-            Label expenseText = generateExpenseLabel(expense.getId(), log);
-            HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
-            expenseBox.setSpacing(10);
-            hBoxMap.put(expense.getId(), expenseBox);
-            expenseBox.setAlignment(CENTER_LEFT);
-            expensesLogListView.getItems().add(expenseBox);
+        try {
+            for (Expense expense : event.getExpenses()) {
+                String log = expense.stringOnScreen();
+                Label expenseText = generateExpenseLabel(expense.getId(), log);
+                HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
+                expenseBox.setSpacing(10);
+                hBoxMap.put(expense.getId(), expenseBox);
+                expenseBox.setAlignment(CENTER_LEFT);
+                expensesLogListView.getItems().add(expenseBox);
+            }
+        } catch (FileNotFoundException e){
+            throw new RuntimeException(e);
         }
     }
 

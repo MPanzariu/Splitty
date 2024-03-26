@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class SettleDebtsScreenCtrl implements Initializable {
+public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final SettleDebtsUtils utils;
@@ -126,7 +126,7 @@ public class SettleDebtsScreenCtrl implements Initializable {
                                         Participant participantOwedTo) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
-        Styling.applyPositiveButtonStyling(button);
+        Styling.applyStyling(button, "positiveButton");
         var onClick = utils.createSettleAction(participantOwes, amount,
                 participantOwedTo, event.getId());
         button.setOnAction(onClick);
@@ -137,7 +137,7 @@ public class SettleDebtsScreenCtrl implements Initializable {
     private Button generateExpandButton(VBox owedToInfoBox) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.expand"));
-        Styling.applyPositiveButtonStyling(button);
+        Styling.applyStyling(button, "positiveButton");
         //This can instead be an image button!
         button.setOnAction(null); //When more features are implemented, this can do something!
         return button;
@@ -166,5 +166,14 @@ public class SettleDebtsScreenCtrl implements Initializable {
      */
     public void switchToEventScreen() {
         mainCtrl.switchToEventScreen();
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return true;
     }
 }
