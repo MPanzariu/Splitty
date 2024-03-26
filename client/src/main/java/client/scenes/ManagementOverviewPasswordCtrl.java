@@ -55,10 +55,9 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        passwordField.promptTextProperty().bind(translation.getStringBinding("MOPCtrl.Password.Field"));
-        inputPasswordLabel.textProperty().bind(translation.getStringBinding("MOPCtrl.Input.Password.Label"));
-        bindLabel(inputPasswordLabel, "MOPCtrl.Input.Password.Label");
-        logInButton.textProperty().bind(translation.getStringBinding("MOPCtrl.Log.In.Button"));
+        translation.bindTextFieldPrompt(passwordField, "MOPCtrl.Password.Field");
+        translation.bindLabel(inputPasswordLabel, "MOPCtrl.Input.Password.Label");
+        translation.bindButton(logInButton, "MOPCtrl.Log.In.Button");
     }
 
     /**
@@ -68,10 +67,11 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
     public void logInCheck(ActionEvent actionEvent) {
         String inputPassword = getPasswordFieldText(passwordField);
         if(inputPassword == null || inputPassword.isEmpty() || !server.checkPassword(inputPassword)){
-            bindLabel(logInFeedback, "MOPCtrl.Log.In.Feedback");
+            translation.bindLabel(logInFeedback, "MOPCtrl.Log.In.Feedback");
             clearPasswordField();
         }
         else{
+            translation.bindLabel(logInFeedback, "Empty");
             clearPasswordField();
             mainCtrl.switchToManagementOverviewScreen();
         }
@@ -82,6 +82,7 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
      * @param actionEvent on button press
      */
     public void goBackToMain(ActionEvent actionEvent) {
+        translation.bindLabel(logInFeedback, "Empty");
         mainCtrl.switchBackToMainScreen();
     }
 
@@ -92,15 +93,6 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
      */
     public String getPasswordFieldText(PasswordField passwordField){
         return passwordField.getText();
-    }
-
-    /**
-     * Binds a label to a string
-     * @param label the label to bind to
-     * @param str the binding's name
-     */
-    public void bindLabel(Label label, String str){
-        label.textProperty().bind(translation.getStringBinding(str));
     }
 
     /**

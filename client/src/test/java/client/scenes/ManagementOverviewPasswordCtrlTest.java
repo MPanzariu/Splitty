@@ -2,17 +2,14 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ManagementOverviewPasswordCtrlTest {
     private Translation translation;
@@ -30,9 +27,9 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckValid() {
         sut.textBoxText = "password";
         when(server.checkPassword("password")).thenReturn(true);
-        assertTrue(sut.bindings.isEmpty());
         sut.logInCheck(null);
-        assertTrue(sut.bindings.isEmpty());
+        //should only contain a binding to empty
+        assertEquals(1, mockingDetails(translation).getInvocations().size());
         assertTrue(sut.textBoxText.isEmpty());
     }
 
@@ -40,9 +37,8 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckNull() {
         sut.textBoxText = null;
         when(server.checkPassword(anyString())).thenReturn(true);
-        assertTrue(sut.bindings.isEmpty());
         sut.logInCheck(null);
-        assertTrue(sut.bindings.contains("MOPCtrl.Log.In.Feedback"));
+        assertEquals(1, mockingDetails(translation).getInvocations().size());
         assertTrue(sut.textBoxText.isEmpty());
     }
 
@@ -50,9 +46,7 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckInvalidPassword() {
         sut.textBoxText = "invalid";
         when(server.checkPassword("invalid")).thenReturn(false);
-        assertTrue(sut.bindings.isEmpty());
         sut.logInCheck(null);
-        assertTrue(sut.bindings.contains("MOPCtrl.Log.In.Feedback"));
         assertTrue(sut.textBoxText.isEmpty());
     }
 
@@ -60,28 +54,34 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckEmptyPassword() {
         sut.textBoxText = "";
         when(server.checkPassword(anyString())).thenReturn(true);
-        assertTrue(sut.bindings.isEmpty());
+        assertEquals(0, mockingDetails(translation).getInvocations().size());
         sut.logInCheck(null);
-        assertTrue(sut.bindings.contains("MOPCtrl.Log.In.Feedback"));
+        assertEquals(1, mockingDetails(translation).getInvocations().size());
         assertTrue(sut.textBoxText.isEmpty());
     }
 
+    @Test
+    void goBackToMainScreen() {
+        sut.goBackToMain(null);
+        assertEquals(1, mockingDetails(mainCtrl).getInvocations().size());
+    }
+
+    @Test
+    void intializeTest(){
+        sut.initialize(null, null);
+        assertEquals(3, mockingDetails(translation).getInvocations().size());
+    }
+
+
     private class TestManagementOverviewPasswordCtrl extends ManagementOverviewPasswordCtrl {
         public String textBoxText;
-        public ArrayList<String> bindings;
         public TestManagementOverviewPasswordCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
             super(server, mainCtrl, translation);
-            bindings = new ArrayList<>();
         }
 
         @Override
         public String getPasswordFieldText(PasswordField passwordField){
             return textBoxText;
-        }
-
-        @Override
-        public void bindLabel(Label label, String str){
-            bindings.add(str);
         }
 
         @Override
