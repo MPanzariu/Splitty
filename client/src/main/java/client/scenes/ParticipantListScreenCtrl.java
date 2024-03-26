@@ -72,7 +72,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
             imageView.setFitHeight(15);
             imageView.setPreserveRatio(true);
             goBack.setGraphic(imageView);
-            Styling.applyPositiveButtonStyling(goBack);
+            Styling.applyStyling(goBack, "positiveButton");
         } catch (FileNotFoundException e) {
             System.out.println("didn't work");
             throw new RuntimeException(e);
