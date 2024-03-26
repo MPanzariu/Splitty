@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -30,11 +31,11 @@ public class EventScreenCtrl implements Initializable{
     @FXML
     private Button addExpense;
     @FXML
-    Button allExpenses;
+    private Button allExpenses;
     @FXML
-    Button fromButton;
+    private Button fromButton;
     @FXML
-    Button inButton;
+    private Button inButton;
     @FXML
     private Button settleDebtsButton;
     @FXML
@@ -79,6 +80,9 @@ public class EventScreenCtrl implements Initializable{
         this.event = null;
         this.hBoxMap = new HashMap<>();
         this.buttonsHBox = new HBox();
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
     }
 
     /**
@@ -96,14 +100,20 @@ public class EventScreenCtrl implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
-        participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
-        expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
-        addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
-        errorInvalidParticipant.textProperty().bind(translation.getStringBinding("empty"));
-        settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        participantsName.textProperty()
+            .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
+        expenseLabel.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
+        addExpense.textProperty()
+            .bind(translation.getStringBinding("Event.Button.AddExpense"));
+        errorInvalidParticipant.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        settleDebtsButton.textProperty()
+            .bind(translation.getStringBinding("Event.Button.SettleDebts"));
         initializeEditTitle();
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -114,7 +124,8 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/add-participant.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/add-participant.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -125,7 +136,8 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/goBack.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -136,6 +148,14 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
+        initializeFilterButtons();
+    }
+
+    public void initializeFilterButtons() {
+        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        allExpenses.getStyleClass().add("button");
     }
 
     public void initializeParticipantsCBox() {
@@ -264,13 +284,14 @@ public class EventScreenCtrl implements Initializable{
      * @param name the name from the buttons
      */
     public void setButtonsNames(String name) {
-        allExpenses = new Button("All");
-        fromButton = new Button("From " + name);
-        inButton = new Button("Including " + name);
+        allExpenses.textProperty().set("All");
+        fromButton.textProperty().set("From " + name);
+        inButton.textProperty().set("Including " + name);
         buttonsHBox.getChildren().clear();
         buttonsHBox.getChildren().add(allExpenses);
         buttonsHBox.getChildren().add(fromButton);
         buttonsHBox.getChildren().add(inButton);
+        buttonsHBox.setAlignment(Pos.CENTER);
     }
 
     /**

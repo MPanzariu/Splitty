@@ -22,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -54,11 +55,7 @@ public class ExpenseScreenCtrl implements Initializable{
     @FXML
     private CheckBox splitBetweenAllCheckBox;
     @FXML
-    private Label splitBetweenAllLabel;
-    @FXML
     private CheckBox splitBetweenCustomCheckBox;
-    @FXML
-    private Label getSplitBetweenCustomLabel;
     @FXML
     private Button cancel;
     @FXML
@@ -68,11 +65,13 @@ public class ExpenseScreenCtrl implements Initializable{
     @FXML
     private Label errorNoPurpose;
     @FXML
-    Label errorAmount;
+    private Label errorAmount;
     @FXML
-    Label errorDate;
+    private Label errorDate;
     @FXML
-    Label errorSplitMethod;
+    private Label errorSplitMethod;
+    @FXML
+    private VBox participantsVBox;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
@@ -144,9 +143,9 @@ public class ExpenseScreenCtrl implements Initializable{
                 .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
         splitMethod.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.split"));
-        splitBetweenAllLabel.textProperty()
+        splitBetweenAllCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitAll"));
-        getSplitBetweenCustomLabel.textProperty()
+        splitBetweenCustomCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitCustom"));
         cancel.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Cancel"));
@@ -234,8 +233,8 @@ public class ExpenseScreenCtrl implements Initializable{
      * in the ExpenseScreen
      */
     public Expense createNewExpense() {
-        String name = expensePurpose.getText();
-        String priceInMoney = sum.getText();
+        String name = getTextFieldText(expensePurpose);
+        String priceInMoney = getTextFieldText(sum);
         double price = 0;
         try {
             price = Double.parseDouble(priceInMoney);
@@ -245,12 +244,12 @@ public class ExpenseScreenCtrl implements Initializable{
         }
         int priceInCents = (int) Math.ceil(price * 100);
         //change in case of wanting to implement another date system
-        LocalDate date = datePicker.getValue();
+        LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
         if(date != null)
             expenseDate = Date.valueOf(datePicker.getValue());
 
-        String participantName = choosePayer.getValue();
+        String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;
         while(participantIterator.hasNext()){
@@ -261,6 +260,32 @@ public class ExpenseScreenCtrl implements Initializable{
         return new Expense(name, priceInCents, expenseDate, participant);
     }
 
+    /**
+     *
+     * @param textField a text field from the screen
+     * @return the text inside the text field
+     */
+    public String getTextFieldText(TextField textField) {
+        return textField.getText();
+    }
+
+    /**
+     *
+     * @param datePicker a chosen date picker
+     * @return the date from the date picker
+     */
+    public LocalDate getLocalDate(DatePicker datePicker) {
+        return datePicker.getValue();
+    }
+
+    /**
+     *
+     * @param comboBox the specified comboBox
+     * @return the text from the comboBox
+     */
+    public String getComboBox(ComboBox<String> comboBox) {
+        return comboBox.getValue();
+    }
     /**
      * Adds the specified expense to the server
      * @param expense the provided expense
@@ -307,7 +332,7 @@ public class ExpenseScreenCtrl implements Initializable{
                 .bind(translation.getStringBinding("Expense.Label.NoPurpose"));
             toAdd = false;
         }
-        if(expense.getPriceInCents() == 0) {
+        if(expense.getPriceInCents() <= 0) {
             errorAmount.textProperty()
                 .bind(translation.getStringBinding("Expense.Label.InvalidAmount"));
             toAdd = false;
@@ -333,6 +358,11 @@ public class ExpenseScreenCtrl implements Initializable{
             mainCtrl.switchToEventScreen();
         }
     }
+
+    public void addParticipants() {
+        currentEvent.getParticipants();
+    }
+
 
     //TODO: 1.Fixing the bindings
     //TODO: 2.Getting the participant that paid (after the participant UI is implemented)

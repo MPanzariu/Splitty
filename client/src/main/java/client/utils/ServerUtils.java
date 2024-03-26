@@ -99,13 +99,14 @@ public class ServerUtils {
 	 * @param eventId the id of the specific event
 	 * @param expense the expense to be added
 	 */
-	public void addExpense(String eventId, Expense expense) {
+	public Expense addExpense(String eventId, Expense expense) {
 		ClientBuilder.newClient()
 				.target(serverURL)
 				.path("api/events/" + eventId + "/expenses")
 				.request(APPLICATION_JSON)
 				.accept(APPLICATION_JSON)
 				.post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+		return expense;
 	}
 
 	/**
@@ -146,7 +147,7 @@ public class ServerUtils {
 	 * @param expense the expense we want the current expense to be updated to
 	 * @return the new expense
 	 */
-	public Expense editExpense(String eventId,long expenseId, Expense expense) {
+	public Expense editExpense(String eventId, long expenseId, Expense expense) {
 		return ClientBuilder.newClient()
 				.target(serverURL)
 				.path("api/events/" + eventId + "/expenses/" + expenseId)
