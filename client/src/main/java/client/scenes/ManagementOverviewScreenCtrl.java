@@ -252,8 +252,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void exportButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
-
-        Styling.addErrorStyling(backupEventFeedbackLabel);
+        Styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
         String eventId = getTextBoxText(backupEventIDTextField);
         Event event;
         try{
@@ -269,7 +268,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             objectMapper.writeValue(backupFile, event);
             System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
-            Styling.addSuccessStyling(backupEventFeedbackLabel);
+            Styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorExportingEvent");
             System.out.printf("Error exporting event %s%n", eventId);
@@ -282,7 +281,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void importButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
-        Styling.addErrorStyling(backupEventFeedbackLabel);
+        Styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
         String eventId = getTextBoxText(backupEventIDTextField);
         objectMapper.registerModule(new JavaTimeModule());
         try {
@@ -293,7 +292,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
             server.addEvent(event);
             initializeAllEvents();
-            Styling.addSuccessStyling(backupEventFeedbackLabel);
+            Styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
 
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");
