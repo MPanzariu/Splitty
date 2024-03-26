@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.SettleDebtsUtils;
 import client.utils.Styling;
 import client.utils.Translation;
@@ -11,13 +12,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.util.Pair;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -68,17 +69,9 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void initialize(URL location, ResourceBundle resources) {
         settleDebtsLabel.textProperty()
                 .bind(translation.getStringBinding("SettleDebts.Label.title"));
-        try{
-            Image image = new Image(
-                    new FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBackButton.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        var backImage = ImageUtils.loadImageFile("goBack.png");
+        var backImageView = ImageUtils.generateImageView(backImage, 20);
+        goBackButton.setGraphic(backImageView);
     }
 
     /***
@@ -88,6 +81,9 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         List<Node> children = settleVBox.getChildren();
         children.clear();
         var owedShares = event.getOwedShares();
+
+        Image expandButtonImage = ImageUtils.loadImageFile("singlearrow.png");
+
         for(Map.Entry<Participant, Integer> entry: owedShares.entrySet()){
             Participant participantOwes = entry.getKey();
             int amount = entry.getValue();
@@ -101,8 +97,11 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
             Participant participantOwedTo = participantOwes; // requisite feature not implemented
 
             Label debtLabel = generateDebtLabel(participantOwes, amount, participantOwedTo);
-            Pane bankDetailsPane = generateBankDetailsPane(participantOwedTo);
-            Button expandButton = generateExpandButton(bankDetailsPane);
+            TextArea participantText = generateParticipantText(participantOwedTo);
+            Pane bankDetailsPane = generateBankDetailsPane(participantText);
+
+            ImageView expandButtonInnerImage = ImageUtils.generateImageView(expandButtonImage, 25);
+            Button expandButton = generateExpandButton(bankDetailsPane, expandButtonInnerImage);
             Button settleButton = generateSettleButton(participantOwes, amount, participantOwedTo);
             HBox debtBox = generateDebtBox(expandButton, debtLabel, settleButton);
             children.addLast(debtBox);
@@ -111,12 +110,23 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
     }
 
-    private Pane generateBankDetailsPane(Participant participant) {
-        Pane pane = new Pane();
-        pane.getChildren().add(new Label(participant.getBankDetails()));
+    private Pane generateBankDetailsPane(TextArea text) {
+        VBox pane = new VBox();
+        pane.getChildren().add(text);
         pane.setVisible(false);
         pane.setManaged(false);
+        Styling.applyStyling(pane, "borderVBox");
+        pane.setMaxWidth(400);
         return pane;
+    }
+
+    private TextArea generateParticipantText(Participant participant){
+        TextArea text = new TextArea(participant.getBankDetails());
+        text.setEditable(false);
+        text.setPrefRowCount(4);
+        text.setFont(new Font(14));
+        Styling.applyStyling(text, "backgroundLight");
+        return text;
     }
 
     private HBox generateDebtBox(Button expandButton, Label debtLabel, Button settleButton){
@@ -143,11 +153,10 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return button;
     }
 
-    private Button generateExpandButton(Pane pane) {
+    private Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
         Button button = new Button();
-        button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.expand"));
         Styling.applyStyling(button, "positiveButton");
-        //This can instead be an image button!
+        button.setGraphic(expandButtonInnerImage);
         button.setOnMouseClicked((action)-> {
             pane.setVisible(!pane.isVisible());
             pane.setManaged(!pane.isManaged());

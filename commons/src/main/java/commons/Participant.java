@@ -43,9 +43,16 @@ public class Participant {
         this.expensesOwedTo = new HashSet<>();
     }
 
+    /***
+     * Generates a String representing all bank details
+     * @return a String representation of a Participant's bank details
+     */
     @JsonIgnore
     public String getBankDetails() {
-        return toString();
+        return "Row 1\n" +
+                "Row 2\n"+
+                "Row 3\n"+
+                "Row 4";
     }
 
     public long getId() {
