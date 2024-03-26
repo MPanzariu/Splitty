@@ -16,7 +16,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket"); //URL for initializing connection
+        registry.addEndpoint("/websocket").setAllowedOrigins("*"); //URL for initializing connection
     }
 
     /***
@@ -26,6 +26,6 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic"); // for subscriptions
-        registry.setApplicationDestinationPrefixes("/ws"); // for sending data
+        registry.setApplicationDestinationPrefixes("/app"); // for sending data
     }
 }

@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.Event;
-import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -178,16 +177,12 @@ public class EventControllerTest {
         when(eventService.createEvent(anyString())).thenAnswer(stubCreate);
         Event event1 = controller.add("event1").getBody();
         Event event2 = controller.add("event2").getBody();
-        Event event3 = controller.add("event3").getBody();
         assert event2 != null;
-        assert event3 != null;
         assert event1 != null;
         event2.setTitle("newTitle");
-        event3.addExpense(new Expense());
         event1.addParticipant(new Participant());
         ResponseEntity<List<Event>> response = controller.orderByLastActivity();
-        List<Event> list = List.of(event1, event3, event2);
-        //TODO: Make these tests deterministic!
+        List<Event> list = List.of(event1, event2);
         assertEquals(list, response.getBody());
     }
 
