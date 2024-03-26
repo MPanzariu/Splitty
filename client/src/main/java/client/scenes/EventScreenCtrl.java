@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.EmailService;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -17,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,6 +71,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Event event;
     private Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
+    @FXML
+    private Button testEmailButton;
+    private EmailService emailService;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -108,6 +113,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
         errorInvalidParticipant.textProperty().bind(translation.getStringBinding("empty"));
         settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
+        testEmailButton.setOnAction(event -> sendTestEmail());
         initializeEditTitle();
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
@@ -144,6 +151,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         }
         initializeParticipantsCBox();
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        emailService = new EmailService();
     }
 
     public void initializeParticipantsCBox() {
@@ -432,5 +440,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public void switchToMainScreen(ActionEvent actionEvent) {
         mainCtrl.showMainScreen();
+    }
+
+    /**
+     * Sends a test email to the user
+     */
+    public void sendTestEmail() {
+        emailService.sendTestEmail();
     }
 }
