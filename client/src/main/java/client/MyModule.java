@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.scenes.LanguageIndicatorCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -34,6 +35,7 @@ public class MyModule implements Module {
         binder.bind(Translation.class).in(Scopes.SINGLETON);
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
+        binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
         binder.bind(WebSocketUtils.class).in(Scopes.SINGLETON);
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
 

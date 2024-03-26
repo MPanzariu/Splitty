@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -59,12 +60,14 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private ListView<HBox> expensesLogListView;
     @FXML
     private HBox buttonsHBox;
+    @FXML
+    private ComboBox<Locale> languageIndicator;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final LanguageIndicatorCtrl languageCtrl;
     private Event event;
     private Map<Long, HBox> hBoxMap;
-    //private Map<Long, >
     private Button selectedExpenseListButton;
     /**
      * Constructor
@@ -73,13 +76,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      */
     @Inject
-    public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                           LanguageIndicatorCtrl languageCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.event = null;
         this.hBoxMap = new HashMap<>();
         this.buttonsHBox = new HBox();
+        this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
     }
 
@@ -138,6 +143,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     public void initializeParticipantsCBox() {
@@ -184,6 +190,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
         buttonsHBox.getChildren().clear();
+        languageCtrl.refresh(languageIndicator);
     }
 
     /***
