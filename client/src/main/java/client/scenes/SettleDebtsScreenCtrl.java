@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class SettleDebtsScreenCtrl implements Initializable {
+public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final SettleDebtsUtils utils;
@@ -166,5 +166,14 @@ public class SettleDebtsScreenCtrl implements Initializable {
      */
     public void switchToEventScreen() {
         mainCtrl.switchToEventScreen();
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return true;
     }
 }

@@ -15,17 +15,21 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class StartupScreenCtrlTest{
 
     private TestStartupScreenCtrl sut;
     private TestServerUtils testServerUtils;
     private TestMainController testMainController;
+    private LanguageIndicatorCtrl languageCtrl;
     @BeforeEach
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController =  new TestMainController();
-        sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null);
+        this.languageCtrl = mock(LanguageIndicatorCtrl.class);
+        sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null,
+                languageCtrl);
 
     }
 
@@ -154,8 +158,9 @@ public class StartupScreenCtrlTest{
          * @param mainCtrl    the MainCtrl instance
          * @param translation the Translation to use
          */
-        public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
-            super(server, mainCtrl, translation);
+        public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                                     LanguageIndicatorCtrl languageCtrl) {
+            super(server, mainCtrl, translation, languageCtrl);
         }
 
         @Override

@@ -13,7 +13,7 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class EditTitleCtrl implements Initializable {
+public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private TextField title;
     @FXML
@@ -56,5 +56,14 @@ public class EditTitleCtrl implements Initializable {
     public void cancel() {
         title.clear();
         mainCtrl.switchToEventScreen();
+    }
+
+    /***
+     * Specifies if the screen should be live-refreshed
+     * @return true if changes should immediately refresh the screen, false otherwise
+     */
+    @Override
+    public boolean shouldLiveRefresh() {
+        return false;
     }
 }

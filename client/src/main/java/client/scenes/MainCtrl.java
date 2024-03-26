@@ -1,16 +1,15 @@
 package client.scenes;
 
-import client.utils.ServerUtils;
+import client.utils.AppStateManager;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MainCtrl {
@@ -28,9 +27,10 @@ public class MainCtrl {
 
     private Scene participantScene;
     private ParticipantScreenCtrl participantScreenCtrl;
-
+    private Scene participantListScene;
     private Scene editTitleScene;
     private Scene managementOvervirewPasswordScene;
+    private ParticipantListScreenCtrl participantListScreenCtrl;
     private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
@@ -38,18 +38,17 @@ public class MainCtrl {
     private Scene settleDebtsScene;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-
     private final Translation translation;
     @Inject
     @Named("client.language")
     private String language;
-    private final ServerUtils server;
+    private final AppStateManager manager;
     private String eventCode;
 
     @Inject
-    public MainCtrl(Translation translation, ServerUtils server) {
+    public MainCtrl(Translation translation, AppStateManager manager) {
         this.translation = translation;
-        this.server = server;
+        this.manager = manager;
         this.eventCode = null;
     }
 
@@ -61,7 +60,8 @@ public class MainCtrl {
                            Pair<ManagementOverviewPasswordCtrl, Parent> managementOverviewPasswordUI,
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
-                           Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI){
+                           Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
+                           Pair<ParticipantListScreenCtrl, Parent> participantListUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -72,7 +72,8 @@ public class MainCtrl {
         this.eventScreenCtrl = eventUI.getKey();
         this.expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
-
+        this.participantListScene = new Scene(participantListUI.getValue());
+        this.participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
 
@@ -91,7 +92,20 @@ public class MainCtrl {
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
 
+        HashMap<Class<?>, SimpleRefreshable> controllerMap = new HashMap<>();
+        controllerMap.put(EventScreenCtrl.class, eventScreenCtrl);
+        controllerMap.put(ExpenseScreenCtrl.class, expenseScreenCtrl);
+        controllerMap.put(EditTitleCtrl.class, editTitleCtrl);
+        controllerMap.put(ParticipantScreenCtrl.class, participantScreenCtrl);
+        controllerMap.put(ParticipantListScreenCtrl.class, participantListScreenCtrl);
+        controllerMap.put(SettleDebtsScreenCtrl.class, settleDebtsScreenCtrl);
+        manager.setControllerMap(controllerMap);
+
         primaryStage.show();
+    }
+
+    public void switchScreens(Class<?> target){
+        manager.onSwitchScreens(target);
     }
 
     public void showMainScreen() {
@@ -105,15 +119,9 @@ public class MainCtrl {
      * join an event (either used when creating or joining one) and updating the fields in the event screen
      */
     public void switchToEventScreen() {
-        Event event = server.getEvent(eventCode);
-        eventScreenCtrl.refresh(event);
+        switchScreens(EventScreenCtrl.class);
         primaryStage.setScene(eventScene);
         primaryStage.setTitle("Event Screen");
-        try {
-            eventScreenCtrl.showExpenseList();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -141,34 +149,42 @@ public class MainCtrl {
         return eventScene;
     }
 
+    public Scene getParticipantScene(){
+        return participantScene;
+    }
+
     public void switchToAddExpense() {
-        Event event = server.getEvent(eventCode);
+        switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.resetAll();
-        expenseScreenCtrl.refresh(event);
         primaryStage.setScene(expenseScene);
     }
     public void switchToEditExpense(long expenseId) {
-        Event event = server.getEvent(eventCode);
-        expenseScreenCtrl.refresh(event);
+        switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.setExpense(expenseId);
         primaryStage.setScene(expenseScene);
     }
 
     public void openEditTitle() {
-        Event event = server.getEvent(eventCode);
-        editTitleCtrl.refresh(event);
+        switchScreens(EditTitleCtrl.class);
         primaryStage.setScene(editTitleScene);
     }
 
     public void switchToAddParticipant() {
-        Event event = server.getEvent(eventCode);
-        participantScreenCtrl.refresh(event);
+        switchScreens(ParticipantScreenCtrl.class);
         primaryStage.setScene(participantScene);
     }
 
-    public void switchToAddParticipantExistent() {
-        //TODO: Implement editing participants
+    public void switchToParticipantListScreen() {
+        switchScreens(ParticipantListScreenCtrl.class);
+        primaryStage.setScene(participantListScene);
     }
+
+    public void switchToEditParticipant(long participantId) {
+        switchScreens(ParticipantScreenCtrl.class);
+        participantScreenCtrl.setParticipant(participantId);
+        primaryStage.setScene(participantScene);
+    }
+
 
     /**
      * switch to the log in page for the management overview
@@ -191,8 +207,7 @@ public class MainCtrl {
      * Switch to the Debt Settle Screen
      */
     public void switchToSettleScreen() {
-        Event event = server.getEvent(eventCode);
-        settleDebtsScreenCtrl.refresh(event);
+        switchScreens(SettleDebtsScreenCtrl.class);
         primaryStage.setScene(settleDebtsScene);
         primaryStage.setTitle("Settle Debts");
     }
@@ -209,5 +224,6 @@ public class MainCtrl {
      */
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
+        manager.switchClientEvent(eventCode);
     }
 }

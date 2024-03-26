@@ -3,7 +3,7 @@ package commons;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -258,8 +258,8 @@ public class EventTest {
 
     @Test
     public void GetAndSetLastActivity() {
-        LocalDateTime time = LocalDateTime.of(0, 1, 1, 0, 0);
-        event.setLastActivity(time);
-        assertEquals(event.getLastActivity(), time);
+        Date date = new Date();
+        event.setLastActivity(date);
+        assertEquals(event.getLastActivity(), date);
     }
 }
