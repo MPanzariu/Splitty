@@ -3,39 +3,45 @@ package client.utils;
 import javafx.scene.Node;
 
 public class Styling {
+
     /**
-     * Adds the success styling to a node
-     * @param node the node to add the styling to
+     * How to use:
+     * Go in main.css and make the style you want e.g:
+     * .backgroundLight{ -fx-background-color: #FFFFFF; }
+     * Now lets say I have a button that I made (myButton) and I want to apply the backgroundLight styling to it. Using the Styling class:
+     * Styling.applyStyling(myButton, backgroundLight)
+     * The button should now have the css property -fx-background-color: #FFFFFF
+     * Now lets say I want to alternate between backgroundLight and another css class e.g. backgroundDark.
+     * Simply doing Styling.applyStyling(myButton, backgroundDark) will not work since myButton already has the class backgroundLight and that one
+     * takes priority.
+     * In this case use Styling.changeStyling(myButton, backgroundLight, backgroundDark) which replaces the backgroundLight styling with backgroundDark.
      */
-    public static void addErrorStyling(Node node) {
-        if (node != null) {
-            node.getStyleClass().remove("successText");
-            if (!node.getStyleClass().contains("errorText")) {
-                node.getStyleClass().add("errorText");
-            }
-        }
-    }
+
     /**
-     * Adds the error styling to a node
-     * @param node the node to add the styling to
+     * Applies a styling to a node
+     * Be careful as the new styling may be overridden by the old styling. In this case use changeStyling
+     * @param node the node to apply the styling to
+     * @param style the style to apply
      */
-    public static void addSuccessStyling(Node node) {
+    public static void applyStyling(Node node, String style) {
         if (node != null) {
-            node.getStyleClass().remove("errorText");
-            if (!node.getStyleClass().contains("successText")) {
-                node.getStyleClass().add("successText");
+            if (!node.getStyleClass().contains(style)) {
+                node.getStyleClass().add(style);
             }
         }
     }
 
     /**
-     * Applies positive button styling to a node
+     * Changes the styling of a node
+     * @param node the node to change the styling of
+     * @param oldStyle the old style to remove
+     * @param newStyle the new style to add
      */
-    public static void applyPositiveButtonStyling(Node node) {
+    public static void changeStyling(Node node, String oldStyle, String newStyle) {
         if (node != null) {
-            if (!node.getStyleClass().contains("positiveButton")) {
-                node.getStyleClass().add("positiveButton");
-            }
+            node.getStyleClass().remove(oldStyle);
+            applyStyling(node, newStyle);
         }
     }
+
 }
