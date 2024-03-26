@@ -3,6 +3,7 @@ package commons;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -40,6 +41,11 @@ public class Participant {
         this.id = id;
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
+    }
+
+    @JsonIgnore
+    public String getBankDetails() {
+        return toString();
     }
 
     public long getId() {

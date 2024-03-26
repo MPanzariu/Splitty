@@ -13,10 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.util.Pair;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,6 +36,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private VBox settleVBox;
     private Event event;
+    private Pair<Pane, Button> lastExpanded;
 
     /***
      * Constructor for the SettleDebtsScreen
@@ -52,6 +51,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         this.translation = translation;
         this.utils = utils;
         this.event = null;
+        this.lastExpanded = null;
     }
 
     /***
@@ -98,16 +98,25 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
             This is added for extensibility later, as are all the methods that use it,
             so that transfer instructions (A sends X to B) can be generated easily
              */
-            Participant participantOwedTo = null;
+            Participant participantOwedTo = participantOwes; // requisite feature not implemented
 
             Label debtLabel = generateDebtLabel(participantOwes, amount, participantOwedTo);
-            var owedToInfoBox = new VBox(); // This can be any UI element
-            Button expandButton = generateExpandButton(owedToInfoBox);
+            Pane bankDetailsPane = generateBankDetailsPane(participantOwedTo);
+            Button expandButton = generateExpandButton(bankDetailsPane);
             Button settleButton = generateSettleButton(participantOwes, amount, participantOwedTo);
             HBox debtBox = generateDebtBox(expandButton, debtLabel, settleButton);
-            children.addFirst(debtBox);
+            children.addLast(debtBox);
+            children.addLast(bankDetailsPane);
         }
 
+    }
+
+    private Pane generateBankDetailsPane(Participant participant) {
+        Pane pane = new Pane();
+        pane.getChildren().add(new Label(participant.getBankDetails()));
+        pane.setVisible(false);
+        pane.setManaged(false);
+        return pane;
     }
 
     private HBox generateDebtBox(Button expandButton, Label debtLabel, Button settleButton){
@@ -134,12 +143,23 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return button;
     }
 
-    private Button generateExpandButton(VBox owedToInfoBox) {
+    private Button generateExpandButton(Pane pane) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.expand"));
         Styling.applyStyling(button, "positiveButton");
         //This can instead be an image button!
-        button.setOnAction(null); //When more features are implemented, this can do something!
+        button.setOnMouseClicked((action)-> {
+            pane.setVisible(!pane.isVisible());
+            pane.setManaged(!pane.isManaged());
+            if(pane.isVisible()){
+                button.setRotate(90);
+                if(lastExpanded!=null) lastExpanded.getValue().getOnMouseClicked().handle(null);
+                lastExpanded = new Pair<>(pane, button);
+            } else {
+                button.setRotate(0);
+                lastExpanded = null;
+            }
+        });
         return button;
     }
 
