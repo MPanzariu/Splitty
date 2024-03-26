@@ -57,18 +57,8 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         passwordField.promptTextProperty().bind(translation.getStringBinding("MOPCtrl.Password.Field"));
         inputPasswordLabel.textProperty().bind(translation.getStringBinding("MOPCtrl.Input.Password.Label"));
+        bindLabel(inputPasswordLabel, "MOPCtrl.Input.Password.Label");
         logInButton.textProperty().bind(translation.getStringBinding("MOPCtrl.Log.In.Button"));
-        try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBackToMainScreen.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
     }
 
     /**

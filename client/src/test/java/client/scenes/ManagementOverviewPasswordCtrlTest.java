@@ -1,19 +1,15 @@
 package client.scenes;
 
-import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
