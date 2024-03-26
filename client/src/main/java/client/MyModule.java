@@ -24,18 +24,21 @@ import com.google.inject.Scopes;
 import client.scenes.MainCtrl;
 import com.google.inject.name.Names;
 
+import java.io.File;
 import java.util.Properties;
 
 public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
         Properties properties = new ConfigUtils().easyLoadProperties();
+        binder.bind(Properties.class).annotatedWith(Names.named("config")).toInstance(properties);
         Names.bindProperties(binder, properties);
 
         binder.bind(Translation.class).in(Scopes.SINGLETON);
         binder.bind(ObservableResourceFactory.class).in(Scopes.SINGLETON);
         binder.bind(ManagementOverviewUtils.class).in(Scopes.SINGLETON);
         binder.bind(LanguageIndicatorCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(File.class).annotatedWith(Names.named("dir")).toInstance(new File(Translation.LANGUAGE_PATH));
         binder.bind(WebSocketUtils.class).in(Scopes.SINGLETON);
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
 
