@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="640.0" prefWidth="485.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ExpenseScreenCtrl">
+<AnchorPane prefHeight="692.0" prefWidth="485.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ExpenseScreenCtrl">
    <children>
       <Label fx:id="addEditExpense" layoutX="47.0" layoutY="44.0" styleClass="h1" text="Add/Edit Expense">
          <font>
@@ -44,23 +44,18 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <CheckBox fx:id="splitBetweenAllCheckBox" layoutX="64.0" layoutY="407.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="242.0" text="Split between all participants" />
-      <VBox layoutX="63.0" layoutY="438.0" prefHeight="138.0" prefWidth="210.0">
-         <children>
-            <CheckBox fx:id="splitBetweenCustomCheckBox" mnemonicParsing="false" text="Split between certain participants" />
-         </children>
-      </VBox>
+      <CheckBox fx:id="splitBetweenAllCheckBox" layoutX="62.0" layoutY="415.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="242.0" text="Split between all participants" />
       <Label fx:id="expenseType" layoutX="347.0" layoutY="363.0" styleClass="h2" text="Expense Type">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Button fx:id="cancel" layoutX="255.0" layoutY="559.0" mnemonicParsing="false" onAction="#switchToEventScreen" prefHeight="31.0" prefWidth="90.0" text="Cancel">
+      <Button fx:id="cancel" layoutX="256.0" layoutY="617.0" mnemonicParsing="false" onAction="#switchToEventScreen" prefHeight="31.0" prefWidth="90.0" text="Cancel">
          <styleClass>
             <String fx:value="negativeButton" />
             <String fx:value="small-text" />
          </styleClass></Button>
-      <Button fx:id="confirm" layoutX="347.0" layoutY="559.0" mnemonicParsing="false" onAction="#addExpenseToEvenScreen" prefHeight="31.0" prefWidth="90.0" text="Confirm">
+      <Button fx:id="confirm" layoutX="345.0" layoutY="617.0" mnemonicParsing="false" onAction="#addExpenseToEvenScreen" prefHeight="31.0" prefWidth="90.0" text="Confirm">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
@@ -85,11 +80,13 @@
             <String fx:value="errorText" />
             <String fx:value="small-text" />
          </styleClass></Label>
-      <Label fx:id="errorSplitMethod" layoutX="43.0" layoutY="465.0" prefHeight="18.0" prefWidth="250.0">
+      <Label fx:id="errorSplitMethod" layoutX="43.0" layoutY="389.0" prefHeight="18.0" prefWidth="250.0">
          <styleClass>
             <String fx:value="errorText" />
             <String fx:value="small-text" />
          </styleClass>
       </Label>
+      <CheckBox fx:id="splitBetweenCustomCheckBox" layoutX="62.0" layoutY="456.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="232.0" text="Split between certain participants" />
+      <VBox fx:id="participantsVBox" layoutX="80.0" layoutY="476.0" prefHeight="200.0" prefWidth="159.0" />
    </children>
 </AnchorPane>

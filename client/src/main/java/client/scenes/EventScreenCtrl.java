@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable{
     @FXML
@@ -148,16 +149,23 @@ public class EventScreenCtrl implements Initializable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
-        initializeFilterButtons();
+        //initializeFilterButtons();
     }
 
+    /**
+     * Initializes the filter buttons(the size and position)
+     */
     public void initializeFilterButtons() {
-        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        allExpenses.getStyleClass().add("button");
+//        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+//        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+//        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+       // allExpenses.getStyleClass().add("button");
     }
 
+    /**
+     * Initializes the Combobox so the participant chosen is
+     * reflected in the filter buttons
+     */
     public void initializeParticipantsCBox() {
         cBoxParticipantExpenses.valueProperty()
             .addListener((observable, oldValue, newValue) -> {
@@ -173,9 +181,15 @@ public class EventScreenCtrl implements Initializable{
                         .bind(translation.getStringBinding("empty"));
                     setButtonsNames(newValue);
                 }
-                else
-                    errorInvalidParticipant.textProperty()
-                        .bind(translation.getStringBinding("Event.Label.Error.InvalidParticipant"));
+                else {
+                    if(newValue == null || newValue.isEmpty())
+                        setButtonsNames("...");
+                    else {
+                        errorInvalidParticipant.textProperty()
+                            .bind(translation.getStringBinding(
+                                "Event.Label.Error.InvalidParticipant"));
+                    }
+                }
             });
     }
 
@@ -200,7 +214,7 @@ public class EventScreenCtrl implements Initializable{
         updateParticipantsDropdown();
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
-        buttonsHBox.getChildren().clear();
+        //buttonsHBox.getChildren().clear();
     }
 
     /**
@@ -287,11 +301,6 @@ public class EventScreenCtrl implements Initializable{
         allExpenses.textProperty().set("All");
         fromButton.textProperty().set("From " + name);
         inButton.textProperty().set("Including " + name);
-        buttonsHBox.getChildren().clear();
-        buttonsHBox.getChildren().add(allExpenses);
-        buttonsHBox.getChildren().add(fromButton);
-        buttonsHBox.getChildren().add(inButton);
-        buttonsHBox.setAlignment(Pos.CENTER);
     }
 
     /**
@@ -330,14 +339,27 @@ public class EventScreenCtrl implements Initializable{
     public void showExpenseList () throws FileNotFoundException {
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
-            String log = expense.stringOnScreen();
-            Label expenseText = generateExpenseLabel(expense.getId(), log);
-            HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
-            expenseBox.setSpacing(10);
-            hBoxMap.put(expense.getId(), expenseBox);
-            expenseBox.setAlignment(CENTER_LEFT);
+            HBox expenseBox = generateExpenseBox(expense);
             expensesLogListView.getItems().add(expenseBox);
         }
+    }
+
+    /**
+     *
+     * @param expense the expense for which we need to generate the HBox
+     * @return the generated hBox, containing the expense details
+     * @throws FileNotFoundException in case the file for the remove button isn't found
+     * an exception is thrown
+     */
+    public HBox generateExpenseBox(Expense expense) throws FileNotFoundException {
+        String log = expense.stringOnScreen();
+        Label expenseText = generateExpenseLabel(expense.getId(), log);
+        ImageView xButton = generateRemoveButton(expense.getId());
+        HBox expenseBox = new HBox(expenseText, xButton);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        hBoxMap.put(expense.getId(), expenseBox);
+        expenseBox.setAlignment(CENTER_LEFT);
+        return expenseBox;
     }
 
     /**
@@ -357,7 +379,7 @@ public class EventScreenCtrl implements Initializable{
         });
         expense.setOnMouseClicked(mouseEvent -> {
             mainCtrl.switchToEditExpense(expenseId);
-            });
+        });
         return expense;
     }
 
@@ -402,6 +424,7 @@ public class EventScreenCtrl implements Initializable{
      */
     public void removeFromList(long expenseId) throws FileNotFoundException {
         server.deleteExpenseForEvent(event.getId(), expenseId);
+        event = server.getEvent(event.getId());
         HBox hBox = hBoxMap.get(expenseId);
         hBoxMap.remove(expenseId);
         expensesLogListView.getItems().remove(hBox);
@@ -422,5 +445,17 @@ public class EventScreenCtrl implements Initializable{
      */
     public void switchToMainScreen(ActionEvent actionEvent) {
         mainCtrl.showMainScreen();
+    }
+    public void fromFilter(ActionEvent actionEvent) throws FileNotFoundException {
+        expensesLogListView.getItems().clear();
+        String name = cBoxParticipantExpenses.getValue();
+        for(Expense expense: event.getExpenses())
+            if(expense.getOwedTo().getName().equals(name)) {
+                HBox expenseBox = generateExpenseBox(expense);
+                expensesLogListView.getItems().add(expenseBox);
+            }
+    }
+    public void allFilter(ActionEvent actionEvent) throws FileNotFoundException {
+        showExpenseList();
     }
 }

@@ -76,14 +76,20 @@ public class ExpenseScreenCtrl implements Initializable{
     private Event currentEvent;
     private final Translation translation;
     private long expenseId;
+    private List<CheckBox> participantCheckBoxes;
 
+    /**
+     *
+     * @param server the server to which the client is connected
+     * @param mainCtrl the main controller
+     * @param translation the class that manages translations
+     */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
                               Translation translation) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
-        //currency.setItems(FXCollections.observableArrayList("EUR"));
     }
 
     /**
@@ -92,22 +98,33 @@ public class ExpenseScreenCtrl implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currency.setItems(FXCollections.observableArrayList("EUR"));
+        participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
         splitBetweenAllCheckBox.setOnAction(event -> {
             if (splitBetweenAllCheckBox.isSelected()) {
                 splitBetweenCustomCheckBox.setSelected(false);
+                participantsVBox.getChildren().clear();
             }
         });
 
         splitBetweenCustomCheckBox.setOnAction(event -> {
             if (splitBetweenCustomCheckBox.isSelected()) {
                 splitBetweenAllCheckBox.setSelected(false);
+                addParticipants();
+            }
+            if(!splitBetweenCustomCheckBox.isSelected()) {
+                participantsVBox.getChildren().clear();
             }
         });
     }
 
 
+    /**
+     * Method used for getting the participants that will be added
+     * in the combobox for the Paid by field
+     * @return the participant list
+     */
     public ObservableList<String> getParticipantList() {
         Set<Participant> participants;
         if(currentEvent == null|| currentEvent.getParticipants() == null)
@@ -122,6 +139,9 @@ public class ExpenseScreenCtrl implements Initializable{
         return FXCollections.observableArrayList(names);
     }
 
+    /**
+     * Binds each text to a key in order to be used for translation
+     */
     private void binds() {
         addEditExpense.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.Add"));
@@ -156,6 +176,9 @@ public class ExpenseScreenCtrl implements Initializable{
         bindToEmpty();
     }
 
+    /**
+     * Binds the error fields to empty
+     */
     public void bindToEmpty() {
         errorParticipants.textProperty()
             .bind(translation.getStringBinding("empty"));
@@ -231,6 +254,7 @@ public class ExpenseScreenCtrl implements Initializable{
     /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
+     * @return the newly created expense
      */
     public Expense createNewExpense() {
         String name = getTextFieldText(expensePurpose);
@@ -294,6 +318,11 @@ public class ExpenseScreenCtrl implements Initializable{
         server.addExpense(currentEvent.getId(), expense);
     }
 
+    /**
+     * when editing an expense this method makes sure that
+     * the fields are filled according to the expense that is being edited
+     * @param id the id of the expense
+     */
     public void setExpense(long id) {
         Set<Expense> expenses = server.getExpensesForEvent(currentEvent.getId());
         Expense expense = null;
@@ -312,11 +341,18 @@ public class ExpenseScreenCtrl implements Initializable{
         expenseId = id;
     }
 
+    /**
+     * Edits the expense with the provided id
+     * @param expenseId the id of the expense that is edited
+     * @param expense the expense we want to replace the current
+     * expense with
+     */
     public void editExpenseOnServer(long expenseId, Expense expense) {
         server.editExpense(currentEvent.getId(), expenseId, expense);
     }
     /**
-     * Needs revision
+     *
+     * @param actionEvent the action of clicking the confirm button
      */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
         boolean toAdd = true;
@@ -359,13 +395,16 @@ public class ExpenseScreenCtrl implements Initializable{
         }
     }
 
+    /**
+     * Generates a list of checkboxes with the names of
+     * the event participants
+     */
     public void addParticipants() {
-        currentEvent.getParticipants();
+        Set<Participant> participants = currentEvent.getParticipants();
+        for(Participant participant: participants) {
+            CheckBox participantToPay = new CheckBox(participant.getName());
+            participantsVBox.getChildren().add(participantToPay);
+            participantCheckBoxes.add(participantToPay);
+        }
     }
-
-
-    //TODO: 1.Fixing the bindings
-    //TODO: 2.Getting the participant that paid (after the participant UI is implemented)
-    //TODO: 3.Adding the expense to the EventScreen
-    //TODO: 4.Making the user able to choose between participants that can pay(for the custom participants button)
 }

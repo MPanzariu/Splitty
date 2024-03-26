@@ -53,7 +53,12 @@
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
          </styleClass></Button>
-      <HBox fx:id="buttonsHBox" layoutX="160.0" layoutY="313.0" prefHeight="25.0" prefWidth="374.0" />
+      <HBox fx:id="buttonsHBox" layoutX="160.0" layoutY="311.0" prefHeight="25.0" prefWidth="374.0">
+         <children>
+            <Button fx:id="allExpenses" mnemonicParsing="false" onAction="#allFilter" prefHeight="25.0" prefWidth="124.66" styleClass="positiveButton" text="All" />
+            <Button fx:id="fromButton" mnemonicParsing="false" onAction="#fromFilter" prefHeight="25.0" prefWidth="124.66" styleClass="positiveButton" text="From..." />
+            <Button fx:id="inButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.66" styleClass="positiveButton" text="Including..." />
+         </children></HBox>
       <VBox layoutX="160.0" layoutY="343.0" prefHeight="200.0" prefWidth="374.0">
          <children>
             <ListView fx:id="expensesLogListView" prefHeight="200.0" prefWidth="200.0" styleClass="small-text" />
