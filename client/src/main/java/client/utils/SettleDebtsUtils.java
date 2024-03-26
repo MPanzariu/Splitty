@@ -92,4 +92,17 @@ public class SettleDebtsUtils {
         }
         return result.toString();
     }
+
+    /***
+     * Generates a String representing all bank details for a Participant
+     * @param participant the Participant to check
+     * @return a String representation of a Participant's bank details
+     */
+    public String getBankDetails(Participant participant) {
+        if(participant.hasBankAccount()) return "Bank information available, transfer the money to:\n" +
+                "Account Holder: " + participant.getName() + "\n" +
+                "IBAN: " + participant.getName() + "\n" +
+                "BIC: " + participant.getName();
+        else return "No bank information available";
+    }
 }

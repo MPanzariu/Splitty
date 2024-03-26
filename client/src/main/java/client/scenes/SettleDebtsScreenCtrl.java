@@ -121,7 +121,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     private TextArea generateParticipantText(Participant participant){
-        TextArea text = new TextArea(participant.getBankDetails());
+        TextArea text = new TextArea(utils.getBankDetails(participant));
         text.setEditable(false);
         if(participant.hasBankAccount()) text.setPrefRowCount(4);
         else text.setPrefRowCount(1);
