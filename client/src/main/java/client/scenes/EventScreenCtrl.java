@@ -424,7 +424,6 @@ public class EventScreenCtrl implements Initializable{
      */
     public void removeFromList(long expenseId) throws FileNotFoundException {
         server.deleteExpenseForEvent(event.getId(), expenseId);
-        event = server.getEvent(event.getId());
         HBox hBox = hBoxMap.get(expenseId);
         hBoxMap.remove(expenseId);
         expensesLogListView.getItems().remove(hBox);
@@ -446,6 +445,12 @@ public class EventScreenCtrl implements Initializable{
     public void switchToMainScreen(ActionEvent actionEvent) {
         mainCtrl.showMainScreen();
     }
+
+    /**
+     * Filters the expenses, showing only the ones that were paid by a certain participant
+     * @param actionEvent when From button is pressed
+     * @throws FileNotFoundException in case the file isn't found the exception is thrown
+     */
     public void fromFilter(ActionEvent actionEvent) throws FileNotFoundException {
         expensesLogListView.getItems().clear();
         String name = cBoxParticipantExpenses.getValue();
@@ -455,7 +460,25 @@ public class EventScreenCtrl implements Initializable{
                 expensesLogListView.getItems().add(expenseBox);
             }
     }
+
+    /**
+     * Resets all the filters
+     * @param actionEvent when the all button is pressed
+     * @throws FileNotFoundException in case the file isn't found the exception is thrown
+     */
     public void allFilter(ActionEvent actionEvent) throws FileNotFoundException {
+        showExpenseList();
+    }
+
+    /**
+     * Filters the expenses, showing the one a certain participant is part of
+     * @param actionEvent when the Including button is pressed
+     * @throws FileNotFoundException in case the file isn't found the exception is thrown
+     */
+    public void IncludingFilter(ActionEvent actionEvent) throws FileNotFoundException {
+        //note: Because for the moment the expenses are split equally between all participants
+        //the Including filter is useless since, by definition if someone is part of an event
+        //they are part of all the expenses in that event
         showExpenseList();
     }
 }
