@@ -95,12 +95,13 @@
       <Button fx:id="goBackButton" layoutX="160.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
         <Label fx:id="errorInvalidParticipant" layoutX="160.0" layoutY="246.0" prefHeight="18.0" prefWidth="212.0" />
       <ComboBox fx:id="languageIndicator" layoutX="605.0" layoutY="18.0" prefHeight="25.0" prefWidth="70.0" />
-      <Button fx:id="testEmailButton" layoutX="564.0" layoutY="615.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="111.0" text="Test Email">
+      <Button fx:id="testEmailButton" layoutX="155.0" layoutY="605.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="111.0" text="Test Email">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
             <String fx:value="disabledButton" />
          </styleClass>
       </Button>
+      <Label fx:id="emailFeedbackLabel" layoutX="280.0" layoutY="614.0" styleClass="small-text" text="Email Feedback" />
    </children>
 </AnchorPane>

@@ -73,6 +73,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
     private Button testEmailButton;
     private EmailHandler emailHandler;
+    @FXML
+    private Label emailFeedbackLabel;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -149,11 +151,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
-        languageCtrl.initializeLanguageIndicator(languageIndicator);
         emailHandler = new EmailHandler();
         if (emailHandler.isConfigured()) {
             Styling.removeStyling(testEmailButton, "disabledButton");
         }
+        emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     public void initializeParticipantsCBox() {
@@ -448,6 +451,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Sends a test email to the user
      */
     public void sendTestEmail() {
-        emailHandler.sendTestEmail();
+        if (emailHandler.sendTestEmail()){
+            Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+            emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+        } else if (emailHandler.isConfigured()){
+            Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
+            emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+        }
     }
 }
