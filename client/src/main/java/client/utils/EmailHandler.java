@@ -30,6 +30,7 @@ public class EmailHandler {
 
     /**
      * Constructor with a javaMailSender object
+     * @param javaMailSender JavaMailSender object
      */
     public EmailHandler(JavaMailSender javaMailSender) {
         isConfigured = false;
@@ -58,6 +59,10 @@ public class EmailHandler {
         return mailSender;
     }
 
+    /**
+     * Reads in the properties from the properties object
+     * @param properties Properties object
+     */
     public void readProperties(Properties properties) {
         host = properties.getProperty("spring.mail.host");
         String strPort = properties.getProperty("spring.mail.port");
