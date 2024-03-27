@@ -25,6 +25,8 @@ public class Event{
     private Set<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Expense> expenses;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Tag> eventTags;
 
 
     /***
@@ -235,6 +237,13 @@ public class Event{
      */
     public Set<Expense> getExpenses(){
         return expenses;
+    }
+
+    public Set<Tag> getEventTags() {
+        return eventTags;
+    }
+    public void setEventTags(Set<Tag> eventTags) {
+        this.eventTags = eventTags;
     }
 
     /***

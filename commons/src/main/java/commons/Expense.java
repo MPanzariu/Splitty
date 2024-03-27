@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Expense.class)
@@ -20,7 +21,8 @@ public class Expense{
     private String name;
     private int priceInCents;
     private Date date;
-
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Tag> expenseTags;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
@@ -68,6 +70,14 @@ public class Expense{
 
     public Participant getOwedTo(){
         return owedTo;
+    }
+
+    public Set<Tag> getExpenseTags() {
+        return expenseTags;
+    }
+
+    public void setExpenseTags(Set<Tag> expenseTags) {
+        this.expenseTags = expenseTags;
     }
 
     @Override
