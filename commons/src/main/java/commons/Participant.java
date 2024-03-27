@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -25,6 +26,9 @@ public class Participant {
                           CascadeType.PERSIST, CascadeType.REFRESH},
                           mappedBy = "owedTo", orphanRemoval = true)
     private Set<Expense> expensesOwedTo;
+    private String legalName;
+    private String iban;
+    private String bic;
 
     /***
      * Constructor used by Object Mappers
@@ -57,7 +61,9 @@ public class Participant {
      * @return a boolean confirming that all bank details are available
      */
     public boolean hasBankAccount(){
-        return true;
+        return (!Objects.equals(legalName, "")
+                && !Objects.equals(iban, "")
+                && !Objects.equals(bic, "") );
     }
 
     /***
@@ -106,6 +112,54 @@ public class Participant {
      */
     public Set<Expense> getExpensesOwedTo() {
         return expensesOwedTo;
+    }
+
+    /***
+     * Provides the real name of the Participant, for bank transfers
+     * @return the Participant's bank account holder's name
+     */
+    public String getLegalName() {
+        return legalName;
+    }
+
+    /***
+     * Changes the real name of the Participant, for bank transfers
+     * @param legalName the new Participant's bank account holder's name
+     */
+    public void setLegalName(String legalName) {
+        this.legalName = legalName;
+    }
+
+    /***
+     * Provides the IBAN of the Participant, for bank transfers
+     * @return the Participant's bank account IBAN
+     */
+    public String getIban() {
+        return iban;
+    }
+
+    /***
+     * Changes the IBAN of the Participant, for bank transfers
+     * @param iban the new Participant's bank account IBAN
+     */
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
+
+    /***
+     * Provides the BIC of the Participant, for bank transfers
+     * @return the Participant's bank account BIC
+     */
+    public String getBic() {
+        return bic;
+    }
+
+    /***
+     * Changes the BIC of the Participant, for bank transfers
+     * @param bic the new Participant's bank account BIC
+     */
+    public void setBic(String bic) {
+        this.bic = bic;
     }
 
     /***

@@ -28,13 +28,13 @@ public class ParticipantController {
     /**
      * Creates a new instance of a participant, which is then tied to an event
      * @param eventId identifies the id for which we want to add a participant
-     * @param participantName the name of the participant we will add
+     * @param participant the participant to add
      * @return returns the status of the operation
      */
     @PostMapping("/{eventId}/participants")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable String eventId,
-                                                      @RequestBody String participantName) {
-        participantService.addParticipantToEvent(eventId, participantName);
+                                                      @RequestBody Participant participant) {
+        participantService.addParticipantToEvent(eventId, participant);
         socketService.propagateEventUpdate(eventId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -5,7 +5,6 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -20,27 +19,33 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     @FXML
-    public Button abortButton;
+    private Button cancelButton;
     @FXML
-    public Label title;
+    private Label title;
     @FXML
-    public Label name;
+    private Label name;
     @FXML
-    public TextField nameField;
+    private TextField nameField;
     @FXML
-    public Label email;
+    private Label email;
     @FXML
-    public TextField emailField;
+    private TextField emailField;
     @FXML
-    public Label iban;
+    private Label iban;
     @FXML
-    public TextField ibanField;
+    private TextField ibanField;
     @FXML
-    public Label bic;
+    private Label bic;
     @FXML
-    public TextField bicField;
+    private TextField bicField;
     @FXML
-    public Button okButton;
+    private Button okButton;
+    @FXML
+    private Label bankDetails;
+    @FXML
+    private Label holder;
+    @FXML
+    private TextField holderField;
 
     private Event event;
     private long participantId;
@@ -58,19 +63,29 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         this.translation = translation;
     }
 
-    /**
-     *binder for the buttons, fields, labels
+    /***
+     * binder for the buttons, fields, labels
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
      */
     public void initialize(URL location, ResourceBundle resources) {
         title.textProperty().bind(translation.getStringBinding("Participants.Label.title"));
-        abortButton.textProperty().bind(translation.getStringBinding("Participants.Button.abort"));
+        cancelButton.textProperty().bind(translation.getStringBinding("Participants.Button.cancel"));
         okButton.textProperty().bind(translation.getStringBinding("Participants.Button.ok"));
+        bankDetails.textProperty().bind(translation.getStringBinding("Participants.Label.bankDetails"));
         emailField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.email"));
+        holderField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.holder"));
         ibanField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.iban"));
         nameField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.name"));
         bicField.promptTextProperty().bind(translation.getStringBinding("Participants.Field.bic"));
         name.textProperty().bind(translation.getStringBinding("Participants.Label.name"));
         email.textProperty().bind(translation.getStringBinding("Participants.Label.email"));
+        holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
     }
@@ -80,11 +95,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * if the participant is new it is added to the event
      * otherwise edits the participant
      */
-    public void confirmEdit(ActionEvent actionEvent) {
+    public void confirmEdit() {
         Participant participant = addParticipant();
-        System.out.println(participantId);
+        clearFields();
         if(participantId == 0){
-            server.addParticipant(event.getId(), participant.getName());
+            server.addParticipant(event.getId(), participant);
             mainCtrl.switchToEventScreen();
         }
         else {
@@ -97,8 +112,16 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * takes you back to the event screen if 'abort' is clicked
      */
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
+        clearFields();
         mainCtrl.switchToEventScreen();
+    }
+
+    private void clearFields(){
+        nameField.clear();
+        holderField.clear();
+        ibanField.clear();
+        bicField.clear();
     }
 
     /**
@@ -108,13 +131,16 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Participant addParticipant(){
         String name = nameField.getText();
-        String accountHolder = null;
         String email = emailField.getText();
+        String accountHolder = holderField.getText();
         String iban = ibanField.getText();
         String bic = bicField.getText();
 
         Participant participant = new Participant(name);
-        //remember email iban bic when available
+        participant.setLegalName(accountHolder);
+        participant.setIban(iban);
+        participant.setBic(bic);
+
         return participant;
     }
 
@@ -123,20 +149,22 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * -> selects details of the participant in the current state
      * @param id -> id of the participant
      */
-        public void setParticipant(long id) {
-            Set<Participant> participantList = event.getParticipants();
-            Participant participantFin = null;
-            for(Participant participant: participantList){
-                if(participant.getId() == id) {
-                    participantFin = participant;
-                    break;
-                }
+    public void setParticipant(long id) {
+        Set<Participant> participantList = event.getParticipants();
+        Participant participantFin = null;
+        for(Participant participant: participantList){
+            if(participant.getId() == id) {
+                participantFin = participant;
+                break;
             }
-            if(participantFin == null)
-                return;
-            nameField.setText(participantFin.getName());
-            participantId = id;
         }
+        if(participantFin == null) return;
+        nameField.setText(participantFin.getName());
+        holderField.setText(participantFin.getLegalName());
+        ibanField.setText(participantFin.getIban());
+        bicField.setText(participantFin.getBic());
+        participantId = id;
+    }
 
     /**
      * updates the event instance
