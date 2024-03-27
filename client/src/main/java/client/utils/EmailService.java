@@ -81,7 +81,9 @@ public class EmailService {
         message.setSubject("Test email");
         message.setText("This is a test email");
         try {
-            javaMailSender.send(message);
+            //This needs to be run on a new thread as the application freezes otherwise
+            Thread thread = new Thread(() -> javaMailSender.send(message));
+            thread.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
