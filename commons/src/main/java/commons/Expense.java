@@ -26,8 +26,8 @@ public class Expense{
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
-//    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-//    private Set<Participant> participantsInExpense;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private Set<Participant> participantsInExpense;
 
     @SuppressWarnings("unused")
     public Expense() {}
@@ -37,7 +37,7 @@ public class Expense{
         this.priceInCents = priceInCents;
         this.date = date;
         this.owedTo = owedTo;
-        //this.participantsInExpense = new HashSet<>();
+        this.participantsInExpense = new HashSet<>();
     }
 
     public long getId() {
@@ -76,12 +76,12 @@ public class Expense{
         return owedTo;
     }
 
-//    public Set<Participant> getParticipantsInExpense() {
-//        return participantsInExpense;
-//    }
-//    public void addParticipantToExpense(Set<Participant> participantSet) {
-//        participantsInExpense.addAll(participantSet);
-//    }
+    public Set<Participant> getParticipantsInExpense() {
+        return participantsInExpense;
+    }
+    public void addParticipantToExpense(Participant participant) {
+        participantsInExpense.add(participant);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -105,4 +105,7 @@ public class Expense{
             return null + " paid " + (double) priceInCents / 100 + " for " + name;
     }
 
+    public void setParticipantToExpense(Set<Participant> participants) {
+        participantsInExpense = participants;
+    }
 }

@@ -11,6 +11,7 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,12 +44,22 @@ public class ExpenseService {
     public void addExpense(String eventId, Expense expense) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-        if(expense.getOwedTo()!=null){
+        if(expense.getOwedTo() != null){
             long extractedParticipantId = expense.getOwedTo().getId();
             Participant participant = participantRepository.findById(extractedParticipantId)
                     .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
             expense.setOwedTo(participant);
         }
+        Set<Participant> participants = new HashSet<>();
+        if (expense.getParticipantsInExpense() != null) {
+            for (Participant participant : expense.getParticipantsInExpense()) {
+                long participantId = participant.getId();
+                Participant fetchedParticipant = participantRepository.findById(participantId)
+                    .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
+                participants.add(fetchedParticipant);
+            }
+        }
+        expense.setParticipantToExpense(participants);
         event.addExpense(expense);
         eventRepository.save(event);
     }

@@ -22,8 +22,8 @@ public class Participant {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "owedTo", orphanRemoval = true)
     private Set<Expense> expensesOwedTo;
-//    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "participantsInExpense")
-//    private Set<Expense> participatesTo;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "participantsInExpense")
+    private Set<Expense> participatesToExpense;
 
     @SuppressWarnings("unused")
     public Participant() {}
@@ -31,7 +31,7 @@ public class Participant {
     public Participant(String name) {
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
-        //this.participatesTo = new HashSet<>();
+        this.participatesToExpense = new HashSet<>();
     }
 
     /**
@@ -43,7 +43,7 @@ public class Participant {
         this.id = id;
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
-        //this.participatesTo = new HashSet<>();
+        this.participatesToExpense = new HashSet<>();
 
     }
 
@@ -71,12 +71,12 @@ public class Participant {
         return expensesOwedTo;
     }
 
-//    public Set<Expense> getParticipatesTo() {
-//        return participatesTo;
-//    }
-//    public void addParticipatedToExpense(Expense expense) {
-//        participatesTo.add(expense);
-//    }
+    public Set<Expense> getParticipatesToExpense() {
+        return participatesToExpense;
+    }
+    public void addParticipatedToExpense(Expense expense) {
+        participatesToExpense.add(expense);
+    }
 
     @Override
     public boolean equals(Object obj) {
