@@ -29,7 +29,7 @@ class ExpenseScreenCtrlTest {
         this.testMainController = new TestMainController();
         this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null);
     }
-    
+
 
     private Event createMockEvent() {
         return null;
