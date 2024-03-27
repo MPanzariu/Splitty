@@ -67,4 +67,38 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains("owes"));
         assertFalse(result.contains("to"));
     }
+
+    @Test
+    void bankFull(){
+        String name = "Vox V.";
+        String iban = "NL02ABNA0123456789";
+        String bic = "ABNANL2AXXX";
+
+        participant1.setLegalName(name);
+        participant1.setIban(iban);
+        participant1.setBic(bic);
+
+        var result = sut.getBankDetails(participant1);
+        assertTrue(result.contains("information available"));
+        assertTrue(result.contains(name));
+        assertTrue(result.contains(iban));
+        assertTrue(result.contains(bic));
+    }
+
+    @Test
+    void bankMissing(){
+        String name = "Vox V.";
+        String iban = "";
+        String bic = "ABNANL2AXXX";
+
+        participant1.setLegalName(name);
+        participant1.setIban(iban);
+        participant1.setBic(bic);
+
+        var result = sut.getBankDetails(participant1);
+        assertTrue(result.contains("information unavailable"));
+        assertTrue(result.contains(name));
+        assertTrue(result.contains("(MISSING)"));
+        assertTrue(result.contains(bic));
+    }
 }

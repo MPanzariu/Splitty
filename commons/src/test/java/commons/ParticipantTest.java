@@ -11,9 +11,19 @@ public class ParticipantTest {
      */
     @Test
     public void checkConstructor() {
-        Event e = new Event();
         var p = new Participant("name");
         assertEquals("name", p.getName());
+        assertTrue(p.getExpensesOwedTo().isEmpty());
+    }
+
+    /**
+     * Test for ID constructor
+     */
+    @Test
+    public void checkIdConstructor() {
+        var p = new Participant(123L, "name");
+        assertEquals("name", p.getName());
+        assertEquals(123L, p.getId());
         assertTrue(p.getExpensesOwedTo().isEmpty());
     }
 
@@ -22,7 +32,6 @@ public class ParticipantTest {
      */
     @Test
     public void setterGetterNameTest(){
-        Event e = new Event();
         var p = new Participant("name");
         assertEquals("name", p.getName());
         p.setName("new name");
@@ -30,11 +39,63 @@ public class ParticipantTest {
     }
 
     /**
+     * Test for bank details getter and setter
+     */
+    @Test
+    public void setterGetterBankTest(){
+        String name = "L. Egal Name";
+        String iban = "NL02ABNA0123456789";
+        String bic = "ABNANL2AXXX";
+        var p = new Participant("Name");
+
+        p.setLegalName(name);
+        p.setIban(iban);
+        p.setBic(bic);
+
+        assertEquals(name, p.getLegalName());
+        assertEquals(iban, p.getIban());
+        assertEquals(bic, p.getBic());
+    }
+
+    /**
+     * Test for bank details checker with all data
+     */
+    @Test
+    public void availableBankTest(){
+        String name = "L. Egal Name";
+        String iban = "NL02ABNA0123456789";
+        String bic = "ABNANL2AXXX";
+        var p = new Participant("Name");
+
+        p.setLegalName(name);
+        p.setIban(iban);
+        p.setBic(bic);
+
+        assertTrue(p.hasBankAccount());
+    }
+
+    /**
+     * Test for bank details checker with data missing
+     */
+    @Test
+    public void unavailableBankTest(){
+        String name = "";
+        String iban = "NL02ABNA0123456789";
+        String bic = "ABNANL2AXXX";
+        var p = new Participant("Name");
+
+        p.setLegalName(name);
+        p.setIban(iban);
+        p.setBic(bic);
+
+        assertFalse(p.hasBankAccount());
+    }
+
+    /**
      * Test for adding and removing expenses
      */
     @Test
     public void expensesTest(){
-        Event e = new Event();
         var p = new Participant("name");
         assertTrue(p.getExpensesOwedTo().isEmpty());
         Expense ex = new Expense();
@@ -48,7 +109,6 @@ public class ParticipantTest {
      */
     @Test
     public void equalsHashCode() {
-        Event e = new Event();
         var a = new Participant("name");
         var b = new Participant("name");
         assertEquals(a, b);
@@ -59,7 +119,6 @@ public class ParticipantTest {
      */
     @Test
     public void notEqualsHashCode() {
-        Event e = new Event();
         var a = new Participant("name");
         var b = new Participant("new name");
         assertNotEquals(a, b);
