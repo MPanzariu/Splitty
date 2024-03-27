@@ -74,8 +74,14 @@ public class Participant {
     public Set<Expense> getParticipatesToExpense() {
         return participatesToExpense;
     }
-    public void addParticipatedToExpense(Expense expense) {
+    public void addParticipatesToExpense(Expense expense) {
         participatesToExpense.add(expense);
+    }
+    public void setParticipatesToExpense(Set<Expense> expenses) {
+        this.participatesToExpense = expenses;
+    }
+    public void removeExpenseFromParticipant(Expense expense) {
+        this.participatesToExpense.remove(expense);
     }
 
     @Override

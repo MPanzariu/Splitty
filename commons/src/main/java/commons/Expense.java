@@ -82,6 +82,9 @@ public class Expense{
     public void addParticipantToExpense(Participant participant) {
         participantsInExpense.add(participant);
     }
+    public void removeParticipantFromExpense(Participant participant) {
+        this.participantsInExpense.remove(participant);
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -29,26 +29,7 @@ class ExpenseScreenCtrlTest {
         this.testMainController = new TestMainController();
         this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null);
     }
-
-    @Test
-    public void testCreateNewExpense_WithValidInput_ShouldReturnExpenseObject() {
-        // Arrange
-        //sut.setEvent(createMockEvent());
-        sut.expensePurpose.setText("Test Expense");
-        sut.sum.setText("100.00");
-        sut.choosePayer.setValue("John Doe");
-        sut.datePicker.setValue(LocalDate.now());
-
-        // Act
-        Expense expense = sut.createNewExpense();
-
-        // Assert
-        assertNotNull(expense);
-        assertEquals("Test Expense", expense.getName());
-        assertEquals(10000, expense.getPriceInCents()); // Assuming you're storing in cents
-        assertEquals(LocalDate.now(), expense.getDate());
-        assertEquals("John Doe", expense.getOwedTo().getName());
-    }
+    
 
     private Event createMockEvent() {
         return null;

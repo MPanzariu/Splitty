@@ -383,6 +383,17 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public HBox generateExpenseBox(Expense expense) {
         String log = expense.stringOnScreen();
+        if(expense.getParticipantsInExpense().containsAll(event.getParticipants()))
+            log += '\n' + "(All)";
+        else {
+            log += '\n' + "(";
+            for(Participant participant: expense.getParticipantsInExpense())
+                if(event.getParticipants().contains(participant)) {
+                    log += participant.getName();
+                    log += " ";
+                }
+            log += ")";
+        }
         Label expenseText = generateExpenseLabel(expense.getId(), log);
         ImageView xButton = generateRemoveButton(expense.getId());
         HBox expenseBox = new HBox(expenseText, xButton);

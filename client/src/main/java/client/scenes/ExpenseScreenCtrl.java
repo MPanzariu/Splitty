@@ -6,6 +6,7 @@ import commons.Expense;
 import commons.Event;
 import commons.Participant;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -289,7 +290,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             if(participant.getName().equals(participantName)) break;
         }
         Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
-        Set<Participant> participantSet = currentEvent.getParticipants();
+        Set<Participant> participantSet = getParticipantsForExpense();
         for(Participant part: participantSet)
             resultExpense.addParticipantToExpense(part);
         return resultExpense;
@@ -404,6 +405,33 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             }
             mainCtrl.switchToEventScreen();
         }
+    }
+
+    /**
+     * Adds the selected participants to the current expense
+     * @return a set of all participants for the expense
+     */
+    public Set<Participant> getParticipantsForExpense() {
+        if(splitBetweenAllCheckBox.isSelected())
+            return currentEvent.getParticipants();
+        Set<Participant> result = new HashSet<>();
+        Set<Participant> participants = currentEvent.getParticipants();
+        for(CheckBox checkBox: participantCheckBoxes) {
+            boolean found = false;
+            if(checkBox.isSelected()) {
+                String name = checkBox.getText();
+                for(Participant participant: participants) {
+                    if(participant.getName().equals(name)) {
+                        result.add(participant);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                    throw new EntityNotFoundException("The participant doesn't exist anymore");
+            }
+        }
+        return result;
     }
 
     /**
