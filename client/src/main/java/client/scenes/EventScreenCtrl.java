@@ -117,6 +117,20 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         testEmailButton.setOnAction(event -> sendTestEmail());
         initializeEditTitle();
+        addGeneratedImages();
+        initializeParticipantsCBox();
+        emailHandler = new EmailHandler();
+        if (emailHandler.isConfigured()) {
+            Styling.removeStyling(testEmailButton, "disabledButton");
+        }
+        emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
+    }
+
+    /**
+     * Adds generated images to the buttons
+     */
+    private void addGeneratedImages() {
         try{
             Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
@@ -150,13 +164,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             System.out.println("didn't work");
             throw new RuntimeException(e);
         }
-        initializeParticipantsCBox();
-        emailHandler = new EmailHandler();
-        if (emailHandler.isConfigured()) {
-            Styling.removeStyling(testEmailButton, "disabledButton");
-        }
-        emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
-        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     public void initializeParticipantsCBox() {

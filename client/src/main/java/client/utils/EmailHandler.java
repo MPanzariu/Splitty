@@ -4,9 +4,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Properties;
 
 public class EmailHandler {
@@ -28,13 +25,15 @@ public class EmailHandler {
     public EmailHandler() {
         isConfigured = false;
         configUtils = new ConfigUtils();
-        host = null;
-        port = -1;
-        userName = null;
-        password = null;
-        smtpAuth = true;
-        smtpStarttlsEnable = true;
         this.javaMailSender = createJavaMailSender();
+    }
+
+    /**
+     * Constructor with a javaMailSender object
+     */
+    public EmailHandler(JavaMailSender javaMailSender) {
+        isConfigured = false;
+        this.javaMailSender = javaMailSender;
     }
 
     /**
@@ -43,7 +42,8 @@ public class EmailHandler {
      */
     private JavaMailSender createJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        readProperties();
+        Properties properties = configUtils.easyLoadProperties();
+        readProperties(properties);
         if (isConfigured){
             mailSender.setHost(host);
             mailSender.setPort(port);
@@ -58,32 +58,34 @@ public class EmailHandler {
         return mailSender;
     }
 
-    private void readProperties() {
-        Properties properties = configUtils.easyLoadProperties();
+    public void readProperties(Properties properties) {
         host = properties.getProperty("spring.mail.host");
         String strPort = properties.getProperty("spring.mail.port");
         if (strPort != null && !strPort.isEmpty()){
-            port = Integer.parseInt(properties.getProperty("spring.mail.port"));
+            try{
+                port = Integer.parseInt(properties.getProperty("spring.mail.port"));
+            }catch (NumberFormatException e) {
+                isConfigured = false;
+                return;
+            }
         }
         userName = properties.getProperty("spring.mail.username");
+        userEmail = userName;
         password = properties.getProperty("spring.mail.password");
         String strSmtpAuth = properties.getProperty("spring.mail.properties.mail.smtp.auth");
         if (strSmtpAuth != null && !strSmtpAuth.isEmpty()){
-            smtpAuth = Boolean.parseBoolean
-                    (properties.getProperty("spring.mail.properties.mail.smtp.auth"));
+            smtpAuth = strSmtpAuth.equals("true");
         }
         String strSmtpStarttlsEnable = properties
                 .getProperty("spring.mail.properties.mail.smtp.starttls.enable");
         if (strSmtpStarttlsEnable != null && !strSmtpStarttlsEnable.isEmpty()){
-            smtpStarttlsEnable = Boolean.parseBoolean(properties
-                    .getProperty("spring.mail.properties.mail.smtp.starttls.enable"));
+            smtpStarttlsEnable = strSmtpStarttlsEnable.equals("true");
         }
         if (host != null && !host.isEmpty() && port != -1 && userName != null
                 && !userName.isEmpty() && password != null && !password.isEmpty()){
             isConfigured = true;
         }
     }
-
     /**
      * Send a test email
      * @return True if the email was sent successfully, false otherwise
@@ -91,7 +93,6 @@ public class EmailHandler {
     public boolean sendTestEmail() {
         return sendEmail(userEmail, "Test email", "This is a test email");
     }
-
     /**
      * Send an email
      * @param to Email recipient
@@ -109,16 +110,13 @@ public class EmailHandler {
         message.setSubject(subject);
         message.setText(text);
         try {
-            //This needs to be run on a new thread as the application freezes otherwise
-            Thread thread = new Thread(() -> javaMailSender.send(message));
-            thread.start();
+            javaMailSender.send(message);
             return true;
         } catch (Exception e) {
             System.out.println("Error sending email");
             return false;
         }
     }
-
     /**
      * Check if the email handler is configured
      * @return True if the email handler is configured, false otherwise
