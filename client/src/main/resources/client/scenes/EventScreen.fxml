@@ -99,6 +99,7 @@
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
+            <String fx:value="disabledButton" />
          </styleClass>
       </Button>
    </children>

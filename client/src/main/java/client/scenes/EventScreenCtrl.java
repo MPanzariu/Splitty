@@ -1,7 +1,8 @@
 package client.scenes;
 
-import client.utils.EmailService;
+import client.utils.EmailHandler;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
@@ -17,8 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.util.Callback;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +72,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button selectedExpenseListButton;
     @FXML
     private Button testEmailButton;
-    private EmailService emailService;
+    private EmailHandler emailHandler;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -151,7 +150,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         }
         initializeParticipantsCBox();
         languageCtrl.initializeLanguageIndicator(languageIndicator);
-        emailService = new EmailService();
+        emailHandler = new EmailHandler();
+        if (emailHandler.isConfigured()) {
+            Styling.removeStyling(testEmailButton, "disabledButton");
+        }
     }
 
     public void initializeParticipantsCBox() {
@@ -446,6 +448,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Sends a test email to the user
      */
     public void sendTestEmail() {
-        emailService.sendTestEmail();
+        emailHandler.sendTestEmail();
     }
 }
