@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -458,12 +459,25 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Sends a test email to the user
      */
     public void sendTestEmail() {
-        if (emailHandler.sendTestEmail()){
-            Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
-            emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
-        } else if (emailHandler.isConfigured()){
-            Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
-            emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
-        }
+        Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+        emailFeedbackLabel.textProperty()
+                .bind(translation.getStringBinding("Event.Label.EmailFeedback.Sending"));
+        Thread t = new Thread(() ->
+        {
+            boolean emailSent = emailHandler.sendTestEmail();
+            Platform.runLater(() -> {
+                if (emailSent) {
+                    Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+                    emailFeedbackLabel.textProperty()
+                            .bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+                } else if (emailHandler.isConfigured()) {
+                    Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
+                    emailFeedbackLabel.textProperty()
+                            .bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+                }
+            });
+        });
+        t.start();
+
     }
 }
