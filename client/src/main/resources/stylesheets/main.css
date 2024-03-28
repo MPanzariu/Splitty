@@ -67,5 +67,11 @@
 }
 .disabledButton:hover{
     -fx-background-color: grey;
-    -fx-cursor: default;
+    -fx-cursor: default
+}
+.borderVBox{
+    -fx-border-radius: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-padding: 5px;
 }

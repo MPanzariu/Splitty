@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.Event;
-import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -131,10 +130,10 @@ public class ParticipantServiceTest {
     @Test
     public void addParticipantsTest(){
         Event event = new Event("test", null);
-        Participant participant = new Participant();
+        Participant participant = new Participant("Name");
         when(eventRepository.findById(anyString())).
                 thenReturn(Optional.of(event));
-        participantService.addParticipantToEvent("Name Surname", event.getId());
+        participantService.addParticipantToEvent(event.getId(), participant);
         verify(eventRepository).save(event);
         Set<Participant> participants = event.getParticipants();
         assertEquals(1, participants.size());
@@ -147,6 +146,6 @@ public class ParticipantServiceTest {
     public void addParticipantsNotExistentTest(){
         Event event = new Event("title", null);
         assertThrows(EntityNotFoundException.class, () ->
-                participantService.addParticipantToEvent("Participant", event.getId()));
+                participantService.addParticipantToEvent(event.getId(), new Participant("Name!")));
     }
 }

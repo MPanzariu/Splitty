@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
-import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
 import java.util.HashSet;
@@ -37,14 +36,17 @@ public class ParticipantService {
 
     /**
      * Add a new participant to an event, add a new participant to the repository
-     * @param participantName the name of the participant we want to add
+     * @param participant the Participant to add
      * @param eventId the event to which we want to add a participant
      */
-    public void addParticipantToEvent(String eventId, String participantName) {
+    public void addParticipantToEvent(String eventId, Participant participant) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-        Participant participant = new Participant(participantName);
-        event.addParticipant(participant);
+        Participant dbParticipant = new Participant(participant.getName());
+        dbParticipant.setLegalName(participant.getLegalName());
+        dbParticipant.setIban(participant.getIban());
+        dbParticipant.setBic(participant.getBic());
+        event.addParticipant(dbParticipant);
         eventRepository.save(event);
     }
 
@@ -75,14 +77,17 @@ public class ParticipantService {
     /**
      * edit the details of a participant that is in an event
      * @param participantId the participant whose details we want to change
-     * @param participantDetails the details of the participant
+     * @param participant the details of the participant
      * @return the participants modified details are now saved in the database
      */
 
-    public Participant editParticipant(Long participantId, Participant participantDetails) {
-        Participant participant = participantRepository.findById(participantId)
+    public Participant editParticipant(Long participantId, Participant participant) {
+        Participant dbParticipant = participantRepository.findById(participantId)
                 .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
-        participant.setName(participantDetails.getName());
+        dbParticipant.setName(participant.getName());
+        dbParticipant.setLegalName(participant.getLegalName());
+        dbParticipant.setIban(participant.getIban());
+        dbParticipant.setBic(participant.getBic());
         return participantRepository.save(participant);
     }
 
