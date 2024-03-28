@@ -81,6 +81,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         List<Node> children = settleVBox.getChildren();
         children.clear();
         var owedShares = event.getOwedShares();
+        var transfers = utils.calculateTransferInstructions(owedShares);
 
         Image expandButtonImage = ImageUtils.loadImageFile("singlearrow.png");
 

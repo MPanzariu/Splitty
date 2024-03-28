@@ -126,11 +126,11 @@ public class EventTest {
         expense1.setPriceInCents(20*cents);
         expense1.addParticipantToExpense(participant1);
         expense1.addParticipantToExpense(participant2);
-        participant1.addExpense(expense1);
+        expense1.setOwedTo(participant1);
 
         expense2.setPriceInCents(10*cents);
         expense2.addParticipantToExpense(participant2);
-        participant1.addExpense(expense2);
+        expense2.setOwedTo(participant1);
 
         event.addExpense(expense1);
         event.addExpense(expense2);
@@ -204,7 +204,7 @@ public class EventTest {
         event.addParticipant(participant2);
 
         expense1.setPriceInCents(1);
-        participant1.addExpense(expense1);
+        expense1.setOwedTo(participant1);
         expense1.addParticipantToExpense(participant1);
         expense1.addParticipantToExpense(participant2);
         event.addExpense(expense1);
@@ -232,17 +232,17 @@ public class EventTest {
 
         Expense expense1 = new Expense();
         expense1.setPriceInCents(10*cents);
-        participant2.addExpense(expense1);
+        expense1.setOwedTo(participant2);
         event.addExpense(expense1);
 
         Expense expense2 = new Expense();
         expense2.setPriceInCents(20*cents);
-        participant3.addExpense(expense2);
+        expense2.setOwedTo(participant3);
         event.addExpense(expense2);
 
         Expense expense3 = new Expense();
         expense3.setPriceInCents(30*cents);
-        participant3.addExpense(expense3);
+        expense3.setOwedTo(participant3);
         event.addExpense(expense3);
 
         var result = event.getSpendingPerPerson();

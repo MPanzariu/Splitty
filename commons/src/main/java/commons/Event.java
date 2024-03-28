@@ -90,6 +90,7 @@ public class Event{
      * @param members the Participants partaking
      * @param costInCents the cost to split equally between the given members
      */
+    @JsonIgnore
     public void splitAmountEqually(HashMap<Participant, BigDecimal> shareMap,
                               Set<Participant> members,
                               int costInCents) {
@@ -112,6 +113,7 @@ public class Event{
      * @param number the number to convert
      * @return a BigDecimal of the int, with additional digits after the dot
      */
+    @JsonIgnore
     private BigDecimal convertIntToDecimal(int number){
         long scale = (long) Math.pow(10, precision);
         BigInteger numberScaled = BigInteger.valueOf(scale * number);
@@ -123,6 +125,7 @@ public class Event{
      * @param decimalMap the map containing BigDecimals
      * @return an Integer map, rounded half-up
      */
+    @JsonIgnore
     public HashMap<Participant, Integer> roundMap(HashMap<Participant, BigDecimal> decimalMap) {
         HashMap<Participant, Integer> roundedMap = new HashMap<>();
         for(Map.Entry<Participant, BigDecimal> entry:
@@ -159,16 +162,20 @@ public class Event{
      * Calculates the total expense spending
      * @return A Map of participants to the total cost of expenses they paid for
      */
+    @JsonIgnore
     public HashMap<Participant, Integer> getSpendingPerPerson(){
         HashMap<Participant, Integer> spendingMap = new HashMap<>();
 
         for (Participant participant:
                 participants) {
-            var expensesForParticipant = participant.getExpensesOwedTo();
-            var totalSpending = expensesForParticipant.stream()
-                                .mapToInt(Expense::getPriceInCents)
-                                .sum();
-            spendingMap.put(participant, totalSpending);
+            spendingMap.put(participant, 0);
+        }
+
+        for(Expense expense:
+            expenses){
+            var participant = expense.getOwedTo();
+            var balance = spendingMap.get(participant);
+            spendingMap.put(participant, balance + expense.getPriceInCents());
         }
         return spendingMap;
     }
