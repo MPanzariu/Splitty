@@ -114,6 +114,33 @@ public class EventTest {
     }
 
     /***
+     * Test of 2 uneven expenses having credit/debit calculated correctly
+     */
+    @Test
+    public void creditBasicTest(){
+        int cents = 100;
+        Participant participant2 = new Participant("Husk");
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+
+        expense1.setPriceInCents(20*cents);
+        expense1.addParticipantToExpense(participant1);
+        expense1.addParticipantToExpense(participant2);
+        participant1.addExpense(expense1);
+
+        expense2.setPriceInCents(10*cents);
+        expense2.addParticipantToExpense(participant2);
+        participant1.addExpense(expense2);
+
+        event.addExpense(expense1);
+        event.addExpense(expense2);
+
+        var result = event.getOwedShares();
+        assertEquals(20*cents, result.get(participant1));
+        assertEquals(-20*cents, result.get(participant2));
+    }
+
+    /***
      * Test of 2 uneven expenses splitting evenly correctly
      */
     @Test
@@ -133,7 +160,7 @@ public class EventTest {
         event.addExpense(expense1);
         event.addExpense(expense2);
 
-        var result = event.getExpenseShare();
+        var result = event.roundMap(event.getExpenseShare());
         assertEquals(10*cents, result.get(participant1));
         assertEquals(20*cents, result.get(participant2));
     }
@@ -160,7 +187,7 @@ public class EventTest {
             event.addExpense(expense);
         }
 
-        var result = event.getExpenseShare();
+        var result = event.roundMap(event.getExpenseShare());
         assertEquals(1000, result.get(participant1));
         assertEquals(1000, result.get(participant2));
         assertEquals(1000, result.get(participant3));
@@ -168,7 +195,7 @@ public class EventTest {
 
     /***
      * Test based on assumption that in situations with fractional cents,
-     * the debt should just be ignored
+     * the person spending should be at an advantage and get money back
      */
     @Test
     public void splitCentRounding(){
@@ -176,15 +203,16 @@ public class EventTest {
         event.addParticipant(participant1);
         event.addParticipant(participant2);
 
-        Expense uglyExpense = new Expense();
-        uglyExpense.setPriceInCents(1);
-        uglyExpense.setOwedTo(participant1);
-        event.addExpense(uglyExpense);
+        expense1.setPriceInCents(1);
+        participant1.addExpense(expense1);
+        expense1.addParticipantToExpense(participant1);
+        expense1.addParticipantToExpense(participant2);
+        event.addExpense(expense1);
 
         // the assumption is that if there's a fractional cent to transfer, no one transfers
         var result = event.getOwedShares();
-        assertEquals(0, result.get(participant1));
-        assertEquals(0, result.get(participant2));
+        assertEquals(1, result.get(participant1));
+        assertEquals(-1, result.get(participant2));
     }
 
     /***
@@ -204,23 +232,23 @@ public class EventTest {
 
         Expense expense1 = new Expense();
         expense1.setPriceInCents(10*cents);
-        expense1.setOwedTo(participant2);
+        participant2.addExpense(expense1);
         event.addExpense(expense1);
 
         Expense expense2 = new Expense();
         expense2.setPriceInCents(20*cents);
-        expense2.setOwedTo(participant3);
+        participant3.addExpense(expense2);
         event.addExpense(expense2);
 
         Expense expense3 = new Expense();
         expense3.setPriceInCents(30*cents);
-        expense3.setOwedTo(participant3);
+        participant3.addExpense(expense3);
         event.addExpense(expense3);
 
-//        var result = event.getSpendingPerPerson();
-//        assertEquals(0, result.get(participant1));
-//        assertEquals(10*cents, result.get(participant2));
-//        assertEquals(50*cents, result.get(participant3));
+        var result = event.getSpendingPerPerson();
+        assertEquals(0, result.get(participant1));
+        assertEquals(10*cents, result.get(participant2));
+        assertEquals(50*cents, result.get(participant3));
     }
 
     @Test
@@ -231,10 +259,10 @@ public class EventTest {
         event.addParticipant(participant2);
         event.addParticipant(participant3);
 
-//        var result = event.getSpendingPerPerson();
-//        assertEquals(0, result.get(participant1));
-//        assertEquals(0, result.get(participant2));
-//        assertEquals(0, result.get(participant3));
+        var result = event.getSpendingPerPerson();
+        assertEquals(0, result.get(participant1));
+        assertEquals(0, result.get(participant2));
+        assertEquals(0, result.get(participant3));
     }
 
     @Test
