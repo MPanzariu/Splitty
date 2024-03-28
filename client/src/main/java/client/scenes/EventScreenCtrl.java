@@ -531,6 +531,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Sends a test email to the user
      */
     public void sendTestEmail() {
+        if (!emailHandler.isConfigured()){
+            return;
+        }
         Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
         emailFeedbackLabel.textProperty()
                 .bind(translation.getStringBinding("Event.Label.EmailFeedback.Sending"));
