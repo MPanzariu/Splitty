@@ -85,6 +85,7 @@ public class Expense{
     }
     public void setExpenseTag(Tag expenseTag) {
         this.expenseTag = expenseTag;
+    }
 
     public Set<Participant> getParticipantsInExpense() {
         return participantsInExpense;
