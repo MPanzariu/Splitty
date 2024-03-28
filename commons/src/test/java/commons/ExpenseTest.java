@@ -118,4 +118,13 @@ public class ExpenseTest {
         assertTrue(actual.contains("date"));
     }
 
+    @Test
+    public void tagTest(){
+        Participant p = new Participant();
+        Expense e = new Expense("Chocolate", 10, null, p);
+        Tag t = new Tag("Food", "#964B00");
+        e.setExpenseTag(t);
+        assertEquals(t, e.getExpenseTag());
+    }
+
 }

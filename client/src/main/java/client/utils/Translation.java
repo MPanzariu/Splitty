@@ -2,6 +2,9 @@ package client.utils;
 
 import com.google.inject.Inject;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 
 import java.io.File;
 import java.io.FileReader;
@@ -73,5 +76,40 @@ public class Translation {
         return locale;
     }
 
+    /**
+     * Binds a label to a text
+     * @param label the label to bind
+     * @param binding the binding to use
+     */
+    public void bindLabel(Label label, String binding){
+        label.textProperty().bind(this.getStringBinding(binding));
+    }
+
+    /**
+     * Binds a textfield to a text
+     * @param textField the textfield to bind
+     * @param binding the binding to use
+     */
+    public void bindTextField(TextField textField, String binding){
+        textField.textProperty().bind(this.getStringBinding(binding));
+    }
+    /**
+     * Binds a textfield's prompt to a text
+     * @param textField the textfield to bind
+     * @param binding the binding to use
+     */
+    public void bindTextFieldPrompt(TextField textField, String binding){
+        textField.promptTextProperty().bind(this.getStringBinding(binding));
+    }
+
+
+    /**
+     * Binds a button to a text
+     * @param button the button to bind
+     * @param binding the binding to use
+     */
+    public void bindButton(Button button, String binding){
+        button.textProperty().bind(this.getStringBinding(binding));
+    }
 
 }
