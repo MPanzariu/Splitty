@@ -22,8 +22,6 @@ public class Participant {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "owedTo", orphanRemoval = true)
     private Set<Expense> expensesOwedTo;
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "participantsInExpense")
-    private Set<Expense> participatesToExpense;
 
     @SuppressWarnings("unused")
     public Participant() {}
@@ -31,7 +29,6 @@ public class Participant {
     public Participant(String name) {
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
-        this.participatesToExpense = new HashSet<>();
     }
 
     /**
@@ -43,7 +40,6 @@ public class Participant {
         this.id = id;
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
-        this.participatesToExpense = new HashSet<>();
 
     }
 
@@ -69,19 +65,6 @@ public class Participant {
 
     public Set<Expense> getExpensesOwedTo() {
         return expensesOwedTo;
-    }
-
-    public Set<Expense> getParticipatesToExpense() {
-        return participatesToExpense;
-    }
-    public void addParticipatesToExpense(Expense expense) {
-        participatesToExpense.add(expense);
-    }
-    public void setParticipatesToExpense(Set<Expense> expenses) {
-        this.participatesToExpense = expenses;
-    }
-    public void removeExpenseFromParticipant(Expense expense) {
-        this.participatesToExpense.remove(expense);
     }
 
     @Override

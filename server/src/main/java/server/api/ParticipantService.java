@@ -44,16 +44,6 @@ public class ParticipantService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         Participant participant = new Participant(participantName);
-        Set<Expense> expenseSet = new HashSet<>();
-        if(participant.getParticipatesToExpense() != null) {
-            for(Expense expense: participant.getParticipatesToExpense()) {
-                long expenseId = expense.getId();
-                Expense fetchedExpense = expenseRepository.findById(expenseId)
-                    .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
-                expenseSet.add(fetchedExpense);
-            }
-        }
-        participant.setParticipatesToExpense(expenseSet);
         event.addParticipant(participant);
         eventRepository.save(event);
     }
@@ -72,6 +62,12 @@ public class ParticipantService {
         var expenses = expenseRepository.findByOwedTo(participant);
         for (Expense expense : expenses)
             event.removeExpense(expense);
+        Set<Expense> expensesInEvent = event.getExpenses();
+        for(Expense expense: expensesInEvent) {
+            Set<Participant> participantsInExpense = expense.getParticipantsInExpense();
+            participantsInExpense.remove(participant);
+            expenseRepository.save(expense);
+        }
         event.removeParticipant(participant);
         eventRepository.save(event);
     }

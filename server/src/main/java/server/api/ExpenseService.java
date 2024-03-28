@@ -4,6 +4,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

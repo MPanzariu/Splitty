@@ -539,15 +539,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(selectedParticipant == null)
             throw new EntityNotFoundException("The participant doesn't exist");
         Set<Expense> eventExpenses = event.getExpenses();
-        Set<Expense> participantExpenses = selectedParticipant.getParticipatesToExpense();
         for(Expense expense1: eventExpenses) {
-            for(Expense expense2: participantExpenses) {
-                if(expense1.getId() == expense2.getId()) {
+            Set<Participant>participantsInExpense = expense1.getParticipantsInExpense();
+                if(participantsInExpense.contains(selectedParticipant)) {
                     HBox expenseBox = generateExpenseBox(expense1);
                     expensesLogListView.getItems().add(expenseBox);
                     break;
                 }
-            }
         }
         //showAllExpenseList();
     }
