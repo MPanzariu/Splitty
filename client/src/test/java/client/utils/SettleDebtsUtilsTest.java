@@ -31,12 +31,21 @@ class SettleDebtsUtilsTest {
         participant2 = new Participant("Val");
     }
 
+    /***
+     * [FEATURE NOT YET IMPLEMENTED]
+     * Checks if the Expense generated to settle a normal debt is correct
+     */
     @Test
     void createSettlementExpense() {
         var result = sut.createSettlementExpense(participant1, 7, participant2);
         assertNotNull(result);
     }
 
+    /***
+     * [FEATURE NOT YET IMPLEMENTED]
+     * Checks if the Action executed when the Mark Received button is pressed
+     * settles a normal debt correctly
+     */
     @Test
     void createSettleAction() {
         EventHandler<ActionEvent> result = sut.createSettleAction(participant1, 7, participant2, "ABC123");
@@ -44,6 +53,11 @@ class SettleDebtsUtilsTest {
         assertNotNull(result);
     }
 
+    /***
+     * [TO BE CHANGED/REMOVED WHEN MORE FEATURES ARE IMPLEMENTED]
+     * Checks if text generated for someone with positive balance
+     * fits the structure and has the correct details
+     */
     @Test
     void stringPositive() {
         var result = sut.createDebtString("A", 7, "B");
@@ -52,6 +66,11 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains("0.07"));
     }
 
+    /***
+     * [TO BE CHANGED WHEN MORE FEATURES ARE IMPLEMENTED]
+     * Checks if text generated for someone owing money
+     * fits the structure and has the correct details
+     */
     @Test
     void stringNegative() {
         var result = sut.createDebtString("A", -7, "B");
@@ -60,6 +79,11 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains("0.07"));
     }
 
+    /***
+     * [TO BE CHANGED/REMOVED WHEN MORE FEATURES ARE IMPLEMENTED]
+     * Checks if text generated for someone with no balance at all
+     * fits the structure and has the correct details
+     */
     @Test
     void stringZero() {
         var result = sut.createDebtString("A", 0, "B");
@@ -68,6 +92,10 @@ class SettleDebtsUtilsTest {
         assertFalse(result.contains("to"));
     }
 
+    /***
+     * Checks if a Participant with all bank details
+     * has their payment information generated properly
+     */
     @Test
     void bankFull(){
         String name = "Vox V.";
@@ -85,6 +113,10 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains(bic));
     }
 
+    /***
+     * Checks if a Participant with missing bank details
+     * has their (unavailable) payment information generated properly
+     */
     @Test
     void bankMissing(){
         String name = "Vox V.";

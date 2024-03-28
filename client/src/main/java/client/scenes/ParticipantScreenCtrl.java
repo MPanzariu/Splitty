@@ -117,7 +117,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         mainCtrl.switchToEventScreen();
     }
 
-    private void clearFields(){
+    /***
+     * Removes text from all details fields
+     */
+    public void clearFields(){
         nameField.clear();
         holderField.clear();
         ibanField.clear();

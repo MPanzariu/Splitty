@@ -77,7 +77,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     /***
      * Populates the VBox with all the debts
      */
-    private void populateVBox(){
+    public void populateVBox(){
         List<Node> children = settleVBox.getChildren();
         children.clear();
         var owedShares = event.getOwedShares();
@@ -110,7 +110,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
     }
 
-    private Pane generateBankDetailsPane(TextArea text) {
+    /***
+     * Generates the expandable pane with payment details
+     * @param text the TextArea containing payment instructions
+     * @return a VBox Pane encapsulating payment details
+     */
+    public Pane generateBankDetailsPane(TextArea text) {
         VBox pane = new VBox();
         pane.getChildren().add(text);
         pane.setVisible(false);
@@ -120,7 +125,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return pane;
     }
 
-    private TextArea generateParticipantText(Participant participant){
+    /***
+     * Generates a TextArea containing bank details for a given Participant
+     * @param participant the Participant to extract bank details from
+     * @return a TextArea with all the Participant's bank information
+     */
+    public TextArea generateParticipantText(Participant participant){
         TextArea text = new TextArea(utils.getBankDetails(participant));
         text.setEditable(false);
         text.setPrefRowCount(4);
@@ -129,7 +139,14 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return text;
     }
 
-    private HBox generateDebtBox(Button expandButton, Label debtLabel, Button settleButton){
+    /***
+     * Generates an HBox with the Expand button, Debt information, and Settle button
+     * @param expandButton the Expand Details button
+     * @param debtLabel the Label detailing who owes what to who
+     * @param settleButton the Mark Received button
+     * @return an HBox containing all given elements, plus the correct spacing
+     */
+    public HBox generateDebtBox(Button expandButton, Label debtLabel, Button settleButton){
         Region spacingL = new Region();
         HBox.setHgrow(spacingL, Priority.ALWAYS);
         Region spacingR = new Region();
@@ -140,7 +157,14 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return box;
     }
 
-    private Button generateSettleButton(Participant participantOwes,
+    /***
+     * Generates a Button that marks a debt payment as received and settled
+     * @param participantOwes the Participant owing the debt
+     * @param amount the amount, in cents, to transfer
+     * @param participantOwedTo the Participant who the debt is owed to
+     * @return a Button that settles the debt when clicked
+     */
+    public Button generateSettleButton(Participant participantOwes,
                                         int amount,
                                         Participant participantOwedTo) {
         Button button = new Button();
@@ -153,7 +177,13 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return button;
     }
 
-    private Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
+    /***
+     * Generates a Button that expands the bank details pane for a debt
+     * @param pane the Pane to expand/collapse
+     * @param expandButtonInnerImage the image for the button, passed in here for better perforamce
+     * @return a Button that expands/collapses the given Pane when clicked
+     */
+    public Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
         Button button = new Button();
         Styling.applyStyling(button, "positiveButton");
         button.setGraphic(expandButtonInnerImage);
@@ -172,7 +202,14 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         return button;
     }
 
-    private Label generateDebtLabel(Participant participantOwes,
+    /***
+     * Generates a Label detailing who should send how much money to who
+     * @param participantOwes the Participant owing the debt
+     * @param amount the amount, in cents, to transfer
+     * @param participantOwedTo the Participant who the debt is owed to
+     * @return a Label explaining who owes how much to who
+     */
+    public Label generateDebtLabel(Participant participantOwes,
                                     int amount, Participant participantOwedTo) {
         Label label = new Label();
         String debtString = utils.createDebtString(participantOwes.getName(),
