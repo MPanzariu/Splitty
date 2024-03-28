@@ -7,7 +7,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 public class EmailHandler {
-    //TODO: Handle properties not found
     private JavaMailSender javaMailSender;
     private String userEmail;
     private boolean isConfigured;
