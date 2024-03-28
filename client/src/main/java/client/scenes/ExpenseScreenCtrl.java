@@ -6,6 +6,7 @@ import commons.Expense;
 import commons.Event;
 import commons.Participant;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -53,11 +55,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private CheckBox splitBetweenAllCheckBox;
     @FXML
-    private Label splitBetweenAllLabel;
-    @FXML
     private CheckBox splitBetweenCustomCheckBox;
-    @FXML
-    private Label getSplitBetweenCustomLabel;
     @FXML
     private Button cancel;
     @FXML
@@ -67,23 +65,31 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Label errorNoPurpose;
     @FXML
-    Label errorAmount;
+    private Label errorAmount;
     @FXML
-    Label errorDate;
+    private Label errorDate;
     @FXML
-    Label errorSplitMethod;
+    private Label errorSplitMethod;
+    @FXML
+    private VBox participantsVBox;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
     private long expenseId;
+    private List<CheckBox> participantCheckBoxes;
 
+    /**
+     *
+     * @param server the server to which the client is connected
+     * @param mainCtrl the main controller
+     * @param translation the class that manages translations
+     */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
                               Translation translation) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
-        //currency.setItems(FXCollections.observableArrayList("EUR"));
     }
 
     /**
@@ -92,22 +98,33 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         currency.setItems(FXCollections.observableArrayList("EUR"));
+        participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
         splitBetweenAllCheckBox.setOnAction(event -> {
             if (splitBetweenAllCheckBox.isSelected()) {
                 splitBetweenCustomCheckBox.setSelected(false);
+                participantsVBox.getChildren().clear();
             }
         });
 
         splitBetweenCustomCheckBox.setOnAction(event -> {
             if (splitBetweenCustomCheckBox.isSelected()) {
                 splitBetweenAllCheckBox.setSelected(false);
+                addParticipants();
+            }
+            if(!splitBetweenCustomCheckBox.isSelected()) {
+                participantsVBox.getChildren().clear();
             }
         });
     }
 
 
+    /**
+     * Method used for getting the participants that will be added
+     * in the combobox for the Paid by field
+     * @return the participant list
+     */
     public ObservableList<String> getParticipantList() {
         Set<Participant> participants;
         if(currentEvent == null|| currentEvent.getParticipants() == null)
@@ -122,6 +139,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         return FXCollections.observableArrayList(names);
     }
 
+    /**
+     * Binds each text to a key in order to be used for translation
+     */
     private void binds() {
         addEditExpense.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.Add"));
@@ -143,9 +163,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
         splitMethod.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.split"));
-        splitBetweenAllLabel.textProperty()
+        splitBetweenAllCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitAll"));
-        getSplitBetweenCustomLabel.textProperty()
+        splitBetweenCustomCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitCustom"));
         cancel.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Cancel"));
@@ -156,6 +176,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         bindToEmpty();
     }
 
+    /**
+     * Binds the error fields to empty
+     */
     public void bindToEmpty() {
         errorParticipants.textProperty()
             .bind(translation.getStringBinding("empty"));
@@ -240,10 +263,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
+     * @return the newly created expense
      */
     public Expense createNewExpense() {
-        String name = expensePurpose.getText();
-        String priceInMoney = sum.getText();
+        String name = getTextFieldText(expensePurpose);
+        String priceInMoney = getTextFieldText(sum);
         double price = 0;
         try {
             price = Double.parseDouble(priceInMoney);
@@ -253,22 +277,52 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         }
         int priceInCents = (int) Math.ceil(price * 100);
         //change in case of wanting to implement another date system
-        LocalDate date = datePicker.getValue();
+        LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
         if(date != null)
             expenseDate = Date.valueOf(datePicker.getValue());
 
-        String participantName = choosePayer.getValue();
+        String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;
         while(participantIterator.hasNext()){
             participant = participantIterator.next();
             if(participant.getName().equals(participantName)) break;
         }
-
-        return new Expense(name, priceInCents, expenseDate, participant);
+        Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
+        Set<Participant> participantSet = getParticipantsForExpense();
+        for(Participant part: participantSet) {
+            resultExpense.addParticipantToExpense(part);
+        }
+        return resultExpense;
     }
 
+    /**
+     *
+     * @param textField a text field from the screen
+     * @return the text inside the text field
+     */
+    public String getTextFieldText(TextField textField) {
+        return textField.getText();
+    }
+
+    /**
+     *
+     * @param datePicker a chosen date picker
+     * @return the date from the date picker
+     */
+    public LocalDate getLocalDate(DatePicker datePicker) {
+        return datePicker.getValue();
+    }
+
+    /**
+     *
+     * @param comboBox the specified comboBox
+     * @return the text from the comboBox
+     */
+    public String getComboBox(ComboBox<String> comboBox) {
+        return comboBox.getValue();
+    }
     /**
      * Adds the specified expense to the server
      * @param expense the provided expense
@@ -277,6 +331,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         server.addExpense(currentEvent.getId(), expense);
     }
 
+    /**
+     * when editing an expense this method makes sure that
+     * the fields are filled according to the expense that is being edited
+     * @param id the id of the expense
+     */
     public void setExpense(long id) {
         Set<Expense> expenses = currentEvent.getExpenses();
         Expense expense = null;
@@ -295,11 +354,18 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         expenseId = id;
     }
 
+    /**
+     * Edits the expense with the provided id
+     * @param expenseId the id of the expense that is edited
+     * @param expense the expense we want to replace the current
+     * expense with
+     */
     public void editExpenseOnServer(long expenseId, Expense expense) {
         server.editExpense(currentEvent.getId(), expenseId, expense);
     }
     /**
-     * Needs revision
+     *
+     * @param actionEvent the action of clicking the confirm button
      */
     public void addExpenseToEvenScreen(ActionEvent actionEvent) {
         boolean toAdd = true;
@@ -315,7 +381,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 .bind(translation.getStringBinding("Expense.Label.NoPurpose"));
             toAdd = false;
         }
-        if(expense.getPriceInCents() == 0) {
+        if(expense.getPriceInCents() <= 0) {
             errorAmount.textProperty()
                 .bind(translation.getStringBinding("Expense.Label.InvalidAmount"));
             toAdd = false;
@@ -342,8 +408,43 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         }
     }
 
-    //TODO: 1.Fixing the bindings
-    //TODO: 2.Getting the participant that paid (after the participant UI is implemented)
-    //TODO: 3.Adding the expense to the EventScreen
-    //TODO: 4.Making the user able to choose between participants that can pay(for the custom participants button)
+    /**
+     * Adds the selected participants to the current expense
+     * @return a set of all participants for the expense
+     */
+    public Set<Participant> getParticipantsForExpense() {
+        if(splitBetweenAllCheckBox.isSelected())
+            return currentEvent.getParticipants();
+        Set<Participant> result = new HashSet<>();
+        Set<Participant> participants = currentEvent.getParticipants();
+        for(CheckBox checkBox: participantCheckBoxes) {
+            boolean found = false;
+            if(checkBox.isSelected()) {
+                String name = checkBox.getText();
+                for(Participant participant: participants) {
+                    if(participant.getName().equals(name)) {
+                        result.add(participant);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                    throw new EntityNotFoundException("The participant doesn't exist anymore");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Generates a list of checkboxes with the names of
+     * the event participants
+     */
+    public void addParticipants() {
+        Set<Participant> participants = currentEvent.getParticipants();
+        for(Participant participant: participants) {
+            CheckBox participantToPay = new CheckBox(participant.getName());
+            participantsVBox.getChildren().add(participantToPay);
+            participantCheckBoxes.add(participantToPay);
+        }
+    }
 }
