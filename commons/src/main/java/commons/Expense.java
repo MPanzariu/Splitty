@@ -21,8 +21,8 @@ public class Expense{
     private String name;
     private int priceInCents;
     private Date date;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Tag> expenseTags;
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE})
+    private Tag expenseTag;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
@@ -72,12 +72,11 @@ public class Expense{
         return owedTo;
     }
 
-    public Set<Tag> getExpenseTags() {
-        return expenseTags;
+    public Tag getExpenseTag() {
+        return expenseTag;
     }
-
-    public void setExpenseTags(Set<Tag> expenseTags) {
-        this.expenseTags = expenseTags;
+    public void setExpenseTag(Tag expenseTag) {
+        this.expenseTag = expenseTag;
     }
 
     @Override

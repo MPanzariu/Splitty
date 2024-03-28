@@ -47,6 +47,7 @@ public class Event{
         this.id = generateId();
         this.creationDate = creationDate;
         this.lastActivity = new Date();
+        this.eventTags = new HashSet<>();
     }
 
     /***
@@ -244,6 +245,9 @@ public class Event{
     }
     public void setEventTags(Set<Tag> eventTags) {
         this.eventTags = eventTags;
+    }
+    public void addTag(Tag eventTag){
+        this.eventTags.add(eventTag);
     }
 
     /***

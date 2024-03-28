@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -261,5 +263,25 @@ public class EventTest {
         Date date = new Date();
         event.setLastActivity(date);
         assertEquals(event.getLastActivity(), date);
+    }
+
+    @Test
+    public void tagsTest(){
+        Event e2 = new Event("Ski Trip", null);
+        Participant p = new Participant("Jon Doe");
+        Expense ex1 = new Expense("Ice-Cream", 1000, null, p);
+        Expense ex2 = new Expense("Ski-Trip", 200000, null, p);
+        Tag t1 = new Tag("Food", "#008000");
+        Tag t2 = new Tag("Travel", "#FF0000");
+        ex1.setExpenseTag(t1);
+        ex2.setExpenseTag(t2);
+        e2.addExpense(ex1);
+        e2.addExpense(ex2);
+        e2.addTag(t1);
+        e2.addTag(t2);
+        Set<Tag> tags = e2.getEventTags();
+        Iterator<Tag> tagIterator = tags.iterator();
+        assertEquals("Food", tagIterator.next().getTagName());
+        assertEquals("Travel", tagIterator.next().getTagName());
     }
 }
