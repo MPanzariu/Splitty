@@ -7,7 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
+import java.util.*;
 
 
 public class SettleDebtsUtils {
@@ -43,6 +43,77 @@ public class SettleDebtsUtils {
         return new Expense();
     }
 
+    //Pseudocode adapted from: https://stackoverflow.com/questions/4554655/who-owes-who-money-optimization
+    /***
+     * Calculates at most N-1 transfer instructions for N participants
+     * @param creditMap a Map of participants to credit(+)/debt(-)
+     * @return a Set of Transfer instructions (sender, amount, receiver)
+     */
+    public Set<Transfer> calculateTransferInstructions(HashMap<Participant, Integer> creditMap){
+        Set<Transfer> result = new HashSet<>();
+        //We probably don't want to be mutating the inserted creditMap, re-running should yield the same result
+        HashMap<Participant, Integer> processMap = new HashMap<>(creditMap);
+
+        List<Map.Entry<Participant, Integer>> creditorsSorted = processMap.entrySet().stream()
+                .filter(entry->entry.getValue()>0)
+                .sorted(Map.Entry.comparingByValue())
+                .toList();
+
+        List<Map.Entry<Participant, Integer>> debtorsSorted = processMap.entrySet().stream()
+                .filter(entry->entry.getValue()<0)
+                .sorted(Map.Entry.comparingByValue())
+                .toList();
+
+        ArrayList<Map.Entry<Participant, Integer>> creditors = new ArrayList<>(creditorsSorted);
+        ArrayList<Map.Entry<Participant, Integer>> debtors = new ArrayList<>(debtorsSorted);
+
+        for(Map.Entry<Participant, Integer> debtorEntry: debtors){
+            Participant debtor = debtorEntry.getKey();
+            int negativeBalance = debtorEntry.getValue();
+            while(negativeBalance < 0){
+                Map.Entry<Participant, Integer> creditorEntry = null;
+                try {
+                    creditorEntry = creditors.getLast();
+                } catch (NoSuchElementException e){
+                    throwBadBalanceException(creditMap, processMap);
+                }
+                int credit = creditorEntry.getValue();
+                int amountToTransfer = Integer.min(-negativeBalance, credit);
+
+                creditorEntry.setValue(credit - amountToTransfer);
+                negativeBalance += amountToTransfer;
+                if(creditorEntry.getValue()==0){
+                    creditors.removeLast();
+                }
+
+                Transfer transfer = new Transfer(debtor, amountToTransfer, creditorEntry.getKey());
+                result.add(transfer);
+            }
+            debtorEntry.setValue(negativeBalance);
+        }
+
+        //Sanity checks to ensure amounts in/out were balanced
+        creditors.forEach(entry->{
+            if(entry.getValue()!=0) throwBadBalanceException(creditMap, processMap);
+        });
+        debtors.forEach(entry->{
+            if(entry.getValue()!=0) throwBadBalanceException(creditMap, processMap);
+        });
+
+        return result;
+    }
+
+    /***
+     * Generates an Exception to be thrown when the credits and debits do not match
+     * @param creditMap the CreditMap to print for debug purposes
+     * @param processMap the CreditMap with mid-processing changes applied to it
+     */
+    private void throwBadBalanceException(HashMap<Participant, Integer> creditMap,
+                                          HashMap<Participant, Integer> processMap){
+        throw new IllegalArgumentException("Debts do not balance!\n"
+                + "Provided input:\n" + creditMap
+                + "Current processing state:\n" + processMap);
+    }
 
     /***
      * Generates the onClick action for a button that settles a particular debt
