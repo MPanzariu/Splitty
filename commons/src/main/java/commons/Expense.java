@@ -10,7 +10,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+
 import java.util.HashSet;
+
 import java.util.Set;
 
 @Entity
@@ -22,7 +24,8 @@ public class Expense{
     private String name;
     private int priceInCents;
     private Date date;
-
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE})
+    private Tag expenseTag;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
 
@@ -74,6 +77,14 @@ public class Expense{
 
     public Participant getOwedTo(){
         return owedTo;
+    }
+
+
+    public Tag getExpenseTag() {
+        return expenseTag;
+    }
+    public void setExpenseTag(Tag expenseTag) {
+        this.expenseTag = expenseTag;
     }
 
     public Set<Participant> getParticipantsInExpense() {
