@@ -291,8 +291,10 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         }
         Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
         Set<Participant> participantSet = getParticipantsForExpense();
-        for(Participant part: participantSet)
+        for(Participant part: participantSet) {
             resultExpense.addParticipantToExpense(part);
+            part.addParticipatesToExpense(resultExpense);
+        }
         return resultExpense;
     }
 

@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -522,9 +523,32 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public void IncludingFilter() {
         selectedExpenseListButton = inButton;
+        expensesLogListView.getItems().clear();
         //note: Because for the moment the expenses are split equally between all participants
         //the Including filter is useless since, by definition if someone is part of an event
         //they are part of all the expenses in that event
-        showAllExpenseList();
+        String name = cBoxParticipantExpenses.getValue();
+        Set<Participant> eventParticipants = event.getParticipants();
+        Participant selectedParticipant = null;
+        for(Participant participant: eventParticipants) {
+            if(participant.getName().equals(name)) {
+                selectedParticipant = participant;
+                break;
+            }
+        }
+        if(selectedParticipant == null)
+            throw new EntityNotFoundException("The participant doesn't exist");
+        Set<Expense> eventExpenses = event.getExpenses();
+        Set<Expense> participantExpenses = selectedParticipant.getParticipatesToExpense();
+        for(Expense expense1: eventExpenses) {
+            for(Expense expense2: participantExpenses) {
+                if(expense1.getId() == expense2.getId()) {
+                    HBox expenseBox = generateExpenseBox(expense1);
+                    expensesLogListView.getItems().add(expenseBox);
+                    break;
+                }
+            }
+        }
+        //showAllExpenseList();
     }
 }
