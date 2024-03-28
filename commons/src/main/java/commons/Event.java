@@ -249,6 +249,9 @@ public class Event{
     public void addTag(Tag eventTag){
         this.eventTags.add(eventTag);
     }
+    public void removeTag(Tag tag){
+        this.eventTags.remove(tag);
+    }
 
     /***
      * Getter for Event last date of activity

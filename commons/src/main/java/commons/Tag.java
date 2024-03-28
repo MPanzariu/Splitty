@@ -13,7 +13,7 @@ import java.util.Objects;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String tagName;
     private String colorCode;
 
@@ -23,7 +23,7 @@ public class Tag {
         this.colorCode = colorCode;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
     public String getTagName() {
