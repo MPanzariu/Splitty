@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 
 public class SettleDebtsUtils {
@@ -90,6 +91,39 @@ public class SettleDebtsUtils {
             result.append(formattedPrice);
             result.append(" by the group");
         }
+        return result.toString();
+    }
+
+    /***
+     * Generates a String representing all bank details for a Participant
+     * @param participant the Participant to check
+     * @return a String representation of a Participant's bank details
+     */
+    public String getBankDetails(Participant participant) {
+        String name = participant.getLegalName();
+        String iban = participant.getIban();
+        String bic = participant.getBic();
+
+        if(Objects.equals(name, "")) name = "(MISSING)";
+        if(Objects.equals(iban, "")) iban = "(MISSING)";
+        if(Objects.equals(bic, "")) bic = "(MISSING)";
+
+        StringBuilder result = new StringBuilder();
+        if(participant.hasBankAccount()){
+            result.append("Bank information available, transfer the money to:\n");
+        } else {
+            result.append("Full bank information unavailable:\n");
+        }
+
+        result.append("Account Holder: ");
+        result.append(name);
+        result.append("\n");
+        result.append("IBAN: ");
+        result.append(iban);
+        result.append("\n");
+        result.append("BIC: ");
+        result.append(bic);
+
         return result.toString();
     }
 }
