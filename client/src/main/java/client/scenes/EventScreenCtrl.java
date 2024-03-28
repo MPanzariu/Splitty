@@ -6,10 +6,12 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import jakarta.persistence.EntityNotFoundException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -24,6 +26,7 @@ import java.net.URL;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
@@ -83,7 +86,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.translation = translation;
         this.event = null;
         this.hBoxMap = new HashMap<>();
-        this.buttonsHBox = new HBox();
+       // this.buttonsHBox = new HBox();
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
     }
@@ -103,14 +109,20 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
-        participantsName.textProperty().bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
-        expenseLabel.textProperty().bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
-        addExpense.textProperty().bind(translation.getStringBinding("Event.Button.AddExpense"));
-        errorInvalidParticipant.textProperty().bind(translation.getStringBinding("empty"));
-        settleDebtsButton.textProperty().bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        participantsName.textProperty()
+            .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
+        expenseLabel.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.EventScreen"));
+        addExpense.textProperty()
+            .bind(translation.getStringBinding("Event.Button.AddExpense"));
+        errorInvalidParticipant.textProperty()
+            .bind(translation.getStringBinding("empty"));
+        settleDebtsButton.textProperty()
+            .bind(translation.getStringBinding("Event.Button.SettleDebts"));
         initializeEditTitle();
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/editing.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/editing.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -121,7 +133,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             throw new RuntimeException(e);
         }
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/add-participant.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/add-participant.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -132,7 +145,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             throw new RuntimeException(e);
         }
         try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
+            Image image = new Image(new
+                FileInputStream("client/src/main/resources/images/goBack.png"));
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(15);
             imageView.setFitHeight(15);
@@ -143,9 +157,24 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             throw new RuntimeException(e);
         }
         initializeParticipantsCBox();
+        //initializeFilterButtons();
+    }
+
+    /**
+     * Initializes the filter buttons(the size and position)
+     */
+    public void initializeFilterButtons() {
+        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
+        allExpenses.getStyleClass().add("button");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
+    /**
+     * Initializes the Combobox so the participant chosen is
+     * reflected in the filter buttons
+     */
     public void initializeParticipantsCBox() {
         cBoxParticipantExpenses.valueProperty()
             .addListener((observable, oldValue, newValue) -> {
@@ -161,9 +190,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                         .bind(translation.getStringBinding("empty"));
                     setButtonsNames(newValue);
                 }
-                else
-                    errorInvalidParticipant.textProperty()
-                        .bind(translation.getStringBinding("Event.Label.Error.InvalidParticipant"));
+                else {
+                    if(newValue == null || newValue.isEmpty())
+                        setButtonsNames("...");
+                    else {
+                        errorInvalidParticipant.textProperty()
+                            .bind(translation.getStringBinding(
+                                "Event.Label.Error.InvalidParticipant"));
+                    }
+                }
             });
     }
 
@@ -189,7 +224,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         refreshExpenseList();
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
-        buttonsHBox.getChildren().clear();
+        //buttonsHBox.getChildren().clear();
         languageCtrl.refresh(languageIndicator);
     }
 
@@ -267,13 +302,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * show the participants of the current event
      */
     private void updateParticipantsDropdown(){
-        cBoxParticipantExpenses.getItems().clear();
+        List<String> names = new ArrayList<>();
+        var boxItems = cBoxParticipantExpenses.getItems();
         //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
-            Label participantLabel = createParticipantLabel(current.getName(),
-                current.getId());
-            cBoxParticipantExpenses.getItems().add(current.getName());
+            names.add(current.getName());
         }
+        boxItems.retainAll(names);
+        names.removeAll(boxItems);
+        boxItems.addAll(names);
     }
 
     /**
@@ -283,13 +320,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param name the name from the buttons
      */
     public void setButtonsNames(String name) {
-        allExpenses = new Button("All");
-        fromButton = new Button("From " + name);
-        inButton = new Button("Including " + name);
-        buttonsHBox.getChildren().clear();
-        buttonsHBox.getChildren().add(allExpenses);
-        buttonsHBox.getChildren().add(fromButton);
-        buttonsHBox.getChildren().add(inButton);
+        allExpenses.textProperty().set("All");
+        fromButton.textProperty().set("From " + name);
+        inButton.textProperty().set("Including " + name);
     }
 
     /**
@@ -324,7 +357,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Button selectedButton = selectedExpenseListButton;
         if(selectedButton==null) selectedButton = allExpenses;
         if(selectedButton==allExpenses) showAllExpenseList();
-        else if(selectedButton==fromButton); //only From someone (unimplemented)
+        else if(selectedButton==fromButton) fromFilter(); //only From someone (unimplemented)
         else; //only Including someone (unimplemented)
     }
 
@@ -335,19 +368,52 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public void showAllExpenseList (){
         expensesLogListView.getItems().clear();
-        try {
-            for (Expense expense : event.getExpenses()) {
-                String log = expense.stringOnScreen();
-                Label expenseText = generateExpenseLabel(expense.getId(), log);
-                HBox expenseBox = new HBox(generateRemoveButton(expense.getId()), expenseText);
-                expenseBox.setSpacing(10);
-                hBoxMap.put(expense.getId(), expenseBox);
-                expenseBox.setAlignment(CENTER_LEFT);
-                expensesLogListView.getItems().add(expenseBox);
-            }
-        } catch (FileNotFoundException e){
-            throw new RuntimeException(e);
+        for(Expense expense: event.getExpenses()) {
+            HBox expenseBox = null;
+            expenseBox = generateExpenseBox(expense);
+            expensesLogListView.getItems().add(expenseBox);
         }
+    }
+
+    /**
+     *
+     * @param expense the expense for which we need to generate the HBox
+     * @return the generated hBox, containing the expense details
+     * @throws FileNotFoundException in case the file for the remove button isn't found
+     * an exception is thrown
+     */
+    public HBox generateExpenseBox(Expense expense) {
+        String log = expense.stringOnScreen();
+        Set<Participant> participants = event.getParticipants();
+        boolean all = true;
+        for(Participant participant: participants) {
+            all = false;
+            for (Participant participant1 : expense.getParticipantsInExpense())
+                if (participant.getId() == participant1.getId()) {
+                    all = true;
+                    break;
+                }
+            if(!all)
+                break;
+        }
+        if(all)
+            log += '\n' + "(All)";
+        else {
+            log += '\n' + "(";
+            for(Participant participant: expense.getParticipantsInExpense())
+                if(event.getParticipants().contains(participant)) {
+                    log += participant.getName();
+                    log += " ";
+                }
+            log += ")";
+        }
+        Label expenseText = generateExpenseLabel(expense.getId(), log);
+        ImageView xButton = generateRemoveButton(expense.getId());
+        HBox expenseBox = new HBox(expenseText, xButton);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        hBoxMap.put(expense.getId(), expenseBox);
+        expenseBox.setAlignment(CENTER_LEFT);
+        return expenseBox;
     }
 
     /**
@@ -367,7 +433,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         });
         expense.setOnMouseClicked(mouseEvent -> {
             mainCtrl.switchToEditExpense(expenseId);
-            });
+        });
         return expense;
     }
 
@@ -379,9 +445,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @throws FileNotFoundException in case the image isn't found,
      * this exception is thrown
      */
-    public ImageView generateRemoveButton (long expenseId) throws FileNotFoundException {
+    public ImageView generateRemoveButton (long expenseId) {
         FileInputStream input = null;
-        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        try {
+            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         int imgSize = 15;
@@ -432,5 +502,51 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public void switchToMainScreen(ActionEvent actionEvent) {
         mainCtrl.showMainScreen();
+    }
+
+    /**
+     * Filters the expenses, showing only the ones that were paid by a certain participant
+     */
+    public void fromFilter() {
+        selectedExpenseListButton = fromButton;
+        expensesLogListView.getItems().clear();
+        String name = cBoxParticipantExpenses.getValue();
+        for(Expense expense: event.getExpenses())
+            if(expense.getOwedTo().getName().equals(name)) {
+                HBox expenseBox = generateExpenseBox(expense);
+                expensesLogListView.getItems().add(expenseBox);
+            }
+    }
+
+    /**
+     * Filters the expenses, showing the one a certain participant is part of
+     */
+    public void IncludingFilter() {
+        selectedExpenseListButton = inButton;
+        expensesLogListView.getItems().clear();
+        //note: Because for the moment the expenses are split equally between all participants
+        //the Including filter is useless since, by definition if someone is part of an event
+        //they are part of all the expenses in that event
+        String name = cBoxParticipantExpenses.getValue();
+        Set<Participant> eventParticipants = event.getParticipants();
+        Participant selectedParticipant = null;
+        for(Participant participant: eventParticipants) {
+            if(participant.getName().equals(name)) {
+                selectedParticipant = participant;
+                break;
+            }
+        }
+        if(selectedParticipant == null)
+            throw new EntityNotFoundException("The participant doesn't exist");
+        Set<Expense> eventExpenses = event.getExpenses();
+        for(Expense expense1: eventExpenses) {
+            Set<Participant>participantsInExpense = expense1.getParticipantsInExpense();
+                if(participantsInExpense.contains(selectedParticipant)) {
+                    HBox expenseBox = generateExpenseBox(expense1);
+                    expensesLogListView.getItems().add(expenseBox);
+                    break;
+                }
+        }
+        //showAllExpenseList();
     }
 }

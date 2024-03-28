@@ -11,6 +11,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 
+import java.util.HashSet;
+
+import java.util.Set;
+
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Expense.class)
 public class Expense{
@@ -20,9 +24,13 @@ public class Expense{
     private String name;
     private int priceInCents;
     private Date date;
-
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE})
+    private Tag expenseTag;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private Set<Participant> participantsInExpense;
 
     @SuppressWarnings("unused")
     public Expense() {}
@@ -32,6 +40,7 @@ public class Expense{
         this.priceInCents = priceInCents;
         this.date = date;
         this.owedTo = owedTo;
+        this.participantsInExpense = new HashSet<>();
     }
 
     public long getId() {
@@ -70,6 +79,24 @@ public class Expense{
         return owedTo;
     }
 
+
+    public Tag getExpenseTag() {
+        return expenseTag;
+    }
+    public void setExpenseTag(Tag expenseTag) {
+        this.expenseTag = expenseTag;
+    }
+
+    public Set<Participant> getParticipantsInExpense() {
+        return participantsInExpense;
+    }
+    public void addParticipantToExpense(Participant participant) {
+        participantsInExpense.add(participant);
+    }
+    public void removeParticipantFromExpense(Participant participant) {
+        this.participantsInExpense.remove(participant);
+    }
+
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);
@@ -92,4 +119,7 @@ public class Expense{
             return null + " paid " + (double) priceInCents / 100 + " for " + name;
     }
 
+    public void setParticipantToExpense(Set<Participant> participants) {
+        participantsInExpense = participants;
+    }
 }

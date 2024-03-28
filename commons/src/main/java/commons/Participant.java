@@ -54,6 +54,7 @@ public class Participant {
         this.id = id;
         this.name = name;
         this.expensesOwedTo = new HashSet<>();
+
     }
 
     /***

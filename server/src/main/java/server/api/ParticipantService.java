@@ -10,6 +10,9 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class ParticipantService {
     private final EventRepository eventRepository;
@@ -61,6 +64,12 @@ public class ParticipantService {
         var expenses = expenseRepository.findByOwedTo(participant);
         for (Expense expense : expenses)
             event.removeExpense(expense);
+        Set<Expense> expensesInEvent = event.getExpenses();
+        for(Expense expense: expensesInEvent) {
+            Set<Participant> participantsInExpense = expense.getParticipantsInExpense();
+            participantsInExpense.remove(participant);
+            expenseRepository.save(expense);
+        }
         event.removeParticipant(participant);
         eventRepository.save(event);
     }
