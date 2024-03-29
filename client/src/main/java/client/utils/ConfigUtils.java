@@ -7,7 +7,7 @@ import java.util.Properties;
 public class ConfigUtils {
     public static final String CONFIG_NAME = "splitty.properties";
     // update this whenever you add/remove/change default properties
-    public static final int CONFIG_VERSION = 2;
+    public static final int CONFIG_VERSION = 3;
     public static final String DEFAULT_PROPS_SERVER_URL = "http://localhost:8080/";
     public static final String DEFAULT_PROPS_LANGUAGE = Locale.ENGLISH.getLanguage();
 
@@ -70,6 +70,12 @@ public class ConfigUtils {
         properties.setProperty("config.version", String.valueOf(CONFIG_VERSION));
         properties.setProperty("connection.URL", DEFAULT_PROPS_SERVER_URL);
         properties.setProperty("client.language", DEFAULT_PROPS_LANGUAGE);
+        properties.setProperty("spring.mail.host", "");
+        properties.setProperty("spring.mail.port", "");
+        properties.setProperty("spring.mail.username", "");
+        properties.setProperty("spring.mail.password", "");
+        properties.setProperty("spring.mail.properties.mail.smtp.auth", "true");
+        properties.setProperty("spring.mail.properties.mail.smtp.starttls.enable", "true");
         return properties;
     }
 }
