@@ -59,12 +59,94 @@ public class Event{
         return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
     }
 
+    private final static BigDecimal initialBalance = BigDecimal.valueOf(0);
+
     /***
-     * Calculates the total spending per person
-     * @return A Map of participants to the amount of expenses attributed to them
+     * Calculates the total expense share per person
+     * @return A Map of participants to the total split cost of expenses they are in
      */
     @JsonIgnore
-    public HashMap<Participant,Integer> getSpendingPerPerson() {
+    public HashMap<Participant,BigDecimal> getExpenseShare() {
+        HashMap<Participant, BigDecimal> shareMap = new HashMap<>();
+
+        for (Participant participant:
+                participants) {
+            shareMap.put(participant, initialBalance);
+        }
+
+        for (Expense expense:
+                expenses) {
+            Set<Participant> members = expense.getParticipantsInExpense();
+            int amountToSplit = expense.getPriceInCents();
+            splitAmountEqually(shareMap, members, amountToSplit);
+        }
+
+        return shareMap;
+    }
+
+    /***
+     * Splits the submitted cost across all members provided, adding it to the Map
+     * @param shareMap a Map containing share per Participant
+     * @param members the Participants partaking
+     * @param costInCents the cost to split equally between the given members
+     */
+    @JsonIgnore
+    public void splitAmountEqually(HashMap<Participant, BigDecimal> shareMap,
+                              Set<Participant> members,
+                              int costInCents) {
+
+        BigDecimal totalCost = convertIntToDecimal(costInCents);
+        BigDecimal peopleToDivideBy = BigDecimal.valueOf(members.size());
+        BigDecimal sharePerPerson = totalCost.divide(peopleToDivideBy, RoundingMode.HALF_UP);
+
+        for (Participant participant:
+                members) {
+            BigDecimal balance = shareMap.get(participant);
+            balance = balance.add(sharePerPerson);
+            shareMap.put(participant, balance);
+        }
+    }
+
+    private final static int precision = 4;
+    /***
+     * Converts an int to an appropriate BigDecimal
+     * @param number the number to convert
+     * @return a BigDecimal of the int, with additional digits after the dot
+     */
+    @JsonIgnore
+    private BigDecimal convertIntToDecimal(int number){
+        long scale = (long) Math.pow(10, precision);
+        BigInteger numberScaled = BigInteger.valueOf(scale * number);
+        return new BigDecimal(numberScaled, precision);
+    }
+
+    /**
+     * Calculates the share owed to (credit) per Participant for all expenses
+     * @return a Map of participants to the amount they are owed (credit)
+     */
+    @JsonIgnore
+    public HashMap<Participant,BigDecimal> getOwedShares(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+
+        HashMap<Participant, BigDecimal> shareMap = getExpenseShare();
+        HashMap<Participant, Integer> spendingMap = getSpendingPerPerson();
+
+        for(Participant participant: getParticipants()){
+            BigDecimal spendingShare = shareMap.get(participant);
+            BigDecimal amountActuallySpent = convertIntToDecimal(spendingMap.get(participant));
+            BigDecimal credit = amountActuallySpent.subtract(spendingShare);
+            creditMap.put(participant, credit);
+        }
+
+        return creditMap;
+    }
+
+    /***
+     * Calculates the total expense spending
+     * @return A Map of participants to the total cost of expenses they paid for
+     */
+    @JsonIgnore
+    public HashMap<Participant, Integer> getSpendingPerPerson(){
         HashMap<Participant, Integer> spendingMap = new HashMap<>();
 
         for (Participant participant:
@@ -72,64 +154,13 @@ public class Event{
             spendingMap.put(participant, 0);
         }
 
-        for (Expense expense:
-                expenses) {
-            Participant spender = expense.getOwedTo();
-            Integer balance = spendingMap.get(spender);
-            spendingMap.put(spender, (balance+expense.getPriceInCents()));
+        for(Expense expense:
+            expenses){
+            Participant participant = expense.getOwedTo();
+            Integer balance = spendingMap.get(participant);
+            spendingMap.put(participant, balance + expense.getPriceInCents());
         }
-
         return spendingMap;
-    }
-
-    private final static int precision = 4;
-    private final static long scale = (long) Math.pow(10, precision);
-    /**
-     * Calculates the share owed to (credit) per Participant for all expenses, split equally
-     * @return a Map of participants to the amount they are owed (credit)
-     */
-    @JsonIgnore
-    public HashMap<Participant,Integer> getOwedShares(){
-        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
-        BigDecimal initialBalance = BigDecimal.valueOf(0);
-
-        for (Participant participant:
-                participants) {
-            creditMap.put(participant, initialBalance);
-        }
-
-        for (Expense expense:
-             expenses) {
-            BigInteger costScaled = BigInteger.valueOf(scale * expense.getPriceInCents());
-            BigDecimal totalCost = new BigDecimal(costScaled, precision);
-            Participant owedTo = expense.getOwedTo();
-
-            BigDecimal owedToBalance = creditMap.get(owedTo);
-            creditMap.put(owedTo, (owedToBalance.add(totalCost)));
-            splitEqually(creditMap, totalCost);
-        }
-        return roundMap(creditMap);
-    }
-
-    private HashMap<Participant, Integer> roundMap(HashMap<Participant, BigDecimal> creditMap) {
-        HashMap<Participant, Integer> roundedMap = new HashMap<>();
-        for(Map.Entry<Participant, BigDecimal> entry:
-            creditMap.entrySet()){
-            Integer roundedValue = entry.getValue().intValue();
-            roundedMap.put(entry.getKey(), roundedValue);
-        }
-        return roundedMap;
-    }
-
-    private void splitEqually(HashMap<Participant, BigDecimal> creditMap, BigDecimal totalCost) {
-        BigDecimal peopleToDivideBy = BigDecimal.valueOf(participants.size());
-        BigDecimal sharePerPerson = totalCost.divide(peopleToDivideBy, RoundingMode.HALF_UP);
-        for (Participant participant:
-                participants) {
-            BigDecimal balance = creditMap.get(participant);
-            balance = balance.subtract(sharePerPerson);
-            creditMap.put(participant, balance);
-        }
     }
 
     static final char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();

@@ -6,4 +6,5 @@ java {
 
 dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.3'
+    testImplementation project(path: ':client')
 }

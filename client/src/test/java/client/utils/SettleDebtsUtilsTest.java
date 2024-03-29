@@ -10,6 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,11 +29,137 @@ class SettleDebtsUtilsTest {
 
     Participant participant1;
     Participant participant2;
+    Participant participant3;
 
     @BeforeEach
     void setup(){
         participant1 = new Participant("Vox");
         participant2 = new Participant("Val");
+        participant3 = new Participant("Vel");
+    }
+
+    BigDecimal bigDecimalize(int number){
+        return BigDecimal.valueOf(number);
+    }
+
+    /***
+     * Randomized transfers result in correct outcome
+     */
+    @Test
+    void randomTransferInstructions(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Random rng = new Random();
+
+        Participant participant4 = new Participant("VVV");
+
+        int rand1 = generateRandom(rng);
+        int rand2 = generateRandom(rng);
+        int rand3 = generateRandom(rng);
+        int balancer = -(rand1+rand2+rand3);
+
+        creditMap.put(participant1, bigDecimalize(rand1));
+        creditMap.put(participant2, bigDecimalize(rand2));
+        creditMap.put(participant3, bigDecimalize(rand3));
+        creditMap.put(participant4, bigDecimalize(balancer));
+
+        var initialResult = sut.calculateTransferInstructions(creditMap);
+        assertTrue(initialResult.size()<creditMap.size());
+
+        //Run one transfer at a time, and make sure it always settles the debt
+        int ceiling = creditMap.size();
+        var transferSetAfterTransfer = new HashSet<>(initialResult);
+        for (Transfer transfer:
+             initialResult) {
+            BigDecimal balSender = creditMap.get(transfer.sender());
+            BigDecimal balReceiver = creditMap.get(transfer.receiver());
+            BigDecimal amount = bigDecimalize(transfer.amount());
+            creditMap.put(transfer.sender(), balSender.add(amount));
+            creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
+            transferSetAfterTransfer.remove(transfer);
+
+            var reranResult = sut.calculateTransferInstructions(creditMap);
+            assertEquals(transferSetAfterTransfer, reranResult);
+
+            ceiling -= 1;
+            assertTrue(reranResult.size()<ceiling);
+        }
+    }
+
+    /***
+     * Generates a random number between min and max
+     */
+    private int generateRandom(Random random){
+        int min = -1000;
+        int max = 1000;
+        return random.nextInt(max - min) + min;
+    }
+
+    /***
+     * One debtor can pay off multiple people
+     */
+    @Test
+    void splitDebtTransferInstructions(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+
+        creditMap.put(participant1, bigDecimalize(-25));
+        creditMap.put(participant2, bigDecimalize(10));
+        creditMap.put(participant3, bigDecimalize(15));
+
+        Transfer transfer1 = new Transfer(participant1, 10, participant2);
+        Transfer transfer2 = new Transfer(participant1, 15, participant3);
+
+        var result = sut.calculateTransferInstructions(creditMap);
+
+        assertTrue(result.contains(transfer1));
+        assertTrue(result.contains(transfer2));
+    }
+
+    /***
+     * One creditor can receive from multiple people
+     */
+    @Test
+    void splitCreditTransferInstructions(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+
+        creditMap.put(participant1, bigDecimalize(100));
+        creditMap.put(participant2, bigDecimalize(-25));
+        creditMap.put(participant3, bigDecimalize(-75));
+
+        Transfer transfer1 = new Transfer(participant2, 25, participant1);
+        Transfer transfer2 = new Transfer(participant3, 75, participant1);
+
+        var result = sut.calculateTransferInstructions(creditMap);
+
+        assertTrue(result.contains(transfer1));
+        assertTrue(result.contains(transfer2));
+    }
+
+    /***
+     * Net positive amounts are rejected
+     */
+    @Test
+    void netPositiveTransferInstructions(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+
+        creditMap.put(participant1, bigDecimalize(100));
+        creditMap.put(participant2, bigDecimalize(-10));
+        creditMap.put(participant3, bigDecimalize(-20));
+
+        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
+    }
+
+    /***
+     * Net negative amounts are rejected
+     */
+    @Test
+    void netNegativeTransferInstructions(){
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+
+        creditMap.put(participant1, bigDecimalize(100));
+        creditMap.put(participant2, bigDecimalize(-70));
+        creditMap.put(participant3, bigDecimalize(-50));
+
+        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
     }
 
     /***
@@ -37,7 +168,8 @@ class SettleDebtsUtilsTest {
      */
     @Test
     void createSettlementExpense() {
-        var result = sut.createSettlementExpense(participant1, 7, participant2);
+        Transfer transfer = new Transfer(participant1, 7, participant2);
+        var result = sut.createSettlementExpense (transfer);
         assertNotNull(result);
     }
 
@@ -48,48 +180,45 @@ class SettleDebtsUtilsTest {
      */
     @Test
     void createSettleAction() {
-        EventHandler<ActionEvent> result = sut.createSettleAction(participant1, 7, participant2, "ABC123");
+        Transfer transfer = new Transfer(participant1, 7, participant2);
+        EventHandler<ActionEvent> result = sut.createSettleAction(transfer, "ABC123");
         result.handle(new ActionEvent());
         assertNotNull(result);
     }
 
     /***
-     * [TO BE CHANGED/REMOVED WHEN MORE FEATURES ARE IMPLEMENTED]
-     * Checks if text generated for someone with positive balance
+     * Checks if text generated for a transfer
      * fits the structure and has the correct details
      */
     @Test
     void stringPositive() {
-        var result = sut.createDebtString("A", 7, "B");
-        assertTrue(result.contains("A"));
-        assertTrue(result.contains("is owed"));
+        Participant participantA = new Participant("NameABC");
+        Participant participantB = new Participant("NameXYZ");
+        Transfer transfer = new Transfer(participantA, 7, participantB);
+        var result = sut.createTransferString(transfer);
+        assertTrue(result.contains("NameABC"));
+        assertTrue(result.contains("gives"));
         assertTrue(result.contains("0.07"));
+        assertTrue(result.contains("to"));
+        assertTrue(result.contains("NameXYZ"));
     }
 
     /***
-     * [TO BE CHANGED WHEN MORE FEATURES ARE IMPLEMENTED]
-     * Checks if text generated for someone owing money
-     * fits the structure and has the correct details
+     * Checks if a negative amount transfer is caught
      */
     @Test
     void stringNegative() {
-        var result = sut.createDebtString("A", -7, "B");
-        assertTrue(result.contains("A"));
-        assertTrue(result.contains("owes"));
-        assertTrue(result.contains("0.07"));
+        Transfer transfer = new Transfer(participant1, -7, participant2);
+        assertThrows(IllegalArgumentException.class, () -> sut.createTransferString(transfer));
     }
 
     /***
-     * [TO BE CHANGED/REMOVED WHEN MORE FEATURES ARE IMPLEMENTED]
-     * Checks if text generated for someone with no balance at all
-     * fits the structure and has the correct details
+     * Checks if a zero amount transfer is caught
      */
     @Test
     void stringZero() {
-        var result = sut.createDebtString("A", 0, "B");
-        assertTrue(result.contains("A"));
-        assertTrue(result.contains("owes"));
-        assertFalse(result.contains("to"));
+        Transfer transfer = new Transfer(participant1, 0, participant2);
+        assertThrows(IllegalArgumentException.class, () -> sut.createTransferString(transfer));
     }
 
     /***
