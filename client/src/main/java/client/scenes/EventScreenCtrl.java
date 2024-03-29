@@ -1,11 +1,14 @@
 package client.scenes;
 
+import client.utils.EmailHandler;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.application.Platform;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,7 +21,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -72,6 +74,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Event event;
     private Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
+    @FXML
+    private Button testEmailButton;
+    private EmailHandler emailHandler;
+    @FXML
+    private Label emailFeedbackLabel;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -109,6 +116,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
+        testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
+        testEmailButton.setOnAction(event -> sendTestEmail());
         participantsName.textProperty()
             .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty()
@@ -120,6 +129,20 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         settleDebtsButton.textProperty()
             .bind(translation.getStringBinding("Event.Button.SettleDebts"));
         initializeEditTitle();
+        addGeneratedImages();
+        initializeParticipantsCBox();
+        emailHandler = new EmailHandler();
+        if (emailHandler.isConfigured()) {
+            Styling.removeStyling(testEmailButton, "disabledButton");
+        }
+        emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        languageCtrl.initializeLanguageIndicator(languageIndicator);
+    }
+
+    /**
+     * Adds generated images to the buttons
+     */
+    private void addGeneratedImages() {
         try{
             Image image = new Image(new
                 FileInputStream("client/src/main/resources/images/editing.png"));
@@ -504,6 +527,33 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         mainCtrl.showMainScreen();
     }
 
+    /**
+     * Sends a test email to the user
+     */
+    public void sendTestEmail() {
+        if (!emailHandler.isConfigured()){
+            return;
+        }
+        Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+        emailFeedbackLabel.textProperty()
+                .bind(translation.getStringBinding("Event.Label.EmailFeedback.Sending"));
+        Thread t = new Thread(() ->
+        {
+            boolean emailSent = emailHandler.sendTestEmail();
+            Platform.runLater(() -> {
+                if (emailSent) {
+                    Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+                    emailFeedbackLabel.textProperty()
+                            .bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+                } else if (emailHandler.isConfigured()) {
+                    Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
+                    emailFeedbackLabel.textProperty()
+                            .bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+                }
+            });
+        });
+        t.start();
+    }
     /**
      * Filters the expenses, showing only the ones that were paid by a certain participant
      */

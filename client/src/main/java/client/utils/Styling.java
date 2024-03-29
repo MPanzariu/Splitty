@@ -44,4 +44,15 @@ public class Styling {
         }
     }
 
+    /**
+     * Removes a styling from a node
+     * @param node the node to remove the styling from
+     * @param style the style to remove
+     */
+    public static void removeStyling(Node node, String style) {
+        if (node != null) {
+            node.getStyleClass().remove(style);
+        }
+    }
+
 }
