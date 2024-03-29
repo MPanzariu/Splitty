@@ -3,6 +3,7 @@ package client.utils;
 import com.google.inject.Inject;
 import commons.Expense;
 import commons.Participant;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
@@ -138,19 +139,23 @@ public class SettleDebtsUtils {
     }
 
     /***
-     * Generates a string representation of a debt
+     * Generates a string representation of Transfer instructions
      * @param transfer the Transfer data to use
      * @return a String stating who owes who and how much
      */
-    public String createTransferString(Transfer transfer) {
+    public ObservableValue<String> createTransferString(Transfer transfer) {
         int amount = transfer.amount();
+        if(amount<=0) throw new IllegalArgumentException("Negative or zero transfer: " + transfer);
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         String formattedAmount = decimalFormat.format(amount / 100.0) + "\u20ac";
 
-        if(amount<=0) throw new IllegalArgumentException("Negative or zero transfer: " + transfer);
-        return transfer.sender().getName() + " gives " +
-                formattedAmount + " to " +
-                transfer.receiver().getName();
+        Map<String, String> substituteValues = new HashMap<>();
+        substituteValues.put("senderName", transfer.sender().getName());
+        substituteValues.put("amount", formattedAmount);
+        substituteValues.put("receiverName", transfer.receiver().getName());
+
+        return translation.getStringSubstitutionBinding("SettleDebts.String.transferInstructions",
+                substituteValues);
     }
 
     /***

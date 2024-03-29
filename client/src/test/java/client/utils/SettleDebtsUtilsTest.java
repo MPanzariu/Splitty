@@ -1,6 +1,9 @@
 package client.utils;
 
 import commons.Participant;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,15 +16,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class SettleDebtsUtilsTest {
     @InjectMocks
     SettleDebtsUtils sut;
-
     @Mock
     ServerUtils server;
     @Mock
@@ -195,12 +199,51 @@ class SettleDebtsUtilsTest {
         Participant participantA = new Participant("NameABC");
         Participant participantB = new Participant("NameXYZ");
         Transfer transfer = new Transfer(participantA, 7, participantB);
-        var result = sut.createTransferString(transfer);
+
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("senderName", "NameABC");
+        expectedValues.put("amount", "0.07\u20ac");
+        expectedValues.put("receiverName", "NameXYZ");
+
+        //Only returns this if the expected values are substituted in, null otherwise
+        lenient().when(translation.getStringSubstitutionBinding(
+                "SettleDebts.String.transferInstructions", expectedValues))
+                .thenReturn(stringToObservable(
+                        expectedValues.get("senderName") + " gives " +
+                        expectedValues.get("amount") + " to " +
+                        expectedValues.get("receiverName")));
+
+        String result = sut.createTransferString(transfer).getValue();
         assertTrue(result.contains("NameABC"));
         assertTrue(result.contains("gives"));
         assertTrue(result.contains("0.07"));
         assertTrue(result.contains("to"));
         assertTrue(result.contains("NameXYZ"));
+    }
+
+    ObservableValue<String> stringToObservable(String string){
+        return new ObservableValue<>() {
+            @Override
+            public String getValue() {
+                return string;
+            }
+
+            @Override
+            public void addListener(ChangeListener<? super String> listener) {
+            }
+
+            @Override
+            public void removeListener(ChangeListener<? super String> listener) {
+            }
+
+            @Override
+            public void addListener(InvalidationListener listener) {
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+            }
+        };
     }
 
     /***
