@@ -1,8 +1,10 @@
 package commons;
 
+import client.utils.RoundUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -135,7 +137,7 @@ public class EventTest {
         event.addExpense(expense1);
         event.addExpense(expense2);
 
-        var result = event.getOwedShares();
+        var result = RoundUtils.roundMap(event.getOwedShares(), RoundingMode.HALF_UP);
         assertEquals(20*cents, result.get(participant1));
         assertEquals(-20*cents, result.get(participant2));
     }
@@ -160,7 +162,7 @@ public class EventTest {
         event.addExpense(expense1);
         event.addExpense(expense2);
 
-        var result = event.roundMap(event.getExpenseShare());
+        var result = RoundUtils.roundMap(event.getExpenseShare(), RoundingMode.HALF_UP);
         assertEquals(10*cents, result.get(participant1));
         assertEquals(20*cents, result.get(participant2));
     }
@@ -187,7 +189,7 @@ public class EventTest {
             event.addExpense(expense);
         }
 
-        var result = event.roundMap(event.getExpenseShare());
+        var result = RoundUtils.roundMap(event.getExpenseShare(), RoundingMode.HALF_UP);
         assertEquals(1000, result.get(participant1));
         assertEquals(1000, result.get(participant2));
         assertEquals(1000, result.get(participant3));
@@ -210,7 +212,7 @@ public class EventTest {
         event.addExpense(expense1);
 
         // the assumption is that if there's a fractional cent to transfer, no one transfers
-        var result = event.getOwedShares();
+        var result = RoundUtils.roundMap(event.getOwedShares(), RoundingMode.HALF_UP);
         assertEquals(1, result.get(participant1));
         assertEquals(-1, result.get(participant2));
     }
