@@ -52,14 +52,14 @@ public class SettleDebtsUtils {
         //We probably don't want to be mutating the inserted creditMap, re-running should yield the same result
         HashMap<Participant, BigDecimal> unroundedMap = new HashMap<>(creditMap);
 
-        var roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.HALF_UP);
+        HashMap<Participant, Integer> roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.HALF_UP);
         int netAmount = roundedMap.values().stream().mapToInt(integer -> integer).sum();
 
         /*
          * Real usage often creates problems with fractional cents causing net balances to be +- 1 instead of 0
          * This problem is solved here by rounding up
          */
-        if(netAmount== -1 ) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.DOWN);
+        if(netAmount == -1 ) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.DOWN);
         else if (netAmount == 1) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.UP);
         else if (netAmount != 0) throwBadBalanceException(creditMap,roundedMap);
         HashMap<Participant, Integer> processMap = new HashMap<>(roundedMap);
@@ -99,11 +99,11 @@ public class SettleDebtsUtils {
 
         //Sanity checks to ensure amounts in/out were balanced
         creditors.forEach(entry->{
-            if(entry.getValue()==1) entry.setValue(0); //Ignore 1 cent net amounts
-            if(entry.getValue()!=0) throwBadBalanceException(creditMap, processMap);
+            if(entry.getValue() == 1) entry.setValue(0); //Ignore 1 cent net amounts
+            if(entry.getValue() != 0) throwBadBalanceException(creditMap, processMap);
         });
         debtors.forEach(entry->{
-            if(entry.getValue()!=0) throwBadBalanceException(creditMap, processMap);
+            if(entry.getValue() != 0) throwBadBalanceException(creditMap, processMap);
         });
 
         return result;

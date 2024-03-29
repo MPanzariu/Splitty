@@ -4,6 +4,8 @@ import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -16,9 +18,12 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Pair;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import static javafx.geometry.Pos.*;
 
@@ -65,8 +70,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void initialize(URL location, ResourceBundle resources) {
         settleDebtsLabel.textProperty()
                 .bind(translation.getStringBinding("SettleDebts.Label.title"));
-        var backImage = ImageUtils.loadImageFile("goBack.png");
-        var backImageView = ImageUtils.generateImageView(backImage, 20);
+        Image backImage = ImageUtils.loadImageFile("goBack.png");
+        ImageView backImageView = ImageUtils.generateImageView(backImage, 20);
         goBackButton.setGraphic(backImageView);
     }
 
@@ -76,8 +81,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void populateVBox(){
         List<Node> children = settleVBox.getChildren();
         children.clear();
-        var owedShares = event.getOwedShares();
-        var transfers = utils.calculateTransferInstructions(owedShares);
+        HashMap<Participant, BigDecimal> owedShares = event.getOwedShares();
+        Set<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
 
         Image expandButtonImage = ImageUtils.loadImageFile("singlearrow.png");
 
@@ -160,7 +165,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
         Styling.applyStyling(button, "positiveButton");
-        var onClick = utils.createSettleAction(transfer, event.getId());
+        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
         button.setOnAction(onClick);
 
         return button;
