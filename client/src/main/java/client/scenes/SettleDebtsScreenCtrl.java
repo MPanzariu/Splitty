@@ -4,7 +4,6 @@ import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -175,7 +174,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     /***
      * Generates a Button that expands the bank details pane for a transfer
      * @param pane the Pane to expand/collapse
-     * @param expandButtonInnerImage the image for the button, passed in here for better performance
+     * @param expandButtonInnerImage the image for the button, passed in here for better perforamce
      * @return a Button that expands/collapses the given Pane when clicked
      */
     public Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
@@ -204,8 +203,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Label generateTransferLabel(Transfer transfer) {
         Label label = new Label();
-        ObservableValue<String> transferString = utils.createTransferString(transfer);
-        label.textProperty().bind(transferString);
+        String transferString = utils.createTransferString(transfer);
+        label.setText(transferString);
         return label;
     }
 
