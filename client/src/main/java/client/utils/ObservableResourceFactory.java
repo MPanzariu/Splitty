@@ -2,7 +2,6 @@ package client.utils;
 
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleMapProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -55,7 +54,7 @@ public class ObservableResourceFactory {
      * @param values the values to substitute in for placeholders
      * @return - a live-updating binding for the translated value, with values substituted (values are NOT live-updated)
      */
-    public ObservableValue<String> getStringSubstitutionBinding(String key, Map<String, String> values) {
+    public StringBinding getStringSubstitutionBinding(String key, Map<String, String> values) {
         return new StringBinding() {
             { bind(resourcesProperty()); }
             @Override
