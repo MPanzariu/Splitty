@@ -278,7 +278,23 @@ class SettleDebtsUtilsTest {
         participant1.setIban(iban);
         participant1.setBic(bic);
 
-        var result = sut.getBankDetails(participant1);
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("holder", name);
+        expectedValues.put("iban", iban);
+        expectedValues.put("bic", bic);
+
+
+        //Only returns this if the expected values are substituted in, null otherwise
+        lenient().when(translation.getStringBinding("SettleDebts.String.bankAvailable"))
+                        .thenReturn(stringToObservable("Bank information available, transfer the money to:"));
+        lenient().when(translation.getStringSubstitutionBinding(
+                        "SettleDebts.String.bankDetails", expectedValues))
+                .thenReturn(stringToObservable(
+                                "Account Holder: " + expectedValues.get("holder") +
+                                "\nIBAN: " + expectedValues.get("iban") +
+                                "\nBIC: " + expectedValues.get("bic")));
+
+        var result = sut.getBankDetails(participant1).getValue();
         assertTrue(result.contains("information available"));
         assertTrue(result.contains(name));
         assertTrue(result.contains(iban));
@@ -299,7 +315,23 @@ class SettleDebtsUtilsTest {
         participant1.setIban(iban);
         participant1.setBic(bic);
 
-        var result = sut.getBankDetails(participant1);
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("holder", name);
+        expectedValues.put("iban", "(MISSING)");
+        expectedValues.put("bic", bic);
+
+
+        //Only returns this if the expected values are substituted in, null otherwise
+        lenient().when(translation.getStringBinding("SettleDebts.String.bankUnavailable"))
+                .thenReturn(stringToObservable("Full bank information unavailable:"));
+        lenient().when(translation.getStringSubstitutionBinding(
+                        "SettleDebts.String.bankDetails", expectedValues))
+                .thenReturn(stringToObservable(
+                        "Account Holder: " + expectedValues.get("holder") +
+                                "\nIBAN: " + expectedValues.get("iban") +
+                                "\nBIC: " + expectedValues.get("bic")));
+
+        var result = sut.getBankDetails(participant1).getValue();
         assertTrue(result.contains("information unavailable"));
         assertTrue(result.contains(name));
         assertTrue(result.contains("(MISSING)"));

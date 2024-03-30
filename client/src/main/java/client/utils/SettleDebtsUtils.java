@@ -3,6 +3,7 @@ package client.utils;
 import com.google.inject.Inject;
 import commons.Expense;
 import commons.Participant;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -139,9 +140,9 @@ public class SettleDebtsUtils {
     }
 
     /***
-     * Generates a string representation of Transfer instructions
+     * Generates a localized Observable String representation of Transfer instructions
      * @param transfer the Transfer data to use
-     * @return a String stating who owes who and how much
+     * @return an ObservableValue String stating who owes who and how much
      */
     public ObservableValue<String> createTransferString(Transfer transfer) {
         int amount = transfer.amount();
@@ -159,11 +160,11 @@ public class SettleDebtsUtils {
     }
 
     /***
-     * Generates a String representing all bank details for a Participant
+     * Generates a localized Observable String representing all bank details for a Participant
      * @param participant the Participant to check
-     * @return a String representation of a Participant's bank details
+     * @return an ObservableValue String representation of a Participant's bank details
      */
-    public String getBankDetails(Participant participant) {
+    public ObservableValue<String> getBankDetails(Participant participant) {
         String name = participant.getLegalName();
         String iban = participant.getIban();
         String bic = participant.getBic();
@@ -172,22 +173,19 @@ public class SettleDebtsUtils {
         if(Objects.equals(iban, "")) iban = "(MISSING)";
         if(Objects.equals(bic, "")) bic = "(MISSING)";
 
-        StringBuilder result = new StringBuilder();
+        ObservableValue<String> availability;
         if(participant.hasBankAccount()){
-            result.append("Bank information available, transfer the money to:\n");
+            availability = translation.getStringBinding("SettleDebts.String.bankAvailable");
         } else {
-            result.append("Full bank information unavailable:\n");
+            availability = translation.getStringBinding("SettleDebts.String.bankUnavailable");
         }
 
-        result.append("Account Holder: ");
-        result.append(name);
-        result.append("\n");
-        result.append("IBAN: ");
-        result.append(iban);
-        result.append("\n");
-        result.append("BIC: ");
-        result.append(bic);
+        Map<String, String> substituteValues = new HashMap<>();
+        substituteValues.put("holder", name);
+        substituteValues.put("iban", iban);
+        substituteValues.put("bic", bic);
 
-        return result.toString();
+        return Bindings.concat(availability, "\n", translation.getStringSubstitutionBinding("SettleDebts.String.bankDetails",
+                substituteValues));
     }
 }

@@ -95,7 +95,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
             Label transferLabel = generateTransferLabel(transfer);
             Button settleButton = generateSettleButton(transfer);
-            HBox transferBox = generateBankDetailsBox(expandButton, transferLabel, settleButton);
+            HBox transferBox = generateTransferDetailsBox(expandButton, transferLabel, settleButton);
 
             children.addLast(transferBox);
             children.addLast(bankDetailsPane);
@@ -130,7 +130,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @return a TextArea with all the Participant's bank information
      */
     public TextArea generateParticipantText(Participant participant){
-        TextArea text = new TextArea(utils.getBankDetails(participant));
+        TextArea text = new TextArea();
+        text.textProperty().bind(utils.getBankDetails(participant));
         text.setEditable(false);
         text.setPrefRowCount(4);
         text.setFont(new Font(14));
@@ -145,7 +146,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param settleButton the Mark Received button
      * @return an HBox containing all given elements, plus the correct spacing
      */
-    public HBox generateBankDetailsBox(Button expandButton, Label transferLabel, Button settleButton){
+    public HBox generateTransferDetailsBox(Button expandButton, Label transferLabel, Button settleButton){
         Region spacingL = new Region();
         HBox.setHgrow(spacingL, Priority.ALWAYS);
         Region spacingR = new Region();
