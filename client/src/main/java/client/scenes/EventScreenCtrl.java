@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
@@ -432,7 +433,16 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         }
         Label expenseText = generateExpenseLabel(expense.getId(), log);
         ImageView xButton = generateRemoveButton(expense.getId());
-        HBox expenseBox = new HBox(expenseText, xButton);
+        Label date = new Label();
+        if(expense.getDate().getYear() != LocalDateTime.now().getYear())
+            date.setText(expense.getDate().getDate() + "/" +
+                            + (expense.getDate().getMonth() + 1) + "\n/" +
+                        + (expense.getDate().getYear()));
+
+        else
+            date.setText(expense.getDate().getDate() + "/" +
+                + (expense.getDate().getMonth() + 1));
+        HBox expenseBox = new HBox(date, expenseText, xButton);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         hBoxMap.put(expense.getId(), expenseBox);
         expenseBox.setAlignment(CENTER_LEFT);

@@ -14,7 +14,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.net.URL;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -226,11 +225,21 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * resets all the fields in the expenseScreen
      */
     public void resetAll() {
+        resetPaidBy();
         resetAmount();
         resetPurpose();
         resetDate();
         resetCurrency();
+        resetSplitMethod();
     }
+
+    /**
+     * resets the text from the Paid by field
+     */
+    public void resetPaidBy() {
+        choosePayer.getEditor().clear();
+    }
+
     /**
      * resets the amount inserted in the amount TextField
      */
@@ -261,6 +270,14 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
+     * resets the checkboxes for the split methods
+     */
+    public void resetSplitMethod() {
+        splitBetweenAllCheckBox.setSelected(false);
+        splitBetweenCustomCheckBox.setSelected(false);
+    }
+
+    /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
      * @return the newly created expense
@@ -279,8 +296,16 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         //change in case of wanting to implement another date system
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
-        if(date != null)
-            expenseDate = Date.valueOf(datePicker.getValue());
+        if(date != null) {
+            System.out.println(date.getDayOfMonth());
+            System.out.println(date.getMonthValue());
+            System.out.println(date.getYear());
+            expenseDate = new Date(date.getYear(),
+                date.getMonthValue() - 1, date.getDayOfMonth());
+            System.out.println(expenseDate.getDate());
+            System.out.println(expenseDate.getMonth());
+            System.out.println(expenseDate.getYear());
+        }
 
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
@@ -350,7 +375,12 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         expensePurpose.setText(expense.getName());
         sum.setText(String.valueOf((double) expense.getPriceInCents()/100));
         choosePayer.getEditor().setText(expense.getOwedTo().getName());
-        datePicker.getEditor().setText(String.valueOf(expense.getDate())); //needs revision
+        Date expenseDate = expense.getDate();
+
+        datePicker.getEditor()
+            .setText((expenseDate.getMonth() + 1) + "/"
+                + expenseDate.getDate() + "/" +
+                expenseDate.getYear()); //needs revision
         expenseId = id;
     }
 
