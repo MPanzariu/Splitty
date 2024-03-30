@@ -1,12 +1,11 @@
 package client.scenes;
 
-import client.utils.ImageUtils;
-import client.utils.SettleDebtsUtils;
-import client.utils.Styling;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -19,12 +18,14 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Pair;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
-import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Pos.*;
 
 public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl mainCtrl;
@@ -69,46 +70,42 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void initialize(URL location, ResourceBundle resources) {
         settleDebtsLabel.textProperty()
                 .bind(translation.getStringBinding("SettleDebts.Label.title"));
-        var backImage = ImageUtils.loadImageFile("goBack.png");
-        var backImageView = ImageUtils.generateImageView(backImage, 20);
+        Image backImage = ImageUtils.loadImageFile("goBack.png");
+        ImageView backImageView = ImageUtils.generateImageView(backImage, 20);
         goBackButton.setGraphic(backImageView);
     }
 
     /***
-     * Populates the VBox with all the debts
+     * Populates the VBox with all the transfers
      */
     public void populateVBox(){
         List<Node> children = settleVBox.getChildren();
         children.clear();
-        var owedShares = event.getOwedShares();
-        var transfers = utils.calculateTransferInstructions(owedShares);
+        HashMap<Participant, BigDecimal> owedShares = event.getOwedShares();
+        Set<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
 
         Image expandButtonImage = ImageUtils.loadImageFile("singlearrow.png");
 
-        for(Map.Entry<Participant, Integer> entry: owedShares.entrySet()){
-            Participant participantOwes = entry.getKey();
-            int amount = entry.getValue();
-
-            /*
-            In the current implementation, as per the basic requirements,
-            there are no "debts" to anyone, only amounts owed to the group.
-            This is added for extensibility later, as are all the methods that use it,
-            so that transfer instructions (A sends X to B) can be generated easily
-             */
-            Participant participantOwedTo = participantOwes; // requisite feature not implemented
-
-            Label debtLabel = generateDebtLabel(participantOwes, amount, participantOwedTo);
-            TextArea participantText = generateParticipantText(participantOwedTo);
+        for(Transfer transfer: transfers){
+            TextArea participantText = generateParticipantText(transfer.receiver());
             Pane bankDetailsPane = generateBankDetailsPane(participantText);
-
             ImageView expandButtonInnerImage = ImageUtils.generateImageView(expandButtonImage, 25);
             Button expandButton = generateExpandButton(bankDetailsPane, expandButtonInnerImage);
-            Button settleButton = generateSettleButton(participantOwes, amount, participantOwedTo);
-            HBox debtBox = generateDebtBox(expandButton, debtLabel, settleButton);
-            children.addLast(debtBox);
+
+            Label transferLabel = generateTransferLabel(transfer);
+            Button settleButton = generateSettleButton(transfer);
+            HBox transferBox = generateBankDetailsBox(expandButton, transferLabel, settleButton);
+
+            children.addLast(transferBox);
             children.addLast(bankDetailsPane);
         }
 
+        if(children.isEmpty()) {
+            Label emptyLabel = new Label();
+            emptyLabel.textProperty().bind(translation.getStringBinding("SettleDebts.Label.noTransfers"));
+            settleVBox.setAlignment(TOP_CENTER);
+            children.addLast(emptyLabel);
+        } else settleVBox.setAlignment(TOP_LEFT);
     }
 
     /***
@@ -141,18 +138,18 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /***
-     * Generates an HBox with the Expand button, Debt information, and Settle button
+     * Generates an HBox with the Expand button, Transfer information, and Settle button
      * @param expandButton the Expand Details button
-     * @param debtLabel the Label detailing who owes what to who
+     * @param transferLabel the Label detailing who should send money to who
      * @param settleButton the Mark Received button
      * @return an HBox containing all given elements, plus the correct spacing
      */
-    public HBox generateDebtBox(Button expandButton, Label debtLabel, Button settleButton){
+    public HBox generateBankDetailsBox(Button expandButton, Label transferLabel, Button settleButton){
         Region spacingL = new Region();
         HBox.setHgrow(spacingL, Priority.ALWAYS);
         Region spacingR = new Region();
         HBox.setHgrow(spacingR, Priority.ALWAYS);
-        HBox box = new HBox(expandButton, spacingL, debtLabel, spacingR, settleButton);
+        HBox box = new HBox(expandButton, spacingL, transferLabel, spacingR, settleButton);
         box.setSpacing(20);
         box.setAlignment(CENTER_LEFT);
         return box;
@@ -160,26 +157,22 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
     /***
      * Generates a Button that marks a debt payment as received and settled
-     * @param participantOwes the Participant owing the debt
-     * @param amount the amount, in cents, to transfer
-     * @param participantOwedTo the Participant who the debt is owed to
-     * @return a Button that settles the debt when clicked
+     * @param transfer the Transfer information to use
+     * @return a Button that settles the
+     * when clicked
      */
-    public Button generateSettleButton(Participant participantOwes,
-                                        int amount,
-                                        Participant participantOwedTo) {
+    public Button generateSettleButton(Transfer transfer) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
         Styling.applyStyling(button, "positiveButton");
-        var onClick = utils.createSettleAction(participantOwes, amount,
-                participantOwedTo, event.getId());
+        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
         button.setOnAction(onClick);
 
         return button;
     }
 
     /***
-     * Generates a Button that expands the bank details pane for a debt
+     * Generates a Button that expands the bank details pane for a transfer
      * @param pane the Pane to expand/collapse
      * @param expandButtonInnerImage the image for the button, passed in here for better perforamce
      * @return a Button that expands/collapses the given Pane when clicked
@@ -205,17 +198,13 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
     /***
      * Generates a Label detailing who should send how much money to who
-     * @param participantOwes the Participant owing the debt
-     * @param amount the amount, in cents, to transfer
-     * @param participantOwedTo the Participant who the debt is owed to
+     * @param transfer the Transfer dat ato use
      * @return a Label explaining who owes how much to who
      */
-    public Label generateDebtLabel(Participant participantOwes,
-                                    int amount, Participant participantOwedTo) {
+    public Label generateTransferLabel(Transfer transfer) {
         Label label = new Label();
-        String debtString = utils.createDebtString(participantOwes.getName(),
-                amount, "NOT IMPLEMENTED");
-        label.setText(debtString);
+        String transferString = utils.createTransferString(transfer);
+        label.setText(transferString);
         return label;
     }
 

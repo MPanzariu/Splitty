@@ -120,29 +120,12 @@ public class Event{
         return new BigDecimal(numberScaled, precision);
     }
 
-    /***
-     * Rounds all BigDecimals in the given Participant-BigDecimal map
-     * @param decimalMap the map containing BigDecimals
-     * @return an Integer map, rounded half-up
-     */
-    @JsonIgnore
-    public HashMap<Participant, Integer> roundMap(HashMap<Participant, BigDecimal> decimalMap) {
-        HashMap<Participant, Integer> roundedMap = new HashMap<>();
-        for(Map.Entry<Participant, BigDecimal> entry:
-                decimalMap.entrySet()){
-            BigDecimal decimalEntry = entry.getValue().setScale(0, RoundingMode.HALF_UP);
-            Integer roundedValue = decimalEntry.intValue();
-            roundedMap.put(entry.getKey(), roundedValue);
-        }
-        return roundedMap;
-    }
-
     /**
      * Calculates the share owed to (credit) per Participant for all expenses
      * @return a Map of participants to the amount they are owed (credit)
      */
     @JsonIgnore
-    public HashMap<Participant,Integer> getOwedShares(){
+    public HashMap<Participant,BigDecimal> getOwedShares(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
 
         HashMap<Participant, BigDecimal> shareMap = getExpenseShare();
@@ -155,7 +138,7 @@ public class Event{
             creditMap.put(participant, credit);
         }
 
-        return roundMap(creditMap);
+        return creditMap;
     }
 
     /***
@@ -173,8 +156,8 @@ public class Event{
 
         for(Expense expense:
             expenses){
-            var participant = expense.getOwedTo();
-            var balance = spendingMap.get(participant);
+            Participant participant = expense.getOwedTo();
+            Integer balance = spendingMap.get(participant);
             spendingMap.put(participant, balance + expense.getPriceInCents());
         }
         return spendingMap;
