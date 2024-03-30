@@ -302,16 +302,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
         if(date != null) {
-            System.out.println(date.getDayOfMonth());
-            System.out.println(date.getMonthValue());
-            System.out.println(date.getYear());
             expenseDate = new Date(date.getYear(),
                 date.getMonthValue() - 1, date.getDayOfMonth());
-            System.out.println(expenseDate.getDate());
-            System.out.println(expenseDate.getMonth());
-            System.out.println(expenseDate.getYear());
         }
-
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;

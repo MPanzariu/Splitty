@@ -442,7 +442,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         else
             date.setText(expense.getDate().getDate() + "/" +
                 + (expense.getDate().getMonth() + 1));
-        HBox expenseBox = new HBox(date, expenseText, xButton);
+        HBox xHBox = new HBox(xButton);
+        HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
+        xHBox.setAlignment((CENTER_RIGHT));
+        HBox expenseBox = new HBox(date, expenseText, xHBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
