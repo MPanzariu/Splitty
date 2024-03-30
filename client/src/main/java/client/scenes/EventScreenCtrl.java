@@ -394,8 +394,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             HBox expenseBox = null;
-            expenseBox = generateExpenseBox(expense);
-            expensesLogListView.getItems().add(expenseBox);
+            if(!expense.getParticipantsInExpense().isEmpty())
+                expenseBox = generateExpenseBox(expense);
+            if(expenseBox != null)
+                expensesLogListView.getItems().add(expenseBox);
         }
     }
 
@@ -423,6 +425,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(all)
             log += '\n' + "(All)";
         else {
+            if(expense.getParticipantsInExpense().isEmpty())
+                try {
+                    removeFromList(expense.getId());
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             log += '\n' + "(";
             for(Participant participant: expense.getParticipantsInExpense())
                 if(event.getParticipants().contains(participant)) {
@@ -589,9 +597,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public void IncludingFilter() {
         selectedExpenseListButton = inButton;
         expensesLogListView.getItems().clear();
-        //note: Because for the moment the expenses are split equally between all participants
-        //the Including filter is useless since, by definition if someone is part of an event
-        //they are part of all the expenses in that event
         String name = cBoxParticipantExpenses.getValue();
         Set<Participant> eventParticipants = event.getParticipants();
         Participant selectedParticipant = null;
@@ -604,15 +609,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(selectedParticipant == null)
             throw new EntityNotFoundException("The participant doesn't exist");
         Set<Expense> eventExpenses = event.getExpenses();
-        for(Expense expense1: eventExpenses) {
-            Set<Participant>participantsInExpense = expense1.getParticipantsInExpense();
+        for(Expense expense: eventExpenses) {
+            Set<Participant>participantsInExpense = expense.getParticipantsInExpense();
                 if(participantsInExpense.contains(selectedParticipant)) {
-                    HBox expenseBox = generateExpenseBox(expense1);
+                    HBox expenseBox = generateExpenseBox(expense);
                     expensesLogListView.getItems().add(expenseBox);
-                    break;
                 }
         }
-        //showAllExpenseList();
-        //TODO:Custom expense button doesn't seem to work
     }
 }

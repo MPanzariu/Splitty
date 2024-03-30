@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -470,10 +471,15 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     public void addParticipants() {
         Set<Participant> participants = currentEvent.getParticipants();
         participantCheckBoxes.clear();
+        if(participants.size() < 4)
+            participantsVBox.setPrefHeight((double)participants.size()/4 * 100);
+        ListView<CheckBox> participantsListView = new ListView<>();
+        participantsVBox.getChildren().add(participantsListView);
         for(Participant participant: participants) {
             CheckBox participantToPay = new CheckBox(participant.getName());
-            participantsVBox.getChildren().add(participantToPay);
+            participantsListView.getItems().add(participantToPay);
             participantCheckBoxes.add(participantToPay);
         }
+
     }
 }
