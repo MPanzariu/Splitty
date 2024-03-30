@@ -444,8 +444,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 + (expense.getDate().getMonth() + 1));
         HBox expenseBox = new HBox(date, expenseText, xButton);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
-        expenseBox.setAlignment(CENTER_LEFT);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setAlignment(Pos.CENTER_LEFT);
         return expenseBox;
     }
 
@@ -608,5 +610,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 }
         }
         //showAllExpenseList();
+        //TODO:Custom expense button doesn't seem to work
     }
 }

@@ -275,8 +275,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     public void resetSplitMethod() {
         splitBetweenAllCheckBox.setSelected(false);
         splitBetweenCustomCheckBox.setSelected(false);
+        participantsVBox.getChildren().clear();
     }
 
+    public void resetParticipants() {
+        for(CheckBox checkBox: participantCheckBoxes)
+            checkBox.setSelected(false);
+    }
     /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
@@ -471,6 +476,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void addParticipants() {
         Set<Participant> participants = currentEvent.getParticipants();
+        participantCheckBoxes.clear();
         for(Participant participant: participants) {
             CheckBox participantToPay = new CheckBox(participant.getName());
             participantsVBox.getChildren().add(participantToPay);
