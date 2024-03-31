@@ -2,6 +2,7 @@ package server.websockets;
 
 import commons.Event;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,23 @@ public class WebSocketService {
         Event updatedEvent = eventRepository.findById(eventID)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         socketMessenger.convertAndSend(eventUpdateURL(eventID), updatedEvent);
+    }
+
+    /***
+     * Propagates an event name change to all listening clients
+     * @param eventID the ID of the event changed
+     * @param newTitle the new title of the event
+     */
+    public void propagateNameChange(String eventID, String newTitle){
+        socketMessenger.convertAndSend("/topic/events/names", Pair.of(eventID, newTitle));
+    }
+
+    /***
+     * Propagates a deletion of an event
+     * @param eventID the ID of the event deleted
+     */
+    public void propagateDeletion(String eventID){
+        socketMessenger.convertAndSend("/topic/events/deletions", eventID);
     }
 
     /***
