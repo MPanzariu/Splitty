@@ -19,8 +19,10 @@ class ObservableResourceFactoryTest {
 
         testMapA = new HashMap<>();
         testMapA.put("keyA", "valueA");
+        testMapA.put("subKeyA", "A: {{subValue}}");
         testMapB = new HashMap<>();
         testMapB.put("keyA", "valueB");
+        testMapB.put("subKeyA", "B: {{subValue}}");
     }
 
     /***
@@ -74,5 +76,35 @@ class ObservableResourceFactoryTest {
         String valueAfter = binding.getValue();
         assertEquals(testMapA.get("keyA"), valueBefore);
         assertEquals(testMapB.get("keyA"), valueAfter);
+    }
+
+    /***
+     * Is the correct StringBinding for a key with substitution returned?
+     */
+    @Test
+    void getStringSubstitutionBinding() {
+        Map<String, String> subMap = new HashMap<>();
+        subMap.put("subValue", "ABC123!");
+
+        sut.setResources(testMapA);
+        var valueReturned = sut.getStringSubstitutionBinding("subKeyA", subMap);
+        assertEquals("A: ABC123!", valueReturned.getValue());
+    }
+
+    /***
+     * Does the substitution binding change correctly when the Map is replaced live?
+     */
+    @Test
+    void liveReplacementSubstitutionBinding() {
+        Map<String, String> subMap = new HashMap<>();
+        subMap.put("subValue", "ABC123!");
+
+        sut.setResources(testMapA);
+        StringBinding binding = sut.getStringSubstitutionBinding("subKeyA", subMap);
+        String valueBefore = binding.getValue();
+        sut.setResources(testMapB);
+        String valueAfter = binding.getValue();
+        assertEquals("A: ABC123!", valueBefore);
+        assertEquals("B: ABC123!", valueAfter);
     }
 }
