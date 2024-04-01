@@ -7,7 +7,6 @@ import commons.Expense;
 import commons.Participant;
 import javafx.application.Platform;
 import jakarta.persistence.EntityNotFoundException;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -198,7 +197,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if(mouseEvent.getClickCount() == 2)
-                    mainCtrl.openEditTitle();
+                    mainCtrl.switchScreens(EditTitleCtrl.class);
             }
         });
     }
@@ -219,20 +218,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         languageCtrl.refresh(languageIndicator);
     }
 
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return true;
-    }
-
     /**
      * Open the title editing screen.
      */
     public void editTitle() {
-        mainCtrl.openEditTitle();
+        mainCtrl.switchScreens(EditTitleCtrl.class);
     }
 
     /**
@@ -246,21 +236,21 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * UI for editing current participants that needs to be implemented when the button is pressed
      */
     public void editCurrentParticipants(){
-        mainCtrl.switchToParticipantListScreen();
+        mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
     }
 
     /**
      * UI for adding a participant that needs to be implemented when the button is pressed
      */
     public void addParticipants(){
-        mainCtrl.switchToAddParticipant();
+        mainCtrl.switchScreens(ParticipantScreenCtrl.class);
     }
 
     /**
      * UI for adding an expense that needs to be implemented when the button is pressed
      */
     public void addExpense(){
-        mainCtrl.switchToAddExpense();
+        mainCtrl.switchScreens(ExpenseScreenCtrl.class);
     }
 
     /**
@@ -481,17 +471,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     /**
      * UI for settling current debts
-     * @param actionEvent on button click event
      */
-    public void settleDebts(ActionEvent actionEvent) {
-        mainCtrl.switchToSettleScreen();
+    public void settleDebts() {
+        mainCtrl.switchScreens(SettleDebtsScreenCtrl.class);
     }
 
     /**
      * go back to the main screen
-     * @param actionEvent when button is clicked
      */
-    public void switchToMainScreen(ActionEvent actionEvent) {
+    public void switchToMainScreen() {
         mainCtrl.showMainScreen();
     }
 

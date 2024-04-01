@@ -301,7 +301,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * when button is pressed, go back to the main screen
      */
     public void goBackToHomeScreen() {
-        mainCtrl.switchBackToMainScreen();
+        mainCtrl.showMainScreen();
     }
 
     /**

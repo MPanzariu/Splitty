@@ -6,8 +6,6 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,7 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -60,6 +57,7 @@ public class StartupScreenCtrl implements Initializable {
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
+     * @param languageCtrl  the LanguageIndicatorCtrl to use
      */
     @Inject
     public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
@@ -125,7 +123,7 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void joinEvent(Event event){
         mainCtrl.switchEvents(event.getId());
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
         addToHistory(event);
     }
 
@@ -376,6 +374,6 @@ public class StartupScreenCtrl implements Initializable {
      * @param actionEvent on button press go to another scene
      */
     public void goToTheManagementOverview(ActionEvent actionEvent) {
-        mainCtrl.switchToMnagamentOverviewPasswordScreen();
+        mainCtrl.switchToManagementOverviewPasswordScreen();
     }
 }

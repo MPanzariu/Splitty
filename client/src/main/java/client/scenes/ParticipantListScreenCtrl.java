@@ -60,11 +60,6 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
         showParticipantList();
     }
 
-    @Override
-    public boolean shouldLiveRefresh() {
-        return true;
-    }
-
     /***
      *
      * @param location
@@ -142,7 +137,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      * go back method when the button is clicked
      */
     public void goBack() {
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**

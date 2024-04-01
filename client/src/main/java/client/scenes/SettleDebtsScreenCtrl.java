@@ -225,15 +225,6 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * Switches back to the event screen
      */
     public void switchToEventScreen() {
-        mainCtrl.switchToEventScreen();
-    }
-
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return true;
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 }

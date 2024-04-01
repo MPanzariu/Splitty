@@ -50,20 +50,11 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     public void confirm() {
         server.editTitle(event.getId(), title.getText());
         title.clear();
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     public void cancel() {
         title.clear();
-        mainCtrl.switchToEventScreen();
-    }
-
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 }
