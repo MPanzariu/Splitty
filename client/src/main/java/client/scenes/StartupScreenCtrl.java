@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.AppStateManager;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -25,6 +26,7 @@ import static javafx.geometry.Pos.CENTER_LEFT;
 public class StartupScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final AppStateManager appStateManager;
     @FXML
     private TextField eventTitleTextBox;
     @FXML
@@ -56,14 +58,16 @@ public class StartupScreenCtrl implements Initializable {
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
+     * @param appStateManager the AppStateManager to use
      */
     @Inject
     public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                             LanguageIndicatorCtrl languageCtrl) {
+                             LanguageIndicatorCtrl languageCtrl, AppStateManager appStateManager) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.languageCtrl = languageCtrl;
+        this.appStateManager = appStateManager;
         eventsAndHBoxes = new HashMap<>();
     }
 
@@ -134,11 +138,12 @@ public class StartupScreenCtrl implements Initializable {
      * @param eventId the ID of the event to add to the history
      * @param eventName the title of the event
      */
-    private void addToHistory(String eventId, String eventName) {
+    public void addToHistory(String eventId, String eventName) {
         Label eventLabel = generateLabelForEvent(eventId, eventName);
         ImageView imageView = generateRemoveButton(eventLabel, eventId);
         HBox hbox = generateHBox(eventLabel, imageView);
         removeFromHistoryIfExists(eventId);
+        appStateManager.addSubscription(eventId);
         List<Node> recentlyViewedEvents = getHistoryNodes();
         recentlyViewedEvents.addFirst(hbox);
         eventsAndHBoxes.put(eventId, hbox);
@@ -181,6 +186,7 @@ public class StartupScreenCtrl implements Initializable {
         var hBox = eventsAndHBoxes.getOrDefault(eventId, null);
         if (hBox!=null){
             eventsAndHBoxes.remove(eventId);
+            appStateManager.removeSubscription(eventId);
             removeFromVBox(hBox);
         }
     }

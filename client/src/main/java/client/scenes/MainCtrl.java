@@ -100,6 +100,8 @@ public class MainCtrl {
         controllerMap.put(ParticipantListScreenCtrl.class, participantListScreenCtrl);
         controllerMap.put(SettleDebtsScreenCtrl.class, settleDebtsScreenCtrl);
         manager.setControllerMap(controllerMap);
+        manager.setStartupScreen(startupScreenCtrl);
+        manager.subscribeToUpdates();
 
         primaryStage.show();
     }

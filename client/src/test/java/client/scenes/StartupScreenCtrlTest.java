@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.AppStateManager;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
@@ -22,13 +23,15 @@ public class StartupScreenCtrlTest{
     private TestServerUtils testServerUtils;
     private TestMainController testMainController;
     private LanguageIndicatorCtrl languageCtrl;
+    private AppStateManager manager;
     @BeforeEach
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController =  new TestMainController();
         this.languageCtrl = mock(LanguageIndicatorCtrl.class);
+        this.manager = mock(AppStateManager.class);
         sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null,
-                languageCtrl);
+                languageCtrl, manager);
 
     }
 
@@ -159,8 +162,8 @@ public class StartupScreenCtrlTest{
          * @param translation the Translation to use
          */
         public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                     LanguageIndicatorCtrl languageCtrl) {
-            super(server, mainCtrl, translation, languageCtrl);
+                                     LanguageIndicatorCtrl languageCtrl, AppStateManager manager) {
+            super(server, mainCtrl, translation, languageCtrl, manager);
         }
 
         @Override

@@ -1,11 +1,14 @@
 package client.utils;
 
 import client.scenes.SimpleRefreshable;
+import client.scenes.StartupScreenCtrl;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.dto.EventDeletedDTO;
+import commons.dto.EventNameChangeDTO;
 import org.springframework.messaging.simp.stomp.StompSession;
 
-import java.util.HashMap;
+import java.util.*;
 
 
 public class AppStateManager {
@@ -15,6 +18,8 @@ public class AppStateManager {
     private HashMap<Class<?>, SimpleRefreshable> controllerMap;
     private SimpleRefreshable currentlyOpen;
     private Event event;
+    private StartupScreenCtrl startupScreen;
+    private final Set<String> relevantEvents;
 
     /***
      * Constructor for the AppStateManager
@@ -29,6 +34,7 @@ public class AppStateManager {
         this.currentClientSubscription = null;
         this.currentlyOpen = null;
         this.event = null;
+        this.relevantEvents = new HashSet<>(5);
     }
 
     /***
@@ -70,5 +76,59 @@ public class AppStateManager {
      */
     public void setControllerMap(HashMap<Class<?>, SimpleRefreshable> controllerMap){
         this.controllerMap = controllerMap;
+    }
+
+    /***
+     * Register for messages of deletion and name changes
+     */
+    public void subscribeToUpdates(){
+        socketUtils.registerForMessages(this::onDeletion, "/topic/events/deletions", EventDeletedDTO.class);
+        socketUtils.registerForMessages(this::onNameChange, "/topic/events/names", EventNameChangeDTO.class);
+    }
+
+    /***
+     * Sets the StartupScreenCtrl to use
+     * @param startupScreen the StartupScreenCtrl to call with updates
+     */
+    public void setStartupScreen(StartupScreenCtrl startupScreen){
+        this.startupScreen = startupScreen;
+    }
+
+    /***
+     * Adds a subscribed to event
+     * @param eventId the ID of the event
+     */
+    public void addSubscription(String eventId){
+        relevantEvents.add(eventId);
+    }
+    /***
+     * Removes a subscribed to event
+     * @param eventId the ID of the event
+     */
+    public void removeSubscription(String eventId){
+        relevantEvents.remove(eventId);
+    }
+
+    /***
+     * Runs on deletion of an event
+     * @param dto A DTO containing the ID of the deleted event
+     */
+    public void onDeletion(EventDeletedDTO dto){
+        String eventId = dto.getEventId();
+        if(relevantEvents.contains(eventId)){
+            startupScreen.removeFromHistoryIfExists(eventId);
+            //Switch back to main screen if we have it active right now
+        }
+    }
+    /***
+     * Runs on name change of an event
+     * @param dto a DTO containing the event ID and new name
+     */
+    public void onNameChange(EventNameChangeDTO dto){
+        String eventId = dto.getEventId();
+        if(relevantEvents.contains(eventId)){
+            String eventName = dto.getNewTitle();
+            startupScreen.addToHistory(eventId, eventName);
+        }
     }
 }
