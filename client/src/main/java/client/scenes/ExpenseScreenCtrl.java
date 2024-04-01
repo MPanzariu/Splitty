@@ -21,7 +21,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -279,10 +278,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         participantsVBox.getChildren().clear();
     }
 
-    public void resetParticipants() {
-        for(CheckBox checkBox: participantCheckBoxes)
-            checkBox.setSelected(false);
-    }
     /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen

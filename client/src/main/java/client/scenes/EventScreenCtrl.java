@@ -28,7 +28,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
@@ -85,6 +84,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
+     * @param languageCtrl the LanguageController instance
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
@@ -359,10 +359,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     private void refreshExpenseList() {
         Button selectedButton = selectedExpenseListButton;
-        if(selectedButton==null) selectedButton = allExpenses;
-        if(selectedButton==allExpenses) showAllExpenseList();
-        else if(selectedButton==fromButton) fromFilter(); //only From someone (unimplemented)
-        else; //only Including someone (unimplemented)
+        if(selectedButton == null) selectedButton = allExpenses;
+        if(selectedButton == allExpenses) showAllExpenseList();
+        else if(selectedButton == fromButton) fromFilter();
+        else if(selectedButton == inButton) includingFilter();
     }
 
     /**
@@ -370,7 +370,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * that presents a quick overview of the expense presented
      * the method throws an error
      */
-    public void showAllExpenseList (){
+    public void showAllExpenseList(){
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             HBox expenseBox = null;
@@ -385,8 +385,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      *
      * @param expense the expense for which we need to generate the HBox
      * @return the generated hBox, containing the expense details
-     * @throws FileNotFoundException in case the file for the remove button isn't found
-     * an exception is thrown
      */
     public HBox generateExpenseBox(Expense expense) {
         String log = generateTextForExpenseLabel(expense);
@@ -585,7 +583,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     /**
      * Filters the expenses, showing the one a certain participant is part of
      */
-    public void IncludingFilter() {
+    public void includingFilter() {
         selectedExpenseListButton = inButton;
         expensesLogListView.getItems().clear();
         String name = cBoxParticipantExpenses.getValue();
@@ -602,10 +600,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Set<Expense> eventExpenses = event.getExpenses();
         for(Expense expense: eventExpenses) {
             Set<Participant>participantsInExpense = expense.getParticipantsInExpense();
-                if(participantsInExpense.contains(selectedParticipant)) {
-                    HBox expenseBox = generateExpenseBox(expense);
-                    expensesLogListView.getItems().add(expenseBox);
-                }
+            if(participantsInExpense.contains(selectedParticipant)) {
+                HBox expenseBox = generateExpenseBox(expense);
+                expensesLogListView.getItems().add(expenseBox);
+            }
         }
     }
 }
