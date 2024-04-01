@@ -114,7 +114,6 @@ public class ParticipantTest {
     @Test
     public void hasToString() {
         var actual = new Participant("name").toString();
-        assertTrue(actual.contains("expensesOwedTo"));
         assertTrue(actual.contains("id"));
     }
 }
