@@ -350,26 +350,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Creates a label for the participant and it
-     * @param participantName the name of the participant we are creating a label for
-     * @param participantId the id of the participant
-     * @return the created label
-     */
-    public Label createParticipantLabel(String participantName, Long participantId) {
-        Label participantLabel = new Label(participantName);
-        participantLabel.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.HAND);
-        });
-        participantLabel.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
-        });
-        participantLabel.setOnMouseClicked(mouseEvent -> {
-            setButtonsNames(participantName);
-        });
-        return participantLabel;
-    }
-
-    /**
      * the action when we press the "All" button
      */
     public void showAllExpenses(){
@@ -409,6 +389,37 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * an exception is thrown
      */
     public HBox generateExpenseBox(Expense expense) {
+        String log = generateTextForExpenseLabel(expense);
+        Label expenseText = generateExpenseLabel(expense.getId(), log);
+        ImageView xButton = generateRemoveButton(expense.getId());
+        Label date = new Label();
+        if(expense.getDate().getYear() != LocalDateTime.now().getYear())
+            date.setText(expense.getDate().getDate() + "/" +
+                            + (expense.getDate().getMonth() + 1) + "\n/" +
+                        + (expense.getDate().getYear()));
+
+        else
+            date.setText(expense.getDate().getDate() + "/" +
+                + (expense.getDate().getMonth() + 1));
+        HBox xHBox = new HBox(xButton);
+        HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
+        xHBox.setAlignment((CENTER_RIGHT));
+        HBox expenseBox = new HBox(date, expenseText, xHBox);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setSpacing(10);
+        hBoxMap.put(expense.getId(), expenseBox);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setAlignment(Pos.CENTER_LEFT);
+        return expenseBox;
+    }
+
+    /**
+     *
+     * @param expense the expense for which we are generating the
+     * label
+     * @return the resulting generated string
+     */
+    public String generateTextForExpenseLabel(Expense expense) {
         String log = expense.stringOnScreen();
         Set<Participant> participants = event.getParticipants();
         boolean all = true;
@@ -439,27 +450,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 }
             log += ")";
         }
-        Label expenseText = generateExpenseLabel(expense.getId(), log);
-        ImageView xButton = generateRemoveButton(expense.getId());
-        Label date = new Label();
-        if(expense.getDate().getYear() != LocalDateTime.now().getYear())
-            date.setText(expense.getDate().getDate() + "/" +
-                            + (expense.getDate().getMonth() + 1) + "\n/" +
-                        + (expense.getDate().getYear()));
-
-        else
-            date.setText(expense.getDate().getDate() + "/" +
-                + (expense.getDate().getMonth() + 1));
-        HBox xHBox = new HBox(xButton);
-        HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
-        xHBox.setAlignment((CENTER_RIGHT));
-        HBox expenseBox = new HBox(date, expenseText, xHBox);
-        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
-        expenseBox.setSpacing(10);
-        hBoxMap.put(expense.getId(), expenseBox);
-        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
-        expenseBox.setAlignment(Pos.CENTER_LEFT);
-        return expenseBox;
+        return log;
     }
 
     /**

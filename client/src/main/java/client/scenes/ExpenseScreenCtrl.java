@@ -380,6 +380,23 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             .setText((expenseDate.getMonth() + 1) + "/"
                 + expenseDate.getDate() + "/" +
                 expenseDate.getYear()); //needs revision
+        if(expense.getParticipantsInExpense()
+            .containsAll(currentEvent.getParticipants())) {
+            splitBetweenAllCheckBox.setSelected(true);
+        }
+        else {
+            participantsVBox.getChildren().clear();
+            splitBetweenCustomCheckBox.setSelected(true);
+            addParticipants();
+            for(Participant participant: expense.getParticipantsInExpense()) {
+                for(CheckBox checkBox: participantCheckBoxes) {
+                    if(checkBox.getText().equals(participant.getName())) {
+                        checkBox.setSelected(true);
+                        break;
+                    }
+                }
+            }
+        }
         expenseId = id;
     }
 
