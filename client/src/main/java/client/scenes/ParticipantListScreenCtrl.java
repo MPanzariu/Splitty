@@ -16,6 +16,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -82,11 +83,12 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      */
     public void showParticipantList () {
         participantList.getItems().clear();
+        Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Participant participant: event.getParticipants()) {
             HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
             Region region = new Region();
             HBox.setHgrow(region, Priority.ALWAYS);
-            HBox participantBox = new HBox(generateRemoveButton(participant.getId()), participantB1, region);
+            HBox participantBox = new HBox(generateRemoveButton(participant.getId(), removeImage), participantB1, region);
             participantBox.setAlignment(Pos.CENTER_RIGHT);
             participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
@@ -99,10 +101,11 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     /**
      * generates the remove button for each participant
      * @param participantId the participant for which the remove button is being generated
+     * @param removeImage the Image to place on the button
      * @return returns the symbol
      */
-    public ImageView generateRemoveButton(long participantId) {
-        ImageView imageView = imageUtils.generateImageView("x_remove.png", 15);
+    public ImageView generateRemoveButton(long participantId, Image removeImage) {
+        ImageView imageView = imageUtils.generateImageView(removeImage, 15);
         imageView.setPickOnBounds(true);
         imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene().
                 setCursor(Cursor.HAND));

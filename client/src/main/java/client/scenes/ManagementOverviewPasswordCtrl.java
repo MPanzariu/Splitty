@@ -3,7 +3,6 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -57,9 +56,8 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
 
     /**
      * check if the password in the passwordField matches with the one randomly generated
-     * @param actionEvent on button press
      */
-    public void logInCheck(ActionEvent actionEvent) {
+    public void logInCheck() {
         String inputPassword = getPasswordFieldText(passwordField);
         if(inputPassword == null || inputPassword.isEmpty() || !server.checkPassword(inputPassword)){
             translation.bindLabel(logInFeedback, "MOPCtrl.Log.In.Feedback");
@@ -74,9 +72,8 @@ public class ManagementOverviewPasswordCtrl implements Initializable {
 
     /**
      * go back to the main menu
-     * @param actionEvent on button press
      */
-    public void goBackToMain(ActionEvent actionEvent) {
+    public void goBackToMain() {
         translation.bindLabel(logInFeedback, "Empty");
         mainCtrl.showMainScreen();
     }
