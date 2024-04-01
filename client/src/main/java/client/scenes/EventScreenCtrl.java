@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.EmailHandler;
-import client.utils.ServerUtils;
-import client.utils.Styling;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -14,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -28,7 +24,6 @@ import java.net.URL;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
-import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
@@ -71,8 +66,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
+    private final ImageUtils imageUtils;
     private Event event;
-    private Map<Long, HBox> hBoxMap;
+    private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
     @FXML
     private Button testEmailButton;
@@ -81,16 +77,20 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Label emailFeedbackLabel;
     /**
      * Constructor
-     * @param server the ServerUtils instance
-     * @param mainCtrl the MainCtrl instance
+     *
+     * @param server      the ServerUtils instance
+     * @param mainCtrl    the MainCtrl instance
      * @param translation the Translation to use
+     * @param languageCtrl the LanguageIndicator to use
+     * @param imageUtils  the ImageUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
        // this.buttonsHBox = new HBox();
@@ -143,44 +143,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Adds generated images to the buttons
      */
     private void addGeneratedImages() {
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/editing.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            editParticipant.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/add-participant.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            addParticipant.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBackButton.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        initializeParticipantsCBox();
-        //initializeFilterButtons();
+        ImageView editParticipantImage = imageUtils.generateImageView("editing.png", 15);
+        editParticipant.setGraphic(editParticipantImage);
+        ImageView addParticipantImage = imageUtils.generateImageView("add-participant.png", 15);
+        addParticipant.setGraphic(addParticipantImage);
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBackButton.setGraphic(goBackImage);
     }
 
     /**

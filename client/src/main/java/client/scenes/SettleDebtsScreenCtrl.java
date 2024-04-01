@@ -32,6 +32,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final SettleDebtsUtils utils;
+    private final ImageUtils imageUtils;
     @FXML
     private Label settleDebtsLabel;
     @FXML
@@ -46,13 +47,15 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param mainCtrl the Main controller to use
      * @param translation the translation to use
      * @param utils the server utilities to use
+     * @param imageUtils the image utilities to use
      */
     @Inject
-    public SettleDebtsScreenCtrl(MainCtrl mainCtrl,
-                                 Translation translation, SettleDebtsUtils utils) {
+    public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,
+                                 SettleDebtsUtils utils, ImageUtils imageUtils) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
+        this.imageUtils = imageUtils;
         this.event = null;
         this.lastExpanded = null;
     }
@@ -71,8 +74,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void initialize(URL location, ResourceBundle resources) {
         settleDebtsLabel.textProperty()
                 .bind(translation.getStringBinding("SettleDebts.Label.title"));
-        Image backImage = ImageUtils.loadImageFile("goBack.png");
-        ImageView backImageView = ImageUtils.generateImageView(backImage, 20);
+        ImageView backImageView = imageUtils.generateImageView("goBack.png", 20);
         goBackButton.setGraphic(backImageView);
     }
 
@@ -85,12 +87,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         HashMap<Participant, BigDecimal> owedShares = event.getOwedShares();
         Set<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
 
-        Image expandButtonImage = ImageUtils.loadImageFile("singlearrow.png");
+        Image expandButtonImage = imageUtils.loadImageFile("singlearrow.png");
 
         for(Transfer transfer: transfers){
             TextArea participantText = generateParticipantText(transfer.receiver());
             Pane bankDetailsPane = generateBankDetailsPane(participantText);
-            ImageView expandButtonInnerImage = ImageUtils.generateImageView(expandButtonImage, 25);
+            ImageView expandButtonInnerImage = imageUtils.generateImageView(expandButtonImage, 25);
             Button expandButton = generateExpandButton(bankDetailsPane, expandButtonInnerImage);
 
             Label transferLabel = generateTransferLabel(transfer);

@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.ManagementOverviewUtils;
-import client.utils.ServerUtils;
-import client.utils.Styling;
-import client.utils.Translation;
+import client.utils.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Inject;
@@ -11,18 +8,13 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -30,20 +22,20 @@ import java.util.ResourceBundle;
 public class ManagementOverviewScreenCtrl implements Initializable {
     protected ObjectMapper objectMapper;
     @FXML
-    public TextField backupEventIDTextField;
+    private TextField backupEventIDTextField;
     @FXML
-    public Button importButton;
+    private Button importButton;
     @FXML
-    public Label backupLabel;
+    private Label backupLabel;
     @FXML
-    public Label backupEventFeedbackLabel;
+    private Label backupEventFeedbackLabel;
     @FXML
-    public Button exportButton;
+    private Button exportButton;
 
     @FXML
     private Button homeScreenButton;
     @FXML
-    private Label MOTitle;
+    private Label moTitle;
     @FXML
     private Label eventsLabel;
     @FXML
@@ -66,20 +58,24 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final ManagementOverviewUtils utils;
+    private final ImageUtils imageUtils;
 
     /**
      * Constructor
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
+     * @param utils the ManagementOverviewUtils to use
+     * @param imageUtils the ImageUtils to use
      */
     @Inject
     public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                        ManagementOverviewUtils utils) {
+                                        ManagementOverviewUtils utils, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
+        this.imageUtils = imageUtils;
         objectMapper = new ObjectMapper();
     }
     /**
@@ -95,7 +91,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        MOTitle.textProperty().bind(translation.getStringBinding("MOSCtrl.Title"));
+        moTitle.textProperty().bind(translation.getStringBinding("MOSCtrl.Title"));
         eventsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Events.Label"));
         participantsLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Participants.Label"));
         expensesLabel.textProperty().bind(translation.getStringBinding("MOSCtrl.Expenses.Label"));
@@ -107,17 +103,8 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         deleteEventsButton.textProperty().bind(translation.getStringBinding("MOSCtrl.Delete.Events.Button"));
         initializeSortButton();
         initializeOrderTypes();
-        try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/home-page.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            homeScreenButton.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
+        ImageView homeImage = imageUtils.generateImageView("home-page.png", 15);
+        homeScreenButton.setGraphic(homeImage);
     }
 
     /**
@@ -311,17 +298,17 @@ public class ManagementOverviewScreenCtrl implements Initializable {
 
     /**
      * switch back to main Screen
-     * @param actionEvent when button is pressed, go back to the main screen
+     * when button is pressed, go back to the main screen
      */
-    public void goBackToHomeScreen(ActionEvent actionEvent) {
+    public void goBackToHomeScreen() {
         mainCtrl.switchBackToMainScreen();
     }
 
     /**
      * switch to the delete event screen
-     * @param mouseEvent when button is pressed, go to the delete event screen
+     * when button is pressed, go to the delete event screen
      */
-    public void goToDeleteEventsScreen(MouseEvent mouseEvent) {
+    public void goToDeleteEventsScreen() {
         mainCtrl.switchToDeleteEventsScreen();
     }
 }

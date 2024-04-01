@@ -23,10 +23,10 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Button cancel;
 
-    ServerUtils server;
-    MainCtrl mainCtrl;
-    Translation translation;
-    Event event;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
+    private final Translation translation;
+    private Event event;
 
     @Inject
     public EditTitleCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
