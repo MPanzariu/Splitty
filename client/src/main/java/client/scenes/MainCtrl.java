@@ -113,7 +113,7 @@ public class MainCtrl {
 
     public void showMainScreen() {
         startupScreenCtrl.refreshEvents();
-        primaryStage.setTitle("Main Menu");
+        primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
     }
 
@@ -152,7 +152,7 @@ public class MainCtrl {
      */
     public void switchToManagementOverviewPasswordScreen(){
         primaryStage.setScene(managementOvervirewPasswordScene);
-        primaryStage.setTitle("Log in");
+        primaryStage.titleProperty().bind(translation.getStringBinding("MOPCtrl.Window.title"));
     }
 
     /**
@@ -160,13 +160,13 @@ public class MainCtrl {
      */
     public void switchToManagementOverviewScreen(){
         primaryStage.setScene(managementOverviewScreenScene);
-        primaryStage.setTitle("Management Overview");
+        primaryStage.titleProperty().bind(translation.getStringBinding("MOSCtrl.Window.title"));
         managementOverviewScreenCtrl.initializeAllEvents();
     }
 
     public void switchToDeleteEventsScreen(){
         primaryStage.setScene(deleteEventsScene);
-        primaryStage.setTitle("Events Removal");
+        primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
     }
 
