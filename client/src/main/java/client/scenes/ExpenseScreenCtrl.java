@@ -378,10 +378,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         if(expense.getParticipantsInExpense()
             .containsAll(currentEvent.getParticipants())) {
             splitBetweenAllCheckBox.setSelected(true);
+            splitBetweenCustomCheckBox.setSelected(false);
+            participantsVBox.getChildren().clear();
         }
         else {
             participantsVBox.getChildren().clear();
             splitBetweenCustomCheckBox.setSelected(true);
+            splitBetweenAllCheckBox.setSelected(false);
             addParticipants();
             for(Participant participant: expense.getParticipantsInExpense()) {
                 for(CheckBox checkBox: participantCheckBoxes) {

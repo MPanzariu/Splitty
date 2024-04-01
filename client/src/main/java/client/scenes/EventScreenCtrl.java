@@ -185,17 +185,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Initializes the filter buttons(the size and position)
-     */
-    public void initializeFilterButtons() {
-        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        allExpenses.getStyleClass().add("button");
-        languageCtrl.initializeLanguageIndicator(languageIndicator);
-    }
-
-    /**
      * Initializes the Combobox so the participant chosen is
      * reflected in the filter buttons
      */

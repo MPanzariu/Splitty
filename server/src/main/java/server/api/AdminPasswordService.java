@@ -12,7 +12,7 @@ import java.util.Random;
 public class AdminPasswordService {
     static final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
     static final int passwordLength = 20;
-    String password = "";
+    private String password = "";
     public AdminPasswordService(){}
 
     /**
