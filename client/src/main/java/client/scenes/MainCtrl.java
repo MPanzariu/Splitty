@@ -109,7 +109,6 @@ public class MainCtrl {
     }
 
     public void showMainScreen() {
-        startupScreenCtrl.refreshEvents();
         primaryStage.setTitle("Main Menu");
         primaryStage.setScene(startupScene);
     }
@@ -128,7 +127,6 @@ public class MainCtrl {
      * switch the primary screen to the main screen
      */
     public void switchBackToMainScreen(){
-        startupScreenCtrl.refreshEvents();
         primaryStage.setScene(startupScene);
         primaryStage.setTitle("Main Menu");
     }

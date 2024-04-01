@@ -5,9 +5,6 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,7 +15,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,7 +47,7 @@ public class StartupScreenCtrl implements Initializable {
     private Label joinEventLabel;
     @FXML
     private ComboBox<Locale> languageIndicator;
-    private List<AbstractMap.SimpleEntry<Event, HBox>> eventsAndHBoxes;
+    private HashMap<String, HBox> eventsAndHBoxes;
     private Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
 
@@ -68,7 +64,7 @@ public class StartupScreenCtrl implements Initializable {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.languageCtrl = languageCtrl;
-        eventsAndHBoxes = new ArrayList<>();
+        eventsAndHBoxes = new HashMap<>();
     }
 
     /**
@@ -86,6 +82,7 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        languageCtrl.refresh(languageIndicator);
     }
 
     /**
@@ -99,7 +96,9 @@ public class StartupScreenCtrl implements Initializable {
             return;
         }
         Event event = server.createEvent(title);
-        joinEvent(event);
+        String newEventID = event.getId();
+        addToHistory(newEventID, event.getTitle());
+        switchToEvent(newEventID);
     }
 
     /**
@@ -114,113 +113,96 @@ public class StartupScreenCtrl implements Initializable {
         }
         try{
             Event event = server.getEvent(inviteCode);
-            joinEvent(event);
+            addToHistory(inviteCode, event.getTitle());
+            switchToEvent(inviteCode);
         }catch (BadRequestException exception){
             bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
     }
     /**
      * Joins the given event
-     * @param event the event to join
+     * @param eventId the ID of the event to join
      */
-    public void joinEvent(Event event){
-        mainCtrl.switchEvents(event.getId());
+    public void switchToEvent(String eventId){
+        mainCtrl.switchEvents(eventId);
         mainCtrl.switchToEventScreen();
-        addToHistory(event);
+        moveHistoryToTop(eventId);
     }
 
     /**
      * Adds the event to the history
-     * @param event the event to add to the history
+     * @param eventId the ID of the event to add to the history
+     * @param eventName the title of the event
      */
-    private void addToHistory(Event event) {
-        Label eventLabel = generateLabelForEvent(event);
-        try{
-            ImageView imageView = generateRemoveButton(eventLabel, event);
-            HBox hbox = generateHBox(eventLabel, imageView);
-            removeFromHistoryIfExists(event);
-            List<Node> recentlyViewedEvents = recentlyViewedEventsVBox.getChildren();
-            recentlyViewedEvents.addFirst(hbox);
-            eventsAndHBoxes.add(new AbstractMap.SimpleEntry<>(event, hbox));
-            if (recentlyViewedEventsVBox.getChildren().size() > 5){
-                HBox lastHBox = (HBox) recentlyViewedEvents.getLast();
-                Event removedEvent = getEntryFromEventHbox(lastHBox).getKey();
-                removeFromHistoryIfExists(removedEvent);
-            }
-        }catch (FileNotFoundException e){
-            System.out.println("File was not found!");
+    private void addToHistory(String eventId, String eventName) {
+        Label eventLabel = generateLabelForEvent(eventId, eventName);
+        ImageView imageView = generateRemoveButton(eventLabel, eventId);
+        HBox hbox = generateHBox(eventLabel, imageView);
+        removeFromHistoryIfExists(eventId);
+        List<Node> recentlyViewedEvents = getHistoryNodes();
+        recentlyViewedEvents.addFirst(hbox);
+        eventsAndHBoxes.put(eventId, hbox);
+        if (recentlyViewedEvents.size() > 5){
+            HBox lastHBox = (HBox) recentlyViewedEvents.getLast();
+            String removedEventId = findKeyByValue(lastHBox);
+            removeFromHistoryIfExists(removedEventId);
         }
     }
-    /**
-     * Gets the entry from the eventHBoxHashMap
-     * @param event the event to get the entry for
-     * @return the entry
-     */
-    public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(Event event){
-        for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
-            if (entry.getKey().equals(event)){
-                return entry;
-            }
-        }
-        return null;
+
+    private String findKeyByValue(HBox hBox) {
+        List<Map.Entry<String, HBox>> matching = eventsAndHBoxes.entrySet().stream().
+                filter(entry->entry.getValue().equals(hBox)).toList();
+        if(matching.size()>1) throw new IllegalStateException("One Event ID bound to multiple HBoxes");
+        if(matching.isEmpty()) return null;
+        return matching.get(0).getKey();
     }
-    /**
-     * Gets the entry from the eventHBoxHashMap
-     * @param hBox the HBox to get the entry for
-     * @return the entry
-     */
-    public AbstractMap.SimpleEntry<Event, HBox> getEntryFromEventHbox(HBox hBox){
-        for (AbstractMap.SimpleEntry<Event, HBox> entry : eventsAndHBoxes){
-            if (entry.getValue().equals(hBox)){
-                return entry;
-            }
-        }
-        return null;
+
+    private void moveHistoryToTop(String eventId) {
+        var relevantHBox = eventsAndHBoxes.get(eventId);
+        var recentlyViewed = getHistoryNodes();
+        recentlyViewed.remove(relevantHBox);
+        recentlyViewed.addFirst(relevantHBox);
     }
 
     /**
      * Getter for eventsAndHBoxes
+     *
      * @return eventsAndHBoxes
      */
-    public List<AbstractMap.SimpleEntry<Event, HBox>> getEventsAndHBoxes() {
+    public HashMap<String, HBox> getEventsAndHBoxes() {
         return eventsAndHBoxes;
     }
 
     /**
      * Removes the HBox containing the event given if it exists already in the history
-     * @param event the event to remove the history of
+     * @param eventId the ID of the event to remove the history of
      */
-    public void removeFromHistoryIfExists(Event event){
-        AbstractMap.SimpleEntry<Event, HBox> entry = getEntryFromEventHbox(event);
-        if (getEntryFromEventHbox(event) != null){
-            HBox hBox = entry.getValue();
-            eventsAndHBoxes.remove(entry);
-            if (hBox != null){
-                removeFromVBox(hBox.idProperty());
-            }
+    public void removeFromHistoryIfExists(String eventId){
+        var hBox = eventsAndHBoxes.getOrDefault(eventId, null);
+        if (hBox!=null){
+            eventsAndHBoxes.remove(eventId);
+            removeFromVBox(hBox);
         }
     }
 
     /**
      * Generates the label for the history
-     * @param event the event to generate the label for
+     * @param eventId the ID of the event to generate the label for
+     * @param eventName the title of the vent
      * @return the label generated
      */
-    public Label generateLabelForEvent(Event event){
-        String eventTitle = event.getTitle();
+    public Label generateLabelForEvent(String eventId, String eventName){
         Label label = new Label();
-        StringBuilder sb = new StringBuilder(eventTitle);
-        sb.append(" (");
-        sb.append(event.getId());
-        sb.append(")");
-        label.setText(sb.toString());
+        String labelString = eventName + " (" +
+                eventId +
+                ")";
+        label.setText(labelString);
         Tooltip joinEventTooltip = new Tooltip();
         joinEventTooltip.textProperty().bind(translation.getStringBinding("Startup.Tooltip.JoinEvent"));
         label.setTooltip(joinEventTooltip);
         label.setOnMouseClicked(
                 mouseEvent -> {
-                    joinEvent(event);
-                    removeFromVBox(label.getParent().idProperty());
+                    switchToEvent(eventId);
                     joinEventFeedback.textProperty().bind(translation.getStringBinding("empty"));
                 });
         label.setOnMouseEntered(
@@ -254,12 +236,16 @@ public class StartupScreenCtrl implements Initializable {
      * Generates an image which when clicked will remove the HBox which contains it.
      * It will also change the cursor of the user while hovering to indicate clickability.
      * @param label the label which will be contained with the image in the HBox
-     * @param event the event to remove
+     * @param eventId the ID of the event to remove
      * @return ImageView with the image
      */
-    public ImageView generateRemoveButton(Label label, Event event) throws FileNotFoundException {
+    public ImageView generateRemoveButton(Label label, String eventId) {
         FileInputStream input = null;
-        input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        try {
+            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         int imgSize = 15;
@@ -281,28 +267,19 @@ public class StartupScreenCtrl implements Initializable {
         );
         imageView.setOnMouseClicked(
                 mouseEvent -> {
-                    removeFromVBox(label.getParent().idProperty());
-                    removeFromHistoryIfExists(event);
+                    removeFromHistoryIfExists(eventId);
                 }
         );
 
         return imageView;
     }
     /**
-     * Removes from the VBox the child with the given id
-     * @param id the given id
+     * Removes from the VBox the corresponding HBox child
+     * @param hBox the HBox to remove
      */
-    public void removeFromVBox(StringProperty id){
+    public void removeFromVBox(HBox hBox){
         List<Node> allNodes = getHistoryNodes();
-        Node removeNode = null;
-        for (Node node : allNodes){
-            if (node != null && node.idProperty() != null && node.idProperty().equals(id)){
-                removeNode = node;
-            }
-        }
-        if (removeNode != null){
-            allNodes.remove(removeNode);
-        }
+        allNodes.remove(hBox);
     }
 
     /**
@@ -350,27 +327,6 @@ public class StartupScreenCtrl implements Initializable {
         button.textProperty().bind(translation.getStringBinding(key));
     }
 
-    /**
-     * Refreshes the events in the history
-     */
-    public void refreshEvents() {
-        List<String> eventIds = new ArrayList<>();
-        List<Map.Entry<Event, HBox>> entries = new ArrayList<>();
-        for (Map.Entry<Event, HBox> entry : eventsAndHBoxes) {
-            eventIds.add(entry.getKey().getId());
-            entries.add(entry);
-        }
-        for (Map.Entry<Event, HBox> entry : entries) {
-            removeFromHistoryIfExists(entry.getKey());
-        }
-        eventsAndHBoxes.clear();
-        recentlyViewedEventsVBox.getChildren().clear();
-        for (String id : eventIds) {
-            Event event = server.getEvent(id);
-            addToHistory(event);
-        }
-        languageCtrl.refresh(languageIndicator);
-    }
     /**
      * switch to the management overview password (log in) scene
      * @param actionEvent on button press go to another scene
