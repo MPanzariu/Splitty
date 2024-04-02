@@ -6,6 +6,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Participant;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -83,6 +84,8 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
     public void sendInvite() {
         String name = nameTextField.getText();
         String email = emailTextField.getText();
+        Participant participant = new Participant(name);
+
         if (name.isEmpty()) {
             nameFeedbackLabel.textProperty().bind(translation.getStringBinding("Email.NameFeedbackLabel"));
         } else {

@@ -37,6 +37,17 @@ public class ParticipantTest {
     }
 
     /**
+     * Test for email getter and setter
+     */
+    @Test
+    public void setterGetterEmailTest(){
+        var p = new Participant("name");
+        assertNull(p.getEmail());
+        p.setEmail("email");
+        assertEquals("email", p.getEmail());
+    }
+
+    /**
      * Test for bank details getter and setter
      */
     @Test

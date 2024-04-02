@@ -24,6 +24,7 @@ public class Participant {
     private String legalName;
     private String iban;
     private String bic;
+    private String email;
 
     /***
      * Constructor used by Object Mappers
@@ -129,6 +130,23 @@ public class Participant {
      */
     public void setBic(String bic) {
         this.bic = bic;
+    }
+
+    /**
+     * Gets the email of the Participant
+     * @return the Participant's email
+     */
+
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Sets the email of the Participant
+     * @param email the new email of the Participant
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /***

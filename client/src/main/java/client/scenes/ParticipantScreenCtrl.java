@@ -125,6 +125,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holderField.clear();
         ibanField.clear();
         bicField.clear();
+        emailField.clear();
     }
 
     /**
@@ -143,7 +144,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         participant.setLegalName(accountHolder);
         participant.setIban(iban);
         participant.setBic(bic);
-
+        participant.setEmail(email);
         return participant;
     }
 
@@ -166,6 +167,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holderField.setText(participantFin.getLegalName());
         ibanField.setText(participantFin.getIban());
         bicField.setText(participantFin.getBic());
+        emailField.setText(participantFin.getEmail());
         participantId = id;
     }
 

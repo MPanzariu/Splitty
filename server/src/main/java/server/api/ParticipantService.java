@@ -46,6 +46,7 @@ public class ParticipantService {
         dbParticipant.setLegalName(participant.getLegalName());
         dbParticipant.setIban(participant.getIban());
         dbParticipant.setBic(participant.getBic());
+        dbParticipant.setEmail(participant.getEmail());
         event.addParticipant(dbParticipant);
         eventRepository.save(event);
     }
@@ -88,6 +89,7 @@ public class ParticipantService {
         dbParticipant.setLegalName(participant.getLegalName());
         dbParticipant.setIban(participant.getIban());
         dbParticipant.setBic(participant.getBic());
+        dbParticipant.setEmail(participant.getEmail());
         return participantRepository.save(participant);
     }
 
