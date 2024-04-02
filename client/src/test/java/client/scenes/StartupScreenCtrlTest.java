@@ -9,17 +9,28 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.testfx.framework.junit5.ApplicationExtension;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class StartupScreenCtrlTest{
 
     private TestStartupScreenCtrl sut;
@@ -28,6 +39,17 @@ public class StartupScreenCtrlTest{
     private LanguageIndicatorCtrl languageCtrl;
     private ImageUtils imageUtils;
     private AppStateManager manager;
+    private Translation translation;
+
+    @BeforeAll
+    static void testFXSetup(){
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("glass.platform", "Monocle");
+        System.setProperty("monocle.platform", "Headless");
+        System.setProperty("prism.order", "sw");
+    }
+
     @BeforeEach
     public void setup() {
         this.testServerUtils = new TestServerUtils();
@@ -35,7 +57,8 @@ public class StartupScreenCtrlTest{
         this.imageUtils = mock(ImageUtils.class);
         this.languageCtrl = mock(LanguageIndicatorCtrl.class);
         this.manager = mock(AppStateManager.class);
-        sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null,
+        this.translation = mock(Translation.class);
+        sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, translation,
                 languageCtrl, manager, imageUtils);
 
     }
@@ -63,11 +86,14 @@ public class StartupScreenCtrlTest{
     @Test
     public void testCreateEventSuccess(){
         String title = "title";
-        //Pending JavaFX testing changes being merged!
-//        sut.textBoxText = title;
-//        sut.createEvent();
-//        assertEquals(testServerUtils.calls.size(), 1);
-//        assertEquals(sut.joinEventCalls.size(), 1);
+        sut.textBoxText = title;
+        doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
+        Image testImage = new WritableImage(1,1);
+        doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(anyString(), anyInt());
+
+        sut.createEvent();
+        assertEquals(testServerUtils.calls.size(), 1);
+        assertEquals(sut.joinEventCalls.size(), 1);
     }
     @Test
     public void testJoinEventInvalidLength(){
@@ -94,11 +120,13 @@ public class StartupScreenCtrlTest{
     @Test
     public void testJoinEventValidCode(){
         String inviteCode = "aaaaaa";
-        //Pending JavaFX testing changes being merged!
-//        sut.textBoxText = inviteCode;
-//        sut.joinEventClicked();
-//        assertEquals(1, testServerUtils.calls.size());
-//        assertFalse(sut.joinEventCalls.isEmpty());
+        sut.textBoxText = inviteCode;
+        doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
+        Image testImage = new WritableImage(1,1);
+        doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(anyString(), anyInt());
+        sut.joinEventClicked();
+        assertEquals(1, testServerUtils.calls.size());
+        assertFalse(sut.joinEventCalls.isEmpty());
     }
 
     @Test
@@ -108,12 +136,11 @@ public class StartupScreenCtrlTest{
 
     @Test
     public void testRemoveFromHistoryIfExists(){
-        HBox hBox = null; //Will be changed with JavaFX testing changes
+        HBox hBox = new HBox();
         sut.getEventsAndHBoxes().put("ABC123", hBox);
         assertFalse(sut.getEventsAndHBoxes().isEmpty());
         sut.removeFromHistoryIfExists("ABC123");
-        //Pending JavaFX testing changes
-//        assertTrue(sut.getEventsAndHBoxes().isEmpty());
+        assertTrue(sut.getEventsAndHBoxes().isEmpty());
     }
 
     private class TestServerUtils extends ServerUtils{
@@ -153,6 +180,7 @@ public class StartupScreenCtrlTest{
     private class TestStartupScreenCtrl extends StartupScreenCtrl{
         public String textBoxText;
         public List<String> joinEventCalls = new ArrayList<>();
+        public List<String> clearCalls = new ArrayList<>();
 
         public List<String> labelBindings = new ArrayList<>();
         public List<String> textBoxBindings = new ArrayList<>();
@@ -195,6 +223,11 @@ public class StartupScreenCtrlTest{
         @Override
         public void switchToEvent(String eventId){
             joinEventCalls.add(eventId);
+        }
+
+        @Override
+        public void clearField(TextField field){
+            clearCalls.add("cleared");
         }
 
         @Override
