@@ -44,7 +44,7 @@ public class EmailHandler {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         Properties properties = configUtils.easyLoadProperties();
         readProperties(properties);
-        if (!isConfigured){
+        if (isConfigured){
             mailSender.setHost(host);
             mailSender.setPort(port);
             mailSender.setUsername(userName);
@@ -54,7 +54,6 @@ public class EmailHandler {
             props.put("mail.transport.protocol", "smtp");
             props.put("mail.smtp.auth", smtpAuth);
             props.put("mail.smtp.starttls.enable", smtpStarttlsEnable);
-            isConfigured = true;
         }
         return mailSender;
     }
