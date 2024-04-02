@@ -1,6 +1,5 @@
 package client.utils;
 
-import client.scenes.SimpleRefreshable;
 import commons.Event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,9 +32,9 @@ class AppStateManagerTest {
     @BeforeEach
     void setUp() {
         refreshable = new TestRefreshable();
-        HashMap<Class<?>, SimpleRefreshable> refreshableMap = new HashMap<>();
-        refreshableMap.put(Void.class, refreshable);
-        sut.setControllerMap(refreshableMap);
+        HashMap<Class<?>, ScreenInfo> screenMap = new HashMap<>();
+        screenMap.put(Void.class, new ScreenInfo(refreshable, true, null, null));
+        sut.setScreenInfoMap(screenMap);
         event1 = new Event("Title!", null);
     }
 
@@ -44,7 +43,6 @@ class AppStateManagerTest {
      */
     @Test
     void onEventUpdateLiveRefresh() {
-        refreshable.setShouldLiveRefresh(true);
         sut.onSwitchScreens(Void.class);
         assertNull(refreshable.getCurrentEvent());
         sut.onEventUpdate(event1);
@@ -56,7 +54,10 @@ class AppStateManagerTest {
      */
     @Test
     void onEventUpdateDoesNotLiveRefresh() {
-        refreshable.setShouldLiveRefresh(false);
+        HashMap<Class<?>, ScreenInfo> screenMap = new HashMap<>();
+        screenMap.put(Void.class, new ScreenInfo(refreshable, false, null, null));
+        sut.setScreenInfoMap(screenMap);
+
         sut.onSwitchScreens(Void.class);
         assertNull(refreshable.getCurrentEvent());
         sut.onEventUpdate(event1);
@@ -68,7 +69,6 @@ class AppStateManagerTest {
      */
     @Test
     void switchClientEventRefreshesEvent() {
-        refreshable.setShouldLiveRefresh(true);
         String eventID = "ABC123";
         String url = "/topic/events/" + eventID;
 
@@ -89,7 +89,6 @@ class AppStateManagerTest {
      */
     @Test
     void consumerUpdatesRefreshable() {
-        refreshable.setShouldLiveRefresh(true);
         String eventID = "ABC123";
         String url = "/topic/events/" + eventID;
         final Consumer[] eventConsumer = new Consumer[]{null};
@@ -119,7 +118,10 @@ class AppStateManagerTest {
      */
     @Test
     void onSwitchScreens() {
-        refreshable.setShouldLiveRefresh(false);
+        HashMap<Class<?>, ScreenInfo> screenMap = new HashMap<>();
+        screenMap.put(Void.class, new ScreenInfo(refreshable, false, null, null));
+        sut.setScreenInfoMap(screenMap);
+
         sut.onEventUpdate(event1);
         assertNull(refreshable.getCurrentEvent());
         sut.onSwitchScreens(Void.class);

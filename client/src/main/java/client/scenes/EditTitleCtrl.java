@@ -23,10 +23,10 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Button cancel;
 
-    ServerUtils server;
-    MainCtrl mainCtrl;
-    Translation translation;
-    Event event;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
+    private final Translation translation;
+    private Event event;
 
     @Inject
     public EditTitleCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
@@ -50,20 +50,11 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     public void confirm() {
         server.editTitle(event.getId(), title.getText());
         title.clear();
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     public void cancel() {
         title.clear();
-        mainCtrl.switchToEventScreen();
-    }
-
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 }

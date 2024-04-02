@@ -8,10 +8,4 @@ public interface SimpleRefreshable {
      * @param event the new Event data to process
      */
     void refresh(Event event);
-
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    boolean shouldLiveRefresh();
 }

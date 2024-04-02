@@ -31,11 +31,21 @@ public class Translation {
 
     /***
      * Provides a binding for the translated value corresponding to a text key
-     * @param key - the text key (e.g. "startup.label.create")
-     * @return - a live-updating binding for the translated value
+     * @param key the text key (e.g. "startup.label.create")
+     * @return a live-updating binding for the translated value
      */
     public ObservableValue<String> getStringBinding(String key) {
         return resourceFactory.getStringBinding(key);
+    }
+
+    /***
+     * Provides a binding for the translated value corresponding to a text key, with placeholders replaced based on the given Map
+     * @param key the text key (e.g. "startup.label.create")
+     * @param values the values to substitute in the final String
+     * @return a live-updating binding for the translated value (values do NOT live update)
+     */
+    public ObservableValue<String> getStringSubstitutionBinding(String key, Map<String, String> values) {
+        return resourceFactory.getStringSubstitutionBinding(key, values);
     }
 
     /***
@@ -101,7 +111,6 @@ public class Translation {
     public void bindTextFieldPrompt(TextField textField, String binding){
         textField.promptTextProperty().bind(this.getStringBinding(binding));
     }
-
 
     /**
      * Binds a button to a text

@@ -53,9 +53,10 @@ public class ParticipantControllerTest {
     @Test
     void addParticipantStatus(){
         Event event = new Event("test", null);
-        doNothing().when(participantService).addParticipantToEvent(anyString(), anyString());
-        ResponseEntity<Void> response = participantController.addParticipantToEvent(event.getId(), "John");
-        verify(participantService).addParticipantToEvent(eq(event.getId()), eq("John"));
+        Participant participant = new Participant("John!");
+        doNothing().when(participantService).addParticipantToEvent(anyString(), any());
+        ResponseEntity<Void> response = participantController.addParticipantToEvent(event.getId(), participant);
+        verify(participantService).addParticipantToEvent(eq(event.getId()), eq(participant));
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
@@ -65,15 +66,16 @@ public class ParticipantControllerTest {
     @Test
     void addParticipantNotExistent(){
         Event event = new Event("test", null);
-        doThrow(new EntityNotFoundException(":{")).when(participantService).addParticipantToEvent(anyString(), anyString());
+        Participant participant = new Participant("John!");
+        doThrow(new EntityNotFoundException(":{")).when(participantService).addParticipantToEvent(anyString(), any());
         try {
-            participantController.addParticipantToEvent(event.getId(), "Participant");
+            participantController.addParticipantToEvent(event.getId(), participant);
         } catch (EntityNotFoundException e) {
             assertThrows(EntityNotFoundException.class, () -> {
-                participantController.addParticipantToEvent(event.getId(), "Participant");
+                participantController.addParticipantToEvent(event.getId(), participant);
             });
         }
-        verify(participantService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()), eq("Participant"));
+        verify(participantService, Mockito.times(2)).addParticipantToEvent(eq(event.getId()),eq(participant));
     }
 
     /**

@@ -83,15 +83,15 @@ public class ServerUtils {
 	/**
 	 * Requests the server to add a participant.
 	 * @param id ID of the event
-	 * @param participantName Name of the participant to add
+	 * @param participant The Participant to add
 	 * @return The participant added by the server
 	 */
-	public Participant addParticipant(String id, String participantName) {
+	public Participant addParticipant(String id, Participant participant) {
 		return ClientBuilder.newClient(new ClientConfig()) //
 				.target(serverURL).path("api/events/" + id + "/participants") //
 				.request(APPLICATION_JSON) //
 				.accept(APPLICATION_JSON) //
-				.post(Entity.entity(participantName, APPLICATION_JSON), Participant.class);
+				.post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
 	}
 
 	/**
