@@ -17,7 +17,6 @@ import java.util.Locale;
 public class MainCtrl {
 
     private Stage primaryStage;
-    private StartupScreenCtrl startupScreenCtrl;
     private ExpenseScreenCtrl expenseScreenCtrl;
     private Scene startupScene;
     private Scene eventScene;
@@ -55,7 +54,7 @@ public class MainCtrl {
 
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
-        this.startupScreenCtrl = overview.getKey();
+        StartupScreenCtrl startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.eventScene = new Scene(eventUI.getValue());
         EventScreenCtrl eventScreenCtrl = eventUI.getKey();
@@ -95,8 +94,11 @@ public class MainCtrl {
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
         manager.setScreenInfoMap(screenMap);
+
         manager.setStartupScreen(startupScreenCtrl);
         manager.subscribeToUpdates();
+        //This can also show a pop-up in the future, but right now it doesn't
+        manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
 
         primaryStage.show();
     }
@@ -114,18 +116,9 @@ public class MainCtrl {
     }
 
     public void showMainScreen() {
+        manager.closeOpenedEvent();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
-    }
-
-    /**
-     * When called the view changes to the event specified as input.
-     * join an event (either used when creating or joining one) and updating the fields in the event screen
-     */
-    public void switchToEventScreen() {
-        switchScreens(EventScreenCtrl.class);
-        primaryStage.setScene(eventScene);
-        primaryStage.setTitle("Event Screen");
     }
 
     /**

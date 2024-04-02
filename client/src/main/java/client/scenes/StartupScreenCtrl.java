@@ -105,6 +105,7 @@ public class StartupScreenCtrl implements Initializable {
         String newEventID = event.getId();
         addToHistory(newEventID, event.getTitle());
         switchToEvent(newEventID);
+        clearField(eventTitleTextBox);
     }
 
     /**
@@ -121,6 +122,7 @@ public class StartupScreenCtrl implements Initializable {
             Event event = server.getEvent(inviteCode);
             addToHistory(inviteCode, event.getTitle());
             switchToEvent(inviteCode);
+            clearField(inviteCodeTextBox);
         }catch (BadRequestException exception){
             bindLabel(joinEventFeedback, "Startup.Label.InvalidCode");
         }
@@ -142,7 +144,7 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void addToHistory(String eventId, String eventName) {
         Label eventLabel = generateLabelForEvent(eventId, eventName);
-        ImageView imageView = generateRemoveButton(eventLabel, eventId);
+        ImageView imageView = generateRemoveButton(eventId);
         HBox hbox = generateHBox(eventLabel, imageView);
         removeFromHistoryIfExists(eventId);
         appStateManager.addSubscription(eventId);
@@ -243,11 +245,10 @@ public class StartupScreenCtrl implements Initializable {
     /**
      * Generates an image which when clicked will remove the HBox which contains it.
      * It will also change the cursor of the user while hovering to indicate clickability.
-     * @param label the label which will be contained with the image in the HBox
      * @param eventId the ID of the event to remove
      * @return ImageView with the image
      */
-    public ImageView generateRemoveButton(Label label, String eventId) {
+    public ImageView generateRemoveButton(String eventId) {
         ImageView imageView = imageUtils.generateImageView("x_remove.png", 15);
         imageView.setPickOnBounds(true);
         Tooltip deleteEventToolTip = new Tooltip();
@@ -260,9 +261,7 @@ public class StartupScreenCtrl implements Initializable {
                 mouseEvent -> mainCtrl.getMainMenuScene().setCursor(Cursor.DEFAULT)
         );
         imageView.setOnMouseClicked(
-                mouseEvent -> {
-                    removeFromHistoryIfExists(eventId);
-                }
+                mouseEvent -> removeFromHistoryIfExists(eventId)
         );
 
         return imageView;
@@ -319,6 +318,14 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void bindButton(Button button, String key) {
         button.textProperty().bind(translation.getStringBinding(key));
+    }
+
+    /***
+     * Removes entered text from a field
+     * @param field the field to remove text from
+     */
+    public void clearField(TextField field){
+        field.clear();
     }
 
     /**
