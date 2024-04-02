@@ -10,7 +10,7 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
-import java.util.HashSet;
+
 import java.util.Set;
 
 @Service
@@ -24,6 +24,7 @@ public class ParticipantService {
      * autowired - automatically inject instances of the parameters when creaitng an EventService
      * @param eventRepository used for handling events
      * @param participantRepository used for handling participants
+     * @param expenseRepository used for handling expenses
      */
     @Autowired
     public ParticipantService(EventRepository eventRepository,
