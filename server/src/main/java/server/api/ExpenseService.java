@@ -110,9 +110,19 @@ public class ExpenseService {
                     .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
             expense.setOwedTo(participant);
         }
+        Set<Participant> participants = new HashSet<>();
+        if (expense.getParticipantsInExpense() != null) {
+            for (Participant participant : newExpense.getParticipantsInExpense()) {
+                long participantId = participant.getId();
+                Participant fetchedParticipant = participantRepository.findById(participantId)
+                    .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
+                participants.add(fetchedParticipant);
+            }
+        }
         expense.setDate(newExpense.getDate());
         expense.setName(newExpense.getName());
         expense.setPriceInCents(newExpense.getPriceInCents());
+        expense.setParticipantToExpense(participants);
         return expenseRepository.save(expense);
     }
 }

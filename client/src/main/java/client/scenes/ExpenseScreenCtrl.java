@@ -14,11 +14,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.net.URL;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -203,34 +201,35 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         bindToEmpty();
     }
 
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
-    }
-
 
     /**
      * When pressing the Cancel button it takes the user
      * back to the Event Screen
-     * @param actionEvent the action of clicking the button
      */
-    public void switchToEventScreen(ActionEvent actionEvent) {
-        mainCtrl.switchToEventScreen();
+    public void switchToEventScreen() {
+        resetAll();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
      * resets all the fields in the expenseScreen
      */
     public void resetAll() {
+        resetPaidBy();
         resetAmount();
         resetPurpose();
         resetDate();
         resetCurrency();
+        resetSplitMethod();
     }
+
+    /**
+     * resets the text from the Paid by field
+     */
+    public void resetPaidBy() {
+        choosePayer.getEditor().clear();
+    }
+
     /**
      * resets the amount inserted in the amount TextField
      */
@@ -261,6 +260,15 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
+     * resets the checkboxes for the split methods
+     */
+    public void resetSplitMethod() {
+        splitBetweenAllCheckBox.setSelected(false);
+        splitBetweenCustomCheckBox.setSelected(false);
+        participantsVBox.getChildren().clear();
+    }
+
+    /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
      * @return the newly created expense
@@ -279,9 +287,10 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         //change in case of wanting to implement another date system
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
-        if(date != null)
-            expenseDate = Date.valueOf(datePicker.getValue());
-
+        if(date != null) {
+            expenseDate = new Date(date.getYear(),
+                date.getMonthValue() - 1, date.getDayOfMonth());
+        }
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;
@@ -350,7 +359,32 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         expensePurpose.setText(expense.getName());
         sum.setText(String.valueOf((double) expense.getPriceInCents()/100));
         choosePayer.getEditor().setText(expense.getOwedTo().getName());
-        datePicker.getEditor().setText(String.valueOf(expense.getDate())); //needs revision
+        Date expenseDate = expense.getDate();
+
+        datePicker.getEditor()
+            .setText((expenseDate.getMonth() + 1) + "/"
+                + expenseDate.getDate() + "/" +
+                expenseDate.getYear()); //needs revision
+        if(expense.getParticipantsInExpense()
+            .containsAll(currentEvent.getParticipants())) {
+            splitBetweenAllCheckBox.setSelected(true);
+            splitBetweenCustomCheckBox.setSelected(false);
+            participantsVBox.getChildren().clear();
+        }
+        else {
+            participantsVBox.getChildren().clear();
+            splitBetweenCustomCheckBox.setSelected(true);
+            splitBetweenAllCheckBox.setSelected(false);
+            addParticipants();
+            for(Participant participant: expense.getParticipantsInExpense()) {
+                for(CheckBox checkBox: participantCheckBoxes) {
+                    if(checkBox.getText().equals(participant.getName())) {
+                        checkBox.setSelected(true);
+                        break;
+                    }
+                }
+            }
+        }
         expenseId = id;
     }
 
@@ -364,10 +398,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         server.editExpense(currentEvent.getId(), expenseId, expense);
     }
     /**
-     *
-     * @param actionEvent the action of clicking the confirm button
+     * Fires on clicking the confirm button
      */
-    public void addExpenseToEvenScreen(ActionEvent actionEvent) {
+    public void addExpenseToEvenScreen() {
         boolean toAdd = true;
         Expense expense = createNewExpense();
         bindToEmpty();
@@ -404,7 +437,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 editExpenseOnServer(expenseId, expense);
                 expenseId = 0;
             }
-            mainCtrl.switchToEventScreen();
+            resetAll();
+            mainCtrl.switchScreens(EventScreenCtrl.class);
         }
     }
 
@@ -441,10 +475,16 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void addParticipants() {
         Set<Participant> participants = currentEvent.getParticipants();
+        participantCheckBoxes.clear();
+        if(participants.size() < 4)
+            participantsVBox.setPrefHeight((double)participants.size()/4 * 100);
+        ListView<CheckBox> participantsListView = new ListView<>();
+        participantsVBox.getChildren().add(participantsListView);
         for(Participant participant: participants) {
             CheckBox participantToPay = new CheckBox(participant.getName());
-            participantsVBox.getChildren().add(participantToPay);
+            participantsListView.getItems().add(participantToPay);
             participantCheckBoxes.add(participantToPay);
         }
+
     }
 }

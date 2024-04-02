@@ -14,7 +14,7 @@ public class ImageUtils {
      * @param fileName the name of the file under the basePath directory
      * @return an Image containing the loaded file, or null
      */
-    public static Image loadImageFile(String fileName){
+    public Image loadImageFile(String fileName){
         try {
             return new Image(new FileInputStream(basePath + fileName));
         } catch (FileNotFoundException e) {
@@ -29,7 +29,7 @@ public class ImageUtils {
      * @param size the size, in pixels
      * @return an ImageView corresponding to the Image
      */
-    public static ImageView generateImageView(Image image, int size){
+    public ImageView generateImageView(Image image, int size){
         ImageView imageView;
         if(image!=null) imageView = new ImageView(image);
         else imageView = new ImageView();
@@ -38,5 +38,15 @@ public class ImageUtils {
         imageView.setPreserveRatio(true);
         imageView.setCache(true);
         return imageView;
+    }
+
+    /***
+     * Generates an ImageView for a given Image
+     * @param fileName the name of the file under the basePath directory
+     * @param size the size, in pixels
+     * @return an ImageView corresponding to the Image
+     */
+    public ImageView generateImageView(String fileName, int size){
+        return generateImageView(loadImageFile(fileName), size);
     }
 }

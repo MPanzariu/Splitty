@@ -1,24 +1,21 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.AppStateManager;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 
@@ -27,6 +24,7 @@ public class StartupScreenCtrl implements Initializable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final AppStateManager appStateManager;
+    private final ImageUtils imageUtils;
     @FXML
     private TextField eventTitleTextBox;
     @FXML
@@ -49,8 +47,8 @@ public class StartupScreenCtrl implements Initializable {
     private Label joinEventLabel;
     @FXML
     private ComboBox<Locale> languageIndicator;
-    private HashMap<String, HBox> eventsAndHBoxes;
-    private Translation translation;
+    private final HashMap<String, HBox> eventsAndHBoxes;
+    private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
 
     /**
@@ -59,16 +57,20 @@ public class StartupScreenCtrl implements Initializable {
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
      * @param appStateManager the AppStateManager to use
+     * @param languageCtrl  the LanguageIndicatorCtrl to use
+     * @param imageUtils the ImageUtils to use
      */
     @Inject
     public StartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                             LanguageIndicatorCtrl languageCtrl, AppStateManager appStateManager) {
+                             AppStateManager appStateManager, LanguageIndicatorCtrl languageCtrl,
+                             ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.languageCtrl = languageCtrl;
         this.appStateManager = appStateManager;
         eventsAndHBoxes = new HashMap<>();
+        this.imageUtils = imageUtils;
     }
 
     /**
@@ -129,7 +131,7 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void switchToEvent(String eventId){
         mainCtrl.switchEvents(eventId);
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
         moveHistoryToTop(eventId);
     }
 
@@ -152,6 +154,7 @@ public class StartupScreenCtrl implements Initializable {
             String removedEventId = findKeyByValue(lastHBox);
             removeFromHistoryIfExists(removedEventId);
         }
+
     }
 
     private String findKeyByValue(HBox hBox) {
@@ -171,7 +174,6 @@ public class StartupScreenCtrl implements Initializable {
 
     /**
      * Getter for eventsAndHBoxes
-     *
      * @return eventsAndHBoxes
      */
     public HashMap<String, HBox> getEventsAndHBoxes() {
@@ -246,30 +248,16 @@ public class StartupScreenCtrl implements Initializable {
      * @return ImageView with the image
      */
     public ImageView generateRemoveButton(Label label, String eventId) {
-        FileInputStream input = null;
-        try {
-            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        Image image = new Image(input);
-        ImageView imageView = new ImageView(image);
-        int imgSize = 15;
-        imageView.setFitHeight(imgSize);
-        imageView.setFitWidth(imgSize);
+        ImageView imageView = imageUtils.generateImageView("x_remove.png", 15);
         imageView.setPickOnBounds(true);
         Tooltip deleteEventToolTip = new Tooltip();
         deleteEventToolTip.textProperty().bind(translation.getStringBinding("Startup.Tooltip.DeleteEvent"));
         Tooltip.install(imageView, deleteEventToolTip);
         imageView.setOnMouseEntered(
-                mouseEvent -> {
-                    mainCtrl.getMainMenuScene().setCursor(Cursor.HAND);
-                }
+                mouseEvent -> mainCtrl.getMainMenuScene().setCursor(Cursor.HAND)
         );
         imageView.setOnMouseExited(
-                mouseEvent -> {
-                    mainCtrl.getMainMenuScene().setCursor(Cursor.DEFAULT);
-                }
+                mouseEvent -> mainCtrl.getMainMenuScene().setCursor(Cursor.DEFAULT)
         );
         imageView.setOnMouseClicked(
                 mouseEvent -> {
@@ -335,9 +323,8 @@ public class StartupScreenCtrl implements Initializable {
 
     /**
      * switch to the management overview password (log in) scene
-     * @param actionEvent on button press go to another scene
      */
-    public void goToTheManagementOverview(ActionEvent actionEvent) {
-        mainCtrl.switchToMnagamentOverviewPasswordScreen();
+    public void goToTheManagementOverview() {
+        mainCtrl.switchToManagementOverviewPasswordScreen();
     }
 }

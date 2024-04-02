@@ -15,8 +15,8 @@ public class AppStateManager {
     private final WebSocketUtils socketUtils;
     private final ServerUtils server;
     private StompSession.Subscription currentClientSubscription;
-    private HashMap<Class<?>, SimpleRefreshable> controllerMap;
-    private SimpleRefreshable currentlyOpen;
+    private HashMap<Class<?>, ScreenInfo> screenInfoMap;
+    private ScreenInfo currentlyOpen;
     private Event event;
     private StartupScreenCtrl startupScreen;
     private final Set<String> relevantEvents;
@@ -44,7 +44,7 @@ public class AppStateManager {
     public void onEventUpdate(Event event){
         this.event = event;
         if(currentlyOpen!=null && currentlyOpen.shouldLiveRefresh())
-            currentlyOpen.refresh(this.event);
+            currentlyOpen.controller().refresh(this.event);
     }
 
     /***
@@ -65,17 +65,17 @@ public class AppStateManager {
      * @param target the Class of the new screen controller
      */
     public void onSwitchScreens(Class<?> target) {
-        SimpleRefreshable controller = controllerMap.get(target);
-        controller.refresh(this.event);
-        this.currentlyOpen = controller;
+        ScreenInfo switchedScreenInfo = screenInfoMap.get(target);
+        switchedScreenInfo.controller().refresh(this.event);
+        this.currentlyOpen = switchedScreenInfo;
     }
 
     /***
      * Sets the map of Classes to their instances (all under one interface)
-     * @param controllerMap the map of Controller Classes to their SimpleRefreshable instances
+     * @param screenInfoMap the map of Controller Classes to their ScreenInfo
      */
-    public void setControllerMap(HashMap<Class<?>, SimpleRefreshable> controllerMap){
-        this.controllerMap = controllerMap;
+    public void setScreenInfoMap(HashMap<Class<?>, ScreenInfo> screenInfoMap){
+        this.screenInfoMap = screenInfoMap;
     }
 
     /***

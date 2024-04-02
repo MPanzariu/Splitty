@@ -1,10 +1,9 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
@@ -31,6 +30,7 @@ class ManagementOverviewScreenCtrlTest {
     private MainCtrl mainCtrl;
     private TestManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private ObjectMapper objectMapper;
+    private ImageUtils imageUtils;
     private File file;
     @BeforeEach
     public void setUp(){
@@ -40,7 +40,7 @@ class ManagementOverviewScreenCtrlTest {
         mainCtrl = mock(MainCtrl.class);
         objectMapper = mock(ObjectMapper.class);
         file = mock(File.class);
-        managementOverviewScreenCtrl = new TestManagementOverviewScreenCtrl(server, mainCtrl, null, utils);
+        managementOverviewScreenCtrl = new TestManagementOverviewScreenCtrl(server, mainCtrl, translation, utils, imageUtils);
         managementOverviewScreenCtrl.setObjectMapper(objectMapper);
     }
 
@@ -73,7 +73,7 @@ class ManagementOverviewScreenCtrlTest {
         when(server.getEvent(anyString())).thenReturn(event);
 
         try {
-            doThrow(new IOException()).when(objectMapper).writeValue(any(File.class), (Class<Event>) any());
+            doThrow(new IOException()).when(objectMapper).writeValue(any(File.class), any());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -127,8 +127,9 @@ class ManagementOverviewScreenCtrlTest {
          * @param translation the Translation to use
          * @param utils       the ManagementOverviewUtils to use
          */
-        public TestManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ManagementOverviewUtils utils) {
-            super(server, mainCtrl, translation, utils);
+        public TestManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
+                                                ManagementOverviewUtils utils, ImageUtils imageUtils) {
+            super(server, mainCtrl, translation, utils, imageUtils);
             bindings = new ArrayList<>();
             initializeAllEventsCalls = 0;
         }
@@ -136,18 +137,15 @@ class ManagementOverviewScreenCtrlTest {
         @Override
         public void bindButton(Button button, String str){
             bindings.add(str);
-            return;
         }
         @Override
         public void bindTextField(TextField button, String str){
             bindings.add(str);
-            return;
         }
 
         @Override
         public void bindLabel(Label button, String str){
             bindings.add(str);
-            return;
         }
 
         @Override
@@ -161,7 +159,6 @@ class ManagementOverviewScreenCtrlTest {
         @Override
         public void initializeAllEvents(){
             initializeAllEventsCalls+=1;
-            return;
         }
     }
 }

@@ -21,11 +21,6 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
-
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,
-                          CascadeType.PERSIST, CascadeType.REFRESH},
-                          mappedBy = "owedTo", orphanRemoval = true)
-    private Set<Expense> expensesOwedTo;
     private String legalName;
     private String iban;
     private String bic;
@@ -42,7 +37,6 @@ public class Participant {
      */
     public Participant(String name) {
         this.name = name;
-        this.expensesOwedTo = new HashSet<>();
     }
 
     /**
@@ -53,8 +47,6 @@ public class Participant {
     public Participant(long id, String name) {
         this.id = id;
         this.name = name;
-        this.expensesOwedTo = new HashSet<>();
-
     }
 
     /***
@@ -89,30 +81,6 @@ public class Participant {
      */
     public String getName() {
         return name;
-    }
-
-    /***
-     * Adds an Expense owed to the Participant
-     * @param expense the Expense owed to the Participant
-     */
-    public void addExpense(Expense expense){
-        expensesOwedTo.add(expense);
-    }
-
-    /***
-     * Removes an Expense owed to the Participant
-     * @param expense the Expense to be removed from the Participant
-     */
-    public void removeExpense(Expense expense){
-        expensesOwedTo.remove(expense);
-    }
-
-    /***
-     * Provides the Set of all Expenses Owed to the Participant
-     * @return the Set of all Expenses Owed to the Participant
-     */
-    public Set<Expense> getExpensesOwedTo() {
-        return expensesOwedTo;
     }
 
     /***

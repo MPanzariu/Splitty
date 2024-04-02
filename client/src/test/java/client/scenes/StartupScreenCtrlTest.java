@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.AppStateManager;
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
@@ -12,7 +13,9 @@ import javafx.scene.layout.HBox;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -23,15 +26,17 @@ public class StartupScreenCtrlTest{
     private TestServerUtils testServerUtils;
     private TestMainController testMainController;
     private LanguageIndicatorCtrl languageCtrl;
+    private ImageUtils imageUtils;
     private AppStateManager manager;
     @BeforeEach
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController =  new TestMainController();
+        this.imageUtils = mock(ImageUtils.class);
         this.languageCtrl = mock(LanguageIndicatorCtrl.class);
         this.manager = mock(AppStateManager.class);
         sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null,
-                languageCtrl, manager);
+                languageCtrl, manager, imageUtils);
 
     }
 
@@ -159,11 +164,12 @@ public class StartupScreenCtrlTest{
          *
          * @param server      the ServerUtils instance
          * @param mainCtrl    the MainCtrl instance
-         * @param translation the Translation to use
+         * @param translation the Translation instance
+         * @param imageUtils  the ImageUtils instance
          */
         public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                     LanguageIndicatorCtrl languageCtrl, AppStateManager manager) {
-            super(server, mainCtrl, translation, languageCtrl, manager);
+                                     LanguageIndicatorCtrl languageCtrl, AppStateManager manager, ImageUtils imageUtils) {
+            super(server, mainCtrl, translation, manager, languageCtrl, imageUtils);
         }
 
         @Override
@@ -174,19 +180,16 @@ public class StartupScreenCtrlTest{
         @Override
         public void bindLabel(Label label,String str){
             labelBindings.add(str);
-            return;
         }
 
         @Override
         public void bindTextBox(TextField textBox, String str){
             textBoxBindings.add(str);
-            return;
         }
 
         @Override
         public void bindButton(Button button, String str){
             buttonBindings.add(str);
-            return;
         }
 
         @Override
