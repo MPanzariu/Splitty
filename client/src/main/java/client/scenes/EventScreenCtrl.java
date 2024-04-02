@@ -25,9 +25,9 @@ import javafx.scene.layout.HBox;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
@@ -84,6 +84,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param server the ServerUtils instance
      * @param mainCtrl the MainCtrl instance
      * @param translation the Translation to use
+     * @param languageCtrl the LanguageController instance
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
@@ -181,17 +182,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         }
         initializeParticipantsCBox();
         //initializeFilterButtons();
-    }
-
-    /**
-     * Initializes the filter buttons(the size and position)
-     */
-    public void initializeFilterButtons() {
-        allExpenses.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        fromButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        inButton.setPrefWidth(buttonsHBox.getPrefWidth()/3);
-        allExpenses.getStyleClass().add("button");
-        languageCtrl.initializeLanguageIndicator(languageIndicator);
     }
 
     /**
@@ -349,26 +339,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Creates a label for the participant and it
-     * @param participantName the name of the participant we are creating a label for
-     * @param participantId the id of the participant
-     * @return the created label
-     */
-    public Label createParticipantLabel(String participantName, Long participantId) {
-        Label participantLabel = new Label(participantName);
-        participantLabel.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.HAND);
-        });
-        participantLabel.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
-        });
-        participantLabel.setOnMouseClicked(mouseEvent -> {
-            setButtonsNames(participantName);
-        });
-        return participantLabel;
-    }
-
-    /**
      * the action when we press the "All" button
      */
     public void showAllExpenses(){
@@ -378,10 +348,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     private void refreshExpenseList() {
         Button selectedButton = selectedExpenseListButton;
-        if(selectedButton==null) selectedButton = allExpenses;
-        if(selectedButton==allExpenses) showAllExpenseList();
-        else if(selectedButton==fromButton) fromFilter(); //only From someone (unimplemented)
-        else; //only Including someone (unimplemented)
+        if(selectedButton == null) selectedButton = allExpenses;
+        if(selectedButton == allExpenses) showAllExpenseList();
+        else if(selectedButton == fromButton) fromFilter();
+        else if(selectedButton == inButton) includingFilter();
     }
 
     /**
@@ -389,12 +359,14 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * that presents a quick overview of the expense presented
      * the method throws an error
      */
-    public void showAllExpenseList (){
+    public void showAllExpenseList(){
         expensesLogListView.getItems().clear();
         for(Expense expense: event.getExpenses()) {
             HBox expenseBox = null;
-            expenseBox = generateExpenseBox(expense);
-            expensesLogListView.getItems().add(expenseBox);
+            if(!expense.getParticipantsInExpense().isEmpty())
+                expenseBox = generateExpenseBox(expense);
+            if(expenseBox != null)
+                expensesLogListView.getItems().add(expenseBox);
         }
     }
 
@@ -402,10 +374,39 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      *
      * @param expense the expense for which we need to generate the HBox
      * @return the generated hBox, containing the expense details
-     * @throws FileNotFoundException in case the file for the remove button isn't found
-     * an exception is thrown
      */
     public HBox generateExpenseBox(Expense expense) {
+        String log = generateTextForExpenseLabel(expense);
+        Label expenseText = generateExpenseLabel(expense.getId(), log);
+        ImageView xButton = generateRemoveButton(expense.getId());
+        Label date = new Label();
+        if(expense.getDate().getYear() != LocalDateTime.now().getYear())
+            date.setText(expense.getDate().getDate() + "/" +
+                            + (expense.getDate().getMonth() + 1) + "\n/" +
+                        + (expense.getDate().getYear()));
+
+        else
+            date.setText(expense.getDate().getDate() + "/" +
+                + (expense.getDate().getMonth() + 1));
+        HBox xHBox = new HBox(xButton);
+        HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
+        xHBox.setAlignment((CENTER_RIGHT));
+        HBox expenseBox = new HBox(date, expenseText, xHBox);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setSpacing(10);
+        hBoxMap.put(expense.getId(), expenseBox);
+        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setAlignment(Pos.CENTER_LEFT);
+        return expenseBox;
+    }
+
+    /**
+     *
+     * @param expense the expense for which we are generating the
+     * label
+     * @return the resulting generated string
+     */
+    public String generateTextForExpenseLabel(Expense expense) {
         String log = expense.stringOnScreen();
         Set<Participant> participants = event.getParticipants();
         boolean all = true;
@@ -422,6 +423,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(all)
             log += '\n' + "(All)";
         else {
+            if(expense.getParticipantsInExpense().isEmpty())
+                try {
+                    removeFromList(expense.getId());
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             log += '\n' + "(";
             for(Participant participant: expense.getParticipantsInExpense())
                 if(event.getParticipants().contains(participant)) {
@@ -430,13 +437,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 }
             log += ")";
         }
-        Label expenseText = generateExpenseLabel(expense.getId(), log);
-        ImageView xButton = generateRemoveButton(expense.getId());
-        HBox expenseBox = new HBox(expenseText, xButton);
-        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
-        hBoxMap.put(expense.getId(), expenseBox);
-        expenseBox.setAlignment(CENTER_LEFT);
-        return expenseBox;
+        return log;
     }
 
     /**
@@ -571,12 +572,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     /**
      * Filters the expenses, showing the one a certain participant is part of
      */
-    public void IncludingFilter() {
+    public void includingFilter() {
         selectedExpenseListButton = inButton;
         expensesLogListView.getItems().clear();
-        //note: Because for the moment the expenses are split equally between all participants
-        //the Including filter is useless since, by definition if someone is part of an event
-        //they are part of all the expenses in that event
         String name = cBoxParticipantExpenses.getValue();
         Set<Participant> eventParticipants = event.getParticipants();
         Participant selectedParticipant = null;
@@ -589,14 +587,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(selectedParticipant == null)
             throw new EntityNotFoundException("The participant doesn't exist");
         Set<Expense> eventExpenses = event.getExpenses();
-        for(Expense expense1: eventExpenses) {
-            Set<Participant>participantsInExpense = expense1.getParticipantsInExpense();
-                if(participantsInExpense.contains(selectedParticipant)) {
-                    HBox expenseBox = generateExpenseBox(expense1);
-                    expensesLogListView.getItems().add(expenseBox);
-                    break;
-                }
+        for(Expense expense: eventExpenses) {
+            Set<Participant>participantsInExpense = expense.getParticipantsInExpense();
+            if(participantsInExpense.contains(selectedParticipant)) {
+                HBox expenseBox = generateExpenseBox(expense);
+                expensesLogListView.getItems().add(expenseBox);
+            }
         }
-        //showAllExpenseList();
     }
 }
