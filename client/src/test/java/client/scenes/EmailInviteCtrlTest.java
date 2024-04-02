@@ -32,19 +32,6 @@ class EmailInviteCtrlTest {
         emailInviteCtrl = new EmailInviteCtrl(translation,serverUtils,mainCtrl,emailHandler,configUtils);
 
     }
-    @Test
-    void getInviteText() {
-        Event testEvent = new Event("Test Event", null);
-        emailInviteCtrl.refresh(testEvent);
-        Properties properties = mock(Properties.class);
-        when(this.configUtils.easyLoadProperties()).thenReturn(properties);
-        when(properties.getProperty("connection.URL")).thenReturn("localhost:8080");
-        System.out.println(emailInviteCtrl.getInviteText());
-        String expected = String.format("You have been invited to event %s" +
-                " with the invitation code of %s!" +
-                " The event is hosted on the server with address: localhost:8080", testEvent.getTitle(), testEvent.getId());
-        assertEquals(expected, emailInviteCtrl.getInviteText());
-    }
 
     @Test
     void cancelButton(){

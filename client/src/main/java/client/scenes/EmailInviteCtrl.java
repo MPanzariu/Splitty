@@ -1,18 +1,13 @@
 package client.scenes;
 
-import client.utils.ConfigUtils;
-import client.utils.EmailHandler;
-import client.utils.ServerUtils;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -81,11 +76,14 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
         inviteButton.textProperty().bind(translation.getStringBinding("Email.InviteButton"));
     }
 
+    /**
+     *Sends an invitation to the email address given in the email text field
+     */
     public void sendInvite() {
         String name = nameTextField.getText();
         String email = emailTextField.getText();
         Participant participant = new Participant(name);
-
+        participant.setEmail(email);
         if (name.isEmpty()) {
             nameFeedbackLabel.textProperty().bind(translation.getStringBinding("Email.NameFeedbackLabel"));
         } else {
@@ -98,39 +96,62 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
         }
         if (!name.isEmpty() && !email.isEmpty()) {
             Thread emailThread = new Thread(() -> {
-                boolean result = emailHandler.sendEmail(email, "Invited to splitty!", getInviteText());
+                boolean result = emailHandler.sendEmail(email, "Invited to splitty!", emailHandler.getInviteText(event));
                 if (result){
-                    Platform.runLater(() -> System.out.println("Successfully sent email!"));
+                    server.addParticipant(event.getId(), participant);
+                    Platform.runLater(() -> {
+                        System.out.println("Successfully sent email!");
+                        Alert a = new Alert(Alert.AlertType.INFORMATION);
+                        a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+                        a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
+                        a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
+                        a.show();
+                    });
                 }else{
-                    Platform.runLater(() -> System.out.println("Error while sending email!"));
+                    Platform.runLater(() -> {
+                        System.out.println("Error while sending email!");
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+                        a.titleProperty().bind(translation.getStringBinding("Email.ErrorTitle"));
+                        a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
+                        a.show();
+                    });
                 }
             });
             emailThread.start();
+            clearFields();
             mainCtrl.switchToEventScreen();
         }
     }
 
+    /**
+     * Cancels the invitation and switches back to the event screen
+     */
     public void cancel(){
         mainCtrl.switchToEventScreen();
     }
 
-    public String getInviteText(){
-        StringBuilder sb = new StringBuilder("You have been invited to event ");
-        sb.append(event.getTitle());
-        sb.append(" with the invitation code of ");
-        sb.append(event.getId());
-        sb.append("!");
-        String serverURL = this.configUtils.easyLoadProperties().getProperty("connection.URL");
-        sb.append(" The event is hosted on the server with address: ");
-        sb.append(serverURL);
-        return sb.toString();
+    /**
+     * Clears the text fields
+     */
+    public void clearFields(){
+        nameTextField.clear();
+        emailTextField.clear();
     }
 
+    /**
+     * Refreshes the data of the EmailInviteCtrl
+     * @param event the new Event data to process
+     */
     @Override
     public void refresh(Event event) {
         this.event = event;
     }
 
+    /**
+     * Checks if the EmailInviteCtrl should live refresh
+     * @return false
+     */
     @Override
     public boolean shouldLiveRefresh() {
         return false;

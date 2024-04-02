@@ -1,5 +1,6 @@
 package client.utils;
 
+import commons.Event;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -128,5 +129,30 @@ public class EmailHandler {
      */
     public boolean isConfigured() {
         return isConfigured;
+    }
+
+    /**
+     * Gets the invite text for a specific event
+     * @param event the event
+     * @return the string with the invite text
+     */
+    public String getInviteText(Event event){
+        StringBuilder sb = new StringBuilder("You have been invited to event ");
+        sb.append(event.getTitle());
+        sb.append(" with the invitation code of ");
+        sb.append(event.getId());
+        sb.append("!");
+        String serverURL = this.configUtils.easyLoadProperties().getProperty("connection.URL");
+        sb.append(" The event is hosted on the server with address: ");
+        sb.append(serverURL);
+        return sb.toString();
+    }
+
+    /**
+     * Setter for configUtils, used to inject the mock object for testing
+     * @param configUtils ConfigUtils object
+     */
+    public void setConfigUtils(ConfigUtils configUtils) {
+        this.configUtils = configUtils;
     }
 }
