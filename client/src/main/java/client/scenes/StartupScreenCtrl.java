@@ -159,15 +159,24 @@ public class StartupScreenCtrl implements Initializable {
 
     }
 
-    private String findKeyByValue(HBox hBox) {
+    /***
+     * Returns a key from the eventsAndHBoxes HashMap based on the provided value
+     * @param hBox the HBox to look up by
+     * @return the corresponding event ID
+     */
+    public String findKeyByValue(HBox hBox) {
         List<Map.Entry<String, HBox>> matching = eventsAndHBoxes.entrySet().stream().
                 filter(entry->entry.getValue().equals(hBox)).toList();
-        if(matching.size()>1) throw new IllegalStateException("One Event ID bound to multiple HBoxes");
+        if(matching.size()>1) throw new IllegalStateException("One HBox bound to multiple Event IDs");
         if(matching.isEmpty()) return null;
         return matching.get(0).getKey();
     }
 
-    private void moveHistoryToTop(String eventId) {
+    /***
+     * Moves the HBox corresponding to the given event ID to the top of history
+     * @param eventId the event ID the HBox uses
+     */
+    public void moveHistoryToTop(String eventId) {
         var relevantHBox = eventsAndHBoxes.get(eventId);
         var recentlyViewed = getHistoryNodes();
         recentlyViewed.remove(relevantHBox);
