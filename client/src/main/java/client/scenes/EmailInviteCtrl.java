@@ -6,6 +6,7 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -93,7 +94,15 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
             emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Empty"));
         }
         if (!name.isEmpty() && !email.isEmpty()) {
-            emailHandler.sendEmail(name, email, getInviteText());
+            Thread emailThread = new Thread(() -> {
+                boolean result = emailHandler.sendEmail(email, "Invited to splitty!", getInviteText());
+                if (result){
+                    Platform.runLater(() -> System.out.println("Successfully sent email!"));
+                }else{
+                    Platform.runLater(() -> System.out.println("Error while sending email!"));
+                }
+            });
+            emailThread.start();
             mainCtrl.switchToEventScreen();
         }
     }

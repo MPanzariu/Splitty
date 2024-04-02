@@ -113,6 +113,7 @@ public class EmailHandler {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
+        message.setCc(userEmail);
         try {
             javaMailSender.send(message);
             return true;
