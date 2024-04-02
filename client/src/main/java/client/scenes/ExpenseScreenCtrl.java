@@ -5,12 +5,15 @@ import client.utils.Translation;
 import commons.Expense;
 import commons.Event;
 import commons.Participant;
+import commons.Tag;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 
 import java.net.URL;
@@ -20,7 +23,10 @@ import java.util.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.util.Callback;
 
 import java.util.List;
 
@@ -70,6 +76,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private Label errorSplitMethod;
     @FXML
     private VBox participantsVBox;
+    @FXML
+    private ComboBox<Tag> tagComboBox;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
@@ -115,6 +123,62 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 participantsVBox.getChildren().clear();
             }
         });
+    }
+
+    public void initializeTagComboBox(){
+        tagComboBox.getItems().clear();
+        Set<Tag> tags = currentEvent.getEventTags();
+        tagComboBox.getItems().addAll(tags);
+        tagComboBox.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Tag item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label label = new Label(item.getTagName());
+                    label.setAlignment(Pos.CENTER);
+                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 5 10 5 10;" +
+                            "-fx-text-fill: white;");
+                    setGraphic(label);
+                }
+            }
+        });
+        tagComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Tag item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label label = new Label(item.getTagName());
+                    label.setAlignment(Pos.CENTER);
+                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 5 10 5 10;" +
+                            "-fx-text-fill: white;");
+
+                    setGraphic(label);
+                }
+            }
+        });
+
+        Tag defaultTag = findDefaultTag(tags);
+        if (!tags.isEmpty()) {
+            tagComboBox.getSelectionModel().select(defaultTag);
+        }
+    }
+    private Tag findDefaultTag(Set<Tag> tags) {
+        for (Tag tag : tags) {
+            if ("default".equals(tag.getTagName())) {
+                return tag;
+            }
+        }
+        return null;
     }
 
 
@@ -198,6 +262,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         this.currentEvent = event;
         currency.setItems(FXCollections.observableArrayList("", "EUR"));
         choosePayer.setItems(getParticipantList());
+        initializeTagComboBox();
         bindToEmpty();
     }
 
