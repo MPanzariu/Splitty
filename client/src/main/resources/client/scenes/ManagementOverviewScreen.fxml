@@ -12,7 +12,7 @@
 <AnchorPane prefHeight="664.0" prefWidth="1145.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ManagementOverviewScreenCtrl">
    <children>
       <Button fx:id="homeScreenButton" layoutX="21.0" layoutY="623.0" mnemonicParsing="false" onAction="#goBackToHomeScreen" prefHeight="30.0" prefWidth="32.0" styleClass="positiveButton" />
-      <Label fx:id="MOTitle" alignment="CENTER" layoutX="199.0" layoutY="18.0" prefHeight="40.0" prefWidth="614.0" styleClass="h1" text="Management Overview">
+      <Label fx:id="moTitle" alignment="CENTER" layoutX="199.0" layoutY="18.0" prefHeight="40.0" prefWidth="614.0" styleClass="h1" text="Management Overview">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>

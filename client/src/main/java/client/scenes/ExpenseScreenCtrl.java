@@ -17,7 +17,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -202,23 +201,14 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         bindToEmpty();
     }
 
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
-    }
-
 
     /**
      * When pressing the Cancel button it takes the user
      * back to the Event Screen
-     * @param actionEvent the action of clicking the button
      */
-    public void switchToEventScreen(ActionEvent actionEvent) {
-        mainCtrl.switchToEventScreen();
+    public void switchToEventScreen() {
+        resetAll();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
@@ -408,10 +398,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         server.editExpense(currentEvent.getId(), expenseId, expense);
     }
     /**
-     *
-     * @param actionEvent the action of clicking the confirm button
+     * Fires on clicking the confirm button
      */
-    public void addExpenseToEvenScreen(ActionEvent actionEvent) {
+    public void addExpenseToEvenScreen() {
         boolean toAdd = true;
         Expense expense = createNewExpense();
         bindToEmpty();
@@ -448,7 +437,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 editExpenseOnServer(expenseId, expense);
                 expenseId = 0;
             }
-            mainCtrl.switchToEventScreen();
+            resetAll();
+            mainCtrl.switchScreens(EventScreenCtrl.class);
         }
     }
 

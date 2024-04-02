@@ -1,24 +1,16 @@
 package client.scenes;
 
-import client.utils.ManagementOverviewUtils;
-import client.utils.ServerUtils;
-import client.utils.Styling;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class DeleteEventsScreenCtrl implements Initializable {
     @FXML
@@ -33,24 +25,29 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private Button deleteAllEventsButton;
     @FXML
     private Button goBackButton;
-    private Map<Event, Boolean> eventSelectionMap = new HashMap<>();
+    private final Map<Event, Boolean> eventSelectionMap = new HashMap<>();
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final ManagementOverviewUtils utils;
+    private final ImageUtils imageUtils;
     /**
      * Constructor
-     * @param server the ServerUtils instance
-     * @param mainCtrl the MainCtrl instance
-     * @param translation the Translation to use
+     *
+     * @param server      the ServerUtils instance to use
+     * @param mainCtrl    the MainCtrl instance to use
+     * @param translation the Translation instance to use
+     * @param utils       the ManagementOverviewUtils instance to use
+     * @param imageUtils  the ImageUtils instance to use
      */
     @Inject
     public DeleteEventsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                        ManagementOverviewUtils utils) {
+                                  ManagementOverviewUtils utils, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
+        this.imageUtils = imageUtils;
     }
 
     /**
@@ -68,17 +65,8 @@ public class DeleteEventsScreenCtrl implements Initializable {
         selectWhichEventsToDelete.textProperty().bind(translation.getStringBinding("DES.Select.Delete"));
         deleteSelectedEvenetsButton.textProperty().bind(translation.getStringBinding("DES.Delete.Selected.Events.Button"));
         deleteAllEventsButton.textProperty().bind(translation.getStringBinding("DES.Delete.All.Events"));
-        try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBackButton.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBackButton.setGraphic(goBackImage);
     }
 
     /**
@@ -111,9 +99,8 @@ public class DeleteEventsScreenCtrl implements Initializable {
     /**
      * delete all the selected events
      * popup for checking whether the admin wants to proceed or not
-     * @param actionEvent on click, delete all the selected events
      */
-    public void deleteSelectedEvents(ActionEvent actionEvent) {
+    public void deleteSelectedEvents() {
         if(!eventSelectionMap.containsValue(true)){
             noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.No.Events.Selected.Label"));
             Styling.changeStyling(noEventsSelectedLabel, "successText", "errorText");
@@ -132,10 +119,9 @@ public class DeleteEventsScreenCtrl implements Initializable {
                 List<Event> selectedEvents = eventSelectionMap.entrySet().stream()
                         .filter(Map.Entry::getValue)
                         .map(Map.Entry::getKey)
-                        .collect(Collectors.toList());
+                        .toList();
                 checkEventsListView.getItems().removeAll(selectedEvents);
-                for (int i = 0; i < selectedEvents.size(); i++) {
-                    Event current = selectedEvents.get(i);
+                for (Event current : selectedEvents) {
                     server.deleteEvent(current.getId());
                     System.out.println("The following event has been deleted: " + current.getTitle());
                 }
@@ -153,9 +139,9 @@ public class DeleteEventsScreenCtrl implements Initializable {
     /**
      * delete all the existent events from the database
      * popup for confirmation of the action
-     * @param actionEvent on click delete all the events
+     * on click delete all the events
      */
-    public void deleteAllEvents(ActionEvent actionEvent) {
+    public void deleteAllEvents() {
         Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationDialog.setTitle("Delete All Confirmation");
         confirmationDialog.setHeaderText("Delete All Events");
@@ -176,9 +162,9 @@ public class DeleteEventsScreenCtrl implements Initializable {
 
     /**
      * go to the managament overview screen
-     * @param actionEvent on button press go back to the management overview screen
+     * on button press go back to the management overview screen
      */
-    public void goBackToManagementOverview(ActionEvent actionEvent) {
+    public void goBackToManagementOverview() {
         noEventsSelectedLabel.textProperty().bind(translation.getStringBinding(""));
         mainCtrl.switchToManagementOverviewScreen();
     }
