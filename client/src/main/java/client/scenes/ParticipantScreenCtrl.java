@@ -100,12 +100,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         clearFields();
         if(participantId == 0){
             server.addParticipant(event.getId(), participant);
-            mainCtrl.switchToEventScreen();
+            mainCtrl.switchScreens(EventScreenCtrl.class);
         }
         else {
             server.editParticipant(event.getId(), participantId, participant);
             participantId = 0;
-            mainCtrl.switchToParticipantListScreen();
+            mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
         }
     }
 
@@ -114,7 +114,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void cancel() {
         clearFields();
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /***
@@ -177,14 +177,5 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void refresh(Event event){
         this.event = event;
-    }
-
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
     }
 }

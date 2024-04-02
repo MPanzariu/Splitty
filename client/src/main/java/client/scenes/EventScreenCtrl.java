@@ -1,17 +1,12 @@
 package client.scenes;
 
-import client.utils.EmailHandler;
-import client.utils.ServerUtils;
-import client.utils.Styling;
-import client.utils.Translation;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.application.Platform;
 import jakarta.persistence.EntityNotFoundException;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -19,13 +14,9 @@ import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_RIGHT;
@@ -71,8 +62,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
+    private final ImageUtils imageUtils;
     private Event event;
-    private Map<Long, HBox> hBoxMap;
+    private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
     @FXML
     private Button testEmailButton;
@@ -83,17 +75,20 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button emailInviteButton;
     /**
      * Constructor
-     * @param server the ServerUtils instance
-     * @param mainCtrl the MainCtrl instance
+     *
+     * @param server      the ServerUtils instance
+     * @param mainCtrl    the MainCtrl instance
      * @param translation the Translation to use
-     * @param languageCtrl the LanguageController instance
+     * @param languageCtrl the LanguageIndicator to use
+     * @param imageUtils  the ImageUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
        // this.buttonsHBox = new HBox();
@@ -157,44 +152,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Adds generated images to the buttons
      */
     private void addGeneratedImages() {
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/editing.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            editParticipant.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/add-participant.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            addParticipant.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        try{
-            Image image = new Image(new
-                FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBackButton.setGraphic(imageView);
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
-        initializeParticipantsCBox();
-        //initializeFilterButtons();
+        ImageView editParticipantImage = imageUtils.generateImageView("editing.png", 15);
+        editParticipant.setGraphic(editParticipantImage);
+        ImageView addParticipantImage = imageUtils.generateImageView("add-participant.png", 15);
+        addParticipant.setGraphic(addParticipantImage);
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBackButton.setGraphic(goBackImage);
     }
 
     /**
@@ -229,12 +192,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     private void initializeEditTitle() {
-        eventNameLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if(mouseEvent.getClickCount() == 2)
-                    mainCtrl.openEditTitle();
-            }
+        eventNameLabel.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getClickCount() == 2)
+                mainCtrl.switchScreens(EditTitleCtrl.class);
         });
     }
 
@@ -254,20 +214,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         languageCtrl.refresh(languageIndicator);
     }
 
-    /***
-     * Specifies if the screen should be live-refreshed
-     * @return true if changes should immediately refresh the screen, false otherwise
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return true;
-    }
-
     /**
      * Open the title editing screen.
      */
     public void editTitle() {
-        mainCtrl.openEditTitle();
+        mainCtrl.switchScreens(EditTitleCtrl.class);
     }
 
     /**
@@ -281,21 +232,21 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * UI for editing current participants that needs to be implemented when the button is pressed
      */
     public void editCurrentParticipants(){
-        mainCtrl.switchToParticipantListScreen();
+        mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
     }
 
     /**
      * UI for adding a participant that needs to be implemented when the button is pressed
      */
     public void addParticipants(){
-        mainCtrl.switchToAddParticipant();
+        mainCtrl.switchScreens(ParticipantScreenCtrl.class);
     }
 
     /**
      * UI for adding an expense that needs to be implemented when the button is pressed
      */
     public void addExpense(){
-        mainCtrl.switchToAddExpense();
+        mainCtrl.switchScreens(ExpenseScreenCtrl.class);
     }
 
     /**
@@ -372,28 +323,32 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * that presents a quick overview of the expense presented
      * the method throws an error
      */
-    public void showAllExpenseList(){
+    public void showAllExpenseList() {
         expensesLogListView.getItems().clear();
+        //We only want to load this in once! IO is expensive.
+        Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses()) {
-            HBox expenseBox = null;
-            if(!expense.getParticipantsInExpense().isEmpty())
-                expenseBox = generateExpenseBox(expense);
-            if(expenseBox != null)
+            if(!expense.getParticipantsInExpense().isEmpty()){
+                HBox expenseBox = generateExpenseBox(expense, removeImage);
                 expensesLogListView.getItems().add(expenseBox);
+            }
         }
     }
 
     /**
      *
      * @param expense the expense for which we need to generate the HBox
+     * @param removeImage the Image to use for the X icon
      * @return the generated hBox, containing the expense details
      */
-    public HBox generateExpenseBox(Expense expense) {
+    public HBox generateExpenseBox(Expense expense, Image removeImage) {
         String log = generateTextForExpenseLabel(expense);
         Label expenseText = generateExpenseLabel(expense.getId(), log);
-        ImageView xButton = generateRemoveButton(expense.getId());
+        ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label date = new Label();
-        if(expense.getDate().getYear() != LocalDateTime.now().getYear())
+        var currentYear = new Date().getYear() + 1900;
+        var expenseYear = expense.getDate().getYear();
+        if(expenseYear != currentYear)
             date.setText(expense.getDate().getDate() + "/" +
                             + (expense.getDate().getMonth() + 1) + "\n/" +
                         + (expense.getDate().getYear()));
@@ -437,11 +392,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             log += '\n' + "(All)";
         else {
             if(expense.getParticipantsInExpense().isEmpty())
-                try {
-                    removeFromList(expense.getId());
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+                removeFromList(expense.getId());
             log += '\n' + "(";
             for(Participant participant: expense.getParticipantsInExpense())
                 if(event.getParticipants().contains(participant)) {
@@ -462,15 +413,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public Label generateExpenseLabel(long expenseId, String expenseTitle) {
         Label expense = new Label(expenseTitle);
-        expense.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.HAND);
-        });
-        expense.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
-        });
-        expense.setOnMouseClicked(mouseEvent -> {
-            mainCtrl.switchToEditExpense(expenseId);
-        });
+        expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
+        expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
+        expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));
         return expense;
     }
 
@@ -478,36 +423,16 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Generates a remove "button" for the expenses from the listview
      * Furthermore, it allows the client to remove set event by pressing the 'X'
      * @param expenseId the id of the expense to be generated
+     * @param image the Image to be placed on the button
      * @return the generated button
-     * @throws FileNotFoundException in case the image isn't found,
      * this exception is thrown
      */
-    public ImageView generateRemoveButton (long expenseId) {
-        FileInputStream input = null;
-        try {
-            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        Image image = new Image(input);
-        ImageView imageView = new ImageView(image);
-        int imgSize = 15;
-        imageView.setFitHeight(imgSize);
-        imageView.setFitWidth(imgSize);
+    public ImageView generateRemoveButton (long expenseId, Image image) {
+        ImageView imageView = imageUtils.generateImageView(image, 15);
         imageView.setPickOnBounds(true);
-        imageView.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.HAND);
-        });
-        imageView.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getEventScene().setCursor(Cursor.DEFAULT);
-        });
-        imageView.setOnMouseClicked(mouseEvent -> {
-            try {
-                removeFromList(expenseId);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
+        imageView.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
+        imageView.setOnMouseClicked(mouseEvent -> removeFromList(expenseId));
         return imageView;
     }
 
@@ -515,9 +440,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Deletes an expense from the server. It also reflects it in the client
      * by deleting the set expense from the listview
      * @param expenseId the id of the expense we want to delete
-     * @throws FileNotFoundException in case the file isn't found the exception is thrown
      */
-    public void removeFromList(long expenseId) throws FileNotFoundException {
+    public void removeFromList(long expenseId){
         server.deleteExpenseForEvent(event.getId(), expenseId);
         HBox hBox = hBoxMap.get(expenseId);
         hBoxMap.remove(expenseId);
@@ -527,17 +451,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     /**
      * UI for settling current debts
-     * @param actionEvent on button click event
      */
-    public void settleDebts(ActionEvent actionEvent) {
-        mainCtrl.switchToSettleScreen();
+    public void settleDebts() {
+        mainCtrl.switchScreens(SettleDebtsScreenCtrl.class);
     }
 
     /**
      * go back to the main screen
-     * @param actionEvent when button is clicked
      */
-    public void switchToMainScreen(ActionEvent actionEvent) {
+    public void switchToMainScreen() {
         mainCtrl.showMainScreen();
     }
 
@@ -575,9 +497,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         selectedExpenseListButton = fromButton;
         expensesLogListView.getItems().clear();
         String name = cBoxParticipantExpenses.getValue();
+        Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses())
             if(expense.getOwedTo().getName().equals(name)) {
-                HBox expenseBox = generateExpenseBox(expense);
+                HBox expenseBox = generateExpenseBox(expense, removeImage);
                 expensesLogListView.getItems().add(expenseBox);
             }
     }
@@ -600,10 +523,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if(selectedParticipant == null)
             throw new EntityNotFoundException("The participant doesn't exist");
         Set<Expense> eventExpenses = event.getExpenses();
+        Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: eventExpenses) {
             Set<Participant>participantsInExpense = expense.getParticipantsInExpense();
             if(participantsInExpense.contains(selectedParticipant)) {
-                HBox expenseBox = generateExpenseBox(expense);
+                HBox expenseBox = generateExpenseBox(expense, removeImage);
                 expensesLogListView.getItems().add(expenseBox);
             }
         }

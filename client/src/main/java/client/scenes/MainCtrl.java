@@ -1,9 +1,11 @@
 package client.scenes;
 
 import client.utils.AppStateManager;
+import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,43 +17,30 @@ import java.util.Locale;
 public class MainCtrl {
 
     private Stage primaryStage;
-    private Scene overview;
     private StartupScreenCtrl startupScreenCtrl;
-    private EventScreenCtrl eventScreenCtrl;
     private ExpenseScreenCtrl expenseScreenCtrl;
-    private EditTitleCtrl editTitleCtrl;
     private Scene startupScene;
-    private Scene add;
     private Scene eventScene;
-    private Scene expenseScene;
-
     private Scene participantScene;
     private ParticipantScreenCtrl participantScreenCtrl;
-    private Scene participantListScene;
-    private Scene editTitleScene;
     private Scene managementOvervirewPasswordScene;
-    private ParticipantListScreenCtrl participantListScreenCtrl;
-    private ManagementOverviewPasswordCtrl managementOverviewPasswordCtrl;
     private Scene managementOverviewScreenScene;
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
-    private SettleDebtsScreenCtrl settleDebtsScreenCtrl;
-    private Scene settleDebtsScene;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
     private Scene emailInviteScene;
     private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
+    private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
     @Named("client.language")
     private String language;
     private final AppStateManager manager;
-    private String eventCode;
 
     @Inject
     public MainCtrl(Translation translation, AppStateManager manager) {
         this.translation = translation;
         this.manager = manager;
-        this.eventCode = null;
     }
 
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
@@ -72,23 +61,23 @@ public class MainCtrl {
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.eventScene = new Scene(eventUI.getValue());
-        this.eventScreenCtrl = eventUI.getKey();
-        this.expenseScene = new Scene(expenseUI.getValue());
+        EventScreenCtrl eventScreenCtrl = eventUI.getKey();
+        Scene expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
-        this.participantListScene = new Scene(participantListUI.getValue());
-        this.participantListScreenCtrl = participantListUI.getKey();
+        Scene participantListScene = new Scene(participantListUI.getValue());
+        ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
 
-        this.editTitleCtrl = editTitlePair.getKey();
-        this.editTitleScene = new Scene(editTitlePair.getValue());
+        EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
+        Scene editTitleScene = new Scene(editTitlePair.getValue());
         showMainScreen();
         this.managementOvervirewPasswordScene = new Scene(managementOverviewPasswordUI.getValue());
         this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         this.managementOverviewScreenCtrl = managementOverviewScreenUI.getKey();
 
-        this.settleDebtsScreenCtrl = settleDebtsUI.getKey();
-        this.settleDebtsScene = new Scene(settleDebtsUI.getValue());
+        SettleDebtsScreenCtrl settleDebtsScreenCtrl = settleDebtsUI.getKey();
+        Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
         //initialize stylesheets
@@ -96,46 +85,41 @@ public class MainCtrl {
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
         this.emailInviteCtrl = emailInviteUI.getKey();
         this.emailInviteScene = new Scene(emailInviteUI.getValue());
-        HashMap<Class<?>, SimpleRefreshable> controllerMap = new HashMap<>();
-        controllerMap.put(EventScreenCtrl.class, eventScreenCtrl);
-        controllerMap.put(ExpenseScreenCtrl.class, expenseScreenCtrl);
-        controllerMap.put(EditTitleCtrl.class, editTitleCtrl);
-        controllerMap.put(ParticipantScreenCtrl.class, participantScreenCtrl);
-        controllerMap.put(ParticipantListScreenCtrl.class, participantListScreenCtrl);
-        controllerMap.put(SettleDebtsScreenCtrl.class, settleDebtsScreenCtrl);
-        controllerMap.put(EmailInviteCtrl.class, emailInviteCtrl);
-        manager.setControllerMap(controllerMap);
-
+        this.screenMap = new HashMap<>();
+        screenMap.put(EventScreenCtrl.class,
+                new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
+        screenMap.put(ExpenseScreenCtrl.class,
+                new ScreenInfo(expenseScreenCtrl, false, expenseScene, "Expense.Window.title"));
+        screenMap.put(EditTitleCtrl.class,
+                new ScreenInfo(editTitleCtrl, false, editTitleScene, "editTitle.Window.title"));
+        screenMap.put(ParticipantScreenCtrl.class,
+                new ScreenInfo(participantScreenCtrl, false, participantScene, "Participants.Window.title"));
+        screenMap.put(ParticipantListScreenCtrl.class,
+                new ScreenInfo(participantListScreenCtrl, true, participantListScene, "ParticipantList.Window.title"));
+        screenMap.put(SettleDebtsScreenCtrl.class,
+                new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
+        screenMap.put(EmailInviteCtrl.class,
+                new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
+        manager.setScreenInfoMap(screenMap);
         primaryStage.show();
     }
 
+    /***
+     * Executes screen switching to the target's instance
+     * @param target the Class of the target screen
+     */
     public void switchScreens(Class<?> target){
+        ScreenInfo screenInfo = screenMap.get(target);
         manager.onSwitchScreens(target);
+        ObservableValue<String> title = translation.getStringBinding(screenInfo.titleBinding());
+        primaryStage.titleProperty().bind(title);
+        primaryStage.setScene(screenInfo.scene());
     }
 
     public void showMainScreen() {
         startupScreenCtrl.refreshEvents();
-        primaryStage.setTitle("Main Menu");
+        primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
-    }
-
-    /**
-     * When called the view changes to the event specified as input.
-     * join an event (either used when creating or joining one) and updating the fields in the event screen
-     */
-    public void switchToEventScreen() {
-        switchScreens(EventScreenCtrl.class);
-        primaryStage.setScene(eventScene);
-        primaryStage.setTitle("Event Screen");
-    }
-
-    /**
-     * switch the primary screen to the main screen
-     */
-    public void switchBackToMainScreen(){
-        startupScreenCtrl.refreshEvents();
-        primaryStage.setScene(startupScene);
-        primaryStage.setTitle("Main Menu");
     }
 
     /**
@@ -158,45 +142,22 @@ public class MainCtrl {
         return participantScene;
     }
 
-    public void switchToAddExpense() {
-        switchScreens(ExpenseScreenCtrl.class);
-        expenseScreenCtrl.resetAll();
-        primaryStage.setScene(expenseScene);
-    }
     public void switchToEditExpense(long expenseId) {
         switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.setExpense(expenseId);
-        primaryStage.setScene(expenseScene);
-    }
-
-    public void openEditTitle() {
-        switchScreens(EditTitleCtrl.class);
-        primaryStage.setScene(editTitleScene);
-    }
-
-    public void switchToAddParticipant() {
-        switchScreens(ParticipantScreenCtrl.class);
-        primaryStage.setScene(participantScene);
-    }
-
-    public void switchToParticipantListScreen() {
-        switchScreens(ParticipantListScreenCtrl.class);
-        primaryStage.setScene(participantListScene);
     }
 
     public void switchToEditParticipant(long participantId) {
         switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
-        primaryStage.setScene(participantScene);
     }
 
-
     /**
-     * switch to the log in page for the management overview
+     * switch to the login page for the management overview
      */
-    public void switchToMnagamentOverviewPasswordScreen(){
+    public void switchToManagementOverviewPasswordScreen(){
         primaryStage.setScene(managementOvervirewPasswordScene);
-        primaryStage.setTitle("Log in");
+        primaryStage.titleProperty().bind(translation.getStringBinding("MOPCtrl.Window.title"));
     }
 
     /**
@@ -204,22 +165,13 @@ public class MainCtrl {
      */
     public void switchToManagementOverviewScreen(){
         primaryStage.setScene(managementOverviewScreenScene);
-        primaryStage.setTitle("Management Overview");
+        primaryStage.titleProperty().bind(translation.getStringBinding("MOSCtrl.Window.title"));
         managementOverviewScreenCtrl.initializeAllEvents();
-    }
-
-    /***
-     * Switch to the Debt Settle Screen
-     */
-    public void switchToSettleScreen() {
-        switchScreens(SettleDebtsScreenCtrl.class);
-        primaryStage.setScene(settleDebtsScene);
-        primaryStage.setTitle("Settle Debts");
     }
 
     public void switchToDeleteEventsScreen(){
         primaryStage.setScene(deleteEventsScene);
-        primaryStage.setTitle("Events Removal");
+        primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
     }
 
@@ -228,7 +180,6 @@ public class MainCtrl {
      * @param eventCode the event code to use
      */
     public void switchEvents(String eventCode) {
-        this.eventCode = eventCode;
         manager.switchClientEvent(eventCode);
     }
 
@@ -238,6 +189,5 @@ public class MainCtrl {
     public void switchToInviteByEmail() {
         switchScreens(EmailInviteCtrl.class);
         primaryStage.setScene(emailInviteScene);
-        primaryStage.setTitle("Invite by Email");
     }
 }

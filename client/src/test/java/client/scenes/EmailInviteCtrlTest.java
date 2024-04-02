@@ -36,7 +36,7 @@ class EmailInviteCtrlTest {
     @Test
     void cancelButton(){
         emailInviteCtrl.cancel();
-        verify(mainCtrl).switchToEventScreen();
+        verify(mainCtrl).switchScreens(EventScreenCtrl.class);
     }
 }
 

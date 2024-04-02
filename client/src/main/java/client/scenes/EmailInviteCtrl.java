@@ -120,7 +120,7 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
             });
             emailThread.start();
             clearFields();
-            mainCtrl.switchToEventScreen();
+            mainCtrl.switchScreens(EventScreenCtrl.class);
         }
     }
 
@@ -128,7 +128,7 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
      * Cancels the invitation and switches back to the event screen
      */
     public void cancel(){
-        mainCtrl.switchToEventScreen();
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
@@ -148,12 +148,4 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
         this.event = event;
     }
 
-    /**
-     * Checks if the EmailInviteCtrl should live refresh
-     * @return false
-     */
-    @Override
-    public boolean shouldLiveRefresh() {
-        return false;
-    }
 }
