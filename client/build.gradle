@@ -30,16 +30,6 @@ dependencies {
 	implementation 'com.google.inject:guice:7.0.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.2.2'
-	
-	implementation 'org.openjfx:javafx-controls:21.0.2'
-	implementation 'org.openjfx:javafx-fxml:21.0.2'
-
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
-	testImplementation 'org.testfx:testfx-junit5:4.0.18'
-	testImplementation 'org.testfx:testfx-core:4.0.18'
-	testImplementation 'org.openjfx:javafx-graphics:21.0.2'
-	testImplementation 'org.openjfx:javafx-controls:21.0.2'
 
 	implementation 'org.apache.commons:commons-text:1.11.0'
 
@@ -47,4 +37,17 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:LATEST'
 	implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.5'
+
+	testImplementation 'org.mockito:mockito-core:5.11.0'
+	testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.11.0'
+
+	testImplementation group: 'org.testfx', name: 'testfx-core', version: '4.0.18'
+	testImplementation group: 'org.testfx', name: 'testfx-junit5', version: '4.0.18'
+	testImplementation group: 'org.testfx', name: 'openjfx-monocle', version: '21.0.2'
+
+	implementation 'org.openjfx:javafx-controls:21.0.2'
+	testImplementation 'org.openjfx:javafx-graphics:21.0.2'
+	implementation 'org.openjfx:javafx-fxml:21.0.2'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
