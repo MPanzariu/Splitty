@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
@@ -8,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,13 +23,15 @@ public class StartupScreenCtrlTest{
     private TestServerUtils testServerUtils;
     private TestMainController testMainController;
     private LanguageIndicatorCtrl languageCtrl;
+    private ImageUtils imageUtils;
     @BeforeEach
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController =  new TestMainController();
+        this.imageUtils = mock(ImageUtils.class);
         this.languageCtrl = mock(LanguageIndicatorCtrl.class);
         sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, null,
-                languageCtrl);
+                languageCtrl, imageUtils);
 
     }
 
@@ -156,11 +158,12 @@ public class StartupScreenCtrlTest{
          *
          * @param server      the ServerUtils instance
          * @param mainCtrl    the MainCtrl instance
-         * @param translation the Translation to use
+         * @param translation the Translation instance
+         * @param imageUtils  the ImageUtils instance
          */
         public TestStartupScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                     LanguageIndicatorCtrl languageCtrl) {
-            super(server, mainCtrl, translation, languageCtrl);
+                                     LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
+            super(server, mainCtrl, translation, languageCtrl, imageUtils);
         }
 
         @Override
@@ -171,19 +174,16 @@ public class StartupScreenCtrlTest{
         @Override
         public void bindLabel(Label label,String str){
             labelBindings.add(str);
-            return;
         }
 
         @Override
         public void bindTextBox(TextField textBox, String str){
             textBoxBindings.add(str);
-            return;
         }
 
         @Override
         public void bindButton(Button button, String str){
             buttonBindings.add(str);
-            return;
         }
 
         @Override

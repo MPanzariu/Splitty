@@ -1,4 +1,5 @@
 package client.scenes;
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -7,8 +8,6 @@ import client.utils.Styling;
 import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 
@@ -28,67 +27,68 @@ import static javafx.geometry.Pos.CENTER_LEFT;
 public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshable {
     private Event event;
     @FXML
-    public Button goBack;
+    private Button goBack;
     @FXML
     private ListView<HBox> participantList;
-    ServerUtils server;
-    MainCtrl mainCtrl;
-    Translation translation;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
+    private final Translation translation;
+    private final ImageUtils imageUtils;
     private Map<Long, HBox> map;
 
     /**
-     * constructor for the participant list screen
+     * Constructor for the participant list screen
+     * @param mainCtrl the MainCtrl instance to use
+     * @param server the ServerUtils instance to use
+     * @param translation the Translation instance to use
+     * @param imageUtils the ImageUtils instance to use
      */
     @Inject
-    public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
+    public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
         this.map = new HashMap<>();
     }
+
     /**
-     * updates the event instance
-     * @param event -> new details
+     * Updates the event instance
+     * @param event updated Event information
      */
     public void refresh(Event event) {
         this.event = event;
         showParticipantList();
     }
 
-    @Override
-    public boolean shouldLiveRefresh() {
-        return true;
-    }
-
-    /**
-     * initializer for the go back button
+    /***
+     *
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try{
-            Image image = new Image(new FileInputStream("client/src/main/resources/images/goBack.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(15);
-            imageView.setFitHeight(15);
-            imageView.setPreserveRatio(true);
-            goBack.setGraphic(imageView);
-            Styling.applyStyling(goBack, "positiveButton");
-        } catch (FileNotFoundException e) {
-            System.out.println("didn't work");
-            throw new RuntimeException(e);
-        }
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBack.setGraphic(goBackImage);
+        Styling.applyStyling(goBack, "positiveButton");
     }
 
     /**
-     * generates the participants in the list in the final form
+     * Generates the participants in the list in the final form
      */
     public void showParticipantList () {
         participantList.getItems().clear();
+        Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Participant participant: event.getParticipants()) {
             HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
             Region region = new Region();
             HBox.setHgrow(region, Priority.ALWAYS);
-            HBox participantBox = new HBox(generateRemoveButton(participant.getId()), participantB1, region);
+            HBox participantBox = new HBox(generateRemoveButton(participant.getId(), removeImage), participantB1, region);
             participantBox.setAlignment(Pos.CENTER_RIGHT);
             participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
@@ -101,40 +101,26 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     /**
      * generates the remove button for each participant
      * @param participantId the participant for which the remove button is being generated
+     * @param removeImage the Image to place on the button
      * @return returns the symbol
      */
-    public ImageView generateRemoveButton(long participantId) {
-        FileInputStream input;
-        try {
-            input = new FileInputStream("client/src/main/resources/images/x_remove.png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        Image image = new Image(input);
-        ImageView imageView = new ImageView(image);
-        int imgSize = 15;
-        imageView.setFitHeight(imgSize);
-        imageView.setFitWidth(imgSize);
+    public ImageView generateRemoveButton(long participantId, Image removeImage) {
+        ImageView imageView = imageUtils.generateImageView(removeImage, 15);
         imageView.setPickOnBounds(true);
-        imageView.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getParticipantScene().
-                    setCursor(Cursor.HAND);
-        });
-        imageView.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getParticipantScene().
-                    setCursor(Cursor.DEFAULT);
-        });
-        imageView.setOnMouseClicked(mouseEvent -> {
-            removeFromList(participantId);
-        });
+        imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene().
+                setCursor(Cursor.HAND));
+        imageView.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantScene().
+                setCursor(Cursor.DEFAULT));
+        imageView.setOnMouseClicked(mouseEvent -> removeFromList(participantId));
         return imageView;
     }
 
     /**
-     * generates label for each participant
-     * clicking the participant leads to the add/edit screen of the participant
+     * Generates HBox for each participant
+     * clicking the participant label leads to the add/edit screen of the participant
      * @param participantId id of the participant
      * @param name name of the participant
+     * @return an HBox containing a label for a participant, and a remove button
      */
     public HBox generateParticipantBox(long participantId, String name) {
         HBox hbox = new HBox();
@@ -142,29 +128,24 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
         HBox.setHgrow(region, Priority.ALWAYS);
         Label participant = new Label(name);
         hbox.getChildren().addAll(participant, region);
-        hbox.setOnMouseEntered(mouseEvent -> {
-            mainCtrl.getParticipantScene()
-                    .setCursor(Cursor.HAND);
-        });
-        hbox.setOnMouseExited(mouseEvent -> {
-            mainCtrl.getParticipantScene()
-                    .setCursor(Cursor.DEFAULT);
-        });
-        hbox.setOnMouseClicked(mouseEvent -> {
-            mainCtrl.switchToEditParticipant(participantId);
-        });
+        hbox.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene()
+                .setCursor(Cursor.HAND));
+        hbox.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantScene()
+                .setCursor(Cursor.DEFAULT));
+        hbox.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditParticipant(participantId));
         return hbox;
     }
 
     /**
      * go back method when the button is clicked
      */
-    public void goBack(javafx.event.ActionEvent actionEvent) {
-        mainCtrl.switchToEventScreen();
+    public void goBack() {
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
-     * removes the participant from the list if deleted
+     * Removes the participant from the list if deleted
+     * @param participantId the ID of the participant
      */
     public void removeFromList(long participantId){
         server.removeParticipant(event.getId(), participantId);

@@ -27,7 +27,7 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckValid() {
         sut.textBoxText = "password";
         when(server.checkPassword("password")).thenReturn(true);
-        sut.logInCheck(null);
+        sut.logInCheck();
         //should only contain a binding to empty
         verify(translation).bindLabel(null, "Empty");
         assertTrue(sut.textBoxText.isEmpty());
@@ -37,7 +37,7 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckNull() {
         sut.textBoxText = null;
         when(server.checkPassword(anyString())).thenReturn(true);
-        sut.logInCheck(null);
+        sut.logInCheck();
         verify(translation).bindLabel(null, "MOPCtrl.Log.In.Feedback");
         assertTrue(sut.textBoxText.isEmpty());
     }
@@ -46,7 +46,7 @@ class ManagementOverviewPasswordCtrlTest {
     void logInCheckInvalidPassword() {
         sut.textBoxText = "invalid";
         when(server.checkPassword("invalid")).thenReturn(false);
-        sut.logInCheck(null);
+        sut.logInCheck();
         verify(translation).bindLabel(null, "MOPCtrl.Log.In.Feedback");
         assertTrue(sut.textBoxText.isEmpty());
     }
@@ -56,14 +56,14 @@ class ManagementOverviewPasswordCtrlTest {
         sut.textBoxText = "";
         when(server.checkPassword(anyString())).thenReturn(true);
         assertEquals(0, mockingDetails(translation).getInvocations().size());
-        sut.logInCheck(null);
+        sut.logInCheck();
         verify(translation).bindLabel(null, "MOPCtrl.Log.In.Feedback");
         assertTrue(sut.textBoxText.isEmpty());
     }
 
     @Test
     void goBackToMainScreen() {
-        sut.goBackToMain(null);
+        sut.goBackToMain();
         assertEquals(1, mockingDetails(mainCtrl).getInvocations().size());
     }
 
