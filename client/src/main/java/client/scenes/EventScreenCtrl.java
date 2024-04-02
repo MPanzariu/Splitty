@@ -14,7 +14,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -28,7 +27,6 @@ import java.net.URL;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
-import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
@@ -79,6 +77,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private EmailHandler emailHandler;
     @FXML
     private Label emailFeedbackLabel;
+    @FXML
+    private Button emailInviteButton;
     /**
      * Constructor
      * @param server the ServerUtils instance
@@ -117,7 +117,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
-        testEmailButton.setOnAction(event -> sendTestEmail());
         participantsName.textProperty()
             .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty()
@@ -133,10 +132,22 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         initializeParticipantsCBox();
         emailHandler = new EmailHandler();
         if (emailHandler.isConfigured()) {
-            Styling.removeStyling(testEmailButton, "disabledButton");
+            enableEmailFeatures();
+
         }
         emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+    }
+
+    /**
+     * Enables the email features
+     */
+    private void enableEmailFeatures() {
+        Styling.removeStyling(testEmailButton, "disabledButton");
+        Styling.removeStyling(emailInviteButton, "disabledButton");
+        emailInviteButton.setOnAction(event -> mainCtrl.switchToInviteByEmail());
+        testEmailButton.setOnAction(event -> sendTestEmail());
     }
 
     /**

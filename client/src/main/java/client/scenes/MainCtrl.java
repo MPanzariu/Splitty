@@ -38,6 +38,8 @@ public class MainCtrl {
     private Scene settleDebtsScene;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
+    private Scene emailInviteScene;
+    private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
     @Inject
     @Named("client.language")
@@ -61,7 +63,8 @@ public class MainCtrl {
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
-                           Pair<ParticipantListScreenCtrl, Parent> participantListUI){
+                           Pair<ParticipantListScreenCtrl, Parent> participantListUI,
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -91,7 +94,8 @@ public class MainCtrl {
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
-
+        this.emailInviteCtrl = emailInviteUI.getKey();
+        this.emailInviteScene = new Scene(emailInviteUI.getValue());
         HashMap<Class<?>, SimpleRefreshable> controllerMap = new HashMap<>();
         controllerMap.put(EventScreenCtrl.class, eventScreenCtrl);
         controllerMap.put(ExpenseScreenCtrl.class, expenseScreenCtrl);
@@ -99,6 +103,7 @@ public class MainCtrl {
         controllerMap.put(ParticipantScreenCtrl.class, participantScreenCtrl);
         controllerMap.put(ParticipantListScreenCtrl.class, participantListScreenCtrl);
         controllerMap.put(SettleDebtsScreenCtrl.class, settleDebtsScreenCtrl);
+        controllerMap.put(EmailInviteCtrl.class, emailInviteCtrl);
         manager.setControllerMap(controllerMap);
 
         primaryStage.show();
@@ -225,5 +230,14 @@ public class MainCtrl {
     public void switchEvents(String eventCode) {
         this.eventCode = eventCode;
         manager.switchClientEvent(eventCode);
+    }
+
+    /**
+     * Switch to the email invite screen
+     */
+    public void switchToInviteByEmail() {
+        switchScreens(EmailInviteCtrl.class);
+        primaryStage.setScene(emailInviteScene);
+        primaryStage.setTitle("Invite by Email");
     }
 }
