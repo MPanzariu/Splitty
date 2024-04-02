@@ -19,7 +19,6 @@ import javafx.scene.layout.HBox;
 import java.net.URL;
 import java.util.*;
 
-import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.CENTER_RIGHT;
 
 public class EventScreenCtrl implements Initializable, SimpleRefreshable{
@@ -334,8 +333,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Label expenseText = generateExpenseLabel(expense.getId(), log);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label date = new Label();
-        Date currentDate = new Date();
-        if(expense.getDate().getYear() != currentDate.getYear())
+        var currentYear = new Date().getYear() + 1900;
+        var expenseYear = expense.getDate().getYear();
+        if(expenseYear != currentYear)
             date.setText(expense.getDate().getDate() + "/" +
                             + (expense.getDate().getMonth() + 1) + "\n/" +
                         + (expense.getDate().getYear()));
