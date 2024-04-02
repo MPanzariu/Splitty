@@ -13,7 +13,6 @@ public class ParticipantTest {
     public void checkConstructor() {
         var p = new Participant("name");
         assertEquals("name", p.getName());
-        assertTrue(p.getExpensesOwedTo().isEmpty());
     }
 
     /**
@@ -24,7 +23,6 @@ public class ParticipantTest {
         var p = new Participant(123L, "name");
         assertEquals("name", p.getName());
         assertEquals(123L, p.getId());
-        assertTrue(p.getExpensesOwedTo().isEmpty());
     }
 
     /**
@@ -90,20 +88,6 @@ public class ParticipantTest {
 
         assertFalse(p.hasBankAccount());
     }
-
-    /**
-     * Test for adding and removing expenses
-     */
-    @Test
-    public void expensesTest(){
-        var p = new Participant("name");
-        assertTrue(p.getExpensesOwedTo().isEmpty());
-        Expense ex = new Expense();
-        p.addExpense(ex);
-        assertTrue(p.getExpensesOwedTo().contains(ex));
-        p.removeExpense(ex);
-        assertTrue(p.getExpensesOwedTo().isEmpty());
-    }
     /**
      * Equality checker for equal expenses
      */
@@ -130,7 +114,6 @@ public class ParticipantTest {
     @Test
     public void hasToString() {
         var actual = new Participant("name").toString();
-        assertTrue(actual.contains("expensesOwedTo"));
         assertTrue(actual.contains("id"));
     }
 }
