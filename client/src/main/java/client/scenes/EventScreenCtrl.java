@@ -55,8 +55,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
     private ListView<HBox> expensesLogListView;
     @FXML
-    private HBox buttonsHBox;
-    @FXML
     private ComboBox<Locale> languageIndicator;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;

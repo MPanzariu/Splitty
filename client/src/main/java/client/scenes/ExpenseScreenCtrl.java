@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Expense;
@@ -22,6 +23,8 @@ import java.util.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.util.List;
@@ -74,9 +77,12 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox participantsVBox;
     @FXML
     private ComboBox<Tag> tagComboBox;
+    @FXML
+    private Button addTagButton;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
+    private final ImageUtils imageUtils;
     private long expenseId;
     private List<CheckBox> participantCheckBoxes;
 
@@ -88,10 +94,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
-                              Translation translation) {
+                              Translation translation, ImageUtils imageUtils) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
+        this.imageUtils = imageUtils;
     }
 
     /**
@@ -103,6 +110,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
+        addGeneratedImages();
         splitBetweenAllCheckBox.setOnAction(event -> {
             if (splitBetweenAllCheckBox.isSelected()) {
                 splitBetweenCustomCheckBox.setSelected(false);
@@ -186,6 +194,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             }
         }
         return null;
+    }
+    private void addGeneratedImages() {
+        ImageView addTagImage = imageUtils.generateImageView("createevent.png", 20);
+        addTagButton.setGraphic(addTagImage);
+    }
+    public void openAddTagPopup() {
+        mainCtrl.switchToAddTag();
     }
 
 

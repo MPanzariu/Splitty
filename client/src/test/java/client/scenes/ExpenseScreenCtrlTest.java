@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
@@ -27,7 +28,7 @@ class ExpenseScreenCtrlTest {
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController = new TestMainController();
-        this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null);
+        this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null, null);
     }
 
 
@@ -41,8 +42,8 @@ class ExpenseScreenCtrlTest {
         public ComboBox<String> choosePayer = new ComboBox<>();
         public DatePicker datePicker = new DatePicker();
 
-        public TestExpenseScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
-            super(server, mainCtrl, translation);
+        public TestExpenseScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils) {
+            super(server, mainCtrl, translation, imageUtils);
         }
 
         @Override

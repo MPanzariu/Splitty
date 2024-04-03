@@ -28,6 +28,8 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
+    private AddTagCtrl addTagCtrl;
+    private Scene addTagScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -50,7 +52,8 @@ public class MainCtrl {
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
-                           Pair<ParticipantListScreenCtrl, Parent> participantListUI){
+                           Pair<ParticipantListScreenCtrl, Parent> participantListUI,
+                           Pair<AddTagCtrl, Parent> addTagUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -77,6 +80,8 @@ public class MainCtrl {
         Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
+        this.addTagScene = new Scene(addTagUI.getValue());
+        this.addTagCtrl = addTagUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
@@ -94,6 +99,8 @@ public class MainCtrl {
                 new ScreenInfo(participantListScreenCtrl, true, participantListScene, "ParticipantList.Window.title"));
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
+        screenMap.put(AddTagCtrl.class,
+                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
         manager.setScreenInfoMap(screenMap);
 
         primaryStage.show();
@@ -168,6 +175,11 @@ public class MainCtrl {
         primaryStage.setScene(deleteEventsScene);
         primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
+    }
+
+    public void switchToAddTag(){
+        primaryStage.setScene(addTagScene);
+        primaryStage.titleProperty().bind(translation.getStringBinding("AddTag.Window.Title"));
     }
 
     /***
