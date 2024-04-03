@@ -111,6 +111,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 wrongIban.textProperty().bind(translation.getStringBinding("empty"));
             } else {
                 ibanField.setStyle("-fx-border-color: red;");
+                wrongIban.textProperty().bind(translation.getStringBinding("empty"));
             }
             if(newValue == null || newValue.isEmpty()) {
                 ibanField.setStyle("");
@@ -123,10 +124,21 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 bicField.setStyle("-fx-border-color: green;");
             } else {
                 bicField.setStyle("-fx-border-color: red;");
+                wrongBic.textProperty().bind(translation.getStringBinding("empty"));
             }
             if(newValue == null || newValue.isEmpty()) {
                 bicField.setStyle("");
                 wrongBic.textProperty().bind(translation.getStringBinding("empty"));
+            }
+        });
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                noEmail.textProperty().bind(translation.getStringBinding("empty"));
+            }
+        });
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                noName.textProperty().bind(translation.getStringBinding("empty"));
             }
         });
     }
