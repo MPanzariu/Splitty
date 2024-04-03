@@ -72,6 +72,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private EmailHandler emailHandler;
     @FXML
     private Label emailFeedbackLabel;
+    @FXML
+    private Button emailInviteButton;
     /**
      * Constructor
      *
@@ -114,7 +116,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
-        testEmailButton.setOnAction(event -> sendTestEmail());
         participantsName.textProperty()
             .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty()
@@ -132,10 +133,22 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         initializeParticipantsCBox();
         emailHandler = new EmailHandler();
         if (emailHandler.isConfigured()) {
-            Styling.removeStyling(testEmailButton, "disabledButton");
+            enableEmailFeatures();
+
         }
         emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+    }
+
+    /**
+     * Enables the email features
+     */
+    private void enableEmailFeatures() {
+        Styling.removeStyling(testEmailButton, "disabledButton");
+        Styling.removeStyling(emailInviteButton, "disabledButton");
+        emailInviteButton.setOnAction(event -> mainCtrl.switchScreens(EmailInviteCtrl.class));
+        testEmailButton.setOnAction(event -> sendTestEmail());
     }
 
     /**
