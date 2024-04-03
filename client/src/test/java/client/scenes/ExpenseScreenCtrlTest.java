@@ -28,7 +28,7 @@ class ExpenseScreenCtrlTest {
     public void setup() {
         this.testServerUtils = new TestServerUtils();
         this.testMainController = new TestMainController();
-        this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null, null);
+        this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null);
     }
 
 
@@ -42,8 +42,8 @@ class ExpenseScreenCtrlTest {
         public ComboBox<String> choosePayer = new ComboBox<>();
         public DatePicker datePicker = new DatePicker();
 
-        public TestExpenseScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils) {
-            super(server, mainCtrl, translation, imageUtils);
+        public TestExpenseScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+            super(server, mainCtrl, translation);
         }
 
         @Override

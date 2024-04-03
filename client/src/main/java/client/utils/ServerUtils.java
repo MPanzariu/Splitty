@@ -25,12 +25,16 @@ import com.google.inject.name.Named;
 import commons.Event;
 import commons.Participant;
 import commons.Expense;
+import commons.Tag;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
+
+import javax.print.attribute.standard.Media;
 
 
 public class ServerUtils {
@@ -260,5 +264,24 @@ public class ServerUtils {
 		} else {
 			System.out.println("Failed to delete all events. Status code: " + response.getStatus());
 		}
+	}
+
+	/**
+	 * this adds a tag to an event, connecting the front-end with the back-end
+	 * @param eventId the ID of the event to which we add the tag
+	 * @param tagName the tag name of the tag we want to add
+	 * @param colorCode the color code of the tag that we want to add
+	 */
+	public void addTagToEvent(String eventId, String tagName, String colorCode){
+		Entity<String> entity = Entity.entity(colorCode, APPLICATION_JSON);
+		Response response = ClientBuilder.newClient()
+				.target(serverURL)
+				.path("api/events/" + eventId + "/tag/" + tagName )
+				.request(APPLICATION_JSON)
+				.post(entity);
+		if(response.getStatus() == Response.Status.CREATED.getStatusCode())
+			System.out.println("Tag added successfully");
+		else
+			System.out.println("Tag was not added");
 	}
 }

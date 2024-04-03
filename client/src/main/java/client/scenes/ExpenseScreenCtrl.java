@@ -77,12 +77,9 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox participantsVBox;
     @FXML
     private ComboBox<Tag> tagComboBox;
-    @FXML
-    private Button addTagButton;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
-    private final ImageUtils imageUtils;
     private long expenseId;
     private List<CheckBox> participantCheckBoxes;
 
@@ -94,11 +91,10 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
-                              Translation translation, ImageUtils imageUtils) {
+                              Translation translation) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
-        this.imageUtils = imageUtils;
     }
 
     /**
@@ -110,7 +106,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
-        addGeneratedImages();
         splitBetweenAllCheckBox.setOnAction(event -> {
             if (splitBetweenAllCheckBox.isSelected()) {
                 splitBetweenCustomCheckBox.setSelected(false);
@@ -195,14 +190,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         }
         return null;
     }
-    private void addGeneratedImages() {
-        ImageView addTagImage = imageUtils.generateImageView("createevent.png", 20);
-        addTagButton.setGraphic(addTagImage);
-    }
-    public void openAddTagPopup() {
-        mainCtrl.switchToAddTag();
-    }
-
 
     /**
      * Method used for getting the participants that will be added
