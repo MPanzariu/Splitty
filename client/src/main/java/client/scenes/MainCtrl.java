@@ -182,12 +182,4 @@ public class MainCtrl {
     public void switchEvents(String eventCode) {
         manager.switchClientEvent(eventCode);
     }
-
-    /**
-     * Switch to the email invite screen
-     */
-    public void switchToInviteByEmail() {
-        switchScreens(EmailInviteCtrl.class);
-        primaryStage.setScene(emailInviteScene);
-    }
 }

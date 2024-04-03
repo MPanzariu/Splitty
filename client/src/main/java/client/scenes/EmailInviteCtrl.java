@@ -95,33 +95,43 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
             emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Empty"));
         }
         if (!name.isEmpty() && !email.isEmpty()) {
-            Thread emailThread = new Thread(() -> {
-                boolean result = emailHandler.sendEmail(email, "Invited to splitty!", emailHandler.getInviteText(event));
-                if (result){
-                    server.addParticipant(event.getId(), participant);
-                    Platform.runLater(() -> {
-                        System.out.println("Successfully sent email!");
-                        Alert a = new Alert(Alert.AlertType.INFORMATION);
-                        a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
-                        a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
-                        a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
-                        a.show();
-                    });
-                }else{
-                    Platform.runLater(() -> {
-                        System.out.println("Error while sending email!");
-                        Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
-                        a.titleProperty().bind(translation.getStringBinding("Email.ErrorTitle"));
-                        a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
-                        a.show();
-                    });
-                }
-            });
+            Thread emailThread = setupEmailThread(email, participant);
             emailThread.start();
             clearFields();
             mainCtrl.switchScreens(EventScreenCtrl.class);
         }
+    }
+
+    /**
+     * Sets up a thread to send an email so the whole app doesn't freeze while the email is sent
+     * @param email the email to send the invitation to
+     * @param participant the participant to add to the event
+     * @return the thread that sends the email
+     */
+    private Thread setupEmailThread(String email, Participant participant) {
+        return new Thread(() -> {
+            boolean result = emailHandler.sendEmail(email, "Invited to splitty!", emailHandler.getInviteText(event));
+            if (result){
+                server.addParticipant(event.getId(), participant);
+                Platform.runLater(() -> {
+                    System.out.println("Successfully sent email!");
+                    Alert a = new Alert(Alert.AlertType.INFORMATION);
+                    a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+                    a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
+                    a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
+                    a.show();
+                });
+            }else{
+                Platform.runLater(() -> {
+                    System.out.println("Error while sending email!");
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+                    a.titleProperty().bind(translation.getStringBinding("Email.ErrorTitle"));
+                    a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
+                    a.show();
+                });
+            }
+        });
     }
 
     /**
