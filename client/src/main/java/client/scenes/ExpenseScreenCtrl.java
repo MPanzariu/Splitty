@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 
@@ -24,9 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.util.Callback;
 
 import java.util.List;
 
@@ -125,6 +121,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         });
     }
 
+    /**
+     * initialize the available tags in the existent event
+     * selects by default the "default" tag, so an event cannot be created without a tag
+     * if forgotten or wrongly chosen, it can be edited
+     */
     public void initializeTagComboBox(){
         tagComboBox.getItems().clear();
         Set<Tag> tags = currentEvent.getEventTags();
@@ -172,6 +173,12 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             tagComboBox.getSelectionModel().select(defaultTag);
         }
     }
+
+    /**
+     * this method searches for the default tag
+     * @param tags the tags in the current event
+     * @return the default tag
+     */
     private Tag findDefaultTag(Set<Tag> tags) {
         for (Tag tag : tags) {
             if ("default".equals(tag.getTagName())) {
@@ -368,6 +375,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         for(Participant part: participantSet) {
             resultExpense.addParticipantToExpense(part);
         }
+        Tag selectedTag = getTagComboBox(tagComboBox);
+        resultExpense.setExpenseTag(selectedTag);
         return resultExpense;
     }
 
@@ -396,6 +405,15 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public String getComboBox(ComboBox<String> comboBox) {
         return comboBox.getValue();
+    }
+
+    /**
+     * gets the selected tag in the combobox
+     * @param tagComboBox the combobox which holds tags
+     * @return the tag stored inside the combo box
+     */
+    public Tag getTagComboBox(ComboBox<Tag> tagComboBox){
+        return tagComboBox.getValue();
     }
     /**
      * Adds the specified expense to the server
@@ -450,6 +468,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 }
             }
         }
+        tagComboBox.getSelectionModel().select(expense.getExpenseTag());
         expenseId = id;
     }
 
