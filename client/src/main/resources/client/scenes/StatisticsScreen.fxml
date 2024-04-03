@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="607.0" prefWidth="836.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsScreenCtrl">
+   <children>
+      <Label fx:id="statisticsLabel" layoutX="22.0" layoutY="14.0" prefHeight="38.0" prefWidth="301.0" styleClass="h1" text="Label" />
+      <Label fx:id="totalCostLabel" layoutX="22.0" layoutY="59.0" prefHeight="26.0" prefWidth="243.0" styleClass="h2" text="Label" />
+      <Label fx:id="expenseSumLabel" layoutX="280.0" layoutY="64.0" prefHeight="26.0" prefWidth="165.0" text="Label" />
+      <Button fx:id="goBackButton" layoutX="20.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToEventScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+   </children>
+</AnchorPane>
