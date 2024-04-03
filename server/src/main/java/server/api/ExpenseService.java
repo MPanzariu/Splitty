@@ -123,6 +123,7 @@ public class ExpenseService {
         expense.setName(newExpense.getName());
         expense.setPriceInCents(newExpense.getPriceInCents());
         expense.setParticipantToExpense(participants);
+        expense.setExpenseTag(newExpense.getExpenseTag());
         return expenseRepository.save(expense);
     }
 }

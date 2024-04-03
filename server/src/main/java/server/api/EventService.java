@@ -1,5 +1,6 @@
 package server.api;
 import commons.Event;
+import commons.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,14 @@ public class EventService {
     public Event createEvent(String title){
         Date currentDate = new Date();
         Event event = new Event(title, currentDate);
+        Tag defaultTag = new Tag("default", "#808080");
+        Tag food = new Tag("food", "#008000");
+        Tag entranceFees = new Tag("entrance fees", "#0000FF");
+        Tag travel = new Tag("travel", "#FF0000");
+        event.addTag(defaultTag);
+        event.addTag(food);
+        event.addTag(entranceFees);
+        event.addTag(travel);
         return eventRepository.save(event);
     }
 

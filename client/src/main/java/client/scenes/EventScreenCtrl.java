@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import javafx.application.Platform;
 import jakarta.persistence.EntityNotFoundException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -55,9 +56,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
     private ListView<HBox> expensesLogListView;
     @FXML
-    private HBox buttonsHBox;
-    @FXML
     private ComboBox<Locale> languageIndicator;
+    @FXML
+    private Button addTagButton;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -125,6 +126,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             .bind(translation.getStringBinding("empty"));
         settleDebtsButton.textProperty()
             .bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        addTagButton.textProperty()
+            .bind(translation.getStringBinding("Event.Button.AddTag"));
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
@@ -531,5 +534,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 expensesLogListView.getItems().add(expenseBox);
             }
         }
+    }
+
+    /**
+     * when pressing the add Tag button it switches to that screen
+     */
+    public void switchToAddTag() {
+        mainCtrl.switchScreens(AddTagCtrl.class);
     }
 }
