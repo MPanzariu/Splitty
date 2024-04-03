@@ -73,6 +73,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Label emailFeedbackLabel;
     @FXML
     private Button emailInviteButton;
+    @FXML
+    private Button transferMoneyButton;
     /**
      * Constructor
      *
@@ -136,6 +138,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
         emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        transferMoneyButton.textProperty().bind(translation.getStringBinding("Event.Button.TransferMoney"));
     }
 
     /**
@@ -531,5 +534,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 expensesLogListView.getItems().add(expenseBox);
             }
         }
+    }
+
+    public void transferMoney() {
+        mainCtrl.switchScreens(TransferMoneyCtrl.class);
     }
 }
