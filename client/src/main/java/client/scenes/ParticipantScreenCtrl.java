@@ -13,8 +13,13 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
+    static String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+    static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
+    static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -26,6 +31,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label name;
     @FXML
     private Label noName;
+    @FXML
+    private Label wrongIban;
+    @FXML
+    private Label wrongBic;
     @FXML
     private Label noEmail;
     @FXML
@@ -50,9 +59,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label holder;
     @FXML
     private TextField holderField;
-
+    private static final Pattern emailPattern = Pattern.compile(emailLike);
+    private static final Pattern bicPattern = Pattern.compile(bicLike);
+    private static final Pattern ibanPattern = Pattern.compile(ibanLike);
     private Event event;
     private long participantId;
+
 
     /**
      * constructor
@@ -92,8 +104,31 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
-        noName.textProperty().bind(translation.getStringBinding("empty"));
-        noEmail.textProperty().bind(translation.getStringBinding("empty"));
+        resetErrorFields();
+        ibanField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (checkIban(newValue)) {
+                ibanField.setStyle("-fx-border-color: green;");
+                wrongIban.textProperty().bind(translation.getStringBinding("empty"));
+            } else {
+                ibanField.setStyle("-fx-border-color: red;");
+            }
+            if(newValue == null || newValue.isEmpty()) {
+                ibanField.setStyle("");
+                wrongIban.textProperty().bind(translation.getStringBinding("empty"));
+            }
+        });
+        bicField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (checkBic(newValue)) {
+                wrongBic.textProperty().bind(translation.getStringBinding("empty"));
+                bicField.setStyle("-fx-border-color: green;");
+            } else {
+                bicField.setStyle("-fx-border-color: red;");
+            }
+            if(newValue == null || newValue.isEmpty()) {
+                bicField.setStyle("");
+                wrongBic.textProperty().bind(translation.getStringBinding("empty"));
+            }
+        });
     }
 
     /**
@@ -103,21 +138,32 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void confirmEdit() {
         Participant participant = addParticipant();
-        clearFields();
-        noName.textProperty()
-                .bind(translation.getStringBinding("empty"));
-        noEmail.textProperty()
-                .bind(translation.getStringBinding("empty"));
+        resetErrorFields();
         boolean ok = true;
         if(participant.getName() == null || participant.getName().isEmpty()) {
             noName.textProperty()
                     .bind(translation.getStringBinding("Participants.Label.noName"));
             ok = false;
         }
-        if(participant.getEmail() == null || participant.getEmail().isEmpty()) {
+        if(participant.getEmail().equals("empty")){
             noEmail.textProperty()
                     .bind(translation.getStringBinding("Participants.Label.noEmail"));
             ok = false;
+        }
+        else{
+            if(participant.getEmail().equals("wrongEmail")){
+               noEmail.textProperty()
+                      .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
+                ok = false;
+          }
+        }
+        if(participant.getIban().equals("wrongIban")) {
+                wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
+                ok = false;
+        }
+        if(participant.getBic().equals("wrongBic")){
+                wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
+                ok = false;
         }
         if(ok){
             if(participantId == 0){
@@ -129,6 +175,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participantId = 0;
                 mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
             }
+            clearFields();
         }
     }
 
@@ -139,6 +186,14 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         clearFields();
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
+
+    public void resetErrorFields(){
+        noName.textProperty().bind(translation.getStringBinding("empty"));
+        noEmail.textProperty().bind(translation.getStringBinding("empty"));
+        wrongBic.textProperty().bind(translation.getStringBinding("empty"));
+        wrongIban.textProperty().bind(translation.getStringBinding("empty"));
+    }
+
 
     /***
      * Removes text from all details fields
@@ -158,16 +213,43 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Participant addParticipant(){
         String name = nameField.getText();
+        Participant participant = new Participant(name);
         String email = emailField.getText();
+        if (checkEmail(email)){
+            participant.setEmail(email);
+        }
+        else{
+            if(emailField.getText() == null || emailField.getText().isEmpty())
+                participant.setEmail("empty");
+            else
+                participant.setEmail("wrongEmail");
+        }
         String accountHolder = holderField.getText();
         String iban = ibanField.getText();
+        if(iban == null || iban.isEmpty()){
+            participant.setIban(iban);
+        }
+        else{
+            if(checkIban(iban))
+                participant.setIban(iban);
+            else{
+                participant.setIban("wrongIban");
+            System.out.println("wrongIban");
+            }
+        }
         String bic = bicField.getText();
-
-        Participant participant = new Participant(name);
+        if(bic == null || bic.isEmpty()){
+            participant.setBic(bic);
+        }
+        else{
+            if(checkBic(bic))
+                participant.setBic(bic);
+            else{
+                participant.setBic("wrongBic");
+                System.out.println("wrongBic");
+            }
+        }
         participant.setLegalName(accountHolder);
-        participant.setIban(iban);
-        participant.setBic(bic);
-        participant.setEmail(email);
         return participant;
     }
 
@@ -200,9 +282,26 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void refresh(Event event){
         this.event = event;
-        noName.textProperty()
-                .bind(translation.getStringBinding("empty"));
-        noEmail.textProperty()
-                .bind(translation.getStringBinding("empty"));
+        resetErrorFields();
+    }
+
+    public boolean checkEmail (String email){
+        Matcher matcher = emailPattern.matcher(email);
+        if (matcher.matches()) {
+            return true;
+        } else {
+            System.out.println("Invalid Email");
+        }
+        return false;
+    }
+
+    public boolean checkBic (String bic){
+        Matcher matcher = bicPattern.matcher(bic);
+        return matcher.matches();
+    }
+
+    public boolean checkIban (String iban){
+        Matcher matcher = ibanPattern.matcher(iban);
+        return matcher.matches();
     }
 }

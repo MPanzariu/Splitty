@@ -12,16 +12,16 @@
          <Font size="25.0" />
       </font></Label>
       <Label fx:id="name" layoutX="110.0" layoutY="75.0" styleClass="h2" text="Name" />
-      <TextField fx:id="nameField" layoutX="209.0" layoutY="75.0" promptText="add name" styleClass="small-text" />
-      <Label fx:id="email" layoutX="110.0" layoutY="129.0" styleClass="h2" text="Email" />
-      <TextField fx:id="emailField" layoutX="209.0" layoutY="125.0" promptText="add email" styleClass="small-text" />
-      <Label fx:id="bankDetails" layoutX="110.0" layoutY="180.0" styleClass="h2" text="Bank Details (Optional)" />
-      <Label fx:id="holder" layoutX="110.0" layoutY="220.0" styleClass="h2" text="Holder" />
-      <TextField fx:id="holderField" layoutX="209.0" layoutY="220.0" promptText="add account holder" styleClass="small-text" />
-      <Label fx:id="iban" layoutX="110.0" layoutY="260.0" styleClass="h2" text="IBAN" />
-      <TextField fx:id="ibanField" layoutX="209.0" layoutY="260.0" promptText="add IBAN" styleClass="small-text" />
+      <TextField fx:id="nameField" layoutX="209.0" layoutY="75.0" prefWidth="200" promptText="add name" styleClass="small-text" />
+      <Label fx:id="email" layoutX="110.0" layoutY="125.0" styleClass="h2" text="Email" />
+      <TextField fx:id="emailField" layoutX="209.0" layoutY="125.0" prefWidth="200" promptText="add email" styleClass="small-text" />
+      <Label fx:id="bankDetails" layoutX="110.0" layoutY="170.0" styleClass="h2" text="Bank Details (Optional)" />
+      <Label fx:id="holder" layoutX="110.0" layoutY="200.0" styleClass="h2" text="Holder" />
+      <TextField fx:id="holderField" layoutX="209.0" layoutY="200.0" prefWidth="200" promptText="add account holder" styleClass="small-text" />
+      <Label fx:id="iban" layoutX="110.0" layoutY="250.0" styleClass="h2" text="IBAN" />
+      <TextField fx:id="ibanField" layoutX="209.0" layoutY="250.0" prefWidth="200" promptText="add IBAN" styleClass="small-text" />
       <Label fx:id="bic" layoutX="110.0" layoutY="300.0" styleClass="h2" text="BIC" />
-      <TextField fx:id="bicField" layoutX="209.0" layoutY="300.0" promptText="add BIC" styleClass="small-text" />
+      <TextField fx:id="bicField" layoutX="209.0" layoutY="300.0" prefWidth="200" promptText="add BIC" styleClass="small-text" />
       <Button fx:id="okButton" layoutX="252.0" layoutY="354.0" mnemonicParsing="false" onAction="#confirmEdit" prefHeight="30.0" prefWidth="87.0" text="OK">
          <styleClass>
             <String fx:value="positiveButton" />
@@ -32,12 +32,22 @@
             <String fx:value="negativeButton" />
             <String fx:value="small-text" />
          </styleClass></Button>
-      <Label fx:id="noName" layoutX="209" layoutY="102.0" prefHeight="18.0" prefWidth="200.0" >
+      <Label fx:id="noName" layoutX="209" layoutY="102.0" prefHeight="18.0" prefWidth="200.0">
          <styleClass>
             <String fx:value="errorText" />
             <String fx:value="small-text" />
          </styleClass></Label>
       <Label fx:id="noEmail" layoutX="209" layoutY="152.0" prefHeight="18.0" prefWidth="200.0">
+         <styleClass>
+            <String fx:value="errorText" />
+            <String fx:value="small-text" />
+         </styleClass></Label>
+      <Label fx:id="wrongIban" layoutX="210.0" layoutY="277.0" prefHeight="18.0" prefWidth="200.0">
+         <styleClass>
+            <String fx:value="errorText" />
+            <String fx:value="small-text" />
+         </styleClass></Label>
+      <Label fx:id="wrongBic" layoutX="210.0" layoutY="327.0" prefHeight="18.0" prefWidth="200.0">
          <styleClass>
             <String fx:value="errorText" />
             <String fx:value="small-text" />
