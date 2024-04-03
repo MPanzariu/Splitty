@@ -25,6 +25,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Label name;
     @FXML
+    private Label noName;
+    @FXML
+    private Label noEmail;
+    @FXML
     private TextField nameField;
     @FXML
     private Label email;
@@ -88,6 +92,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
+        noName.textProperty().bind(translation.getStringBinding("empty"));
+        noEmail.textProperty().bind(translation.getStringBinding("empty"));
     }
 
     /**
@@ -98,14 +104,31 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     public void confirmEdit() {
         Participant participant = addParticipant();
         clearFields();
-        if(participantId == 0){
-            server.addParticipant(event.getId(), participant);
-            mainCtrl.switchScreens(EventScreenCtrl.class);
+        noName.textProperty()
+                .bind(translation.getStringBinding("empty"));
+        noEmail.textProperty()
+                .bind(translation.getStringBinding("empty"));
+        boolean ok = true;
+        if(participant.getName() == null || participant.getName().isEmpty()) {
+            noName.textProperty()
+                    .bind(translation.getStringBinding("Participants.Label.noName"));
+            ok = false;
         }
-        else {
-            server.editParticipant(event.getId(), participantId, participant);
-            participantId = 0;
-            mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
+        if(participant.getEmail() == null || participant.getEmail().isEmpty()) {
+            noEmail.textProperty()
+                    .bind(translation.getStringBinding("Participants.Label.noEmail"));
+            ok = false;
+        }
+        if(ok){
+            if(participantId == 0){
+                server.addParticipant(event.getId(), participant);
+                mainCtrl.switchScreens(EventScreenCtrl.class);
+            }
+            else {
+                server.editParticipant(event.getId(), participantId, participant);
+                participantId = 0;
+                mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
+            }
         }
     }
 
@@ -177,5 +200,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void refresh(Event event){
         this.event = event;
+        noName.textProperty()
+                .bind(translation.getStringBinding("empty"));
+        noEmail.textProperty()
+                .bind(translation.getStringBinding("empty"));
     }
 }
