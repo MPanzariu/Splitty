@@ -28,12 +28,6 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private AddTagCtrl addTagCtrl;
-    private Scene addTagScene;
-    private Scene emailInviteScene;
-    private StatisticsScreenCtrl statisticsScreenCtrl;
-    private Scene statisticsScreenScene;
-    private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -86,15 +80,15 @@ public class MainCtrl {
         Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
-        this.addTagScene = new Scene(addTagUI.getValue());
-        this.addTagCtrl = addTagUI.getKey();
-        this.statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
-        this.statisticsScreenCtrl = statisticsScreenUI.getKey();
+        Scene addTagScene = new Scene(addTagUI.getValue());
+        AddTagCtrl addTagCtrl = addTagUI.getKey();
+        Scene statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
+        StatisticsScreenCtrl statisticsScreenCtrl = statisticsScreenUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
-        this.emailInviteCtrl = emailInviteUI.getKey();
-        this.emailInviteScene = new Scene(emailInviteUI.getValue());
+        EmailInviteCtrl emailInviteCtrl = emailInviteUI.getKey();
+        Scene emailInviteScene = new Scene(emailInviteUI.getValue());
         this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
@@ -115,6 +109,12 @@ public class MainCtrl {
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
+
+        manager.setStartupScreen(startupScreenCtrl);
+        manager.subscribeToUpdates();
+        //This can also show a pop-up in the future, but right now it doesn't
+        manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
+
         primaryStage.show();
     }
 
@@ -130,8 +130,12 @@ public class MainCtrl {
         primaryStage.setScene(screenInfo.scene());
     }
 
+    /***
+     * Switches back to the Startup screen
+     */
     public void showMainScreen() {
-        startupScreenCtrl.refreshEvents();
+        manager.closeOpenedEvent();
+        startupScreenCtrl.refreshLanguageOnSwitchback();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
     }
@@ -187,11 +191,6 @@ public class MainCtrl {
         primaryStage.setScene(deleteEventsScene);
         primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
-    }
-
-    public void switchToAddTag(){
-        primaryStage.setScene(addTagScene);
-        primaryStage.titleProperty().bind(translation.getStringBinding("AddTag.Window.Title"));
     }
 
     /***

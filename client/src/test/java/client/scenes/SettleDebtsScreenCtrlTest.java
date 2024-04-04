@@ -4,8 +4,6 @@ import client.utils.SettleDebtsUtils;
 import client.utils.Transfer;
 import client.utils.Translation;
 import commons.Participant;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -45,30 +44,5 @@ class SettleDebtsScreenCtrlTest {
         when(settleUtils.createTransferString(exampleTransfer)).thenReturn(observableText);
         Label transferLabel = sut.generateTransferLabel(exampleTransfer);
         assertEquals(observableText.getValue(), transferLabel.textProperty().getValue());
-    }
-
-    ObservableValue<String> stringToObservable(String string){
-        return new ObservableValue<>() {
-            @Override
-            public String getValue() {
-                return string;
-            }
-
-            @Override
-            public void addListener(ChangeListener<? super String> listener) {
-            }
-
-            @Override
-            public void removeListener(ChangeListener<? super String> listener) {
-            }
-
-            @Override
-            public void addListener(InvalidationListener listener) {
-            }
-
-            @Override
-            public void removeListener(InvalidationListener listener) {
-            }
-        };
     }
 }
