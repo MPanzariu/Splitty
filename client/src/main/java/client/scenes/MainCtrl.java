@@ -17,6 +17,7 @@ import java.util.Locale;
 public class MainCtrl {
 
     private Stage primaryStage;
+    private StartupScreenCtrl startupScreenCtrl;
     private ExpenseScreenCtrl expenseScreenCtrl;
     private Scene startupScene;
     private Scene eventScene;
@@ -27,12 +28,6 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private AddTagCtrl addTagCtrl;
-    private Scene addTagScene;
-    private Scene emailInviteScene;
-    private StatisticsScreenCtrl statisticsScreenCtrl;
-    private Scene statisticsScreenScene;
-    private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -63,7 +58,7 @@ public class MainCtrl {
 
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
-        StartupScreenCtrl startupScreenCtrl = overview.getKey();
+        this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.eventScene = new Scene(eventUI.getValue());
         EventScreenCtrl eventScreenCtrl = eventUI.getKey();
@@ -85,15 +80,15 @@ public class MainCtrl {
         Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
-        this.addTagScene = new Scene(addTagUI.getValue());
-        this.addTagCtrl = addTagUI.getKey();
-        this.statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
-        this.statisticsScreenCtrl = statisticsScreenUI.getKey();
+        Scene addTagScene = new Scene(addTagUI.getValue());
+        AddTagCtrl addTagCtrl = addTagUI.getKey();
+        Scene statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
+        StatisticsScreenCtrl statisticsScreenCtrl = statisticsScreenUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
-        this.emailInviteCtrl = emailInviteUI.getKey();
-        this.emailInviteScene = new Scene(emailInviteUI.getValue());
+        EmailInviteCtrl emailInviteCtrl = emailInviteUI.getKey();
+        Scene emailInviteScene = new Scene(emailInviteUI.getValue());
         this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
@@ -135,8 +130,12 @@ public class MainCtrl {
         primaryStage.setScene(screenInfo.scene());
     }
 
+    /***
+     * Switches back to the Startup screen
+     */
     public void showMainScreen() {
         manager.closeOpenedEvent();
+        startupScreenCtrl.refreshLanguageOnSwitchback();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
     }
@@ -192,11 +191,6 @@ public class MainCtrl {
         primaryStage.setScene(deleteEventsScene);
         primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
-    }
-
-    public void switchToAddTag(){
-        primaryStage.setScene(addTagScene);
-        primaryStage.titleProperty().bind(translation.getStringBinding("AddTag.Window.Title"));
     }
 
     /***

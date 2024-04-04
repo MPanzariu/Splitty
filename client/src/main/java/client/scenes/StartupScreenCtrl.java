@@ -88,7 +88,6 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
-        languageCtrl.refresh(languageIndicator);
     }
 
     /**
@@ -335,6 +334,13 @@ public class StartupScreenCtrl implements Initializable {
      */
     public void clearField(TextField field){
         field.clear();
+    }
+
+    /***
+     * Ran whenever the client switches back to this screen, to ensure the language indicator is initialized and up-to-date
+     */
+    public void refreshLanguageOnSwitchback(){
+        languageCtrl.refresh(languageIndicator);
     }
 
     /**
