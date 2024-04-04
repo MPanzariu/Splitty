@@ -1,9 +1,6 @@
 package client.utils;
 
 import commons.Participant;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
+import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
@@ -212,38 +210,12 @@ class SettleDebtsUtilsTest {
                         expectedValues.get("senderName") + " gives " +
                         expectedValues.get("amount") + " to " +
                         expectedValues.get("receiverName")));
-
         String result = sut.createTransferString(transfer).getValue();
         assertTrue(result.contains("NameABC"));
         assertTrue(result.contains("gives"));
         assertTrue(result.contains("0.07"));
         assertTrue(result.contains("to"));
         assertTrue(result.contains("NameXYZ"));
-    }
-
-    ObservableValue<String> stringToObservable(String string){
-        return new ObservableValue<>() {
-            @Override
-            public String getValue() {
-                return string;
-            }
-
-            @Override
-            public void addListener(ChangeListener<? super String> listener) {
-            }
-
-            @Override
-            public void removeListener(ChangeListener<? super String> listener) {
-            }
-
-            @Override
-            public void addListener(InvalidationListener listener) {
-            }
-
-            @Override
-            public void removeListener(InvalidationListener listener) {
-            }
-        };
     }
 
     /***

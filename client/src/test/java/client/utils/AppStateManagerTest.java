@@ -1,6 +1,9 @@
 package client.utils;
 
+import client.scenes.StartupScreenCtrl;
 import commons.Event;
+import commons.dto.EventDeletedDTO;
+import commons.dto.EventNameChangeDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.util.HashMap;
@@ -16,7 +20,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AppStateManagerTest {
@@ -126,5 +130,98 @@ class AppStateManagerTest {
         assertNull(refreshable.getCurrentEvent());
         sut.onSwitchScreens(Void.class);
         assertEquals(event1, refreshable.getCurrentEvent());
+    }
+
+    @Test
+    void deletionRemovesHistoryAndRunsCallback() {
+        String eventID = event1.getId();
+        String url = "/topic/events/" + eventID;
+
+        when(serverUtils.getEvent(eventID)).thenReturn(event1);
+        when(webSocketUtils.registerForMessages(any(), eq(url), eq(Event.class))).thenReturn(null);
+        sut.switchClientEvent(eventID);
+        sut.addSubscription(eventID);
+
+        StartupScreenCtrl testCtrl = mock(StartupScreenCtrl.class);
+        sut.setStartupScreen(testCtrl);
+
+        final boolean[] callbackCalledBack = {false};
+        sut.setOnCurrentEventDeletedCallback(()-> callbackCalledBack[0] = true);
+
+        EventDeletedDTO dto = new EventDeletedDTO(eventID);
+        sut.onDeletion(dto);
+        assertTrue(callbackCalledBack[0]);
+        verify(testCtrl).removeFromHistoryIfExists(eventID);
+    }
+
+    @Test
+    void renamingRenamesHistory() {
+        String eventID = "F7DS14";
+        String newTitle = "Best Party Ever";
+        sut.addSubscription(eventID);
+
+        StartupScreenCtrl testCtrl = mock(StartupScreenCtrl.class);
+        sut.setStartupScreen(testCtrl);
+
+        EventNameChangeDTO dto = new EventNameChangeDTO(eventID, newTitle);
+        sut.onNameChange(dto);
+        verify(testCtrl).addToHistory(eventID, newTitle);
+    }
+
+    @Test
+    void closeOpenedActuallyCloses(){
+        String eventID = "ABC123";
+        String url = "/topic/events/" + eventID;
+
+        when(serverUtils.getEvent(eventID)).thenReturn(event1);
+        when(webSocketUtils.registerForMessages(any(), eq(url), eq(Event.class))).thenReturn(new StompSession.Subscription() {
+            @Override
+            public String getSubscriptionId() {
+                return null;
+            }
+
+            @Override
+            public StompHeaders getSubscriptionHeaders() {
+                return null;
+            }
+
+            @Override
+            public void unsubscribe() {
+            }
+
+            @Override
+            public void unsubscribe(StompHeaders headers) {
+            }
+
+            @Override
+            public String getReceiptId() {
+                return null;
+            }
+
+            @Override
+            public void addReceiptTask(Runnable task) {
+            }
+
+            @Override
+            public void addReceiptTask(Consumer<StompHeaders> task) {
+            }
+
+            @Override
+            public void addReceiptLostTask(Runnable task) {
+            }
+        });
+        sut.switchClientEvent(eventID);
+
+        final boolean[] callbackCalledBack = {false};
+        sut.setOnCurrentEventDeletedCallback(()-> callbackCalledBack[0] = true);
+        sut.closeOpenedEvent();
+        sut.addSubscription(eventID);
+
+        StartupScreenCtrl testCtrl = mock(StartupScreenCtrl.class);
+        sut.setStartupScreen(testCtrl);
+
+        sut.onDeletion(new EventDeletedDTO(eventID));
+        assertFalse(callbackCalledBack[0]);
+        verify(testCtrl).removeFromHistoryIfExists(eventID);
     }
 }
