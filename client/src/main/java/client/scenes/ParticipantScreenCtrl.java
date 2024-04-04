@@ -2,14 +2,21 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import client.utils.Translation;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -59,6 +66,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label holder;
     @FXML
     private TextField holderField;
+    @FXML
+    private AnchorPane pane;
     private static final Pattern emailPattern = Pattern.compile(emailLike);
     private static final Pattern bicPattern = Pattern.compile(bicLike);
     private static final Pattern ibanPattern = Pattern.compile(ibanLike);
@@ -107,7 +116,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         resetErrorFields();
         ibanField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (checkIban(newValue)) {
-                ibanField.setStyle("-fx-border-color: green;");
+                ibanField.setStyle("-fx-border-color: #26c506;");
                 wrongIban.textProperty().bind(translation.getStringBinding("empty"));
             } else {
                 ibanField.setStyle("-fx-border-color: red;");
@@ -121,7 +130,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         bicField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (checkBic(newValue)) {
                 wrongBic.textProperty().bind(translation.getStringBinding("empty"));
-                bicField.setStyle("-fx-border-color: green;");
+                bicField.setStyle("-fx-border-color: #26c506;");
             } else {
                 bicField.setStyle("-fx-border-color: red;");
                 wrongBic.textProperty().bind(translation.getStringBinding("empty"));
@@ -139,6 +148,31 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 noName.textProperty().bind(translation.getStringBinding("empty"));
+            }
+        });
+        nameField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                confirmEdit();
+            }
+        });
+        emailField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                confirmEdit();
+            }
+        });
+        bicField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                confirmEdit();
+            }
+        });
+        ibanField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                confirmEdit();
+            }
+        });
+        holderField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                confirmEdit();
             }
         });
     }
