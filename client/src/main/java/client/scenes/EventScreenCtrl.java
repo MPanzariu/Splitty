@@ -547,6 +547,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         mainCtrl.switchScreens(AddTagCtrl.class);
     }
 
+    /**
+     * when pressing on the Show statistics button it switches to the statistics screen
+     */
     public void switchToStatistics() {
         mainCtrl.switchScreens(StatisticsScreenCtrl.class);
     }

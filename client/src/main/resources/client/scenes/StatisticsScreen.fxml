@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -9,5 +10,6 @@
       <Label fx:id="totalCostLabel" layoutX="22.0" layoutY="59.0" prefHeight="26.0" prefWidth="243.0" styleClass="h2" text="Label" />
       <Label fx:id="expenseSumLabel" layoutX="280.0" layoutY="64.0" prefHeight="26.0" prefWidth="165.0" text="Label" />
       <Button fx:id="goBackButton" layoutX="20.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToEventScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+      <PieChart fx:id="tagPieChart" layoutX="15.0" layoutY="104.0" prefHeight="254.0" prefWidth="476.0" />
    </children>
 </AnchorPane>
