@@ -59,6 +59,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private ComboBox<Locale> languageIndicator;
     @FXML
     private Button addTagButton;
+    @FXML
+    private Button showStatisticsButton;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -128,6 +130,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             .bind(translation.getStringBinding("Event.Button.SettleDebts"));
         addTagButton.textProperty()
             .bind(translation.getStringBinding("Event.Button.AddTag"));
+        showStatisticsButton.textProperty()
+            .bind(translation.getStringBinding("Event.Button.Statistics"));
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
@@ -541,5 +545,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public void switchToAddTag() {
         mainCtrl.switchScreens(AddTagCtrl.class);
+    }
+
+    /**
+     * when pressing on the Show statistics button it switches to the statistics screen
+     */
+    public void switchToStatistics() {
+        mainCtrl.switchScreens(StatisticsScreenCtrl.class);
     }
 }
