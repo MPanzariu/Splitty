@@ -30,6 +30,8 @@ public class MainCtrl {
     private AddTagCtrl addTagCtrl;
     private Scene addTagScene;
     private Scene emailInviteScene;
+    private StatisticsScreenCtrl statisticsScreenCtrl;
+    private Scene statisticsScreenScene;
     private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
@@ -55,7 +57,8 @@ public class MainCtrl {
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
                            Pair<AddTagCtrl, Parent> addTagUI,
-                           Pair<EmailInviteCtrl, Parent> emailInviteUI){
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -84,6 +87,8 @@ public class MainCtrl {
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
         this.addTagScene = new Scene(addTagUI.getValue());
         this.addTagCtrl = addTagUI.getKey();
+        this.statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
+        this.statisticsScreenCtrl = statisticsScreenUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
@@ -106,6 +111,8 @@ public class MainCtrl {
                 new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
+        screenMap.put(StatisticsScreenCtrl.class,
+                new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
 
         manager.setStartupScreen(startupScreenCtrl);

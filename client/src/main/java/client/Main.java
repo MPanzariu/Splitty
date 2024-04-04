@@ -50,8 +50,9 @@ public class Main extends Application {
         var participantListScreen = FXML.load(ParticipantListScreenCtrl.class, "client", "scenes", "ParticipantList.fxml");
         var addTagScreen = FXML.load(AddTagCtrl.class, "client", "scenes", "AddTag.fxml");
         var emailInviteScreen = FXML.load(EmailInviteCtrl.class, "client", "scenes", "EmailInvite.fxml");
+        var statisticsScreen = FXML.load(StatisticsScreenCtrl.class, "client", "scenes", "StatisticsScreen.fxml");
         mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle,
                 managementOverviewPassword, managementOverviewScreen, settleDebtsScreen, deleteEventsScreen,
-                participantListScreen, addTagScreen,emailInviteScreen);
+                participantListScreen, addTagScreen,emailInviteScreen, statisticsScreen);
     }
 }
