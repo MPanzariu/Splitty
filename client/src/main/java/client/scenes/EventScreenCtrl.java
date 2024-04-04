@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import javafx.application.Platform;
 import jakarta.persistence.EntityNotFoundException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -55,9 +56,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @FXML
     private ListView<HBox> expensesLogListView;
     @FXML
-    private HBox buttonsHBox;
-    @FXML
     private ComboBox<Locale> languageIndicator;
+    @FXML
+    private Button addTagButton;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -71,6 +72,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private EmailHandler emailHandler;
     @FXML
     private Label emailFeedbackLabel;
+    @FXML
+    private Button emailInviteButton;
     /**
      * Constructor
      *
@@ -113,7 +116,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public void initialize(URL location, ResourceBundle resources) {
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
-        testEmailButton.setOnAction(event -> sendTestEmail());
         participantsName.textProperty()
             .bind(translation.getStringBinding("Participants.DisplayName.EventScreen"));
         expenseLabel.textProperty()
@@ -124,15 +126,29 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             .bind(translation.getStringBinding("empty"));
         settleDebtsButton.textProperty()
             .bind(translation.getStringBinding("Event.Button.SettleDebts"));
+        addTagButton.textProperty()
+            .bind(translation.getStringBinding("Event.Button.AddTag"));
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
         emailHandler = new EmailHandler();
         if (emailHandler.isConfigured()) {
-            Styling.removeStyling(testEmailButton, "disabledButton");
+            enableEmailFeatures();
+
         }
         emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
+        emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+    }
+
+    /**
+     * Enables the email features
+     */
+    private void enableEmailFeatures() {
+        Styling.removeStyling(testEmailButton, "disabledButton");
+        Styling.removeStyling(emailInviteButton, "disabledButton");
+        emailInviteButton.setOnAction(event -> mainCtrl.switchScreens(EmailInviteCtrl.class));
+        testEmailButton.setOnAction(event -> sendTestEmail());
     }
 
     /**
@@ -518,5 +534,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 expensesLogListView.getItems().add(expenseBox);
             }
         }
+    }
+
+    /**
+     * when pressing the add Tag button it switches to that screen
+     */
+    public void switchToAddTag() {
+        mainCtrl.switchScreens(AddTagCtrl.class);
     }
 }

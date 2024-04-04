@@ -27,6 +27,10 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
+    private AddTagCtrl addTagCtrl;
+    private Scene addTagScene;
+    private Scene emailInviteScene;
+    private EmailInviteCtrl emailInviteCtrl;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -49,7 +53,9 @@ public class MainCtrl {
                            Pair<ManagementOverviewScreenCtrl, Parent> managementOverviewScreenUI,
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
-                           Pair<ParticipantListScreenCtrl, Parent> participantListUI){
+                           Pair<ParticipantListScreenCtrl, Parent> participantListUI,
+                           Pair<AddTagCtrl, Parent> addTagUI,
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -76,10 +82,13 @@ public class MainCtrl {
         Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
+        this.addTagScene = new Scene(addTagUI.getValue());
+        this.addTagCtrl = addTagUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
-
+        this.emailInviteCtrl = emailInviteUI.getKey();
+        this.emailInviteScene = new Scene(emailInviteUI.getValue());
         this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
@@ -93,6 +102,10 @@ public class MainCtrl {
                 new ScreenInfo(participantListScreenCtrl, true, participantListScene, "ParticipantList.Window.title"));
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
+        screenMap.put(AddTagCtrl.class,
+                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
+        screenMap.put(EmailInviteCtrl.class,
+                new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
         manager.setScreenInfoMap(screenMap);
 
         manager.setStartupScreen(startupScreenCtrl);
@@ -172,6 +185,11 @@ public class MainCtrl {
         primaryStage.setScene(deleteEventsScene);
         primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
         deleteEventsScreenCtrl.initializeEventsCheckList();
+    }
+
+    public void switchToAddTag(){
+        primaryStage.setScene(addTagScene);
+        primaryStage.titleProperty().bind(translation.getStringBinding("AddTag.Window.Title"));
     }
 
     /***

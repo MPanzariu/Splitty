@@ -1,16 +1,19 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Expense;
 import commons.Event;
 import commons.Participant;
+import commons.Tag;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 
 import java.net.URL;
@@ -20,7 +23,9 @@ import java.util.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 
 import java.util.List;
 
@@ -70,6 +75,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private Label errorSplitMethod;
     @FXML
     private VBox participantsVBox;
+    @FXML
+    private ComboBox<Tag> tagComboBox;
     private final MainCtrl mainCtrl;
     private Event currentEvent;
     private final Translation translation;
@@ -117,6 +124,72 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         });
     }
 
+    /**
+     * initialize the available tags in the existent event
+     * selects by default the "default" tag, so an event cannot be created without a tag
+     * if forgotten or wrongly chosen, it can be edited
+     */
+    public void initializeTagComboBox(){
+        tagComboBox.getItems().clear();
+        Set<Tag> tags = currentEvent.getEventTags();
+        tagComboBox.getItems().addAll(tags);
+        tagComboBox.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Tag item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label label = new Label(item.getTagName());
+                    label.setAlignment(Pos.CENTER);
+                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 5 10 5 10;" +
+                            "-fx-text-fill: white;");
+                    setGraphic(label);
+                }
+            }
+        });
+        tagComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Tag item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label label = new Label(item.getTagName());
+                    label.setAlignment(Pos.CENTER);
+                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 5 10 5 10;" +
+                            "-fx-text-fill: white;");
+
+                    setGraphic(label);
+                }
+            }
+        });
+
+        Tag defaultTag = findDefaultTag(tags);
+        if (!tags.isEmpty()) {
+            tagComboBox.getSelectionModel().select(defaultTag);
+        }
+    }
+
+    /**
+     * this method searches for the default tag
+     * @param tags the tags in the current event
+     * @return the default tag
+     */
+    private Tag findDefaultTag(Set<Tag> tags) {
+        for (Tag tag : tags) {
+            if ("default".equals(tag.getTagName())) {
+                return tag;
+            }
+        }
+        return null;
+    }
 
     /**
      * Method used for getting the participants that will be added
@@ -198,6 +271,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         this.currentEvent = event;
         currency.setItems(FXCollections.observableArrayList("", "EUR"));
         choosePayer.setItems(getParticipantList());
+        initializeTagComboBox();
         bindToEmpty();
     }
 
@@ -303,6 +377,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         for(Participant part: participantSet) {
             resultExpense.addParticipantToExpense(part);
         }
+        Tag selectedTag = getTagComboBox(tagComboBox);
+        resultExpense.setExpenseTag(selectedTag);
         return resultExpense;
     }
 
@@ -331,6 +407,15 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public String getComboBox(ComboBox<String> comboBox) {
         return comboBox.getValue();
+    }
+
+    /**
+     * gets the selected tag in the combobox
+     * @param tagComboBox the combobox which holds tags
+     * @return the tag stored inside the combo box
+     */
+    public Tag getTagComboBox(ComboBox<Tag> tagComboBox){
+        return tagComboBox.getValue();
     }
     /**
      * Adds the specified expense to the server
@@ -385,6 +470,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                 }
             }
         }
+        tagComboBox.getSelectionModel().select(expense.getExpenseTag());
         expenseId = id;
     }
 

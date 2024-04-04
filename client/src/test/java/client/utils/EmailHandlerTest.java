@@ -1,5 +1,6 @@
 package client.utils;
 
+import commons.Event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -9,18 +10,19 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class EmailHandlerTest {
     private Properties properties;
     private EmailHandler emailHandler;
     private JavaMailSender javaMailSender;
+    private ConfigUtils configUtils;
     @BeforeEach
     void setUp() {
         properties = mock(Properties.class);
         javaMailSender = mock(JavaMailSender.class);
+        configUtils = mock(ConfigUtils.class);
         emailHandler = new EmailHandler(javaMailSender);
         when(properties.getProperty("spring.mail.host")).thenReturn("smtp.gmail.com");
         when(properties.getProperty("spring.mail.port")).thenReturn("587");
@@ -93,5 +95,19 @@ class EmailHandlerTest {
     void sendTestEmailSuccess(){
         emailHandler.readProperties(properties);
         assertTrue(emailHandler.sendTestEmail());
+    }
+
+    @Test
+    void getInviteText() {
+        Event testEvent = new Event("Test Event", null);
+        Properties properties = mock(Properties.class);
+        emailHandler.setConfigUtils(configUtils);
+        when(this.configUtils.easyLoadProperties()).thenReturn(properties);
+        when(properties.getProperty("connection.URL")).thenReturn("localhost:8080");
+        String returned = emailHandler.getInviteText(testEvent);
+        String expected = String.format("You have been invited to event %s" +
+                " with the invitation code of %s!" +
+                " The event is hosted on the server with address: localhost:8080", testEvent.getTitle(), testEvent.getId());
+        assertEquals(expected, returned);
     }
 }

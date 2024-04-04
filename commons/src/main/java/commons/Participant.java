@@ -1,17 +1,18 @@
 package commons;
 
-import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -24,6 +25,7 @@ public class Participant {
     private String legalName;
     private String iban;
     private String bic;
+    private String email;
 
     /***
      * Constructor used by Object Mappers
@@ -129,6 +131,23 @@ public class Participant {
      */
     public void setBic(String bic) {
         this.bic = bic;
+    }
+
+    /**
+     * Gets the email of the Participant
+     * @return the Participant's email
+     */
+
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Sets the email of the Participant
+     * @param email the new email of the Participant
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /***
