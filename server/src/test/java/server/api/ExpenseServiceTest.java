@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
+import server.database.TagRepository;
 
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +26,8 @@ class ExpenseServiceTest {
 
     @Mock
     private EventRepository mockEventRepository;
+    @Mock
+    private TagRepository mockTagRepository;
 
     @InjectMocks
     private ExpenseService mockExpenseService;
