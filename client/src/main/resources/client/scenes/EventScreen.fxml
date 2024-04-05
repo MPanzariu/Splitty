@@ -79,7 +79,7 @@
             <ListView fx:id="expensesLogListView" prefHeight="200.0" prefWidth="200.0" styleClass="small-text" />
          </children>
       </VBox>
-      <Button fx:id="settleDebtsButton" layoutX="357.0" layoutY="554.0" mnemonicParsing="false" onAction="#settleDebts" prefHeight="35.0" prefWidth="181.0" text="Settle Debts">
+      <Button fx:id="settleDebtsButton" layoutX="353.0" layoutY="673.0" mnemonicParsing="false" onAction="#settleDebts" prefHeight="35.0" prefWidth="187.0" text="Settle Debts">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
@@ -91,10 +91,10 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="goBackButton" layoutX="160.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+      <Button fx:id="goBackButton" layoutX="164.0" layoutY="675.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="35.0" prefWidth="36.0" styleClass="positiveButton" />
         <Label fx:id="errorInvalidParticipant" layoutX="160.0" layoutY="246.0" prefHeight="18.0" prefWidth="212.0" />
       <ComboBox fx:id="languageIndicator" layoutX="605.0" layoutY="18.0" prefHeight="25.0" prefWidth="70.0" />
-      <Button fx:id="testEmailButton" layoutX="155.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="157.0" text="Test Email">
+      <Button fx:id="testEmailButton" layoutX="164.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="157.0" text="Test Email">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
@@ -108,8 +108,8 @@
             </ImageView>
          </graphic>
       </Button>
-      <Label fx:id="emailFeedbackLabel" layoutX="162.0" layoutY="653.0" styleClass="small-text" text="Email Feedback" />
-      <Button fx:id="emailInviteButton" layoutX="353.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="181.0" text="Invite By Email">
+      <Label fx:id="emailFeedbackLabel" layoutX="162.0" layoutY="646.0" styleClass="small-text" text="Email Feedback" />
+      <Button fx:id="emailInviteButton" layoutX="353.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="187.0" text="Invite By Email">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
@@ -135,7 +135,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="showStatisticsButton" layoutX="163.0" layoutY="680.0" mnemonicParsing="false" onAction="#switchToStatistics" prefHeight="27.0" prefWidth="374.0" text="Show statistics">
+      <Button fx:id="showStatisticsButton" layoutX="164.0" layoutY="554.0" mnemonicParsing="false" onAction="#switchToStatistics" prefHeight="34.0" prefWidth="374.0" text="Show statistics">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
