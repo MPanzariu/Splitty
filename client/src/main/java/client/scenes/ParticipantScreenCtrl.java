@@ -2,21 +2,15 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-
-import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -66,14 +60,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label holder;
     @FXML
     private TextField holderField;
-    @FXML
-    private AnchorPane pane;
     private static final Pattern emailPattern = Pattern.compile(emailLike);
     private static final Pattern bicPattern = Pattern.compile(bicLike);
     private static final Pattern ibanPattern = Pattern.compile(ibanLike);
     private Event event;
     private long participantId;
-
 
     /**
      * constructor
@@ -93,7 +84,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param location
      * The location used to resolve relative paths for the root object, or
      * {@code null} if the location is not known.
-     *
+     * Adds response to pressing the Enter key, as well as a few usability features
      * @param resources
      * The resources used to localize the root object, or {@code null} if
      * the root object was not localized.
@@ -181,6 +172,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * method for clicking 'ok' in add/edit participant screen
      * if the participant is new it is added to the event
      * otherwise edits the participant
+     * A few checks are made regarding the values inserted by the user
      */
     public void confirmEdit() {
         Participant participant = addParticipant();
@@ -233,13 +225,15 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
+    /**
+     * resets the errors for the wrong values
+     */
     public void resetErrorFields(){
         noName.textProperty().bind(translation.getStringBinding("empty"));
         noEmail.textProperty().bind(translation.getStringBinding("empty"));
         wrongBic.textProperty().bind(translation.getStringBinding("empty"));
         wrongIban.textProperty().bind(translation.getStringBinding("empty"));
     }
-
 
     /***
      * Removes text from all details fields
@@ -255,6 +249,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * creates an instance of a participant which is being assigned/updated
      * in the confirm method
+     * Checks for the correctness of certain values
      * @return returns the new participant
      */
     public Participant addParticipant(){
@@ -331,6 +326,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         resetErrorFields();
     }
 
+    /**
+     * checks if the inserted email has an appropriate pattern
+     * @param email the value inserted by the user
+     * @return true if the value is correct, false otherwise
+     */
     public boolean checkEmail (String email){
         Matcher matcher = emailPattern.matcher(email);
         if (matcher.matches()) {
@@ -341,11 +341,21 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         return false;
     }
 
+    /**
+     * checks if the inserted bic has an appropriate pattern
+     * @param bic the value inserted by the user
+     * @return true if the value is correct, false otherwise
+     */
     public boolean checkBic (String bic){
         Matcher matcher = bicPattern.matcher(bic);
         return matcher.matches();
     }
 
+    /**
+     * checks if the inserted iban has an appropriate pattern
+     * @param iban the value inserted by the user
+     * @return true if the value is correct, false otherwise
+     */
     public boolean checkIban (String iban){
         Matcher matcher = ibanPattern.matcher(iban);
         return matcher.matches();
