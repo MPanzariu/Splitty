@@ -1,15 +1,19 @@
 package client.scenes;
 
 import client.utils.ServerUtils;
+import client.utils.TransferMoneyUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Participant;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,16 +32,32 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Label amountLabel;
     @FXML
-    private ChoiceBox<String> currency = new ChoiceBox<>();
-    private final ServerUtils utils;
+    private ChoiceBox<String> currencyChoiceBox = new ChoiceBox<>();
+    @FXML
+    private TextField amountTextField;
+    @FXML
+    private ComboBox<Participant> fromComboBox;
+    @FXML
+    private ComboBox<Participant> toComboBox;
+    @FXML
+    private Label amountError;
+    @FXML
+    private Label fromError;
+    @FXML
+    private Label toError;
+    private final StringProperty sameParticipants = new SimpleStringProperty();
+    private final ServerUtils serverUtils;
     private final Translation translation;
     private final MainCtrl ctrl;
+    private final TransferMoneyUtils utils;
 
     @Inject
-    public TransferMoneyCtrl(Translation translation, ServerUtils utils, MainCtrl ctrl) {
+    public TransferMoneyCtrl(Translation translation, ServerUtils serverUtils, MainCtrl ctrl,
+                             TransferMoneyUtils utils) {
         this.translation = translation;
-        this.utils = utils;
+        this.serverUtils = serverUtils;
         this.ctrl = ctrl;
+        this.utils = utils;
     }
 
     /**
@@ -53,8 +73,42 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
         cancelButton.textProperty().bind(translation.getStringBinding("TransferMoney.Button.Cancel"));
         transferButton.textProperty().bind(translation.getStringBinding("TransferMoney.Button.Confirm"));
         amountLabel.textProperty().bind(translation.getStringBinding("TransferMoney.Label.Amount"));
-        currency.setItems(FXCollections.observableArrayList("EUR"));
-        currency.getSelectionModel().select(0);
+        amountError.textProperty().bind(translation.getStringBinding("TransferMoney.Label.AmountError"));
+        sameParticipants.bind(translation.getStringBinding("TransferMoney.Error.SameParticipants"));
+        fromError.textProperty().bind(translation.getStringBinding("TransferMoney.Label.ParticipantError"));
+        toError.textProperty().bind(translation.getStringBinding("TransferMoney.Label.ParticipantError"));
+
+        fromComboBox.setItems(utils.getParticipants());
+        toComboBox.setItems(utils.getParticipants());
+
+        currencyChoiceBox.setItems(utils.getCurrencies());
+        utils.setSelectedCurrency(currencyChoiceBox.valueProperty());
+
+        utils.setIsAmountErrorVisible(amountError.visibleProperty());
+        utils.setAmount(amountTextField.textProperty());
+
+        utils.setFrom(fromComboBox.valueProperty());
+        utils.setIsFromErrorVisible(fromError.visibleProperty());
+        utils.setFromAction(fromComboBox.onActionProperty());
+
+        utils.setTo(toComboBox.valueProperty());
+        utils.setIsToErrorVisible(toError.visibleProperty());
+        utils.setToAction(toComboBox.onActionProperty());
+
+        Callback<ListView<Participant>, ListCell<Participant>> cellFactory = listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Participant participant, boolean empty) {
+                super.updateItem(participant, empty);
+                if(participant == null || empty)
+                    setText(null);
+                else
+                    setText(participant.getName());
+            }
+        };
+        fromComboBox.setCellFactory(cellFactory);
+        fromComboBox.setButtonCell(cellFactory.call(null));
+        toComboBox.setCellFactory(cellFactory);
+        toComboBox.setButtonCell(cellFactory.call(null));
     }
 
     /**
@@ -68,7 +122,14 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
      * Switch screens when clicking confirm button.
      */
     public void confirm() {
-        ctrl.switchScreens(EventScreenCtrl.class);
+        if(utils.hasErrors())
+            return;
+        if(utils.hasInvalidParticipants()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, sameParticipants.getValue());
+            alert.showAndWait();
+        } else {
+            ctrl.switchScreens(EventScreenCtrl.class);
+        }
     }
 
     /**
@@ -77,6 +138,7 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
      */
     @Override
     public void refresh(Event event) {
-        // TODO
+        utils.refresh(event);
+        fromComboBox.requestFocus();
     }
 }
