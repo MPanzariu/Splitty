@@ -16,7 +16,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_RIGHT;
@@ -345,30 +349,49 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @return the generated hBox, containing the expense details
      */
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
-        String log = generateTextForExpenseLabel(expense);
+        String log = "";
+        if(expense.getPriceInCents() > 0)
+            log = generateTextForExpenseLabel(expense);
+        else if(expense.getPriceInCents() < 0)
+            log = generateTextForMoneyTransfer(expense);
         Label expenseText = generateExpenseLabel(expense.getId(), log);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
-        Label date = new Label();
-        var currentYear = new Date().getYear() + 1900;
-        var expenseYear = expense.getDate().getYear();
-        if(expenseYear != currentYear)
-            date.setText(expense.getDate().getDate() + "/" +
-                            + (expense.getDate().getMonth() + 1) + "\n/" +
-                        + (expense.getDate().getYear()));
-
+        Label dateLabel = new Label();
+        dateLabel.setPrefWidth(40);
+        dateLabel.setWrapText(true);
+        Calendar expenseCalendar  = Calendar.getInstance();
+        expenseCalendar.setTime(expense.getDate());
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat shortDate = new SimpleDateFormat("dd/MM");
+        SimpleDateFormat fullDate = new SimpleDateFormat("dd/MM/yyyy");
+        if(expenseCalendar.get(Calendar.YEAR) != now.get(Calendar.YEAR))
+            dateLabel.setText(shortDate.format(expense.getDate()));
         else
-            date.setText(expense.getDate().getDate() + "/" +
-                + (expense.getDate().getMonth() + 1));
+            dateLabel.setText(fullDate.format(expense.getDate()));
         HBox xHBox = new HBox(xButton);
         HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
         xHBox.setAlignment((CENTER_RIGHT));
-        HBox expenseBox = new HBox(date, expenseText, xHBox);
+        HBox expenseBox = new HBox(dateLabel, expenseText, xHBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setAlignment(Pos.CENTER_LEFT);
         return expenseBox;
+    }
+
+    /**
+     * Generates the expense description for money transfers in this format: "A paid B 60.0"
+     * @param expense The money transfer
+     * @return Description of money transfer
+     */
+    private String generateTextForMoneyTransfer(Expense expense) {
+        Participant from = (Participant) expense.getParticipantsInExpense().toArray()[0];
+        double amount = expense.getPriceInCents() / -100.0;
+        return from.getName() +
+                " paid " +
+                expense.getOwedTo().getName() +
+                " " + amount;
     }
 
     /**

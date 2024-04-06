@@ -36,6 +36,13 @@ public class TransferMoneyUtils {
         }
     };
     private StringProperty expenseMessage;
+    private final ServerUtils server;
+    private Event event;
+
+    @Inject
+    public TransferMoneyUtils(ServerUtils server) {
+        this.server = server;
+    }
 
     public void initializeFrom() {
         fromAction.setValue(event -> {
@@ -77,7 +84,20 @@ public class TransferMoneyUtils {
         }
     }
 
+    /**
+     * Creates an expense for the money transfer which is sent to the backend.
+     * If A transfer an X amount of money to B, then the expense will be modelled as A owes -X to B.
+     * This allows the client to recognize this expense as a money transfer.
+     */
+    public void transferMoney() {
+        Expense transfer = new Expense("Money Transfer", Integer.parseInt(amount.get()) * -100,
+                new Date(), to.get());
+        transfer.addParticipantToExpense(from.get());
+        server.addExpense(event.getId(), transfer);
+    }
+
     public void refresh(Event event) {
+        this.event = event;
         participants.setAll(event.getParticipants());
         // This should change when there is a variable for all currencies supported by our application.
         currencies.setAll("EUR");

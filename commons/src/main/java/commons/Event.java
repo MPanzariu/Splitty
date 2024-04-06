@@ -52,11 +52,12 @@ public class Event{
 
     /***
      * Calculates the total spending for the event
+     * Negative expenses are ignored.
      * @return an int of the total cost of the event, in cents
      */
     @JsonIgnore
     public int getTotalSpending(){
-        return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
+        return expenses.stream().mapToInt(Expense::getPriceInCents).filter(x -> x >= 0).sum();
     }
 
     private final static BigDecimal initialBalance = BigDecimal.valueOf(0);

@@ -129,6 +129,7 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
             alert.showAndWait();
         } else {
             ctrl.switchScreens(EventScreenCtrl.class);
+            utils.transferMoney();
         }
     }
 

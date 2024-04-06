@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import javafx.scene.control.Button;
@@ -288,8 +289,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
         if(date != null) {
-            expenseDate = new Date(date.getYear(),
-                date.getMonthValue() - 1, date.getDayOfMonth());
+            expenseDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
