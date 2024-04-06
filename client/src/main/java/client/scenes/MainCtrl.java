@@ -5,6 +5,7 @@ import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import commons.Participant;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -166,10 +167,10 @@ public class MainCtrl {
     }
 
     public void switchToEditParticipant(long participantId) {
+        participantScreenCtrl.saveId(participantId);
         switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
     }
-
     /**
      * switch to the login page for the management overview
      */
