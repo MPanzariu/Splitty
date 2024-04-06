@@ -357,6 +357,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         catch (IllegalArgumentException e) {
             System.out.println("Please enter a valid number");
         }
+        String curr = getComboBox(currency);
         int priceInCents = (int) Math.ceil(price * 100);
         //change in case of wanting to implement another date system
         LocalDate date = getLocalDate(datePicker);
@@ -369,14 +370,18 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;
         while(participantIterator.hasNext()){
-            participant = participantIterator.next();
-            if(participant.getName().equals(participantName)) break;
+            Participant current = participantIterator.next();
+            if(current.getName().equals(participantName)) {
+                participant = current;
+                break;
+            }
         }
         Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
         Set<Participant> participantSet = getParticipantsForExpense();
         for(Participant part: participantSet) {
             resultExpense.addParticipantToExpense(part);
         }
+        resultExpense.setCurrency(curr);
         Tag selectedTag = getTagComboBox(tagComboBox);
         resultExpense.setExpenseTag(selectedTag);
         return resultExpense;
@@ -442,7 +447,10 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         if(expense == null)
             return;
         expensePurpose.setText(expense.getName());
-        sum.setText(String.valueOf((double) expense.getPriceInCents()/100));
+        double price = expense.getPriceInCents() / 100.;
+        if(price == (int) price)
+            sum.setText(Integer.toString((int)price));
+        sum.setText(String.valueOf(price));
         choosePayer.getEditor().setText(expense.getOwedTo().getName());
         Date expenseDate = expense.getDate();
 
@@ -503,6 +511,12 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         if(expense.getPriceInCents() <= 0) {
             errorAmount.textProperty()
                 .bind(translation.getStringBinding("Expense.Label.InvalidAmount"));
+            toAdd = false;
+        }
+        if(expense.getPriceInCents() > 0 &&
+            (expense.getCurrency() == null || !expense.getCurrency().equals("EUR"))) {
+            errorAmount.textProperty()
+                .bind(translation.getStringBinding("Expense.Label.InvalidCurrency"));
             toAdd = false;
         }
         if(expense.getDate() == null) {
