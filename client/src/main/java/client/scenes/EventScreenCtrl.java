@@ -135,7 +135,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
-        emailHandler = new EmailHandler();
+        emailHandler = new EmailHandler(translation);
         if (emailHandler.isConfigured()) {
             enableEmailFeatures();
 

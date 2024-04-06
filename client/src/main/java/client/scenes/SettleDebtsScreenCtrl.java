@@ -4,12 +4,14 @@ import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -41,6 +43,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox settleVBox;
     private Event event;
     private Pair<Pane, Button> lastExpanded;
+    private EmailHandler emailHandler;
 
     /***
      * Constructor for the SettleDebtsScreen
@@ -51,13 +54,14 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Inject
     public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,
-                                 SettleDebtsUtils utils, ImageUtils imageUtils) {
+                                 SettleDebtsUtils utils, ImageUtils imageUtils, EmailHandler emailHandler) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
         this.event = null;
         this.lastExpanded = null;
+        this.emailHandler = emailHandler;
     }
 
     /***
@@ -97,7 +101,9 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
             Label transferLabel = generateTransferLabel(transfer);
             Button settleButton = generateSettleButton(transfer);
-            HBox transferBox = generateTransferDetailsBox(expandButton, transferLabel, settleButton);
+            Button emailInstructionsButton = generateSendEmailButton(transfer);
+            HBox transferBox = generateTransferDetailsBox
+                    (expandButton, transferLabel, settleButton,emailInstructionsButton);
 
             children.addLast(transferBox);
             children.addLast(bankDetailsPane);
@@ -148,12 +154,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param settleButton the Mark Received button
      * @return an HBox containing all given elements, plus the correct spacing
      */
-    public HBox generateTransferDetailsBox(Button expandButton, Label transferLabel, Button settleButton){
+    public HBox generateTransferDetailsBox(Button expandButton, Label transferLabel, Button settleButton, Button emailInstructionsButton){
         Region spacingL = new Region();
         HBox.setHgrow(spacingL, Priority.ALWAYS);
         Region spacingR = new Region();
         HBox.setHgrow(spacingR, Priority.ALWAYS);
-        HBox box = new HBox(expandButton, spacingL, transferLabel, spacingR, settleButton);
+        HBox box = new HBox(expandButton, spacingL, transferLabel, spacingR, settleButton, emailInstructionsButton);
         box.setSpacing(20);
         box.setAlignment(CENTER_LEFT);
         return box;
@@ -210,6 +216,27 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         ObservableValue<String> transferString = utils.createTransferString(transfer);
         label.textProperty().bind(transferString);
         return label;
+    }
+
+    /**
+     * Generates a button for sending payment requests via email
+     */
+    public Button generateSendEmailButton(Transfer transfer) {
+        Button button = new Button();
+        button.textProperty().bind
+                (translation.getStringBinding("SettleDebts.Button.sendEmailInstructions"));
+        Styling.applyStyling(button, "positiveButton");
+        if (transfer.sender().getEmail().isEmpty() || !emailHandler.isConfigured()){
+            Styling.applyStyling(button, "disabledButton");
+        }else{
+            button.setOnAction((action) -> {
+                Thread thread = new Thread(() -> {
+                    utils.sendEmailTransferEmail(transfer);
+                });
+                thread.start();
+            });
+        }
+        return button;
     }
 
     /***
