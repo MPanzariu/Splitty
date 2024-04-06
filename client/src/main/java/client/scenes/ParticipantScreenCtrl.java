@@ -18,7 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
-    static String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
     static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
     private final ServerUtils server;
@@ -60,7 +59,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label holder;
     @FXML
     private TextField holderField;
-    private static final Pattern emailPattern = Pattern.compile(emailLike);
     private static final Pattern bicPattern = Pattern.compile(bicLike);
     private static final Pattern ibanPattern = Pattern.compile(ibanLike);
     private Event event;
@@ -141,9 +139,30 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 noName.textProperty().bind(translation.getStringBinding("empty"));
             }
         });
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println(participantId);
+            if(participantId!=0) {
+                Participant participant = findById(participantId);
+                if (participant != null && participant.getName().equals(newValue))
+                    noName.textProperty().bind(translation.getStringBinding("empty"));
+                else {
+                    if (checkParticipantName(newValue)) {
+                        noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
+                        noName.setStyle("-fx-fill: #ff7200;");
+                    }
+                }
+            }
+            else
+            if (checkParticipantName(newValue)) {
+                noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
+                noName.setStyle("-fx-fill: #ff7200;");
+            }
+        });
         nameField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                confirmEdit();
+                if(nameField.getText()==null || nameField.getText().isEmpty())
+                    confirmEdit();
+                else emailField.requestFocus();
             }
         });
         emailField.setOnKeyPressed(event -> {
@@ -332,6 +351,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkEmail (String email){
+        String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern emailPattern = Pattern.compile(emailLike);
         Matcher matcher = emailPattern.matcher(email);
         if (matcher.matches()) {
             return true;
@@ -360,4 +381,26 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         Matcher matcher = ibanPattern.matcher(iban);
         return matcher.matches();
     }
+    public boolean checkParticipantName(String name){
+        Set<Participant> participantList = event.getParticipants();
+        for(Participant participant: participantList)
+            if(participant.getName().equals(name)) {
+                return true;
+            }
+        return false;
+    }
+    public void saveId(Long id){
+        participantId = id;
+    }
+    public Participant findById(long id){
+        Set<Participant> participantList = event.getParticipants();
+        Participant participantF = null;
+        for(Participant participant: participantList)
+            if(participant.getId() == id) {
+                participantF = participant;
+                break;
+            }
+        return participantF;
+    }
+
 }
