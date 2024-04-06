@@ -36,7 +36,7 @@ class EventScreenCtrlTest {
         expense1.setParticipantToExpense(payers);
         assertTrue(expense1.getParticipantsInExpense().contains(participant1));
         String result = eventScreenCtrl.generateTextForExpenseLabel(expense1);
-        assertEquals(result, "John paid 0.12 for Drinks\n" +
+        assertEquals(result, "John paid 0.12" + (char)128 + " for Drinks\n" +
             "(All)");
     }
     @Test
@@ -50,7 +50,7 @@ class EventScreenCtrlTest {
         assertTrue(expense1.getParticipantsInExpense().contains(participant1));
         assertFalse(expense1.getParticipantsInExpense().contains(participant3));
         String result = eventScreenCtrl.generateTextForExpenseLabel(expense1);
-        assertEquals(result, "John paid 0.12 for Drinks\n" +
+        assertEquals(result, "John paid 0.12" + (char)128 + " for Drinks\n" +
             "(John Jane )");
     }
 }
