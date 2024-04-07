@@ -44,6 +44,7 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
      * @param server the server to use
      * @param mainCtrl the main controller
      * @param emailHandler the email handler to use
+     * @param configUtils the configUtils
      */
     @Inject
     public EmailInviteCtrl(Translation translation, ServerUtils server, MainCtrl mainCtrl, EmailHandler emailHandler, ConfigUtils configUtils) {

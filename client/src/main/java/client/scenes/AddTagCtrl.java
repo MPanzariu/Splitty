@@ -3,7 +3,6 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
-import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

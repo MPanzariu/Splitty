@@ -24,11 +24,11 @@ public class Expense{
     private String name;
     private int priceInCents;
     private Date date;
+    private String currency;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE})
     private Tag expenseTag;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Participant owedTo;
-
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Participant> participantsInExpense;
 
@@ -71,6 +71,14 @@ public class Expense{
         return date;
     }
 
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCurrency() {
+        return this.currency;
+    }
+
     public void setOwedTo(Participant participant){
         this.owedTo = participant;
     }
@@ -78,7 +86,6 @@ public class Expense{
     public Participant getOwedTo(){
         return owedTo;
     }
-
 
     public Tag getExpenseTag() {
         return expenseTag;
@@ -113,10 +120,11 @@ public class Expense{
     }
 
     public String stringOnScreen() {
-        if(owedTo != null)
-            return owedTo.getName() + " paid " + (double) priceInCents / 100 + " for " + name;
-        else
-            return null + " paid " + (double) priceInCents / 100 + " for " + name;
+        double price = priceInCents / 100.;
+        if(price == (int)price)
+            return owedTo.getName() + " paid " + (int) price + '\u20ac' + " for " + name;
+        return owedTo.getName() + " paid " + price + '\u20ac' + " for " + name;
+
     }
 
     public void setParticipantToExpense(Set<Participant> participants) {

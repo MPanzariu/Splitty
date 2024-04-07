@@ -28,6 +28,12 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
     private final Translation translation;
     private Event event;
 
+    /**
+     *
+     * @param mainCtrl the main controller
+     * @param server the server
+     * @param translation the translation class
+     */
     @Inject
     public EditTitleCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation) {
         this.server = server;
@@ -35,6 +41,16 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
         this.translation = translation;
     }
 
+    /**
+     *
+     * @param location
+     * The location used to resolve relative paths for the root object, or
+     * {@code null} if the location is not known.
+     *
+     * @param resources
+     * The resources used to localize the root object, or {@code null} if
+     * the root object was not localized.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.label.textProperty().bind(translation.getStringBinding("editTitle.label"));
@@ -43,16 +59,27 @@ public class EditTitleCtrl implements Initializable, SimpleRefreshable {
         this.confirm.textProperty().bind(translation.getStringBinding("editTitle.confirmButton"));
     }
 
+    /**
+     *
+     * @param event the new Event data to process
+     */
     public void refresh(Event event) {
         this.event = event;
     }
 
+    /**
+     * updates the information on the server with the new title
+     * that was provided
+     */
     public void confirm() {
         server.editTitle(event.getId(), title.getText());
         title.clear();
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
+    /**
+     * switches back to the event screen
+     */
     public void cancel() {
         title.clear();
         mainCtrl.switchScreens(EventScreenCtrl.class);

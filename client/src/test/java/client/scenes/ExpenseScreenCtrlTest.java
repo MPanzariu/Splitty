@@ -5,94 +5,67 @@ import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import commons.Participant;
+import commons.Tag;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ExpenseScreenCtrlTest {
 
-    private TestExpenseScreenCtrl sut;
-    private TestServerUtils testServerUtils;
-    private TestMainController testMainController;
+    private ExpenseScreenCtrl expenseScreenCtrl;
+    private ServerUtils serverUtilsMock;
+    private MainCtrl mainCtrlMock;
+    private Translation translationMock;
+
     @BeforeEach
-    public void setup() {
-        this.testServerUtils = new TestServerUtils();
-        this.testMainController = new TestMainController();
-        this.sut = new TestExpenseScreenCtrl(this.testServerUtils, this.testMainController, null);
+    public void setUp() {
+        serverUtilsMock = mock(ServerUtils.class);
+        mainCtrlMock = mock(MainCtrl.class);
+        translationMock = mock(Translation.class);
+        expenseScreenCtrl = new ExpenseScreenCtrl(serverUtilsMock, mainCtrlMock, translationMock);
     }
 
+    @Test
+    public void testGetParticipantList_EmptyEvent() {
+        // Given an empty event
+        Event event = new Event();
+        expenseScreenCtrl.setCurrentEvent(event);
 
-    private Event createMockEvent() {
-        return null;
+        // When getParticipantList is called
+        ObservableList<String> participantList = expenseScreenCtrl.getParticipantList();
+
+        // Then the participantList should be empty
+        assertEquals(0, participantList.size());
     }
 
-    private class TestExpenseScreenCtrl extends ExpenseScreenCtrl {
-        public TextField expensePurpose = new TextField();
-        public TextField sum = new TextField();
-        public ComboBox<String> choosePayer = new ComboBox<>();
-        public DatePicker datePicker = new DatePicker();
+    @Test
+    public void testGetParticipantList_NonEmptyEvent() {
+        // Given a non-empty event with participants
+        Set<Participant> participants = new HashSet<>();
+        participants.add(new Participant("John"));
+        participants.add(new Participant("Alice"));
+        participants.add(new Participant("Bob"));
+        Event event = new Event("Event", null);
+        for(Participant participant: participants)
+            event.addParticipant(participant);
+        expenseScreenCtrl.setCurrentEvent(event);
 
-        public TestExpenseScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
-            super(server, mainCtrl, translation);
-        }
+        // When getParticipantList is called
+        ObservableList<String> participantList = expenseScreenCtrl.getParticipantList();
 
-        @Override
-        public String getTextFieldText(TextField textField) {
-            if (textField == expensePurpose) return expensePurpose.getText();
-            else if (textField == sum) return sum.getText();
-            return null;
-        }
-
-        @Override
-        public LocalDate getLocalDate(DatePicker datePicker) {
-            return datePicker.getValue();
-        }
-
-        @Override
-        public String getComboBox(ComboBox<String> comboBox) {
-            return comboBox.getValue();
-        }
-    }
-
-    private class TestServerUtils extends ServerUtils {
-        public List<String> calls = new LinkedList<>();
-        public String validEventId = "123456";
-        public long validExpenseId = 123;
-        public Expense validExpense = new Expense();
-        @Override
-        public Expense addExpense(String eventId, Expense expense) {
-            calls.add(eventId);
-            return expense;
-        }
-
-        @Override
-        public Expense editExpense(String eventId, long expenseId, Expense expense) {
-            if(eventId.equals(validEventId) && expenseId == validExpenseId) {
-                return expense;
-            }
-            throw new jakarta.ws.rs.BadRequestException();
-        }
-    }
-
-    private class TestMainController extends MainCtrl{
-        public List<String> calls = new LinkedList<>();
-
-        public TestMainController() {
-            super(null, null);
-        }
-        /*Override
-        public void switchEvents(String eventCode){
-            calls.add("join");
-        }*/
+        // Then the participantList should contain names of all participants
+        assertEquals(3, participantList.size());
+        assertTrue(participantList.contains("John"));
+        assertTrue(participantList.contains("Alice"));
+        assertTrue(participantList.contains("Bob"));
     }
 }
