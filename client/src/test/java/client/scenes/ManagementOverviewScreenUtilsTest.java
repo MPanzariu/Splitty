@@ -3,6 +3,7 @@ package client.scenes;
 import client.utils.ManagementOverviewUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
+import client.utils.WebSocketUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
@@ -24,6 +25,7 @@ public class ManagementOverviewScreenUtilsTest {
 
     private Translation translation;
     private ServerUtils server;
+    private WebSocketUtils socketUtils;
     private ManagementOverviewUtils utils;
     private Event e1;
     private Event e2;
@@ -38,7 +40,8 @@ public class ManagementOverviewScreenUtilsTest {
     public void setup() {
         translation = mock(Translation.class);
         server = mock(ServerUtils.class);
-        utils = new ManagementOverviewUtils(translation, server);
+        socketUtils = mock(WebSocketUtils.class);
+        utils = new ManagementOverviewUtils(translation, server, socketUtils);
         e1 = new Event("Party", new Date(0));
         e2 = new Event("Holiday", new Date(5));
         e3 = new Event("party", new Date(2));

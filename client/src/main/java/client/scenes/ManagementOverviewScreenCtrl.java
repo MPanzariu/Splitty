@@ -59,6 +59,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private final Translation translation;
     private final ManagementOverviewUtils utils;
     private final ImageUtils imageUtils;
+    private boolean listWasInitialized = false;
 
     /**
      * Constructor
@@ -111,7 +112,9 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * Initialize a ListView with all events.
      */
     public void initializeAllEvents() {
+        if(listWasInitialized) return;
         eventsListView.setItems(utils.retrieveEvents());
+        utils.subscribeToUpdates();
         eventsListView.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Event event, boolean empty) {
@@ -158,6 +161,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             participantsListView.setItems(utils.initializeParticipantsList(newEvent));
             expensesListView.setItems(utils.initializeExpenseList(newEvent));
         });
+        listWasInitialized = true;
     }
 
     /**
@@ -277,8 +281,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             Event event = objectMapper.readValue(backupFile, Event.class);
             System.out.println("Read from file: " + event);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessImport");
+            if(utils.checkIfDuplicate(eventId)){
+                server.deleteEvent(eventId); //event IDs are unique, but this should enable updating an event this way
+            }
             server.addEvent(event);
-            initializeAllEvents();
             Styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
 
         } catch (IOException e) {
