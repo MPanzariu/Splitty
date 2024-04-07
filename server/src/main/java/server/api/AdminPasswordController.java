@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/password")
 public class AdminPasswordController {
-    AdminPasswordService adminPasswordService;
+    private AdminPasswordService adminPasswordService;
 
     /**
      * Constructor

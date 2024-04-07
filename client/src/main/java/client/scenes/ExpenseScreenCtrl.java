@@ -198,7 +198,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public ObservableList<String> getParticipantList() {
         Set<Participant> participants;
-        if(currentEvent == null|| currentEvent.getParticipants() == null)
+        if(currentEvent == null || currentEvent.getParticipants() == null)
             participants = new HashSet<>();
         else participants = currentEvent.getParticipants();
         Iterator<Participant> iterator = participants.iterator();
@@ -301,7 +301,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * resets the text from the Paid by field
      */
     public void resetPaidBy() {
-        choosePayer.getEditor().clear();
+        choosePayer.setValue("");
     }
 
     /**
@@ -330,7 +330,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * ComboBox
      */
     public void resetCurrency() {
-        this.currency.getEditor().clear();
+        this.currency.setValue("");
     }
 
     /**
@@ -453,7 +453,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         sum.setText(String.valueOf(price));
         choosePayer.getEditor().setText(expense.getOwedTo().getName());
         Date expenseDate = expense.getDate();
-
+        currency.setValue(expense.getCurrency());
         datePicker.getEditor()
             .setText((expenseDate.getMonth() + 1) + "/"
                 + expenseDate.getDate() + "/" +
@@ -577,7 +577,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         Set<Participant> participants = currentEvent.getParticipants();
         participantCheckBoxes.clear();
         if(participants.size() < 4)
-            participantsVBox.setPrefHeight((double)participants.size()/4 * 100);
+            participantsVBox.setPrefHeight((double)participants.size() / 4 * 100);
         ListView<CheckBox> participantsListView = new ListView<>();
         participantsVBox.getChildren().add(participantsListView);
         for(Participant participant: participants) {
@@ -585,6 +585,8 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             participantsListView.getItems().add(participantToPay);
             participantCheckBoxes.add(participantToPay);
         }
-
+    }
+    public void setCurrentEvent(Event event) {
+        this.currentEvent = event;
     }
 }

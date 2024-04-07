@@ -122,8 +122,8 @@ public class Expense{
     public String stringOnScreen() {
         double price = priceInCents / 100.;
         if(price == (int)price)
-            return owedTo.getName() + " paid " + (int) price + (char)128 + " for " + name;
-        return owedTo.getName() + " paid " + price + (char)128 + " for " + name;
+            return owedTo.getName() + " paid " + (int) price + '\u20ac' + " for " + name;
+        return owedTo.getName() + " paid " + price + '\u20ac' + " for " + name;
 
     }
 
