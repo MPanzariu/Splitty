@@ -1,1 +1,0 @@
-{"id":"SP854P","title":"test","creationDate":1710950228741,"lastActivity":[2024,3,20,16,57,46,143666000],"participants":[{"id":4752,"name":"test","expensesOwedTo":[{"id":3152,"name":"qwegq","priceInCents":10000,"date":1710889200000}]}],"expenses":[{"id":3152,"name":"qwegq","priceInCents":10000,"date":1710889200000,"owedTo":{"id":4752,"name":"test"}}]}
