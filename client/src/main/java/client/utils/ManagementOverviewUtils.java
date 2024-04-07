@@ -30,6 +30,7 @@ public class ManagementOverviewUtils {
      * Constructor
      * @param translation Translation to use
      * @param server    ServerUtils to use
+     * @param socketUtils WebSocketUtils to use
      */
     @Inject
     public ManagementOverviewUtils(Translation translation, ServerUtils server, WebSocketUtils socketUtils) {
