@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.ImageUtils;
-import client.utils.ManagementOverviewUtils;
-import client.utils.ServerUtils;
-import client.utils.Translation;
+import client.utils.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
@@ -26,6 +23,7 @@ import static org.mockito.Mockito.*;
 class ManagementOverviewScreenCtrlTest {
     private Translation translation;
     private ServerUtils server;
+    private WebSocketUtils socketUtils;
     private ManagementOverviewUtils utils;
     private MainCtrl mainCtrl;
     private TestManagementOverviewScreenCtrl managementOverviewScreenCtrl;
@@ -36,7 +34,8 @@ class ManagementOverviewScreenCtrlTest {
     public void setUp(){
         translation = mock(Translation.class);
         server = mock(ServerUtils.class);
-        utils = new ManagementOverviewUtils(translation, server);
+        socketUtils = mock(WebSocketUtils.class);
+        utils = new ManagementOverviewUtils(translation, server, socketUtils);
         mainCtrl = mock(MainCtrl.class);
         objectMapper = mock(ObjectMapper.class);
         file = mock(File.class);
@@ -107,17 +106,14 @@ class ManagementOverviewScreenCtrlTest {
             throw new RuntimeException(e);
         }
         managementOverviewScreenCtrl.setObjectMapper(objectMapper);
-        assertEquals(0, managementOverviewScreenCtrl.initializeAllEventsCalls);
         managementOverviewScreenCtrl.importButtonClicked();
         assertTrue(managementOverviewScreenCtrl.bindings.contains("MOSCtrl.SuccessImport"));
-        assertEquals(1, managementOverviewScreenCtrl.initializeAllEventsCalls);
     }
 
 
     private class TestManagementOverviewScreenCtrl extends ManagementOverviewScreenCtrl{
         public String textBoxText;
         public ArrayList<String> bindings;
-        public int initializeAllEventsCalls;
 
         /**
          * Constructor
@@ -131,7 +127,6 @@ class ManagementOverviewScreenCtrlTest {
                                                 ManagementOverviewUtils utils, ImageUtils imageUtils) {
             super(server, mainCtrl, translation, utils, imageUtils);
             bindings = new ArrayList<>();
-            initializeAllEventsCalls = 0;
         }
 
         @Override
@@ -155,10 +150,6 @@ class ManagementOverviewScreenCtrlTest {
 
         public void setObjectMapper(ObjectMapper objectMapper){
             this.objectMapper = objectMapper;
-        }
-        @Override
-        public void initializeAllEvents(){
-            initializeAllEventsCalls+=1;
         }
     }
 }

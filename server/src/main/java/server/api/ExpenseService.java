@@ -3,14 +3,15 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
+import server.database.TagRepository;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -21,19 +22,22 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final EventRepository eventRepository;
     private final ParticipantRepository participantRepository;
+    private final TagRepository tagRepository;
 
     /**
      *
      * @param expenseRepository the repository containing the expenses
      * @param eventRepository the repository containing the events
      * @param participantRepository the repository containing the participants
+     * @param tagRepository the repository containing the tags
      */
     @Autowired
     public ExpenseService(ExpenseRepository expenseRepository, EventRepository eventRepository,
-                          ParticipantRepository participantRepository) {
+                          ParticipantRepository participantRepository, TagRepository tagRepository) {
         this.expenseRepository = expenseRepository;
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
+        this.tagRepository = tagRepository;
     }
 
     /**
@@ -59,6 +63,12 @@ public class ExpenseService {
                     .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
                 participants.add(fetchedParticipant);
             }
+        }
+        if(expense.getExpenseTag() != null){
+            long extractedTagId = expense.getExpenseTag().getId();
+            Tag fetchedTag = tagRepository.findById(extractedTagId)
+                    .orElseThrow(() -> new EntityNotFoundException("Tag not found"));
+            expense.setExpenseTag(fetchedTag);
         }
         expense.setParticipantToExpense(participants);
         event.addExpense(expense);
@@ -102,16 +112,16 @@ public class ExpenseService {
      * @return The updated expense
      */
     public Expense editExpense(long id, Expense newExpense) {
-        Expense expense = expenseRepository.findById(id) //
+        Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
-        if(expense.getOwedTo() != null){
+        if(newExpense.getOwedTo() != null){
             long extractedParticipantId = newExpense.getOwedTo().getId();
             Participant participant = participantRepository.findById(extractedParticipantId)
                     .orElseThrow(() -> new EntityNotFoundException("Participant not found"));
             expense.setOwedTo(participant);
         }
         Set<Participant> participants = new HashSet<>();
-        if (expense.getParticipantsInExpense() != null) {
+        if (newExpense.getParticipantsInExpense() != null) {
             for (Participant participant : newExpense.getParticipantsInExpense()) {
                 long participantId = participant.getId();
                 Participant fetchedParticipant = participantRepository.findById(participantId)
@@ -119,10 +129,17 @@ public class ExpenseService {
                 participants.add(fetchedParticipant);
             }
         }
+        Tag newTag = null;
+        if(newExpense.getExpenseTag() != null){
+            long extractedTagId = newExpense.getExpenseTag().getId();
+            newTag = tagRepository.findById(extractedTagId)
+                    .orElseThrow(() -> new EntityNotFoundException("Tag not found"));
+        }
         expense.setDate(newExpense.getDate());
         expense.setName(newExpense.getName());
         expense.setPriceInCents(newExpense.getPriceInCents());
         expense.setParticipantToExpense(participants);
+        expense.setExpenseTag(newTag);
         return expenseRepository.save(expense);
     }
 }

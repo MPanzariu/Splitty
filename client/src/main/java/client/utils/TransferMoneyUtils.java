@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -111,6 +112,7 @@ public class TransferMoneyUtils {
         Expense transfer = new Expense("Money Transfer", Integer.parseInt(amount.get()) * -100,
                 new Date(), to.get());
         transfer.addParticipantToExpense(from.get());
+        transfer.setExpenseTag((Tag) event.getEventTags().stream().filter(tag -> tag.getTagName().equals("money transfer")).toArray()[0]);
         server.addExpense(event.getId(), transfer);
     }
 

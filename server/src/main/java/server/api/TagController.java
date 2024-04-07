@@ -1,12 +1,9 @@
 package server.api;
 
-import commons.Tag;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.database.EventRepository;
 import server.websockets.WebSocketService;
 
 @RestController
@@ -34,19 +31,5 @@ public class TagController {
         tagService.removeTag(eventId, tagId);
         webSocketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok().build();
-    }
-    @PostMapping("/{eventId}/{expenseId}/tag/{tagName}")
-    public ResponseEntity<Void> addTagToExpense(@PathVariable String eventId, @PathVariable Long expenseId,
-                                                @PathVariable String tagName, @RequestBody String colorCode){
-        tagService.addTagToExpense(eventId, expenseId, tagName, colorCode);
-        webSocketService.propagateEventUpdate(eventId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-    @PutMapping("/{eventId}/{expenseId}/tag/{tagName}")
-    public ResponseEntity<Tag> editTagOfExpense(@PathVariable String eventId, @PathVariable Long expenseId,
-                                                @PathVariable String tagName, @RequestBody String colorCode){
-        Tag tag = tagService.editTagOfExpense(eventId, expenseId, tagName, colorCode);
-        webSocketService.propagateEventUpdate(eventId);
-        return ResponseEntity.ok(tag);
     }
 }

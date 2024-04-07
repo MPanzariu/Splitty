@@ -43,6 +43,7 @@ public class EventController {
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
         socketService.propagateEventUpdate(eventId);
+        socketService.propagateNameChange(eventId, updatedEvent.getTitle());
         return ResponseEntity.ok(updatedEvent);
     }
 
@@ -69,6 +70,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.createEvent(eventName);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 
@@ -105,6 +107,7 @@ public class EventController {
         if(event.isEmpty())
             return ResponseEntity.badRequest().build();
         repository.deleteById(id);
+        socketService.propagateDeletion(id);
         return ResponseEntity.ok(event.get());
     }
 
@@ -115,10 +118,13 @@ public class EventController {
      */
     @DeleteMapping("/delete/all")
     ResponseEntity<String> deleteAll(){
-        if(repository.findAll().isEmpty()){
+        List<Event> allEvents = repository.findAll();
+        List<String> allIds = allEvents.stream().map(Event::getId).toList();
+        if(allEvents.isEmpty()){
             return ResponseEntity.ok("No events do be deleted");
         }
         repository.deleteAll();
+        allIds.forEach(socketService::propagateDeletion);
         return ResponseEntity.ok("Successfully deleted all the events");
     }
 
@@ -163,6 +169,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.saveEvent(event);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 

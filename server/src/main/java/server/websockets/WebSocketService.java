@@ -1,6 +1,8 @@
 package server.websockets;
 
 import commons.Event;
+import commons.dto.EventDeletedDTO;
+import commons.dto.EventNameChangeDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,6 +34,34 @@ public class WebSocketService {
         Event updatedEvent = eventRepository.findById(eventID)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         socketMessenger.convertAndSend(eventUpdateURL(eventID), updatedEvent);
+        socketMessenger.convertAndSend("/topic/events/all", updatedEvent);
+    }
+
+    /***
+     * Propagates an event name change to all listening clients
+     * @param eventID the ID of the event changed
+     * @param newTitle the new title of the event
+     */
+    public void propagateNameChange(String eventID, String newTitle){
+        EventNameChangeDTO dto = new EventNameChangeDTO(eventID, newTitle);
+        socketMessenger.convertAndSend("/topic/events/names", dto);
+    }
+
+    /***
+     * Propagates a deletion of an event
+     * @param eventID the ID of the event deleted
+     */
+    public void propagateDeletion(String eventID){
+        EventDeletedDTO dto = new EventDeletedDTO(eventID);
+        socketMessenger.convertAndSend("/topic/events/deletions", dto);
+    }
+
+    /***
+     * Propagates event creation to admins
+     * @param createdEvent the created event
+     */
+    public void propagateCreation(Event createdEvent) {
+        socketMessenger.convertAndSend("/topic/events/creations", createdEvent);
     }
 
     /***

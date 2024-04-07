@@ -5,6 +5,7 @@ import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import commons.Participant;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,8 +29,6 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private Scene emailInviteScene;
-    private EmailInviteCtrl emailInviteCtrl;
     private TransferMoneyCtrl transferMoneyCtrl;
     private Scene transferMoneyScene;
     private final Translation translation;
@@ -55,8 +54,10 @@ public class MainCtrl {
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
-                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                           Pair<TransferMoneyCtrl, Parent> transferMoneyUI){
+                           Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
+                            Pair<AddTagCtrl, Parent> addTagUI,
+                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -85,11 +86,15 @@ public class MainCtrl {
         Scene settleDebtsScene = new Scene(settleDebtsUI.getValue());
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
+        Scene addTagScene = new Scene(addTagUI.getValue());
+        AddTagCtrl addTagCtrl = addTagUI.getKey();
+        Scene statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
+        StatisticsScreenCtrl statisticsScreenCtrl = statisticsScreenUI.getKey();
         //initialize stylesheets
         this.startupScene.getStylesheets().add("stylesheets/main.css");
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
-        this.emailInviteCtrl = emailInviteUI.getKey();
-        this.emailInviteScene = new Scene(emailInviteUI.getValue());
+        EmailInviteCtrl emailInviteCtrl = emailInviteUI.getKey();
+        Scene emailInviteScene = new Scene(emailInviteUI.getValue());
         this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
@@ -103,11 +108,21 @@ public class MainCtrl {
                 new ScreenInfo(participantListScreenCtrl, true, participantListScene, "ParticipantList.Window.title"));
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
+        screenMap.put(AddTagCtrl.class,
+                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
         screenMap.put(TransferMoneyCtrl.class,
                 new ScreenInfo(transferMoneyCtrl, true, transferMoneyScene, "TransferMoney.title"));
+        screenMap.put(StatisticsScreenCtrl.class,
+                new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
+
+        manager.setStartupScreen(startupScreenCtrl);
+        manager.subscribeToUpdates();
+        //This can also show a pop-up in the future, but right now it doesn't
+        manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
+
         primaryStage.show();
     }
 
@@ -123,8 +138,12 @@ public class MainCtrl {
         primaryStage.setScene(screenInfo.scene());
     }
 
+    /***
+     * Switches back to the Startup screen
+     */
     public void showMainScreen() {
-        startupScreenCtrl.refreshEvents();
+        manager.closeOpenedEvent();
+        startupScreenCtrl.refreshLanguageOnSwitchback();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
     }
@@ -155,10 +174,10 @@ public class MainCtrl {
     }
 
     public void switchToEditParticipant(long participantId) {
+        participantScreenCtrl.saveId(participantId);
         switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
     }
-
     /**
      * switch to the login page for the management overview
      */
