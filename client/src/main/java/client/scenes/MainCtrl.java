@@ -5,7 +5,6 @@ import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import commons.Participant;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -111,6 +110,7 @@ public class MainCtrl {
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
 
+        primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.subscribeToUpdates();
         //This can also show a pop-up in the future, but right now it doesn't
