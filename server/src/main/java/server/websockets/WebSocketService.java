@@ -34,6 +34,7 @@ public class WebSocketService {
         Event updatedEvent = eventRepository.findById(eventID)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         socketMessenger.convertAndSend(eventUpdateURL(eventID), updatedEvent);
+        socketMessenger.convertAndSend("/topic/events/all", updatedEvent);
     }
 
     /***
@@ -53,6 +54,14 @@ public class WebSocketService {
     public void propagateDeletion(String eventID){
         EventDeletedDTO dto = new EventDeletedDTO(eventID);
         socketMessenger.convertAndSend("/topic/events/deletions", dto);
+    }
+
+    /***
+     * Propagates event creation to admins
+     * @param createdEvent the created event
+     */
+    public void propagateCreation(Event createdEvent) {
+        socketMessenger.convertAndSend("/topic/events/creations", createdEvent);
     }
 
     /***
