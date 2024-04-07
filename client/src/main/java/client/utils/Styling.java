@@ -14,7 +14,8 @@ public class Styling {
      * Now lets say I want to alternate between backgroundLight and another css class e.g. backgroundDark.
      * Simply doing Styling.applyStyling(myButton, backgroundDark) will not work since myButton already has the class backgroundLight and that one
      * takes priority.
-     * In this case use Styling.changeStyling(myButton, backgroundLight, backgroundDark) which replaces the backgroundLight styling with backgroundDark.
+     * In this case use Styling.changeStyling(myButton, backgroundLight, backgroundDark)
+     * which replaces the backgroundLight styling with backgroundDark.
      */
 
     /**

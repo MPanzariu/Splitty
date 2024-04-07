@@ -42,6 +42,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param mainCtrl the main controller
      * @param translation the class that manages translations
      * @param languageCtrl the LanguageIndicator to use
+     * @param imageUtils the ImageUtils to use
      */
     @Inject
     public StatisticsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,

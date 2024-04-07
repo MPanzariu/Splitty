@@ -26,7 +26,12 @@ public class ManagementOverviewUtils {
     private final StringProperty lastActivity = new SimpleStringProperty();
     private final WebSocketUtils socketUtils;
 
-
+    /**
+     * Constructor
+     * @param translation Translation to use
+     * @param server    ServerUtils to use
+     * @param socketUtils WebSocketUtils to use
+     */
     @Inject
     public ManagementOverviewUtils(Translation translation, ServerUtils server, WebSocketUtils socketUtils) {
         this.translation = translation;
@@ -209,6 +214,10 @@ public class ManagementOverviewUtils {
         else return FXCollections.observableArrayList();
     }
 
+    /**
+     * Get the list of events for the management overview
+     * @return the list of events
+     */
     public ObservableList<Event> getEvents() {
         return events;
     }
