@@ -33,10 +33,21 @@ public class MyFXML {
 
     private Injector injector;
 
+    /**
+     * Constructor
+     * @param injector Injector to use
+     */
     public MyFXML(Injector injector) {
         this.injector = injector;
     }
 
+    /**
+     * Load a FXML file
+     * @param c Class
+     * @param parts Parts
+     * @return Pair
+     * @param <T> Type
+     */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
             var loader = new FXMLLoader(getLocation(parts), null, null, new MyFactory(), StandardCharsets.UTF_8);
@@ -48,6 +59,11 @@ public class MyFXML {
         }
     }
 
+    /**
+     * Get the location of a file
+     * @param parts Parts
+     * @return URL
+     */
     private URL getLocation(String... parts) {
         var path = Path.of("", parts).toString();
         return MyFXML.class.getClassLoader().getResource(path);

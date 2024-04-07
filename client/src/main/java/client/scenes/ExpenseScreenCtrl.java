@@ -1,10 +1,9 @@
 package client.scenes;
 
-import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
-import commons.Expense;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import commons.Tag;
 import jakarta.inject.Inject;
@@ -15,19 +14,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
-
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-
-import java.util.List;
 
 public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
@@ -586,6 +577,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             participantCheckBoxes.add(participantToPay);
         }
     }
+
+    /**
+     * Setter for the current event
+     * @param event the event
+     */
     public void setCurrentEvent(Event event) {
         this.currentEvent = event;
     }

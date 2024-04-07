@@ -15,273 +15,291 @@
  */
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.client.ClientConfig;
 
 import java.util.List;
 import java.util.Set;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import commons.Event;
-import commons.Participant;
-import commons.Expense;
-import commons.Tag;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import org.glassfish.jersey.client.ClientConfig;
-
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.GenericType;
-
-import javax.print.attribute.standard.Media;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 
 public class ServerUtils {
 
-	@Inject
-	@Named("connection.URL")
-	private String serverURL;
+    @Inject
+    @Named("connection.URL")
+    private String serverURL;
 
-	/**
-	 * Gets the event from the server based on the invite code
-	 * @param inviteCode the invite code of the event
-	 * @return the event
-	 */
-	public Event getEvent(String inviteCode){
-		String path = "api/events/" + inviteCode;
-		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path(path) //invite code is the ID
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(Event.class);
-	}
+    /**
+     * Gets the event from the server based on the invite code
+     *
+     * @param inviteCode the invite code of the event
+     * @return the event
+     */
+    public Event getEvent(String inviteCode) {
+        String path = "api/events/" + inviteCode;
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(serverURL).path(path) //invite code is the ID
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(Event.class);
+    }
 
-	/**
-	 * Creates an event with the title given
-	 * @param title the title of the event
-	 * @return the event created
-	 */
-	public Event createEvent(String title){
-		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/events/")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.post(Entity.entity(title, APPLICATION_JSON),Event.class);
-	}
+    /**
+     * Creates an event with the title given
+     *
+     * @param title the title of the event
+     * @return the event created
+     */
+    public Event createEvent(String title) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(serverURL).path("api/events/")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(title, APPLICATION_JSON), Event.class);
+    }
 
-	/**
-	 * Sends a PUT request to change the event with the given ID the given title.
-	 * @param id Invitation code of the event
-	 * @param title Title of the event
-	 * @return Event with a new title
-	 */
-	public Event editTitle(String id, String title) {
-		return ClientBuilder.newClient(new ClientConfig()) //
-				.target(serverURL).path("api/events/" + id) //
-				.request(APPLICATION_JSON) //
-				.accept(APPLICATION_JSON) //
-				.put(Entity.entity(title, APPLICATION_JSON), Event.class);
-	}
+    /**
+     * Sends a PUT request to change the event with the given ID the given title.
+     *
+     * @param id    Invitation code of the event
+     * @param title Title of the event
+     * @return Event with a new title
+     */
+    public Event editTitle(String id, String title) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(serverURL).path("api/events/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .put(Entity.entity(title, APPLICATION_JSON), Event.class);
+    }
 
-	/**
-	 * Requests the server to add a participant.
-	 * @param id ID of the event
-	 * @param participant The Participant to add
-	 * @return The participant added by the server
-	 */
-	public Participant addParticipant(String id, Participant participant) {
-		return ClientBuilder.newClient(new ClientConfig()) //
-				.target(serverURL).path("api/events/" + id + "/participants") //
-				.request(APPLICATION_JSON) //
-				.accept(APPLICATION_JSON) //
-				.post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
-	}
+    /**
+     * Requests the server to add a participant.
+     *
+     * @param id          ID of the event
+     * @param participant The Participant to add
+     * @return The participant added by the server
+     */
+    public Participant addParticipant(String id, Participant participant) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(serverURL).path("api/events/" + id + "/participants") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
 
-	/**
-	 * method for removing participant from event and server
-	 * @param id id of the event
-	 * @param participantId id of the participant to be removed
-	 */
-	public void removeParticipant(String id, long participantId) {
-		Response response = ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + id + "/participants/" + participantId)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.delete();
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-			System.out.println("removed");
-		}
-		else {
-			System.out.println("not removed " + response.getStatus());
-		}
-	}
+    /**
+     * method for removing participant from event and server
+     *
+     * @param id            id of the event
+     * @param participantId id of the participant to be removed
+     */
+    public void removeParticipant(String id, long participantId) {
+        Response response = ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + id + "/participants/" + participantId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            System.out.println("removed");
+        } else {
+            System.out.println("not removed " + response.getStatus());
+        }
+    }
 
-	/**
-	 * edits the participant info in the server
-	 * @param eventId the id of the event
-	 * @param participant the participant to be edited
-	 */
-	public void editParticipant(String eventId, long participantId, Participant participant) {
-		ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + eventId + "/participants/" + participantId)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
-	}
+    /**
+     * edits the participant info in the server
+     *
+     * @param eventId       the id of the event
+     * @param participant   the participant to be edited
+     * @param participantId the id of the participant to be edited
+     */
+    public void editParticipant(String eventId, long participantId, Participant participant) {
+        ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + eventId + "/participants/" + participantId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
 
-	/**
-	 * Sends a POST request to add an expense to a specific event
-	 * @param eventId the id of the specific event
-	 * @param expense the expense to be added
-	 */
-	public Expense addExpense(String eventId, Expense expense) {
-		ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + eventId + "/expenses")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
-		return expense;
-	}
+    /**
+     * Sends a POST request to add an expense to a specific event
+     *
+     * @param eventId the id of the specific event
+     * @param expense the expense to be added
+     * @return the expense added
+     */
+    public Expense addExpense(String eventId, Expense expense) {
+        ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + eventId + "/expenses")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+        return expense;
+    }
 
-	/**
-	 * Sends a GET request to get a list of expenses for a specific event
-	 * @param eventId the id of the event for which we want to get the expenses
-	 * @return the list of expenses for the specific event
-	 */
-	public Set<Expense> getExpensesForEvent(String eventId) {
-		return ClientBuilder.newClient()
-				.target(serverURL).path("api/events/" + eventId + "/expenses")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(new GenericType<Set<Expense>>() {});
-	}
+    /**
+     * Sends a GET request to get a list of expenses for a specific event
+     *
+     * @param eventId the id of the event for which we want to get the expenses
+     * @return the list of expenses for the specific event
+     */
+    public Set<Expense> getExpensesForEvent(String eventId) {
+        return ClientBuilder.newClient()
+                .target(serverURL).path("api/events/" + eventId + "/expenses")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(new GenericType<Set<Expense>>() {
+                });
+    }
 
-	/**
-	 * Sends a DELETE request to delete the specific expense
-	 * @param eventId the id of the event to delete the Expense from
-	 * @param expenseId the id of the expense we want to delete
-	 */
-	public void deleteExpenseForEvent(String eventId, Long expenseId) {
-		Response response = ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + eventId + "/expenses/" + expenseId)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.delete();
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-			System.out.println("Expense deleted successfully.");
-		} else {
-			System.out.println("Failed to delete expense. Status code: " + response.getStatus());
-		}
-	}
+    /**
+     * Sends a DELETE request to delete the specific expense
+     *
+     * @param eventId   the id of the event to delete the Expense from
+     * @param expenseId the id of the expense we want to delete
+     */
+    public void deleteExpenseForEvent(String eventId, Long expenseId) {
+        Response response = ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + eventId + "/expenses/" + expenseId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            System.out.println("Expense deleted successfully.");
+        } else {
+            System.out.println("Failed to delete expense. Status code: " + response.getStatus());
+        }
+    }
 
-	/**
-	 * Sends a PUT request to modify an existing expense
-	 * @param eventId the id of the Event tied to the expense
-	 * @param expense the expense we want the current expense to be updated to
-	 * @return the new expense
-	 */
-	public Expense editExpense(String eventId, long expenseId, Expense expense) {
-		return ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + eventId + "/expenses/" + expenseId)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.put(Entity.entity(expense, APPLICATION_JSON), Expense.class);
-	}
+    /**
+     * Sends a PUT request to modify an existing expense
+     *
+     * @param eventId   the id of the Event tied to the expense
+     * @param expense   the expense we want the current expense to be updated to
+     * @param expenseId the id of the expense we want to update
+     * @return the new expense
+     */
+    public Expense editExpense(String eventId, long expenseId, Expense expense) {
+        return ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + eventId + "/expenses/" + expenseId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .put(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+    }
 
-	//TODO Test weather or not the methods actually work in cae of problems like(expense doesn't exist)
-	/**
-	 * checks if a password matches with the one randomly generated
-	 * @param inputPassword the password the user inputs to log in to the management overview
-	 * @return a boolean, true or false whether the password matches or not
-	 */
-	public Boolean checkPassword(String inputPassword){
-		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/password/" + inputPassword)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(Boolean.class);
-	}
+    //TODO Test weather or not the methods actually work in cae of problems like(expense doesn't exist)
 
-	/**
-	 * retrieves all events from the server
-	 * @return all the events from the server
-	 */
-	public List<Event> retrieveAllEvents(){
-		List<Event> events = ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/events/all")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.get(new GenericType<List<Event>>(){});
-		return events;
-	}
+    /**
+     * checks if a password matches with the one randomly generated
+     *
+     * @param inputPassword the password the user inputs to log in to the management overview
+     * @return a boolean, true or false whether the password matches or not
+     */
+    public Boolean checkPassword(String inputPassword) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(serverURL).path("api/password/" + inputPassword)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(Boolean.class);
+    }
 
-	/**
-	 * Sends an event to be added to the database
-	 */
-	public Event addEvent(Event event){
-		return ClientBuilder.newClient(new ClientConfig())
-				.target(serverURL).path("api/events/")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.put(Entity.entity(event, APPLICATION_JSON),Event.class);
-	}
-	/**
-	 * delete an event using it's ID
-	 * @param eventId the id of the event we want to delete
-	 */
-	public void deleteEvent(String eventId){
-		Response response = ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/remove/" + eventId)
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.delete();
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-			System.out.println("Event deleted successfully.");
-		} else {
-			System.out.println("Failed to delete event. Status code: " + response.getStatus());
-		}
-	}
+    /**
+     * retrieves all events from the server
+     *
+     * @return all the events from the server
+     */
+    public List<Event> retrieveAllEvents() {
+        List<Event> events = ClientBuilder.newClient(new ClientConfig())
+                .target(serverURL).path("api/events/all")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(new GenericType<List<Event>>() {
+                });
+        return events;
+    }
 
-	/**
-	 * delete all the events in the database
-	 */
-	public void deleteAllEvents(){
-		Response response = ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/delete/all")
-				.request(APPLICATION_JSON)
-				.accept(APPLICATION_JSON)
-				.delete();
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-			System.out.println("All events deleted successfully.");
-		} else {
-			System.out.println("Failed to delete all events. Status code: " + response.getStatus());
-		}
-	}
+    /**
+     * Sends an event to be added to the database
+     *
+     * @param event the event to be added
+     * @return the event added
+     */
+    public Event addEvent(Event event) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(serverURL).path("api/events/")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .put(Entity.entity(event, APPLICATION_JSON), Event.class);
+    }
 
-	/**
-	 * this adds a tag to an event, connecting the front-end with the back-end
-	 * @param eventId the ID of the event to which we add the tag
-	 * @param tagName the tag name of the tag we want to add
-	 * @param colorCode the color code of the tag that we want to add
-	 */
-	public void addTagToEvent(String eventId, String tagName, String colorCode){
-		Entity<String> entity = Entity.entity(colorCode, APPLICATION_JSON);
-		Response response = ClientBuilder.newClient()
-				.target(serverURL)
-				.path("api/events/" + eventId + "/tag/" + tagName )
-				.request(APPLICATION_JSON)
-				.post(entity);
-		if(response.getStatus() == Response.Status.CREATED.getStatusCode())
-			System.out.println("Tag added successfully");
-		else
-			System.out.println("Tag was not added");
-	}
+    /**
+     * delete an event using it's ID
+     *
+     * @param eventId the id of the event we want to delete
+     */
+    public void deleteEvent(String eventId) {
+        Response response = ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/remove/" + eventId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            System.out.println("Event deleted successfully.");
+        } else {
+            System.out.println("Failed to delete event. Status code: " + response.getStatus());
+        }
+    }
+
+    /**
+     * delete all the events in the database
+     */
+    public void deleteAllEvents() {
+        Response response = ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/delete/all")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            System.out.println("All events deleted successfully.");
+        } else {
+            System.out.println("Failed to delete all events. Status code: " + response.getStatus());
+        }
+    }
+
+    /**
+     * this adds a tag to an event, connecting the front-end with the back-end
+     *
+     * @param eventId   the ID of the event to which we add the tag
+     * @param tagName   the tag name of the tag we want to add
+     * @param colorCode the color code of the tag that we want to add
+     */
+    public void addTagToEvent(String eventId, String tagName, String colorCode) {
+        Entity<String> entity = Entity.entity(colorCode, APPLICATION_JSON);
+        Response response = ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + eventId + "/tag/" + tagName)
+                .request(APPLICATION_JSON)
+                .post(entity);
+        if (response.getStatus() == Response.Status.CREATED.getStatusCode())
+            System.out.println("Tag added successfully");
+        else
+            System.out.println("Tag was not added");
+    }
 }

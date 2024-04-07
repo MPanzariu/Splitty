@@ -17,6 +17,11 @@ public class LanguageIndicatorCtrl {
     private final Translation translation;
     private final LanguageSwitchUtils utils;
 
+    /**
+     * Constructor for the LanguageIndicatorCtrl
+     * @param translation - the translation to use
+     * @param utils - the language switch utils to use
+     */
     @Inject
     public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils) {
         this.translation = translation;

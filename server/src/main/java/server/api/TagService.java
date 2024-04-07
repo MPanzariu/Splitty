@@ -17,6 +17,13 @@ public class TagService {
     private final EventRepository eventRepository;
     private final ExpenseRepository expenseRepository;
     private final TagRepository tagRepository;
+
+    /**
+     * Constructor
+     * @param eventRepository EventRepository to use
+     * @param expenseRepository  ExpenseRepository to use
+     * @param tagRepository TagRepository to use
+     */
     @Autowired
     public TagService(EventRepository eventRepository,
                       ExpenseRepository expenseRepository, TagRepository tagRepository){
@@ -25,6 +32,12 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
+    /**
+     * Adds a tag to an event
+     * @param eventId id of the event to add the tag to
+     * @param tagName name of the tag
+     * @param colorCode color code of the tag
+     */
     public void addTagToEvent(String eventId, String tagName, String colorCode){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
@@ -32,6 +45,12 @@ public class TagService {
         event.addTag(tag);
         eventRepository.save(event);
     }
+
+    /**
+     * Removes a tag from an event
+     * @param eventId id of the event to remove the tag from
+     * @param tagId id of the tag to remove
+     */
     public void removeTag(String eventId, Long tagId){
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new EntityNotFoundException("Tag not found"));

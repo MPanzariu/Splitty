@@ -23,7 +23,11 @@ public class ManagementOverviewUtils {
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty lastActivity = new SimpleStringProperty();
 
-
+    /**
+     * Constructor
+     * @param translation Translation to use
+     * @param server    ServerUtils to use
+     */
     @Inject
     public ManagementOverviewUtils(Translation translation, ServerUtils server) {
         this.translation = translation;
@@ -121,6 +125,10 @@ public class ManagementOverviewUtils {
         return FXCollections.observableArrayList(event.getExpenses());
     }
 
+    /**
+     * Get the list of events for the management overview
+     * @return the list of events
+     */
     public ObservableList<Event> getEvents() {
         return events;
     }

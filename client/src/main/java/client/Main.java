@@ -31,10 +31,22 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
+    /**
+     * Main method
+     * @param args Command line arguments
+     * @throws URISyntaxException URISyntaxException
+     * @throws IOException IOException
+     */
+
     public static void main(String[] args) throws URISyntaxException, IOException {
         launch();
     }
 
+    /**
+     * Start method
+     * @param primaryStage the primary stage for this application
+     * @throws IOException IOException
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
         var startUp = FXML.load(StartupScreenCtrl.class, "client", "scenes", "StartupScreen.fxml");
