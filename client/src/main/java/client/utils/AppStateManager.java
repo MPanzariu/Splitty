@@ -13,6 +13,7 @@ import java.util.*;
 public class AppStateManager {
     private final WebSocketUtils socketUtils;
     private final ServerUtils server;
+    private final LPUtils lpUtils;
     private StompSession.Subscription currentClientSubscription;
     private HashMap<Class<?>, ScreenInfo> screenInfoMap;
     private ScreenInfo currentlyOpen;
@@ -25,9 +26,10 @@ public class AppStateManager {
      * Constructor for the AppStateManager
      * @param socketUtils the WebSocketUtils to use
      * @param server the ServerUtils to use
+     * @param lpUtils the Long Polling utils to use
      */
     @Inject
-    public AppStateManager(WebSocketUtils socketUtils, ServerUtils server) {
+    public AppStateManager(WebSocketUtils socketUtils, ServerUtils server, LPUtils lpUtils) {
         this.socketUtils = socketUtils;
         socketUtils.startConnection();
         this.server = server;
@@ -36,6 +38,7 @@ public class AppStateManager {
         this.event = null;
         this.relevantEvents = new HashSet<>(5);
         this.onCurrentEventDeletedCallback = null;
+        this.lpUtils = lpUtils;
     }
 
     /***
@@ -95,7 +98,7 @@ public class AppStateManager {
      */
     public void subscribeToUpdates(){
         socketUtils.registerForMessages(this::onDeletion, "/topic/events/deletions", EventDeletedDTO.class);
-        socketUtils.registerForMessages(this::onNameChange, "/topic/events/names", EventNameChangeDTO.class);
+        lpUtils.registerForNameUpdates(this::onNameChange);
     }
 
     /***
@@ -153,5 +156,12 @@ public class AppStateManager {
             String eventName = dto.getNewTitle();
             startupScreen.addToHistory(eventId, eventName);
         }
+    }
+
+    /***
+     * Runs when the application stops, in order to shut down the Long Polling thread
+     */
+    public void onStop(){
+        lpUtils.stopLP();
     }
 }
