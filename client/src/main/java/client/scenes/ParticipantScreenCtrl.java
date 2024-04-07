@@ -18,8 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
-    static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
-    static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
+    private static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
+    private static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -152,12 +152,19 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                     }
                 }
             }
-            else
-            if (checkParticipantName(newValue)) {
+            else if (checkParticipantName(newValue)) {
                 noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
                 noName.setStyle("-fx-fill: #ff7200;");
             }
         });
+        bindFieldsToEnter();
+    }
+
+    /**
+     * Binds the nameField, emailField, bicField, ibanField and holderField to the Enter key
+     */
+
+    private void bindFieldsToEnter() {
         nameField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 if(nameField.getText()==null || nameField.getText().isEmpty())
@@ -209,18 +216,18 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         }
         else{
             if(participant.getEmail().equals("wrongEmail")){
-               noEmail.textProperty()
+                noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
-          }
+            }
         }
         if(participant.getIban().equals("wrongIban")) {
-                wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
-                ok = false;
+            wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
+            ok = false;
         }
         if(participant.getBic().equals("wrongBic")){
-                wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
-                ok = false;
+            wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
+            ok = false;
         }
         if(ok){
             if(participantId == 0){
@@ -294,7 +301,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setIban(iban);
             else{
                 participant.setIban("wrongIban");
-            System.out.println("wrongIban");
+                System.out.println("wrongIban");
             }
         }
         String bic = bicField.getText();
@@ -381,6 +388,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         Matcher matcher = ibanPattern.matcher(iban);
         return matcher.matches();
     }
+
+    /**
+     * checks if the participant name is already in the list of participants
+     * @param name the value inserted by the user
+     * @return true if the value is correct, false otherwise
+     */
     public boolean checkParticipantName(String name){
         Set<Participant> participantList = event.getParticipants();
         for(Participant participant: participantList)
@@ -389,9 +402,20 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         return false;
     }
+
+    /**
+     * Setter for participantId
+     * @param id id of the participant
+     */
     public void saveId(Long id){
         participantId = id;
     }
+
+    /**
+     * Gets a participant based on id
+     * @param id id of the participant
+     * @return the participant
+     */
     public Participant findById(long id){
         Set<Participant> participantList = event.getParticipants();
         Participant participantF = null;
