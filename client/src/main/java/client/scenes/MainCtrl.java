@@ -132,6 +132,7 @@ public class MainCtrl {
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
 
+        primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.subscribeToUpdates();
         //This can also show a pop-up in the future, but right now it doesn't
