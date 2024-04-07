@@ -44,6 +44,9 @@ public class TransferMoneyUtils {
         this.server = server;
     }
 
+    /**
+     * Initialize the receiving participant combo box.
+     */
     public void initializeFrom() {
         fromAction.setValue(event -> {
             isFromErrorVisible.set(false);
@@ -51,6 +54,9 @@ public class TransferMoneyUtils {
         });
     }
 
+    /**
+     * Initialize the sending participant combo box.
+     */
     public void initializeTo() {
         toAction.setValue(event -> {
             isToErrorVisible.set(false);
@@ -58,6 +64,10 @@ public class TransferMoneyUtils {
         });
     }
 
+    /**
+     * Process the user input and check whether errors should be toggled on.
+     * @return True iff there are errors
+     */
     public boolean hasErrors() {
         if(from.getValue() == null || to.getValue() == null) {
             isFromErrorVisible.set(from.getValue() == null);
@@ -70,10 +80,18 @@ public class TransferMoneyUtils {
         return isFromErrorVisible.get() || isToErrorVisible.get() || isAmountErrorVisible.get();
     }
 
+    /**
+     * Check if sending and receiving party are the same
+     * @return True iff participants are equal
+     */
     public boolean hasInvalidParticipants() {
         return from.get().equals(to.get());
     }
 
+    /**
+     * Checks whether the given amount for money transfer can be interpreted as a monetary value.
+     * @return True iff the amount is invalid
+     */
     private boolean isAmountInvalid() {
         try {
             BigDecimal b = new BigDecimal(amount.getValue());
@@ -96,6 +114,10 @@ public class TransferMoneyUtils {
         server.addExpense(event.getId(), transfer);
     }
 
+    /**
+     * Refresh the screen
+     * @param event New event
+     */
     public void refresh(Event event) {
         this.event = event;
         participants.setAll(event.getParticipants());
