@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.util.*;
 
@@ -81,13 +80,21 @@ public class ManagementOverviewUtils {
      * @param event the new edited event
      */
     public void onEditEvent(Event event){
+        editEvent(event, event.getId());
+    }
+
+    /***
+     * Executes event editing
+     * @param event the new edited event
+     * @param eventId the ID of the event
+     */
+    public void editEvent(Event event, String eventId){
         /*
          * The workaround exists for cases where there is only one event, and it is edited/removed
          * This does not work well with the current implementation of the ListView and Selection methods
          * Thus, a second Event has to be added, and then immediately removed after
          */
         Event workaroundEvent = new Event();
-        String eventId = event.getId();
         Event currentEvent = eventLookup.get(eventId);
         int index = events.indexOf(currentEvent);
         if(index != -1){

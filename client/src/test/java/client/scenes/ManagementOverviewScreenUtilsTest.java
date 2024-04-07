@@ -7,6 +7,7 @@ import client.utils.WebSocketUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.dto.EventDeletedDTO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -17,8 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ManagementOverviewScreenUtilsTest {
@@ -56,6 +56,49 @@ public class ManagementOverviewScreenUtilsTest {
         utils.bindTitle(title);
         utils.bindCreationDate(creationDate);
         utils.bindLastActivity(lastActivity);
+    }
+
+    @Test
+    public void creationTest(){
+        when(server.retrieveAllEvents()).thenReturn(List.of(e1, e2));
+        utils.retrieveEvents();
+        ObservableList<Event> events = utils.getEvents();
+        assertEquals(2, events.size());
+
+        utils.onCreateEvent(e3);
+        assertEquals(3, events.size());
+    }
+
+    @Test
+    public void editingTest(){
+        String eventId = e2.getId();
+        Event newE2 = new Event("Different title!", new Date(123));
+        when(server.retrieveAllEvents()).thenReturn(List.of(e1, e2, e3));
+        utils.retrieveEvents();
+        ObservableList<Event> events = utils.getEvents();
+
+        utils.editEvent(newE2, eventId);
+        assertFalse(events.contains(e2));
+        assertTrue(events.contains(newE2));
+        assertEquals(events.size(), 3);
+    }
+
+    @Test
+    public void deletionTest(){
+        String eventId = e2.getId();
+        when(server.retrieveAllEvents()).thenReturn(List.of(e1, e2, e3));
+        utils.retrieveEvents();
+        ObservableList<Event> events = utils.getEvents();
+
+        utils.onDeleteEvent(new EventDeletedDTO(eventId));
+        assertFalse(events.contains(e2));
+        assertEquals(events.size(), 2);
+    }
+
+    @Test
+    public void subscriptionTest(){
+        utils.subscribeToUpdates();
+        verify(socketUtils, times(3)).registerForMessages(any(), any(), any());
     }
 
     /**
