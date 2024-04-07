@@ -104,16 +104,25 @@ public class TransferMoneyUtils {
     }
 
     /**
+     * Sends the money to the receiver.
+     */
+    public void send() {
+        Transfer transfer = new Transfer(from.get(), Integer.parseInt(amount.get()), to.get());
+        transferMoney(transfer);
+    }
+
+    /**
      * Creates an expense for the money transfer which is sent to the backend.
      * If A transfer an X amount of money to B, then the expense will be modelled as A owes -X to B.
      * This allows the client to recognize this expense as a money transfer.
+     * This method is here for re-use in marking debts as settled as well.
      */
-    public void transferMoney() {
-        Expense transfer = new Expense("Money Transfer", Integer.parseInt(amount.get()) * -100,
-                new Date(), to.get());
-        transfer.addParticipantToExpense(from.get());
-        transfer.setExpenseTag((Tag) event.getEventTags().stream().filter(tag -> tag.getTagName().equals("money transfer")).toArray()[0]);
-        server.addExpense(event.getId(), transfer);
+    public Expense transferMoney(Transfer transfer) {
+        Expense expense = new Expense("Money Transfer", transfer.amount() * -100,
+                new Date(), transfer.receiver());
+        expense.addParticipantToExpense(from.get());
+        expense.setExpenseTag((Tag) event.getEventTags().stream().filter(tag -> tag.getTagName().equals("money transfer")).toArray()[0]);
+        return server.addExpense(event.getId(), expense);
     }
 
     /**

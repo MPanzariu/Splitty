@@ -8,8 +8,6 @@ import commons.Event;
 import commons.Participant;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -128,8 +126,8 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
             Alert alert = new Alert(Alert.AlertType.ERROR, sameParticipants.getValue());
             alert.showAndWait();
         } else {
+            utils.send();
             ctrl.switchScreens(EventScreenCtrl.class);
-            utils.transferMoney();
         }
     }
 
