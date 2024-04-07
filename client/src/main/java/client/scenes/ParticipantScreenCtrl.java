@@ -209,11 +209,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                     .bind(translation.getStringBinding("Participants.Label.noName"));
             ok = false;
         }
-        if(participant.getEmail().equals("empty")){
-            noEmail.textProperty()
-                    .bind(translation.getStringBinding("Participants.Label.noEmail"));
-            ok = false;
-        }
         else{
             if(participant.getEmail().equals("wrongEmail")){
                 noEmail.textProperty()
@@ -248,7 +243,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void cancel() {
         clearFields();
-        mainCtrl.switchScreens(EventScreenCtrl.class);
+        mainCtrl.swuitchToEventFromEditParticipant();
     }
 
     /**
