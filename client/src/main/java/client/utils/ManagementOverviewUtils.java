@@ -4,24 +4,27 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.dto.EventDeletedDTO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.Comparator;
+import java.util.*;
 
 public class ManagementOverviewUtils {
 
     private final Translation translation;
     private final ServerUtils server;
     private final ObservableList<Event> events = FXCollections.observableArrayList();
+    private final Map<String, Event> eventLookup = new HashMap<>();
     private final SimpleStringProperty ascending = new SimpleStringProperty();
     private final SimpleStringProperty descending = new SimpleStringProperty();
     private final StringProperty order = new SimpleStringProperty();
     private final StringProperty title = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty lastActivity = new SimpleStringProperty();
+    private final WebSocketUtils socketUtils;
 
     /**
      * Constructor
@@ -29,9 +32,10 @@ public class ManagementOverviewUtils {
      * @param server    ServerUtils to use
      */
     @Inject
-    public ManagementOverviewUtils(Translation translation, ServerUtils server) {
+    public ManagementOverviewUtils(Translation translation, ServerUtils server, WebSocketUtils socketUtils) {
         this.translation = translation;
         this.server = server;
+        this.socketUtils = socketUtils;
     }
 
     /**
@@ -50,9 +54,91 @@ public class ManagementOverviewUtils {
      * @return ObservableList of all events sorted by their title in ascending order.
      */
     public ObservableList<Event> retrieveEvents() {
-        events.setAll(server.retrieveAllEvents());
+        var allEvents = server.retrieveAllEvents();
+        events.setAll(allEvents);
         events.sort(Comparator.comparing(event -> event.getTitle().toLowerCase()));
+        allEvents.forEach(event -> eventLookup.put(event.getId(), event));
         return events;
+    }
+
+    /***
+     * Initiates subscriptions to relevant endpoints
+     */
+    public void subscribeToUpdates(){
+        socketUtils.registerForMessages(this::onCreateEvent, "/topic/events/creations", Event.class);
+        socketUtils.registerForMessages(this::onEditEvent, "/topic/events/all", Event.class);
+        socketUtils.registerForMessages(this::onDeleteEvent, "/topic/events/deletions", EventDeletedDTO.class);
+    }
+
+    /***
+     * Ran when an event is created
+     * @param event the created event
+     */
+    public void onCreateEvent(Event event){
+        events.add(event);
+        eventLookup.put(event.getId(), event);
+    }
+
+    /***
+     * Ran when an event is edited
+     * @param event the new edited event
+     */
+    public void onEditEvent(Event event){
+        editEvent(event, event.getId());
+    }
+
+    /***
+     * Executes event editing
+     * @param event the new edited event
+     * @param eventId the ID of the event
+     */
+    public void editEvent(Event event, String eventId){
+        /*
+         * The workaround exists for cases where there is only one event, and it is edited/removed
+         * This does not work well with the current implementation of the ListView and Selection methods
+         * Thus, a second Event has to be added, and then immediately removed after
+         */
+        Event workaroundEvent = new Event();
+        Event currentEvent = eventLookup.get(eventId);
+        int index = events.indexOf(currentEvent);
+        if(index != -1){
+            events.add(workaroundEvent);
+            events.set(index, event);
+            eventLookup.put(eventId, event);
+            events.remove(workaroundEvent);
+        }
+    }
+
+    /***
+     * Ran when an event is deleted
+     * @param dto an EventDeletedDTO containing the ID of the deleted event
+     */
+    public void onDeleteEvent(EventDeletedDTO dto){
+        /*
+         * The workaround exists for cases where there is only one event, and it is edited/removed
+         * This does not work well with the current implementation of the ListView and Selection methods
+         * Thus, a second Event has to be added, and then immediately removed after
+         */
+        Event workaroundEvent = new Event();
+        String eventId = dto.getEventId();
+        Event currentEvent = eventLookup.get(eventId);
+        int index = events.indexOf(currentEvent);
+        if(index != -1){
+            events.add(workaroundEvent);
+            events.set(index, new Event());
+            events.remove(index);
+            eventLookup.remove(eventId);
+            events.remove(workaroundEvent);
+        }
+    }
+
+    /***
+     * Checks if an event with the given ID already exists
+     * @param eventId the ID of the event to check
+     * @return true if the event already exists, false otherwise
+     */
+    public boolean checkIfDuplicate(String eventId){
+        return eventLookup.containsKey(eventId);
     }
 
     /**
@@ -113,7 +199,8 @@ public class ManagementOverviewUtils {
      * @return Observable list of the selects event's participant
      */
     public ObservableList<Participant> initializeParticipantsList(Event event) {
-        return FXCollections.observableArrayList(event.getParticipants());
+        if(event != null && event.getParticipants() != null) return FXCollections.observableArrayList(event.getParticipants());
+        else return FXCollections.observableArrayList();
     }
 
     /**
@@ -122,7 +209,8 @@ public class ManagementOverviewUtils {
      * @return Observable list of the event's expenses
      */
     public ObservableList<Expense> initializeExpenseList(Event event) {
-        return FXCollections.observableArrayList(event.getExpenses());
+        if(event != null && event.getExpenses() != null) return FXCollections.observableArrayList(event.getExpenses());
+        else return FXCollections.observableArrayList();
     }
 
     /**

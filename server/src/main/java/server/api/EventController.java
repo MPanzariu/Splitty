@@ -70,6 +70,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.createEvent(eventName);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 
@@ -168,6 +169,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.saveEvent(event);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 
