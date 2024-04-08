@@ -24,6 +24,7 @@ public class EmailHandler {
 
     /**
      * Constructor
+     * @param translation Translation object
      */
     @Inject
     public EmailHandler(Translation translation) {

@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
     @FXML
-    public Button goBackButton;
+    private Button goBackButton;
     @FXML
     private Label titleLabel;
     @FXML
@@ -110,6 +110,9 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkEmail (String email){
+        if (email == null || email.isEmpty()){
+            return false;
+        }
         String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailLike);
         Matcher matcher = emailPattern.matcher(email);
@@ -166,24 +169,42 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
         this.event = event;
     }
 
-
+    /**
+     * Sets the name text field
+     * @param nameTextField the textField to set it to
+     */
     public void setNameTextField(TextField nameTextField) {
         this.nameTextField = nameTextField;
     }
 
-
+    /**
+     * Sets the email text field
+     * @param emailTextField the textField to set it to
+     */
     public void setEmailTextField(TextField emailTextField) {
         this.emailTextField = emailTextField;
     }
 
+    /**
+     * Sets the invite button
+     * @param inviteButton the button to set it to
+     */
     public void setInviteButton(Button inviteButton) {
         this.inviteButton = inviteButton;
     }
 
+    /**
+     * Sets the name feedback label
+     * @param nameFeedbackLabel the label to set it to
+     */
     public void setNameFeedbackLabel(Label nameFeedbackLabel) {
         this.nameFeedbackLabel = nameFeedbackLabel;
     }
 
+    /**
+     * Sets the email feedback label
+     * @param emailFeedbackLabel the label to set it to
+     */
     public void setEmailFeedbackLabel(Label emailFeedbackLabel) {
         this.emailFeedbackLabel = emailFeedbackLabel;
     }

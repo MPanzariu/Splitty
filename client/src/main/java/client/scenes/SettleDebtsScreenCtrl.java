@@ -4,14 +4,12 @@ import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -51,6 +49,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation the translation to use
      * @param utils the server utilities to use
      * @param imageUtils the image utilities to use
+     * @param emailHandler the email handler to use
      */
     @Inject
     public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,
@@ -152,6 +151,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param expandButton the Expand Details button
      * @param transferLabel the Label detailing who should send money to who
      * @param settleButton the Mark Received button
+     * @param emailInstructionsButton the Send Email Instructions button
      * @return an HBox containing all given elements, plus the correct spacing
      */
     public HBox generateTransferDetailsBox(Button expandButton, Label transferLabel, Button settleButton, Button emailInstructionsButton){
@@ -220,11 +220,13 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
 
     /**
      * Generates a button for sending payment requests via email
+     * @param transfer the transfer to send the email for
+     * @return a button that sends an email with payment instructions
      */
     public Button generateSendEmailButton(Transfer transfer) {
         Button button = new Button();
         button.textProperty().bind
-                (translation.getStringBinding("SettleDebts.Button.sendEmailInstructions"));
+            (translation.getStringBinding("SettleDebts.Button.sendEmailInstructions"));
         Styling.applyStyling(button, "positiveButton");
         if (transfer.sender().getEmail().isEmpty() || !emailHandler.isConfigured()){
             Styling.applyStyling(button, "disabledButton");

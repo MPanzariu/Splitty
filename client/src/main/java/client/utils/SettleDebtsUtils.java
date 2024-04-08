@@ -25,6 +25,7 @@ public class SettleDebtsUtils {
      * Constructor for the utility class for the SettleDebts screen
      * @param translation - the translation to use
      * @param server - the severUtils to use
+     * @param emailHandler - the emailHandler to use
      */
     @Inject
     public SettleDebtsUtils(Translation translation, ServerUtils server, EmailHandler emailHandler) {
@@ -194,6 +195,7 @@ public class SettleDebtsUtils {
 
     /**
      * Sends the email to the participant to pay
+     * @param transfer the transfer to send the email for
      */
     public void sendEmailTransferEmail(Transfer transfer) {
         String emailBody = generateEmailBody(transfer);
