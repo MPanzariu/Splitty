@@ -1,6 +1,7 @@
 package client.utils;
 
 import commons.Participant;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -351,12 +353,34 @@ class SettleDebtsUtilsTest {
     }
 
     @Test
-    void sendEmailTransferTest(){
+    void sendEmailTransferTestSuccess(){
         when(emailHandler.sendEmail(any(), any(), any())).thenReturn(true);
         Participant sender = new Participant("Sender");
         Participant receiver = new Participant("Receiver");
         Transfer t = new Transfer(sender, 10,receiver);
         sut.sendEmailTransferEmail(t);
+        waitForJavaFX();
         verify(emailHandler, times(1)).showSuccessPrompt();
+    }
+
+    @Test
+    void sendEmailTransferTestFail(){
+        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(false);
+        Participant sender = new Participant("Sender");
+        Participant receiver = new Participant("Receiver");
+        Transfer t = new Transfer(sender, 10,receiver);
+        sut.sendEmailTransferEmail(t);
+        waitForJavaFX();
+        verify(emailHandler, times(1)).showFailPrompt();
+    }
+
+    private void waitForJavaFX() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(latch::countDown);
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
