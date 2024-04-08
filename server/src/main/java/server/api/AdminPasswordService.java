@@ -13,6 +13,10 @@ public class AdminPasswordService {
     static final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
     static final int passwordLength = 20;
     private String password = "";
+
+    /***
+     * Constructor for object mappers
+     */
     public AdminPasswordService(){}
 
     /**

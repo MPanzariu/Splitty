@@ -18,6 +18,12 @@ public class LanguageSwitchUtils {
     private final File dir;
     private final Properties properties;
 
+    /**
+     * Constructor
+     * @param translation
+     * @param dir
+     * @param properties
+     */
     @Inject
     public LanguageSwitchUtils(Translation translation, @Named("dir") File dir,
                                @Named("config") Properties properties) {
@@ -70,10 +76,18 @@ public class LanguageSwitchUtils {
         }
     }
 
+    /**
+     * Getter for the list of languages.
+     * @return List of languages
+     */
     public ObservableList<Locale> getLanguages() {
         return languages;
     }
 
+    /**
+     * Setter for the list of languages.
+     * @param languages List of languages
+     */
     public void setLanguages(Locale... languages) {
         this.languages.setAll(languages);
     }

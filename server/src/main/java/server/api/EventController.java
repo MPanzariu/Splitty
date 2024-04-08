@@ -1,5 +1,6 @@
 package server.api;
 import commons.Event;
+import commons.dto.EventNameChangeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
+    private final LPController lpController;
     private EventRepository repository;
     private final WebSocketService socketService;
     /**
@@ -23,13 +25,15 @@ public class EventController {
      * @param eventService  the EventService used for backend handling of events
      * @param repository    the EventRepository storing Events
      * @param socketService the WebSocketService propagating updates
+     * @param lpController  the Long Polling controller to use to propagate name changes
      */
     @Autowired
     public EventController(EventService eventService, EventRepository repository,
-                           WebSocketService socketService) {
+                           WebSocketService socketService, LPController lpController) {
         this.eventService = eventService;
         this.repository = repository;
         this.socketService = socketService;
+        this.lpController = lpController;
     }
 
     /**
@@ -43,7 +47,8 @@ public class EventController {
                                            @RequestBody String newTitle){
         Event updatedEvent = eventService.editTitle(eventId, newTitle);
         socketService.propagateEventUpdate(eventId);
-        socketService.propagateNameChange(eventId, updatedEvent.getTitle());
+        EventNameChangeDTO dto = new EventNameChangeDTO(eventId, updatedEvent.getTitle());
+        lpController.propagateToAllListeners(dto);
         return ResponseEntity.ok(updatedEvent);
     }
 
@@ -70,6 +75,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.createEvent(eventName);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 
@@ -168,6 +174,7 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
         Event createdEvent = eventService.saveEvent(event);
+        socketService.propagateCreation(createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
 

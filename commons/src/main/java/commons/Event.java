@@ -271,15 +271,34 @@ public class Event{
         return expenses;
     }
 
+    /**
+     * Returns the tags of the event
+     * @return  the tags of the event
+     */
     public Set<Tag> getEventTags() {
         return eventTags;
     }
+
+    /**
+     * Sets the tags of the event
+     * @param eventTags the tags of the event to set it to
+     */
     public void setEventTags(Set<Tag> eventTags) {
         this.eventTags = eventTags;
     }
+
+    /**
+     * Adds a tag to the event
+     * @param eventTag the tag to add
+     */
     public void addTag(Tag eventTag){
         this.eventTags.add(eventTag);
     }
+
+    /**
+     * Removes a tag from the event
+     * @param tag the tag to remove
+     */
     public void removeTag(Tag tag){
         this.eventTags.remove(tag);
     }
@@ -291,6 +310,11 @@ public class Event{
     public Date getLastActivity(){
         return lastActivity;
     }
+
+    /**
+     * Sets the last activity of the event
+     * @param lastActivity the last activity of the event
+     */
     public void setLastActivity(Date lastActivity) {
         this.lastActivity = lastActivity;
     }

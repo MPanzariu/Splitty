@@ -31,6 +31,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private final Translation translation;
     private final ManagementOverviewUtils utils;
     private final ImageUtils imageUtils;
+    private boolean listWasInitialized = false;
     /**
      * Constructor
      *
@@ -74,13 +75,14 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * keep the selected events in a hash-map
      */
     public void initializeEventsCheckList() {
+        if(listWasInitialized) return;
         checkEventsListView.setItems(utils.retrieveEvents());
         checkEventsListView.setCellFactory(listView -> new ListCell<>() {
             private final CheckBox checkBox = new CheckBox();
             @Override
             protected void updateItem(Event event, boolean empty) {
                 super.updateItem(event, empty);
-                if (empty || event == null) {
+                if (empty || event == null || event.getId() == null) {
                     setText(null);
                     setGraphic(null);
                 } else {

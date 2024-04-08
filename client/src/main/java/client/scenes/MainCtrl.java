@@ -35,12 +35,34 @@ public class MainCtrl {
     private String language;
     private final AppStateManager manager;
 
+    /**
+     * Constructor
+     * @param translation the translation
+     * @param manager the app state manager
+     */
     @Inject
     public MainCtrl(Translation translation, AppStateManager manager) {
         this.translation = translation;
         this.manager = manager;
     }
 
+    /**
+     * Initialize the main controller
+     * @param primaryStage the primary stage
+     * @param overview the startup screen
+     * @param eventUI the event screen
+     * @param expenseUI the expense screen
+     * @param participantUI the participant screen
+     * @param editTitlePair the edit title pair
+     * @param managementOverviewPasswordUI the management overview password UI
+     * @param managementOverviewScreenUI the management overview screen UI
+     * @param settleDebtsUI the settle debts UI
+     * @param deleteEventsScreenUI the delete events screen UI
+     * @param participantListUI the participant list UI
+     * @param addTagUI the add tag UI
+     * @param emailInviteUI the email invite UI
+     * @param statisticsScreenUI the statistics screen UI
+     */
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
                            Pair<ExpenseScreenCtrl, Parent> expenseUI,
@@ -110,6 +132,7 @@ public class MainCtrl {
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
 
+        primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.subscribeToUpdates();
         //This can also show a pop-up in the future, but right now it doesn't
@@ -156,20 +179,32 @@ public class MainCtrl {
         return eventScene;
     }
 
+    /**
+     * Gets the ExpenseScreen
+     * @return the Expense screen
+     */
     public Scene getParticipantScene(){
         return participantScene;
     }
 
+    /**
+     * Switches to the edit expense screen
+     * @param expenseId  the expense id of the expense to edit
+     */
     public void switchToEditExpense(long expenseId) {
         switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.setExpense(expenseId);
     }
 
+    /**
+     * Switches to the edit participant screen
+     * @param participantId the participant id of the participant to edit
+     */
     public void switchToEditParticipant(long participantId) {
+        participantScreenCtrl.saveId(participantId);
         switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
     }
-
     /**
      * switch to the login page for the management overview
      */
@@ -187,6 +222,9 @@ public class MainCtrl {
         managementOverviewScreenCtrl.initializeAllEvents();
     }
 
+    /**
+     * Switches to the settle debts screen
+     */
     public void switchToDeleteEventsScreen(){
         primaryStage.setScene(deleteEventsScene);
         primaryStage.titleProperty().bind(translation.getStringBinding("DES.Window.title"));
