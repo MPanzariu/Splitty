@@ -108,7 +108,7 @@ public class TransferMoneyUtils {
      */
     public void send() {
         Transfer transfer = new Transfer(from.get(), Integer.parseInt(amount.get()), to.get());
-        transferMoney(transfer);
+        server.addExpense(event.getId(), transferMoney(transfer));
     }
 
     /**
@@ -122,7 +122,7 @@ public class TransferMoneyUtils {
                 new Date(), transfer.receiver());
         expense.addParticipantToExpense(from.get());
         expense.setExpenseTag((Tag) event.getEventTags().stream().filter(tag -> tag.getTagName().equals("money transfer")).toArray()[0]);
-        return server.addExpense(event.getId(), expense);
+        return expense;
     }
 
     /**
