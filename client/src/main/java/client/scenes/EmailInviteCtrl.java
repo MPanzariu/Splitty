@@ -11,8 +11,12 @@ import javafx.scene.control.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
+    @FXML
+    public Button goBackButton;
     @FXML
     private Label titleLabel;
     @FXML
@@ -36,7 +40,6 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
     private MainCtrl mainCtrl;
     private EmailHandler emailHandler;
     private Event event;
-    private ConfigUtils configUtils;
 
     /**
      * Constructor
@@ -44,15 +47,13 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
      * @param server the server to use
      * @param mainCtrl the main controller
      * @param emailHandler the email handler to use
-     * @param configUtils the configUtils
      */
     @Inject
-    public EmailInviteCtrl(Translation translation, ServerUtils server, MainCtrl mainCtrl, EmailHandler emailHandler, ConfigUtils configUtils) {
+    public EmailInviteCtrl(Translation translation, ServerUtils server, MainCtrl mainCtrl, EmailHandler emailHandler) {
         this.translation = translation;
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.emailHandler = emailHandler;
-        this.configUtils = configUtils;
     }
 
     /**
@@ -90,17 +91,34 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
         } else {
             nameFeedbackLabel.textProperty().bind(translation.getStringBinding("Empty"));
         }
-        if (email.isEmpty()) {
+        if (email.isEmpty() || !checkEmail(email)){
             emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Email.EmailFeedbackLabel"));
         } else {
             emailFeedbackLabel.textProperty().bind(translation.getStringBinding("Empty"));
         }
-        if (!name.isEmpty() && !email.isEmpty()) {
+        if (!name.isEmpty() && !email.isEmpty() && checkEmail(email)) {
             Thread emailThread = setupEmailThread(email, participant);
             emailThread.start();
             clearFields();
             mainCtrl.switchScreens(EventScreenCtrl.class);
         }
+    }
+
+    /**
+     * checks if the inserted email has an appropriate pattern
+     * @param email the value inserted by the user
+     * @return true if the value is correct, false otherwise
+     */
+    public boolean checkEmail (String email){
+        String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern emailPattern = Pattern.compile(emailLike);
+        Matcher matcher = emailPattern.matcher(email);
+        if (matcher.matches()) {
+            return true;
+        } else {
+            System.out.println("Invalid Email");
+        }
+        return false;
     }
 
     /**

@@ -19,7 +19,6 @@ class EmailInviteCtrlTest {
     private Translation translation;
     private ServerUtils serverUtils;
     private EmailHandler emailHandler;
-    private ConfigUtils configUtils;
     private MainCtrl mainCtrl;
 
     @BeforeEach
@@ -27,9 +26,8 @@ class EmailInviteCtrlTest {
         translation = mock(Translation.class);
         emailHandler = mock(EmailHandler.class);
         serverUtils = mock(ServerUtils.class);
-        configUtils = mock(ConfigUtils.class);
         mainCtrl = mock(MainCtrl.class);
-        emailInviteCtrl = new EmailInviteCtrl(translation,serverUtils,mainCtrl,emailHandler,configUtils);
+        emailInviteCtrl = new EmailInviteCtrl(translation,serverUtils,mainCtrl,emailHandler);
 
     }
 
