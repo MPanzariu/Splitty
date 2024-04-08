@@ -89,10 +89,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      * it sets the label holding the cost of the entire event with the sum of expenses inside the event
      */
     public void setTotalSumOfExpenses(){
-        float sum = 0;
-        for(Expense expense : event.getExpenses()){
-            sum+=expense.getPriceInCents();
-        }
+        float sum = event.getTotalSpending();
         sum/=100;
         String euro = "\u20ac";
         expenseSumLabel.setText(String.valueOf(sum) + euro);
@@ -107,6 +104,8 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
         Map<String, String> tagColorMap = new HashMap<>();
         Set<Expense> expenses = event.getExpenses();
         for (Expense expense : expenses) {
+            if(expense.getExpenseTag().getTagName().equals("money transfer"))
+                continue;
             String tagName = expense.getExpenseTag().getTagName();
             int expensePrice = expense.getPriceInCents();
             String colorCode = expense.getExpenseTag().getColorCode();

@@ -288,6 +288,23 @@ public class EventTest {
     }
 
     @Test
+    public void sumExpensesWithNegatives() {
+        Expense expense1 = new Expense();
+        expense1.setPriceInCents(100);
+        event.addExpense(expense1);
+
+        Expense expense2 = new Expense();
+        expense2.setPriceInCents(200);
+        event.addExpense(expense2);
+
+        Expense expense3 = new Expense();
+        expense3.setPriceInCents(-100);
+        event.addExpense(expense3);
+
+        assertEquals(300, event.getTotalSpending());
+    }
+
+    @Test
     public void noExpenseTest(){
         var result = event.getTotalSpending();
         assertEquals(0, result);
