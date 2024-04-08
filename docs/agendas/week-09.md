@@ -24,7 +24,7 @@ Agenda Items:
   6. Code deadline **(3 min)**
      - How to deal with problematic MRs just before the deadline for knockout-criteria?
      - Should we test the entire application aka all requirements when accepting MRs?
-  7. What else should we work on? **(16 min)**
+  7. What else should we work on? **(9 min)**
      - Missing @Controller?
      - Relocate backup and lang folder and config file into client module
      - Are there rubrics we haven't yet satisfied?
