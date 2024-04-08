@@ -28,6 +28,8 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
+    private TransferMoneyCtrl transferMoneyCtrl;
+    private Scene transferMoneyScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -73,9 +75,10 @@ public class MainCtrl {
                            Pair<SettleDebtsScreenCtrl, Parent> settleDebtsUI,
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
-                           Pair<AddTagCtrl, Parent> addTagUI,
-                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
+                           Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
+                            Pair<AddTagCtrl, Parent> addTagUI,
+                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -90,6 +93,8 @@ public class MainCtrl {
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
+        this.transferMoneyCtrl = transferMoneyUI.getKey();
+        this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
 
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
@@ -128,6 +133,8 @@ public class MainCtrl {
                 new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
+        screenMap.put(TransferMoneyCtrl.class,
+                new ScreenInfo(transferMoneyCtrl, true, transferMoneyScene, "TransferMoney.title"));
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
