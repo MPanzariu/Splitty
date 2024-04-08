@@ -1,6 +1,8 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
@@ -10,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,8 +26,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final ImageUtils imageUtils;
     @FXML
     private Button cancelButton;
+    @FXML
+    private Button goBack;
     @FXML
     private Label title;
     @FXML
@@ -73,10 +79,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation for translating buttons and fields
      */
     @Inject
-    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
     }
 
     /***
@@ -161,6 +168,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         bindFieldsToEnter();
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBack.setGraphic(goBackImage);
+        Styling.applyStyling(goBack, "positiveButton");
     }
 
     /**

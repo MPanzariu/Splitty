@@ -30,14 +30,14 @@
    <Label fx:id="bic" layoutX="90.0" layoutY="300.0" styleClass="h2" text="BIC"/>
    <TextField fx:id="bicField" layoutX="209.0" layoutY="300.0" prefWidth="205" promptText="add BIC"
               styleClass="small-text"/>
-   <Button fx:id="okButton" layoutX="252.0" layoutY="354.0" mnemonicParsing="false" onAction="#confirmEdit"
+   <Button fx:id="okButton" layoutX="327.0" layoutY="354.0" mnemonicParsing="false" onAction="#confirmEdit"
            prefHeight="30.0" prefWidth="87.0" text="OK">
       <styleClass>
          <String fx:value="positiveButton"/>
          <String fx:value="small-text"/>
       </styleClass>
    </Button>
-   <Button fx:id="cancelButton" layoutX="150.0" layoutY="354.0" mnemonicParsing="false" onAction="#cancel"
+   <Button fx:id="cancelButton" layoutX="209.0" layoutY="354.0" mnemonicParsing="false" onAction="#cancel"
            prefHeight="30.0" prefWidth="87.0" text="Cancel">
       <styleClass>
          <String fx:value="negativeButton"/>
@@ -56,16 +56,17 @@
          <String fx:value="small-text"/>
       </styleClass>
    </Label>
-   <Label fx:id="wrongIban" layoutX="210.0" layoutY="278.0" prefHeight="18.0" prefWidth="200.0">
+   <Label fx:id="wrongIban" layoutX="209.0" layoutY="278.0" prefHeight="18.0" prefWidth="200.0">
       <styleClass>
          <String fx:value="errorText"/>
          <String fx:value="small-text"/>
       </styleClass>
    </Label>
-   <Label fx:id="wrongBic" layoutX="210.0" layoutY="328.0" prefHeight="18.0" prefWidth="200.0">
+   <Label fx:id="wrongBic" layoutX="209.0" layoutY="328.0" prefHeight="18.0" prefWidth="200.0">
       <styleClass>
          <String fx:value="errorText"/>
          <String fx:value="small-text"/>
       </styleClass>
    </Label>
+   <Button fx:id="goBack" layoutX="90" layoutY="354.0" mnemonicParsing="false" onAction="#cancel" prefHeight="30" prefWidth="30" styleClass="positiveButton" />
 </AnchorPane>
