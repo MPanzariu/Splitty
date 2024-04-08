@@ -3,6 +3,7 @@ package client.utils;
 import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,15 @@ class SettleDebtsUtilsTest {
     Participant participant1;
     Participant participant2;
     Participant participant3;
+
+    @BeforeAll
+    static void testFXSetup(){
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("glass.platform", "Monocle");
+        System.setProperty("monocle.platform", "Headless");
+        System.setProperty("prism.order", "sw");
+    }
 
     @BeforeEach
     void setup(){
