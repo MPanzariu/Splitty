@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.FormattingUtils;
-import client.utils.ImageUtils;
-import client.utils.RoundUtils;
-import client.utils.Translation;
+import client.utils.*;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
@@ -33,6 +30,10 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     private Label totalCostLabel;
     @FXML
     private Label expenseSumLabel;
+    @FXML
+    private Label pieChartLabel;
+    @FXML
+    private Label shareLabel;
     @FXML
     private PieChart tagPieChart;
     @FXML
@@ -69,9 +70,13 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         statisticsLabel.textProperty()
-                .bind(translation.getStringBinding("SS.Label.Statistics"));
+                .bind(translation.getStringBinding("Stats.Label.Statistics"));
         totalCostLabel.textProperty()
-                .bind(translation.getStringBinding("SS.Label.TotalCost"));
+                .bind(translation.getStringBinding("Stats.Label.TotalCost"));
+        pieChartLabel.textProperty()
+                .bind(translation.getStringBinding("Stats.Label.PieChart"));
+        shareLabel.textProperty()
+                .bind(translation.getStringBinding("Stats.Label.Share"));
         addGeneratedImages();
     }
 
@@ -156,21 +161,25 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
             return new SimpleStringProperty(formattedShare);
         });
 
-        //To be replaced with bindings
-        columnName.setText("Participant");
-        columnAmount.setText("Share");
-
+        columnName.textProperty().bind(translation.getStringBinding("Stats.ColumnLabel.Participant"));
+        columnName.setPrefWidth(100);
         table.getColumns().add(columnName);
+
+        columnAmount.textProperty().bind(translation.getStringBinding("Stats.ColumnLabel.Share"));
+        columnAmount.setPrefWidth(70);
         table.getColumns().add(columnAmount);
 
-        table.setLayoutX(100);
-        table.setLayoutY(100);
-        table.setPrefHeight(300);
-        table.setPrefWidth(100);
+        table.setLayoutX(400);
+        table.setLayoutY(180);
+        table.setPrefHeight(200);
+        table.setPrefWidth(170);
         table.setItems(FXCollections.observableList(event.getParticipants().stream().toList()));
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        table.setItems(FXCollections.observableList(event.getParticipants().stream().toList()));
+        //noinspection SuspiciousMethodCalls
+        table.setItems(FXCollections.observableList(event.getParticipants().stream()
+                .sorted(Comparator.comparing(dataMap::get).reversed())
+                .toList()));
         return table;
     }
 
