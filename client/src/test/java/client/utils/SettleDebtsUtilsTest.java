@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -18,9 +19,10 @@ import java.util.Random;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 class SettleDebtsUtilsTest {
     @InjectMocks
     SettleDebtsUtils sut;
@@ -28,7 +30,8 @@ class SettleDebtsUtilsTest {
     ServerUtils server;
     @Mock
     Translation translation;
-
+    @Mock
+    EmailHandler emailHandler;
     Participant participant1;
     Participant participant2;
     Participant participant3;
@@ -308,5 +311,42 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains(name));
         assertTrue(result.contains("(MISSING)"));
         assertTrue(result.contains(bic));
+    }
+
+    @Test
+    void generateEmailBodyNoBankCredentials(){
+        Participant sender = new Participant("Sender");
+        Participant receiver = new Participant("Receiver");
+        Transfer t = new Transfer(sender, 10,receiver);
+        String emailBody = sut.generateEmailBody(t);
+        assertEquals(emailBody, "Please transfer the amount of 0.1 Euros to Receiver\n\n" +"Thank you!");
+    }
+
+    @Test
+    void generateEmailBodyWithBankCredentials(){
+        Participant sender = new Participant("Sender");
+        Participant receiver = new Participant("Receiver");
+        receiver.setBic("BIC");
+        receiver.setIban("IBAN");
+        receiver.setLegalName("Legal Name");
+        Transfer t = new Transfer(sender, 10,receiver);
+        String emailBody = sut.generateEmailBody(t);
+        assertEquals(emailBody, "Please transfer the amount of 0.1 Euros to Receiver to the following bank account:\n" +
+                "\n" +
+                "Name: Legal Name\n" +
+                "IBAN: IBAN\n" +
+                "BIC: BIC\n" +
+                "\n" +
+                "Thank you!");
+    }
+
+    @Test
+    void sendEmailTransferTest(){
+        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(true);
+        Participant sender = new Participant("Sender");
+        Participant receiver = new Participant("Receiver");
+        Transfer t = new Transfer(sender, 10,receiver);
+        sut.sendEmailTransferEmail(t);
+        verify(emailHandler, times(1)).showSuccessPrompt();
     }
 }

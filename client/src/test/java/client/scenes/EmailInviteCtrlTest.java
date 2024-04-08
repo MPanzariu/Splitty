@@ -36,5 +36,12 @@ class EmailInviteCtrlTest {
         emailInviteCtrl.cancel();
         verify(mainCtrl).switchScreens(EventScreenCtrl.class);
     }
+
+    @Test
+    void checkEmail() {
+        assertTrue(emailInviteCtrl.checkEmail("test@test.com"));
+        assertFalse(emailInviteCtrl.checkEmail("@test.com"));
+        assertFalse(emailInviteCtrl.checkEmail("test@test"));
+    }
 }
 

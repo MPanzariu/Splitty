@@ -196,6 +196,26 @@ public class SettleDebtsUtils {
      * Sends the email to the participant to pay
      */
     public void sendEmailTransferEmail(Transfer transfer) {
+        String emailBody = generateEmailBody(transfer);
+        String emailSubject = "Payment Request";
+        boolean result = emailHandler.sendEmail(transfer.sender().getEmail(),emailSubject,emailBody);
+        if (result){
+            Platform.runLater(() -> {
+                emailHandler.showSuccessPrompt();
+            });
+        }else{
+            Platform.runLater(() -> {
+                emailHandler.showFailPrompt();
+            });
+        }
+    }
+
+    /**
+     * Generates an email body for the transfer
+     * @param transfer the transfer to generate the email body for
+     * @return the email body
+     */
+    public String generateEmailBody(Transfer transfer) {
         String emailBody;
         if (transfer.receiver().hasBankAccount()) {
             emailBody= """
@@ -217,16 +237,6 @@ public class SettleDebtsUtils {
 
         emailBody = emailBody.replace("{amount}", transfer.amount() / 100.0 + " Euros");
         emailBody = emailBody.replace("{receiver}", transfer.receiver().getName());
-        String emailSubject = "Payment Request";
-        boolean result = emailHandler.sendEmail(transfer.sender().getEmail(),emailSubject,emailBody);
-        if (result){
-            Platform.runLater(() -> {
-                emailHandler.showSuccessPrompt();
-            });
-        }else{
-            Platform.runLater(() -> {
-                emailHandler.showFailPrompt();
-            });
-        }
+        return emailBody;
     }
 }
