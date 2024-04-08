@@ -132,26 +132,15 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
             boolean result = emailHandler.sendEmail(email, "Invited to splitty!", emailHandler.getInviteText(event));
             if (result){
                 server.addParticipant(event.getId(), participant);
-                Platform.runLater(() -> {
-                    System.out.println("Successfully sent email!");
-                    Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
-                    a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
-                    a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
-                    a.show();
-                });
-            }else{
-                Platform.runLater(() -> {
-                    System.out.println("Error while sending email!");
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
-                    a.titleProperty().bind(translation.getStringBinding("Email.ErrorTitle"));
-                    a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
-                    a.show();
-                });
+
             }
+            Platform.runLater(() -> {
+                mainCtrl.showEmailPrompt(result);
+            });
         });
     }
+
+
 
     /**
      * Cancels the invitation and switches back to the event screen
@@ -176,5 +165,28 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
     public void refresh(Event event) {
         this.event = event;
     }
+
+
+    public void setNameTextField(TextField nameTextField) {
+        this.nameTextField = nameTextField;
+    }
+
+
+    public void setEmailTextField(TextField emailTextField) {
+        this.emailTextField = emailTextField;
+    }
+
+    public void setInviteButton(Button inviteButton) {
+        this.inviteButton = inviteButton;
+    }
+
+    public void setNameFeedbackLabel(Label nameFeedbackLabel) {
+        this.nameFeedbackLabel = nameFeedbackLabel;
+    }
+
+    public void setEmailFeedbackLabel(Label emailFeedbackLabel) {
+        this.emailFeedbackLabel = emailFeedbackLabel;
+    }
+
 
 }
