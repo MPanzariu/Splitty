@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="607.0" prefWidth="836.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsScreenCtrl">
+<AnchorPane fx:id = "parentPane" prefHeight="607.0" prefWidth="836.0" stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsScreenCtrl">
    <children>
       <Label fx:id="statisticsLabel" layoutX="22.0" layoutY="14.0" prefHeight="38.0" prefWidth="301.0" styleClass="h1" text="Label" />
       <Label fx:id="totalCostLabel" layoutX="22.0" layoutY="59.0" prefHeight="26.0" prefWidth="243.0" styleClass="h2" text="Label" />

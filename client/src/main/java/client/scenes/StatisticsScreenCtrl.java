@@ -1,24 +1,32 @@
 package client.scenes;
 
+import client.utils.FormattingUtils;
 import client.utils.ImageUtils;
-import client.utils.ServerUtils;
+import client.utils.RoundUtils;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;
+import commons.Participant;
 import jakarta.inject.Inject;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
+    @FXML
+    private AnchorPane parentPane;
     @FXML
     private Label statisticsLabel;
     @FXML
@@ -29,28 +37,22 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     private PieChart tagPieChart;
     @FXML
     private Button goBackButton;
+    private TableView<Participant> shareTable;
     private Event event;
-    private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
-    private final LanguageIndicatorCtrl languageCtrl;
     private final ImageUtils imageUtils;
 
     /**
-     *
-     * @param server the server to which the client is connected
+     * Constructor for StatisticsScreenCtrl
      * @param mainCtrl the main controller
      * @param translation the class that manages translations
-     * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils the ImageUtils to use
      */
     @Inject
-    public StatisticsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils){
-        this.server = server;
+    public StatisticsScreenCtrl(MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils){
         this.mainCtrl = mainCtrl;
         this.translation = translation;
-        this.languageCtrl = languageCtrl;
         this.imageUtils = imageUtils;
     }
 
@@ -83,19 +85,18 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
         this.event = event;
         setTotalSumOfExpenses();
         setPieChart();
+        parentPane.getChildren().remove(shareTable);
+        TableView<Participant> newTable = generateShareTable(event);
+        parentPane.getChildren().add(newTable);
+        shareTable = newTable;
     }
 
     /**
      * it sets the label holding the cost of the entire event with the sum of expenses inside the event
      */
     public void setTotalSumOfExpenses(){
-        float sum = 0;
-        for(Expense expense : event.getExpenses()){
-            sum+=expense.getPriceInCents();
-        }
-        sum/=100;
-        String euro = "\u20ac";
-        expenseSumLabel.setText(String.valueOf(sum) + euro);
+        int sum = event.getTotalSpending();
+        expenseSumLabel.setText(FormattingUtils.getFormattedPrice(sum));
     }
 
     /**
@@ -132,6 +133,45 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         tagPieChart.setLegendVisible(false);
+    }
+
+    /***
+     * Generates a table of participants and their expense shares
+     * @param event the event to gather data from
+     * @return a TableView with 2 columns: participant name, and expense share
+     */
+    public TableView<Participant> generateShareTable(Event event){
+        TableView<Participant> table = new TableView<>();
+        TableColumn<Participant, String> columnName = new TableColumn<>();
+        TableColumn<Participant, String> columnAmount = new TableColumn<>();
+
+        columnName.setCellValueFactory(participantValue -> new SimpleStringProperty(participantValue.getValue().getName()));
+
+        HashMap<Participant, BigDecimal> expenseShare = event.getExpenseShare();
+        HashMap<Participant, Integer> dataMap = RoundUtils.roundMap(expenseShare, RoundingMode.HALF_UP);
+        columnAmount.setCellValueFactory(participantValue -> {
+            Participant participant = participantValue.getValue();
+            int shareOfParticipant = dataMap.get(participant);
+            String formattedShare = FormattingUtils.getFormattedPrice(shareOfParticipant);
+            return new SimpleStringProperty(formattedShare);
+        });
+
+        //To be replaced with bindings
+        columnName.setText("Participant");
+        columnAmount.setText("Share");
+
+        table.getColumns().add(columnName);
+        table.getColumns().add(columnAmount);
+
+        table.setLayoutX(100);
+        table.setLayoutY(100);
+        table.setPrefHeight(300);
+        table.setPrefWidth(100);
+        table.setItems(FXCollections.observableList(event.getParticipants().stream().toList()));
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        table.setItems(FXCollections.observableList(event.getParticipants().stream().toList()));
+        return table;
     }
 
     /**
