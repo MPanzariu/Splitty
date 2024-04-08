@@ -38,6 +38,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Label noEmail;
     @FXML
+    private Label optional;
+    @FXML
     private TextField nameField;
     @FXML
     private Label email;
@@ -102,6 +104,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
+        optional.textProperty().bind(translation.getStringBinding("Participants.Label.optional"));
         resetErrorFields();
         ibanField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (checkIban(newValue)) {

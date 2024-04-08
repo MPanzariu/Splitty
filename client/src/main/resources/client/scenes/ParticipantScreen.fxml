@@ -16,10 +16,11 @@
    <Label fx:id="name" layoutX="90.0" layoutY="75.0" styleClass="h2" text="Name"/>
    <TextField fx:id="nameField" layoutX="209.0" layoutY="75.0" prefWidth="205" promptText="add name"
               styleClass="small-text"/>
-   <Label fx:id="email" layoutX="90.0" layoutY="125.0" styleClass="h2" text="Email"/>
-   <TextField fx:id="emailField" layoutX="209.0" layoutY="125.0" prefWidth="205" promptText="add email"
+   <Label fx:id="optional" layoutX="90.0" layoutY="120.0" styleClass="small-text" text="optional"/>
+   <Label fx:id="email" layoutX="90.0" layoutY="140.0" styleClass="h2" text="Email"/>
+   <TextField fx:id="emailField" layoutX="209.0" layoutY="140.0" prefWidth="205" promptText="add email"
               styleClass="small-text"/>
-   <Label fx:id="bankDetails" layoutX="90.0" layoutY="170.0" styleClass="h2" text="Bank Details (Optional)"/>
+   <Label fx:id="bankDetails" layoutX="90.0" layoutY="178.0" styleClass="small-text" text="Bank Details (Optional)"/>
    <Label fx:id="holder" layoutX="90.0" layoutY="200.0" styleClass="h2" text="Holder"/>
    <TextField fx:id="holderField" layoutX="209.0" layoutY="200.0" prefWidth="205" promptText="add account holder"
               styleClass="small-text"/>
@@ -49,7 +50,7 @@
          <String fx:value="small-text"/>
       </styleClass>
    </Label>
-   <Label fx:id="noEmail" layoutX="209" layoutY="152.0" prefHeight="18.0" prefWidth="200.0">
+   <Label fx:id="noEmail" layoutX="209" layoutY="167.0" prefHeight="18.0" prefWidth="200.0">
       <styleClass>
          <String fx:value="errorText"/>
          <String fx:value="small-text"/>

@@ -205,6 +205,9 @@ public class MainCtrl {
         participantScreenCtrl.setParticipant(participantId);
     }
 
+    /**
+     * resets participant id if you exit edit mode
+     */
     public void swuitchToEventFromEditParticipant(){
         participantScreenCtrl.saveId(0L);
         switchScreens(EventScreenCtrl.class);
