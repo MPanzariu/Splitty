@@ -8,6 +8,9 @@ import com.google.inject.name.Named;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -144,7 +147,7 @@ public class MainCtrl {
         manager.subscribeToUpdates();
         //This can also show a pop-up in the future, but right now it doesn't
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
-
+        addMainScreenShortcuts();
         primaryStage.show();
     }
 
@@ -244,5 +247,24 @@ public class MainCtrl {
      */
     public void switchEvents(String eventCode) {
         manager.switchClientEvent(eventCode);
+    }
+
+    /**
+     * Adds shortcuts to the scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + e switches to the event screen with the most recently joined event
+     */
+    public void addMainScreenShortcuts() {
+        //Switch to admin password screen ctrl + a
+        KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+        //Switch to the event screen with the most recently joined event ctrl + e
+        KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+        this.startupScene.setOnKeyPressed(e -> {
+            if (ctrlE.match(e)) {
+                startupScreenCtrl.joinMostRecentEvent();
+            }else if (ctrlA.match(e)) {
+                switchToManagementOverviewPasswordScreen();
+            }
+        });
     }
 }

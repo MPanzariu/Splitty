@@ -13,6 +13,9 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -74,6 +77,20 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
+     * Joins the most recent event
+     */
+    public void joinMostRecentEvent() {
+        List<Node> children = getHistoryNodes();
+        if (children != null && !children.isEmpty()){
+            Node mostRecentNode = children.getFirst();
+            if (mostRecentNode instanceof HBox mostRecentHbox) {
+                String eventId = findKeyByValue(mostRecentHbox);
+                switchToEvent(eventId);
+            }
+        }
+    }
+
+    /**
      * Binds the fields to their matching binding
      */
     @Override
@@ -88,6 +105,19 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        eventTitleTextBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                createEventButton.fire();
+            }
+        });
+        inviteCodeTextBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                joinEventButton.fire();
+            }
+        });
+        Tooltip managementOverviewTooltip = new Tooltip();
+        managementOverviewTooltip.setText("Ctrl + A");
+        managementOverviewButton.setTooltip(managementOverviewTooltip);
     }
 
     /**
@@ -349,4 +379,6 @@ public class StartupScreenCtrl implements Initializable {
     public void goToTheManagementOverview() {
         mainCtrl.switchToManagementOverviewPasswordScreen();
     }
+
+
 }
