@@ -113,6 +113,8 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
         Map<String, String> tagColorMap = new HashMap<>();
         Set<Expense> expenses = event.getExpenses();
         for (Expense expense : expenses) {
+            if(expense.getExpenseTag().getTagName().equals("money transfer"))
+                continue;
             String tagName = expense.getExpenseTag().getTagName();
             int expensePrice = expense.getPriceInCents();
             String colorCode = expense.getExpenseTag().getColorCode();
