@@ -217,6 +217,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
+            } else if (participant.getEmail().equals("empty")) {
+                participant.setEmail(null);
             }
         }
         if(participant.getIban().equals("wrongIban")) {
@@ -382,7 +384,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param iban the value inserted by the user
      * @return true if the value is correct, false otherwise
      */
-    public boolean checkIban (String iban){
+    public boolean checkIban (String iban) {
+        if (iban == null || iban.isEmpty()){
+            return false;
+        }
         Matcher matcher = ibanPattern.matcher(iban);
         return matcher.matches();
     }
