@@ -1,8 +1,10 @@
 package client.utils;
 
+import client.scenes.GenerateLanguageTemplate;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -33,20 +35,6 @@ public class LanguageSwitchUtils {
     }
 
     /**
-     * Change the language of the client when selecting a new value.
-     * @param property Selected property
-     */
-    public void setBehavior(ReadOnlyObjectProperty<Locale> property) {
-        property.addListener((observable, oldValue, newValue) -> {
-            // Languages will be emptied in refresh() method, which should be ignored.
-            if(newValue != null) {
-                translation.changeLanguage(newValue);
-                persistLanguage(newValue);
-            }
-        });
-    }
-
-    /**
      * Writes the language to the config file.
      * @param language The newly selected language
      */
@@ -74,6 +62,7 @@ public class LanguageSwitchUtils {
                 languages.add(Locale.of(parts[1]));
             }
         }
+        languages.add(Locale.ROOT);
     }
 
     /**

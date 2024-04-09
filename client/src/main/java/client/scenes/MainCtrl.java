@@ -30,6 +30,8 @@ public class MainCtrl {
     private Scene deleteEventsScene;
     private TransferMoneyCtrl transferMoneyCtrl;
     private Scene transferMoneyScene;
+    private GenerateLanguageTemplate generateLanguageTemplateCtrl;
+    private Scene generateLanguageTemplateScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
     @Inject
@@ -76,9 +78,10 @@ public class MainCtrl {
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
                            Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
-                            Pair<AddTagCtrl, Parent> addTagUI,
-                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
+                           Pair<AddTagCtrl, Parent> addTagUI,
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI,
+                           Pair<GenerateLanguageTemplate, Parent> generateLanguageTemplatePair){
 
 
         translation.changeLanguage(Locale.forLanguageTag(language));
@@ -95,6 +98,8 @@ public class MainCtrl {
         this.participantScreenCtrl = participantUI.getKey();
         this.transferMoneyCtrl = transferMoneyUI.getKey();
         this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
+        this.generateLanguageTemplateCtrl = generateLanguageTemplatePair.getKey();
+        this.generateLanguageTemplateScene = new Scene(generateLanguageTemplatePair.getValue());
 
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
@@ -137,6 +142,8 @@ public class MainCtrl {
                 new ScreenInfo(transferMoneyCtrl, true, transferMoneyScene, "TransferMoney.title"));
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
+        screenMap.put(GenerateLanguageTemplate.class,
+                new ScreenInfo(generateLanguageTemplateCtrl, false, generateLanguageTemplateScene, "Event.Language.Generate"));
         manager.setScreenInfoMap(screenMap);
 
         primaryStage.setOnCloseRequest(e -> manager.onStop());

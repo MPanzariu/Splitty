@@ -30,17 +30,6 @@ public class LanguageSwitchTests {
     }
 
     /**
-     * When the property changes, then the language should be changed.
-     */
-    @Test
-    public void changeLanguage() {
-        SimpleObjectProperty<Locale> property = new SimpleObjectProperty<>(Locale.ENGLISH);
-        utils.setBehavior(property);
-        property.setValue(Locale.GERMAN);
-        verify(translation).changeLanguage(Locale.GERMAN);
-    }
-
-    /**
      * Languages in the language directory should be added to the language observable list.
      */
     @Test
@@ -51,7 +40,7 @@ public class LanguageSwitchTests {
         when(english.getName()).thenReturn("lang_en.properties");
         when(german.getName()).thenReturn("lang_de.properties");
         utils.refreshLanguages();
-        ObservableList<Locale> expected = FXCollections.observableArrayList(Locale.ENGLISH, Locale.GERMAN);
+        ObservableList<Locale> expected = FXCollections.observableArrayList(Locale.ENGLISH, Locale.GERMAN, Locale.ROOT);
         assertEquals(expected, utils.getLanguages());
     }
 
