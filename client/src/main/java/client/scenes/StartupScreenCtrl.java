@@ -108,11 +108,13 @@ public class StartupScreenCtrl implements Initializable {
         eventTitleTextBox.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 createEventButton.fire();
+                event.consume();
             }
         });
         inviteCodeTextBox.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 joinEventButton.fire();
+                event.consume();
             }
         });
         Tooltip managementOverviewTooltip = new Tooltip();
