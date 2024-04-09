@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -28,6 +29,9 @@
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
          </styleClass>
+         <tooltip>
+            <Tooltip text="Ctrl + E" />
+         </tooltip>
       </Button>
       <TextField fx:id="invitationCode" layoutX="399.0" layoutY="30.0" prefHeight="51.0" prefWidth="139.0" styleClass="h1" text="Event">
          <font>
@@ -45,7 +49,10 @@
          </font>
       </Label>
       <Button fx:id="editParticipant" layoutX="306.0" layoutY="125.0" mnemonicParsing="false" onAction="#editCurrentParticipants" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
-      <Button fx:id="addParticipant" layoutX="349.0" layoutY="124.0" mnemonicParsing="false" onAction="#addParticipants" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton" />
+      <Button fx:id="addParticipant" layoutX="349.0" layoutY="124.0" mnemonicParsing="false" onAction="#addParticipants" prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton">
+         <tooltip>
+            <Tooltip text="Ctrl + P" />
+         </tooltip></Button>
       <Label fx:id="expenseLabel" layoutX="160.0" layoutY="189.0" prefHeight="17.0" prefWidth="111.0" styleClass="h2" text="Expenses">
          <font>
             <Font size="16.0" />
@@ -67,7 +74,10 @@
                   <Image url="@/images/addExpense.png" />
                </image>
             </ImageView>
-         </graphic></Button>
+         </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + Q" />
+         </tooltip></Button>
       <Button fx:id="addTagButton" layoutX="335.0" layoutY="219.0" mnemonicParsing="false" onAction="#switchToAddTag" prefHeight="34.0" prefWidth="195.0" text="Add Tag">
          <styleClass>
             <String fx:value="positiveButton" />
@@ -79,12 +89,18 @@
                   <Image url="@/images/tag.png" />
                </image>
             </ImageView>
-         </graphic></Button>
+         </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + F" />
+         </tooltip></Button>
       <Button fx:id="transferMoneyButton" layoutX="335.0" layoutY="263.0" mnemonicParsing="false" onAction="#transferMoney" prefHeight="34.0" prefWidth="195.0" text="Transfer Money">
          <styleClass>
             <String fx:value="positiveButton" />
             <String fx:value="small-text" />
-         </styleClass></Button>
+         </styleClass>
+         <tooltip>
+            <Tooltip text="Ctrl + D" />
+         </tooltip></Button>
       <HBox fx:id="buttonsHBox" layoutX="160.0" layoutY="311.0" prefHeight="25.0" prefWidth="374.0">
          <children>
             <Button fx:id="allExpenses" mnemonicParsing="false" onAction="#showAllExpenseList" prefHeight="25.0" prefWidth="124.66" styleClass="positiveButton" text="All" />
@@ -109,7 +125,10 @@
                   <Image url="@/images/showStatistics.png" />
                </image>
             </ImageView>
-         </graphic></Button>
+         </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + S" />
+         </tooltip></Button>
       <Button fx:id="testEmailButton" layoutX="164.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="157.0" text="Test Email">
          <styleClass>
             <String fx:value="positiveButton" />
@@ -123,6 +142,9 @@
                </image>
             </ImageView>
          </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + T" />
+         </tooltip>
       </Button>
       <Label fx:id="emailFeedbackLabel" layoutX="162.0" layoutY="646.0" styleClass="small-text" text="Email Feedback" />
       <Button fx:id="emailInviteButton" layoutX="353.0" layoutY="605.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="187.0" text="Invite By Email">
@@ -138,8 +160,14 @@
                </image>
             </ImageView>
          </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + I" />
+         </tooltip>
       </Button>
-      <Button fx:id="goBackButton" layoutX="164.0" layoutY="675.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="35.0" prefWidth="36.0" styleClass="positiveButton" />
+      <Button fx:id="goBackButton" layoutX="164.0" layoutY="675.0" mnemonicParsing="false" onAction="#switchToMainScreen" prefHeight="35.0" prefWidth="36.0" styleClass="positiveButton">
+         <tooltip>
+            <Tooltip text="Ctrl + B" />
+         </tooltip></Button>
       <Button fx:id="settleDebtsButton" layoutX="353.0" layoutY="673.0" mnemonicParsing="false" onAction="#settleDebts" prefHeight="35.0" prefWidth="187.0" text="Settle Debts">
          <styleClass>
             <String fx:value="positiveButton" />
@@ -151,6 +179,9 @@
                   <Image url="@/images/settleDebts.png" />
                </image>
             </ImageView>
-         </graphic></Button>
+         </graphic>
+         <tooltip>
+            <Tooltip text="Ctrl + G" />
+         </tooltip></Button>
    </children>
 </AnchorPane>

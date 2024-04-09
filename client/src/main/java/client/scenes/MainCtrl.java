@@ -299,6 +299,14 @@ public class MainCtrl {
             KeyCombination ctrlP = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
             //Invite by email ctrl + I
             KeyCombination ctrlI = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+            //Go to main screen ctrl + b
+            KeyCombination ctrlB = new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+            //Add tag ctrl + f
+            KeyCombination ctrlF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+            //Transfer movie ctrl + d
+            KeyCombination ctrlD = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+            //Settle debts ctrl + g
+            KeyCombination ctrlG = new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
             eventScene.setOnKeyPressed(e -> {
                 if (ctrlA.match(e)) {
                     switchToManagementOverviewPasswordScreen();
@@ -314,6 +322,14 @@ public class MainCtrl {
                     eventScreenCtrl.addParticipants();
                 } else if (ctrlI.match(e)) {
                     eventScreenCtrl.switchToInviteEmail();
+                }else if (ctrlB.match(e)) {
+                    eventScreenCtrl.switchToMainScreen();
+                }else if (ctrlF.match(e)) {
+                    eventScreenCtrl.switchToAddTag();
+                }else if (ctrlD.match(e)){
+                   eventScreenCtrl.transferMoney();
+                }else if (ctrlG.match(e)){
+                    eventScreenCtrl.settleDebts();
                 }
             });
         };
