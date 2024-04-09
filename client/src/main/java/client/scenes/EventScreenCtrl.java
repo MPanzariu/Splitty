@@ -98,10 +98,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.imageUtils = imageUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
-       // this.buttonsHBox = new HBox();
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
     }
@@ -120,6 +116,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         participantsName.textProperty()
@@ -356,7 +355,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
         ObservableValue<String> expenseTextValue;
         if(expense.getPriceInCents() > 0)
-            expenseTextValue = generateTextForExpenseLabel(expense);
+            expenseTextValue = generateTextForExpenseLabel(expense, event);
         else
             expenseTextValue = generateTextForMoneyTransfer(expense);
         Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
@@ -392,12 +391,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      */
     public ObservableValue<String> generateTextForMoneyTransfer(Expense expense) {
         Participant sender = (Participant) expense.getParticipantsInExpense().toArray()[0];
-        double amount = expense.getPriceInCents() / -100.0;
+        int amount = -1 * expense.getPriceInCents();
         Participant receiver = expense.getOwedTo();
 
         Map<String, String> substituteValues = new HashMap<>();
         substituteValues.put("senderName", sender.getName());
-        substituteValues.put("amount", String.valueOf(amount)); //Replace with merged-in formatting utils
+        substituteValues.put("amount", FormattingUtils.getFormattedPrice(amount));
         substituteValues.put("receiverName", receiver.getName());
 
         return translation.getStringSubstitutionBinding("Event.String.transferString", substituteValues);
@@ -406,35 +405,37 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     /**
      *
      * @param expense the expense for which we are generating the label
+     * @param event the event of the relevant expense
      * @return the resulting generated ObservableString
      */
-    public ObservableValue<String> generateTextForExpenseLabel(Expense expense) {
+    public ObservableValue<String> generateTextForExpenseLabel(Expense expense, Event event) {
         Map<String, String> substituteValues = new HashMap<>();
         substituteValues.put("senderName", expense.getOwedTo().getName());
-        substituteValues.put("amount", String.valueOf(expense.getPriceInCents())); //Replace with merged-in formatting utils
+        substituteValues.put("amount", FormattingUtils.getFormattedPrice(expense.getPriceInCents()));
         substituteValues.put("expenseTitle", expense.getName());
         ObservableValue<String> descriptionString =  translation.getStringSubstitutionBinding("Event.String.expenseString", substituteValues);
 
         Set<Participant> participants = event.getParticipants();
         Set<Participant> partipantsInExpense = expense.getParticipantsInExpense();
 
-        StringBuilder includedString = new StringBuilder();
+        StringBuilder includedSB = new StringBuilder();
         if(participants.size() == partipantsInExpense.size())
-            includedString.append("\n(All)");
+            includedSB.append("\n(All)");
         else {
             if(expense.getParticipantsInExpense().isEmpty())
                 removeFromList(expense.getId());
-            includedString.append("\n(");
+            includedSB.append("\n(");
             for(Participant participant: partipantsInExpense) {
-                includedString.append(participant.getName());
-                includedString.append(" ");
+                includedSB.append(participant.getName());
+                includedSB.append(", ");
             }
             if(!partipantsInExpense.isEmpty()){
-                int indexToRemove = includedString.lastIndexOf(" ");
-                includedString.deleteCharAt(indexToRemove);
+                int indexToRemove = includedSB.lastIndexOf(",");
+                includedSB.delete(indexToRemove, indexToRemove + 2);
             }
-            includedString.append(")");
+            includedSB.append(")");
         }
+        String includedString = includedSB.toString();
         return Bindings.concat(descriptionString, includedString);
     }
 
