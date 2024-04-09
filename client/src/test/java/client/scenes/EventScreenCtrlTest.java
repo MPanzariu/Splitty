@@ -12,7 +12,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 class EventScreenCtrlTest {
 
     @Mock
@@ -52,5 +51,10 @@ class EventScreenCtrlTest {
         String result = eventScreenCtrl.generateTextForExpenseLabel(expense1);
         assertEquals(result, "John paid 0.12" + '\u20ac' + " for Drinks\n" +
             "(John Jane )");
+    }
+
+    @Test
+    void ctrlT(){
+
     }
 }

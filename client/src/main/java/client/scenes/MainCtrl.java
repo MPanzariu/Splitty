@@ -1,7 +1,6 @@
 package client.scenes;
 
 import client.utils.AppStateManager;
-import client.utils.EmailHandler;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -71,6 +70,7 @@ public class MainCtrl {
      * @param addTagUI the add tag UI
      * @param emailInviteUI the email invite UI
      * @param statisticsScreenUI the statistics screen UI
+     * @param transferMoneyUI the transfer money UI
      */
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
@@ -260,6 +260,11 @@ public class MainCtrl {
      * ctrl + e switches to the event screen with the most recently joined event
      */
     public void addMainScreenShortcuts() {
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForMainScreen();
+        getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    public EventHandler<KeyEvent> getEventHandlerForMainScreen() {
         EventHandler<KeyEvent> shortcutFilter = event -> {
             KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
             //Switch to the event screen with the most recently joined event ctrl + e
@@ -270,7 +275,7 @@ public class MainCtrl {
                 switchToManagementOverviewPasswordScreen();
             }
         };
-        getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+        return shortcutFilter;
     }
 
     /**
@@ -284,6 +289,15 @@ public class MainCtrl {
      * ctrl + m transfers money
      */
     public void addEventScreenShortcuts(){
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForEventScreen();
+        this.eventScene.addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Generates the event handler for the event screen
+     * @return the event handler
+     */
+    public EventHandler<KeyEvent> getEventHandlerForEventScreen() {
         EventHandler<KeyEvent> shortcutFilter = event -> {
             //Switch to admin password screen ctrl + a
             KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
@@ -327,12 +341,13 @@ public class MainCtrl {
                 }else if (ctrlF.match(e)) {
                     eventScreenCtrl.switchToAddTag();
                 }else if (ctrlD.match(e)){
-                   eventScreenCtrl.transferMoney();
+                    eventScreenCtrl.transferMoney();
                 }else if (ctrlG.match(e)){
                     eventScreenCtrl.settleDebts();
                 }
             });
         };
-        this.eventScene.addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+        return shortcutFilter;
     }
 }
+

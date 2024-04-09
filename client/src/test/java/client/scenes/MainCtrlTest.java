@@ -15,12 +15,37 @@
  */
 package client.scenes;
 
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.testfx.api.FxRobot;
+import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class MainCtrlTest {
 
     private MainCtrl sut;
+    @BeforeAll
+    static void testFXSetup(){
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("glass.platform", "Monocle");
+        System.setProperty("monocle.platform", "Headless");
+        System.setProperty("prism.order", "sw");
+    }
 
     @BeforeEach
     public void setup() {
@@ -28,8 +53,11 @@ public class MainCtrlTest {
     }
 
     @Test
-    public void writeSomeTests() {
-        // TODO create replacement objects and write some tests
-        // sut.initialize(null, null, null);
+    void testGetEventFilterNotNull(){
+        assertNotNull(sut.getEventHandlerForEventScreen());;
+    }
+    @Test
+    void testGetEventFilterMainScreen(){
+        assertNotNull(sut.getEventHandlerForMainScreen());
     }
 }
