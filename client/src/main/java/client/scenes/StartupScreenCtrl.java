@@ -109,7 +109,9 @@ public class StartupScreenCtrl implements Initializable {
         languageCtrl.initializeLanguageIndicator(languageIndicator);
         Tooltip managementOverviewTooltip = new Tooltip();
         managementOverviewTooltip.setText("Ctrl + A");
-        managementOverviewButton.setTooltip(managementOverviewTooltip);
+        if (managementOverviewButton != null){
+            managementOverviewButton.setTooltip(managementOverviewTooltip);
+        }
     }
 
     /**

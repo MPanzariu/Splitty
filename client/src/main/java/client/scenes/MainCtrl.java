@@ -43,7 +43,6 @@ public class MainCtrl {
     @Named("client.language")
     private String language;
     private final AppStateManager manager;
-    private final EmailHandler emailHandler;
 
     /**
      * Constructor
@@ -51,10 +50,9 @@ public class MainCtrl {
      * @param manager the app state manager
      */
     @Inject
-    public MainCtrl(Translation translation, AppStateManager manager, EmailHandler emailHandler){
+    public MainCtrl(Translation translation, AppStateManager manager){
         this.translation = translation;
         this.manager = manager;
-        this.emailHandler = emailHandler;
     }
 
     /**
@@ -315,9 +313,7 @@ public class MainCtrl {
                 } else if (ctrlP.match(e)) {
                     eventScreenCtrl.addParticipants();
                 } else if (ctrlI.match(e)) {
-                    if (emailHandler.isConfigured()){
-                        switchScreens(EmailInviteCtrl.class);
-                    }
+                    eventScreenCtrl.switchToInviteEmail();
                 }
             });
         };
