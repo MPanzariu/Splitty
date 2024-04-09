@@ -150,7 +150,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(participantId);
             if(participantId!=0) {
                 Participant participant = findById(participantId);
                 if (participant != null && participant.getName().equals(newValue))
@@ -227,6 +226,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
+                System.out.println("Email format is not correct");
             } else if (participant.getEmail().equals("empty")) {
                 participant.setEmail(null);
             }
@@ -258,7 +258,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void cancel() {
         clearFields();
-        mainCtrl.swuitchToEventFromEditParticipant();
+        saveId(0L);
+        mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
@@ -311,7 +312,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setIban(iban);
             else{
                 participant.setIban("wrongIban");
-                System.out.println("wrongIban");
+                System.out.println("IBAN format is not correct");
             }
         }
         String bic = bicField.getText();
@@ -323,7 +324,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setBic(bic);
             else{
                 participant.setBic("wrongBic");
-                System.out.println("wrongBic");
+                System.out.println("BIC format is not correct");
             }
         }
         participant.setLegalName(accountHolder);
@@ -370,11 +371,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     public boolean checkEmail (String email){
         String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailLike);
-        Matcher matcher = emailPattern.matcher(email);
-        if (matcher.matches()) {
-            return true;
-        } else {
-            System.out.println("Invalid Email");
+        if(email!=null){
+            Matcher matcher = emailPattern.matcher(email);
+            return matcher.matches();
         }
         return false;
     }

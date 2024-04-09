@@ -206,14 +206,6 @@ public class MainCtrl {
     }
 
     /**
-     * resets participant id if you exit edit mode
-     */
-    public void swuitchToEventFromEditParticipant(){
-        participantScreenCtrl.saveId(0L);
-        switchScreens(EventScreenCtrl.class);
-    }
-
-    /**
      * switch to the login page for the management overview
      */
     public void switchToManagementOverviewPasswordScreen(){
