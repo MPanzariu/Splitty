@@ -3,7 +3,6 @@ package client.scenes;
 import client.utils.LanguageSwitchUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.ComboBox;
@@ -65,7 +64,7 @@ public class LanguageIndicatorCtrl {
                     setText(null);
                 } else {
                     if(!item.equals(Locale.ROOT)) {
-                        ImageView flag = loadFlag(item.getLanguage());
+                        ImageView flag = loadFlag(item.getCountry().toLowerCase());
                         flag.setFitWidth(getWidth());
                         setGraphic(flag);
                     }
@@ -77,8 +76,7 @@ public class LanguageIndicatorCtrl {
             if(newValue != null) {
                 if(newValue.equals(Locale.ROOT)) {
                     languageIndicator.getSelectionModel().select(translation.getLocale());
-                    main.switchScreens(GenerateLanguageTemplate.class);
-
+                    main.openLanguageGeneration();
                 } else {
                     translation.changeLanguage(newValue);
                     utils.persistLanguage(newValue);
@@ -86,7 +84,6 @@ public class LanguageIndicatorCtrl {
             }
         });
         languageIndicator.setCellFactory(cellFactory);
-        ReadOnlyObjectProperty<Locale> selectedLanguage = languageIndicator.getSelectionModel().selectedItemProperty();
     }
 
     /**
@@ -106,7 +103,7 @@ public class LanguageIndicatorCtrl {
      */
     public ImageView loadFlag(String lang) {
         // Should look if caching is beneficial when adding more languages
-        Image defaultLanguage = new Image("images/flags/" + lang + "_flag.png");
+        Image defaultLanguage = new Image("images/flags/" + lang + ".png");
         ImageView iv = new ImageView();
         iv.setImage(defaultLanguage);
         iv.setPreserveRatio(true);

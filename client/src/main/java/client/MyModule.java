@@ -23,6 +23,7 @@ import com.google.inject.Scopes;
 
 import client.scenes.MainCtrl;
 import com.google.inject.name.Names;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Properties;
@@ -43,6 +44,7 @@ public class MyModule implements Module {
         binder.bind(LPUtils.class).in(Scopes.SINGLETON);
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
         binder.bind(TransferMoneyUtils.class).in(Scopes.SINGLETON);
+        binder.bind(Stage.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }

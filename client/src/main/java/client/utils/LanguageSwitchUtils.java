@@ -41,8 +41,8 @@ public class LanguageSwitchUtils {
     public void persistLanguage(Locale language) {
         try {
             FileWriter writer = new FileWriter(ConfigUtils.CONFIG_NAME);
-            properties.setProperty("client.language", language.getLanguage());
-            properties.store(writer, null);
+            properties.setProperty("client.language", language.getLanguage() + "_" + language.getCountry());
+            properties.store(writer, ConfigUtils.CONFIG_COMMENTS);
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(ConfigUtils.CONFIG_NAME + " is not found!");
@@ -59,7 +59,7 @@ public class LanguageSwitchUtils {
             for(File properties : files) {
                 String name = properties.getName();
                 String[] parts = name.split("_|\\.");
-                languages.add(Locale.of(parts[1]));
+                languages.add(Locale.of(parts[0], parts[1]));
             }
         }
         languages.add(Locale.ROOT);

@@ -37,10 +37,10 @@ public class LanguageSwitchTests {
         File english = mock(File.class);
         File german = mock(File.class);
         when(dir.listFiles()).thenReturn(new File[] {english, german});
-        when(english.getName()).thenReturn("lang_en.properties");
-        when(german.getName()).thenReturn("lang_de.properties");
+        when(english.getName()).thenReturn("en_GB.properties");
+        when(german.getName()).thenReturn("de_DE.properties");
         utils.refreshLanguages();
-        ObservableList<Locale> expected = FXCollections.observableArrayList(Locale.ENGLISH, Locale.GERMAN, Locale.ROOT);
+        ObservableList<Locale> expected = FXCollections.observableArrayList(Locale.of("en", "GB"), Locale.of("de", "DE"), Locale.ROOT);
         assertEquals(expected, utils.getLanguages());
     }
 
@@ -60,9 +60,9 @@ public class LanguageSwitchTests {
      */
     @Test
     public void persistLanguageSwitch() throws IOException {
-        Locale german = Locale.GERMAN;
+        Locale german = Locale.of("de", "DE");
         utils.persistLanguage(german);
-        verify(properties).setProperty("client.language", "de");
-        verify(properties).store(any(FileWriter.class), isNull());
+        verify(properties).setProperty("client.language", "de_DE");
+        verify(properties).store(any(FileWriter.class), anyString());
     }
 }

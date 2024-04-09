@@ -8,6 +8,7 @@ import com.google.inject.name.Named;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -38,6 +39,8 @@ public class MainCtrl {
     @Named("client.language")
     private String language;
     private final AppStateManager manager;
+    @Inject
+    private Stage currentStage;
 
     /**
      * Constructor
@@ -84,7 +87,9 @@ public class MainCtrl {
                            Pair<GenerateLanguageTemplate, Parent> generateLanguageTemplatePair){
 
 
-        translation.changeLanguage(Locale.forLanguageTag(language));
+        String[] languageParts = language.split("_|\\.");
+        translation.changeLanguage(Locale.of(languageParts[0], languageParts[1]));
+        System.out.println(translation.getLocale());
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
@@ -251,5 +256,23 @@ public class MainCtrl {
      */
     public void switchEvents(String eventCode) {
         manager.switchClientEvent(eventCode);
+    }
+
+    /**
+     * Opens a window for generating an empty language template.
+     * This window blocks all parent windows.
+     */
+    public void openLanguageGeneration() {
+        if(!currentStage.getModality().equals(Modality.APPLICATION_MODAL))
+            currentStage.initModality(Modality.APPLICATION_MODAL);
+        currentStage.setScene(generateLanguageTemplateScene);
+        currentStage.show();
+    }
+
+    /**
+     * Close screen for generating an empty language template.
+     */
+    public void closeLanguageGeneration() {
+        currentStage.close();
     }
 }

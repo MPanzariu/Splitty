@@ -18,7 +18,6 @@ public class Translation {
     private final ObservableResourceFactory resourceFactory;
     private Locale locale;
     public static final String LANGUAGE_PATH = "lang/";
-    private static final String LANGUAGE_PREFIX = "lang_";
 
     /***
      * Constructor that takes the resourceFactory the Translation encapsulates
@@ -54,7 +53,8 @@ public class Translation {
      */
     public void changeLanguage(Locale locale) {
         String languageCode = locale.getLanguage();
-        String fileName = LANGUAGE_PREFIX.concat(languageCode).concat(".properties");
+        String countryCode = locale.getCountry();
+        String fileName = languageCode + "_" + countryCode + ".properties";
 
         Properties languageProperties = new Properties();
         File file = new File(LANGUAGE_PATH, fileName);

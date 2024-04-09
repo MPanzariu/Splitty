@@ -26,12 +26,22 @@ public class GenerateLanguageTemplate implements Initializable, SimpleRefreshabl
     private final Translation translation;
     private final MainCtrl ctrl;
 
+    /**
+     * Constructor for this controller
+     * @param translation Translation used to bind nodes
+     * @param ctrl MainCtrl used for switching between screens
+     */
     @Inject
     public GenerateLanguageTemplate(Translation translation, MainCtrl ctrl) {
         this.translation = translation;
         this.ctrl = ctrl;
     }
 
+    /**
+     * Initialize this controller
+     * @param url URL
+     * @param rsc ResourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle rsc) {
         header.textProperty().bind(translation.getStringBinding("Language.header"));
@@ -41,12 +51,17 @@ public class GenerateLanguageTemplate implements Initializable, SimpleRefreshabl
         confirmButton.textProperty().bind(translation.getStringBinding("Language.confirmButton"));
     }
 
+    /**
+     * Nothing needs to refreshed
+     * @param event the new Event data to process
+     */
     @Override
-    public void refresh(Event event) {
+    public void refresh(Event event) {}
 
-    }
-
+    /**
+     * Event handler for cancel button
+     */
     public void cancel() {
-        ctrl.switchScreens(EventScreenCtrl.class);
+        ctrl.closeLanguageGeneration();
     }
 }
