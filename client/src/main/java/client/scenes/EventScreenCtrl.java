@@ -7,6 +7,8 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -16,11 +18,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_RIGHT;
@@ -355,12 +354,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @return the generated hBox, containing the expense details
      */
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
-        String log = "";
+        ObservableValue<String> expenseTextValue;
         if(expense.getPriceInCents() > 0)
-            log = generateTextForExpenseLabel(expense);
-        else if(expense.getPriceInCents() < 0)
-            log = generateTextForMoneyTransfer(expense);
-        Label expenseText = generateExpenseLabel(expense.getId(), log);
+            expenseTextValue = generateTextForExpenseLabel(expense);
+        else
+            expenseTextValue = generateTextForMoneyTransfer(expense);
+        Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label dateLabel = new Label();
         dateLabel.setPrefWidth(40);
@@ -387,64 +386,68 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Generates the expense description for money transfers in this format: "A paid B 60.0"
+     * Generates the expense description for money transfers in this format: "A paid 60.0 to B"
      * @param expense The money transfer
      * @return Description of money transfer
      */
-    private String generateTextForMoneyTransfer(Expense expense) {
-        Participant from = (Participant) expense.getParticipantsInExpense().toArray()[0];
+    public ObservableValue<String> generateTextForMoneyTransfer(Expense expense) {
+        Participant sender = (Participant) expense.getParticipantsInExpense().toArray()[0];
         double amount = expense.getPriceInCents() / -100.0;
-        return from.getName() +
-                " paid " +
-                expense.getOwedTo().getName() +
-                " " + amount;
+        Participant receiver = expense.getOwedTo();
+
+        Map<String, String> substituteValues = new HashMap<>();
+        substituteValues.put("senderName", sender.getName());
+        substituteValues.put("amount", String.valueOf(amount)); //Replace with merged-in formatting utils
+        substituteValues.put("receiverName", receiver.getName());
+
+        return translation.getStringSubstitutionBinding("Event.String.transferString", substituteValues);
     }
 
     /**
      *
-     * @param expense the expense for which we are generating the
-     * label
-     * @return the resulting generated string
+     * @param expense the expense for which we are generating the label
+     * @return the resulting generated ObservableString
      */
-    public String generateTextForExpenseLabel(Expense expense) {
-        String log = expense.stringOnScreen();
+    public ObservableValue<String> generateTextForExpenseLabel(Expense expense) {
+        Map<String, String> substituteValues = new HashMap<>();
+        substituteValues.put("senderName", expense.getOwedTo().getName());
+        substituteValues.put("amount", String.valueOf(expense.getPriceInCents())); //Replace with merged-in formatting utils
+        substituteValues.put("expenseTitle", expense.getName());
+        ObservableValue<String> descriptionString =  translation.getStringSubstitutionBinding("Event.String.expenseString", substituteValues);
+
         Set<Participant> participants = event.getParticipants();
-        boolean all = true;
-        for(Participant participant: participants) {
-            all = false;
-            for (Participant participant1 : expense.getParticipantsInExpense())
-                if (participant.getId() == participant1.getId()) {
-                    all = true;
-                    break;
-                }
-            if(!all)
-                break;
-        }
-        if(all)
-            log += '\n' + "(All)";
+        Set<Participant> partipantsInExpense = expense.getParticipantsInExpense();
+
+        StringBuilder includedString = new StringBuilder();
+        if(participants.size() == partipantsInExpense.size())
+            includedString.append("\n(All)");
         else {
             if(expense.getParticipantsInExpense().isEmpty())
                 removeFromList(expense.getId());
-            log += '\n' + "(";
-            for(Participant participant: expense.getParticipantsInExpense())
-                if(event.getParticipants().contains(participant)) {
-                    log += participant.getName();
-                    log += " ";
-                }
-            log += ")";
+            includedString.append("\n(");
+            for(Participant participant: partipantsInExpense) {
+                includedString.append(participant.getName());
+                includedString.append(" ");
+            }
+            if(!partipantsInExpense.isEmpty()){
+                int indexToRemove = includedString.lastIndexOf(" ");
+                includedString.deleteCharAt(indexToRemove);
+            }
+            includedString.append(")");
         }
-        return log;
+        return Bindings.concat(descriptionString, includedString);
     }
 
     /**
      * Creates a label that will later be added to the hBox from the expense listview
      * Furthermore, it allows the client to access set expense and edit it
      * @param expenseId the id of the expense we are creating a label for
-     * @param expenseTitle the title of the expense
+     * @param expenseDescription the description of the expense
      * @return the created label
      */
-    public Label generateExpenseLabel(long expenseId, String expenseTitle) {
-        Label expense = new Label(expenseTitle);
+    public Label generateExpenseLabel(long expenseId, ObservableValue<String> expenseDescription) {
+        Label expense = new Label();
+        expense.textProperty().bind(expenseDescription);
         expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
         expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
         expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));
