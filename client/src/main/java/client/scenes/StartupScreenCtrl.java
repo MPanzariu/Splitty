@@ -7,6 +7,7 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.BadRequestException;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -16,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -105,18 +107,6 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
-        eventTitleTextBox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                createEventButton.fire();
-                event.consume();
-            }
-        });
-        inviteCodeTextBox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                joinEventButton.fire();
-                event.consume();
-            }
-        });
         Tooltip managementOverviewTooltip = new Tooltip();
         managementOverviewTooltip.setText("Ctrl + A");
         managementOverviewButton.setTooltip(managementOverviewTooltip);

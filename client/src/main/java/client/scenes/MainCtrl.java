@@ -1,16 +1,19 @@
 package client.scenes;
 
 import client.utils.AppStateManager;
+import client.utils.EmailHandler;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -35,10 +38,12 @@ public class MainCtrl {
     private Scene transferMoneyScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
+    private EventScreenCtrl eventScreenCtrl;
     @Inject
     @Named("client.language")
     private String language;
     private final AppStateManager manager;
+    private final EmailHandler emailHandler;
 
     /**
      * Constructor
@@ -46,9 +51,10 @@ public class MainCtrl {
      * @param manager the app state manager
      */
     @Inject
-    public MainCtrl(Translation translation, AppStateManager manager) {
+    public MainCtrl(Translation translation, AppStateManager manager, EmailHandler emailHandler){
         this.translation = translation;
         this.manager = manager;
+        this.emailHandler = emailHandler;
     }
 
     /**
@@ -98,7 +104,7 @@ public class MainCtrl {
         this.participantScreenCtrl = participantUI.getKey();
         this.transferMoneyCtrl = transferMoneyUI.getKey();
         this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
-
+        this.eventScreenCtrl = eventUI.getKey();
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
         showMainScreen();
@@ -148,6 +154,7 @@ public class MainCtrl {
         //This can also show a pop-up in the future, but right now it doesn't
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
         addMainScreenShortcuts();
+        addEventScreenShortcuts();
         primaryStage.show();
     }
 
@@ -255,16 +262,65 @@ public class MainCtrl {
      * ctrl + e switches to the event screen with the most recently joined event
      */
     public void addMainScreenShortcuts() {
-        //Switch to admin password screen ctrl + a
-        KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
-        //Switch to the event screen with the most recently joined event ctrl + e
-        KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
-        this.startupScene.setOnKeyPressed(e -> {
-            if (ctrlE.match(e)) {
+        EventHandler<KeyEvent> shortcutFilter = event -> {
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Switch to the event screen with the most recently joined event ctrl + e
+            KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+            if (ctrlE.match(event)) {
                 startupScreenCtrl.joinMostRecentEvent();
-            }else if (ctrlA.match(e)) {
+            }else if (ctrlA.match(event)) {
                 switchToManagementOverviewPasswordScreen();
             }
-        });
+        };
+        getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Adds shortcuts to the event scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + t tests the email invite
+     * ctrl + s switches to the statistics screen
+     * ctrl + e edits the title of the event
+     * ctrl + + adds a new expense
+     * ctrl + p adds a new participant
+     * ctrl + m transfers money
+     */
+    public void addEventScreenShortcuts(){
+        EventHandler<KeyEvent> shortcutFilter = event -> {
+            //Switch to admin password screen ctrl + a
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Test email invite ctrl + t
+            KeyCombination ctrlT = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+            //Switch to statistics screen ctrl + s
+            KeyCombination ctrlS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+            //Edit the title of the event ctrl + e
+            KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+            //Add a new expense ctrl + q
+            KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+            //Add a new participant ctrl + p
+            KeyCombination ctrlP = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+            //Invite by email ctrl + I
+            KeyCombination ctrlI = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+            eventScene.setOnKeyPressed(e -> {
+                if (ctrlA.match(e)) {
+                    switchToManagementOverviewPasswordScreen();
+                } else if (ctrlT.match(e)) {
+                    eventScreenCtrl.sendTestEmail();
+                } else if (ctrlS.match(e)) {
+                    eventScreenCtrl.switchToStatistics();
+                } else if (ctrlE.match(e)) {
+                    switchScreens(EditTitleCtrl.class);
+                } else if (ctrlQ.match(e)) {
+                    eventScreenCtrl.addExpense();
+                } else if (ctrlP.match(e)) {
+                    eventScreenCtrl.addParticipants();
+                } else if (ctrlI.match(e)) {
+                    if (emailHandler.isConfigured()){
+                        switchScreens(EmailInviteCtrl.class);
+                    }
+                }
+            });
+        };
+        this.eventScene.addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
     }
 }
