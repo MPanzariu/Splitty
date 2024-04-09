@@ -118,4 +118,25 @@ class EventScreenCtrlTest {
                 stringToObservable("John paid 0.12" + FormattingUtils.CURRENCY + " for Drinks" + "\n(John, Jane)");
         assertEquals(expected.getValue(), result.getValue());
     }
+
+    @Test
+    void generateTextForMoneyTransfer(){
+        int amount = 1929;
+        Expense transfer = new Expense("Transfer!", -1 * amount, null, participant1);
+        transfer.addParticipantToExpense(participant2);
+
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("senderName", "Jane");
+        expectedValues.put("amount", FormattingUtils.getFormattedPrice(amount));
+        expectedValues.put("receiverName", "John");
+        lenient().when(translation.getStringSubstitutionBinding("Event.String.transferString", expectedValues))
+                .thenReturn(stringToObservable(expectedValues.get("senderName") + " paid "
+                        + expectedValues.get("amount") + " to "
+                        + expectedValues.get("receiverName")));
+
+        ObservableValue<String> result = sut.generateTextForMoneyTransfer(transfer);
+        ObservableValue<String> expected =
+                stringToObservable("Jane paid 19.29" + FormattingUtils.CURRENCY + " to John");
+        assertEquals(expected.getValue(), result.getValue());
+    }
 }
