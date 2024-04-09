@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -150,8 +149,7 @@ public class SettleDebtsUtils {
     public ObservableValue<String> createTransferString(Transfer transfer) {
         int amount = transfer.amount();
         if(amount<=0) throw new IllegalArgumentException("Negative or zero transfer: " + transfer);
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        String formattedAmount = decimalFormat.format(amount / 100.0) + "\u20ac";
+        String formattedAmount = FormattingUtils.getFormattedPrice(amount);
 
         Map<String, String> substituteValues = new HashMap<>();
         substituteValues.put("senderName", transfer.sender().getName());

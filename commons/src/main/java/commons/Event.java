@@ -52,21 +52,23 @@ public class Event{
 
     /***
      * Calculates the total spending for the event
+     * Negative expenses are ignored.
      * @return an int of the total cost of the event, in cents
      */
     @JsonIgnore
     public int getTotalSpending(){
-        return expenses.stream().mapToInt(Expense::getPriceInCents).sum();
+        return expenses.stream().mapToInt(Expense::getPriceInCents).filter(x -> x >= 0).sum();
     }
 
     private final static BigDecimal initialBalance = BigDecimal.valueOf(0);
 
     /***
      * Calculates the total expense share per person
+     * @param includingTransfers whether negative balance expenses should be included (true for splitting, false for statistics)
      * @return A Map of participants to the total split cost of expenses they are in
      */
     @JsonIgnore
-    public HashMap<Participant,BigDecimal> getExpenseShare() {
+    public HashMap<Participant,BigDecimal> getExpenseShare(boolean includingTransfers) {
         HashMap<Participant, BigDecimal> shareMap = new HashMap<>();
 
         for (Participant participant:
@@ -78,6 +80,7 @@ public class Event{
                 expenses) {
             Set<Participant> members = expense.getParticipantsInExpense();
             int amountToSplit = expense.getPriceInCents();
+            if(!includingTransfers && amountToSplit <= 0) continue;
             splitAmountEqually(shareMap, members, amountToSplit);
         }
 
@@ -128,7 +131,7 @@ public class Event{
     public HashMap<Participant,BigDecimal> getOwedShares(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
 
-        HashMap<Participant, BigDecimal> shareMap = getExpenseShare();
+        HashMap<Participant, BigDecimal> shareMap = getExpenseShare(true);
         HashMap<Participant, Integer> spendingMap = getSpendingPerPerson();
 
         for(Participant participant: getParticipants()){

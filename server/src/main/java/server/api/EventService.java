@@ -35,10 +35,12 @@ public class EventService {
         Tag food = new Tag("food", "#008000");
         Tag entranceFees = new Tag("entrance fees", "#0000FF");
         Tag travel = new Tag("travel", "#FF0000");
+        Tag moneyTransfer = new Tag("money transfer", "#000000");
         event.addTag(defaultTag);
         event.addTag(food);
         event.addTag(entranceFees);
         event.addTag(travel);
+        event.addTag(moneyTransfer);
         return eventRepository.save(event);
     }
 
