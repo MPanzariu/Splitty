@@ -154,7 +154,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
 
         columnName.setCellValueFactory(participantValue -> new SimpleStringProperty(participantValue.getValue().getName()));
 
-        HashMap<Participant, BigDecimal> expenseShare = event.getExpenseShare();
+        HashMap<Participant, BigDecimal> expenseShare = event.getExpenseShare(false);
         HashMap<Participant, Integer> dataMap = RoundUtils.roundMap(expenseShare, RoundingMode.HALF_UP);
         columnAmount.setCellValueFactory(participantValue -> {
             Participant participant = participantValue.getValue();
