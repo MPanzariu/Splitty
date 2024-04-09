@@ -31,6 +31,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private final Translation translation;
     private final ManagementOverviewUtils utils;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private boolean listWasInitialized = false;
     /**
      * Constructor
@@ -40,15 +41,17 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * @param translation the Translation instance to use
      * @param utils       the ManagementOverviewUtils instance to use
      * @param imageUtils  the ImageUtils instance to use
+     * @param stringUtils the StringUtils instance to use
      */
     @Inject
     public DeleteEventsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                  ManagementOverviewUtils utils, ImageUtils imageUtils) {
+                                  ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
     }
 
     /**
@@ -83,9 +86,10 @@ public class DeleteEventsScreenCtrl implements Initializable {
             protected void updateItem(Event event, boolean empty) {
                 super.updateItem(event, empty);
                 if (empty || event == null || event.getId() == null) {
-                    setText(null);
+                    textProperty().bind(translation.getStringBinding("empty"));
                     setGraphic(null);
                 } else {
+                    textProperty().bind(stringUtils.generateTextForEventLabel(event));
                     checkBox.setText("Title: " + event.getTitle() + ", ID: " + event.getId());
                     checkBox.setOnAction(e -> eventSelectionMap.put(event, checkBox.isSelected()));
                     if (!eventSelectionMap.containsKey(event)) {
@@ -96,6 +100,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
                 }
             }
         });
+        listWasInitialized = true;
     }
 
     /**

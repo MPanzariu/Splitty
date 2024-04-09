@@ -7,7 +7,6 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -68,6 +67,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private Event event;
     private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
@@ -88,14 +88,16 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
         this.languageCtrl = languageCtrl;
@@ -355,9 +357,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
         ObservableValue<String> expenseTextValue;
         if(expense.getPriceInCents() > 0)
-            expenseTextValue = generateTextForExpenseLabel(expense, event);
+            expenseTextValue = stringUtils.generateTextForExpenseLabel(expense, event.getParticipants().size());
         else
-            expenseTextValue = generateTextForMoneyTransfer(expense);
+            expenseTextValue = stringUtils.generateTextForMoneyTransfer(expense);
         Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label dateLabel = new Label();
@@ -382,61 +384,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setAlignment(Pos.CENTER_LEFT);
         return expenseBox;
-    }
-
-    /**
-     * Generates the expense description for money transfers in this format: "A paid 60.0 to B"
-     * @param expense The money transfer
-     * @return Description of money transfer
-     */
-    public ObservableValue<String> generateTextForMoneyTransfer(Expense expense) {
-        Participant sender = (Participant) expense.getParticipantsInExpense().toArray()[0];
-        int amount = -1 * expense.getPriceInCents();
-        Participant receiver = expense.getOwedTo();
-
-        Map<String, String> substituteValues = new HashMap<>();
-        substituteValues.put("senderName", sender.getName());
-        substituteValues.put("amount", FormattingUtils.getFormattedPrice(amount));
-        substituteValues.put("receiverName", receiver.getName());
-
-        return translation.getStringSubstitutionBinding("Event.String.transferString", substituteValues);
-    }
-
-    /**
-     *
-     * @param expense the expense for which we are generating the label
-     * @param event the event of the relevant expense
-     * @return the resulting generated ObservableString
-     */
-    public ObservableValue<String> generateTextForExpenseLabel(Expense expense, Event event) {
-        Map<String, String> substituteValues = new HashMap<>();
-        substituteValues.put("senderName", expense.getOwedTo().getName());
-        substituteValues.put("amount", FormattingUtils.getFormattedPrice(expense.getPriceInCents()));
-        substituteValues.put("expenseTitle", expense.getName());
-        ObservableValue<String> descriptionString =  translation.getStringSubstitutionBinding("Event.String.expenseString", substituteValues);
-
-        Set<Participant> participants = event.getParticipants();
-        Set<Participant> partipantsInExpense = expense.getParticipantsInExpense();
-
-        StringBuilder includedSB = new StringBuilder();
-        if(participants.size() == partipantsInExpense.size())
-            includedSB.append("\n(All)");
-        else {
-            if(expense.getParticipantsInExpense().isEmpty())
-                removeFromList(expense.getId());
-            includedSB.append("\n(");
-            for(Participant participant: partipantsInExpense) {
-                includedSB.append(participant.getName());
-                includedSB.append(", ");
-            }
-            if(!partipantsInExpense.isEmpty()){
-                int indexToRemove = includedSB.lastIndexOf(",");
-                includedSB.delete(indexToRemove, indexToRemove + 2);
-            }
-            includedSB.append(")");
-        }
-        String includedString = includedSB.toString();
-        return Bindings.concat(descriptionString, includedString);
     }
 
     /**
