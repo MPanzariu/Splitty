@@ -11,10 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,12 +36,12 @@ class StringGenerationUtilsTest {
         participant2 = new Participant(2, "Jane");
         participant3 = new Participant(3, "Mike");
         participant4 = new Participant(4, "Bob");
-        event = new Event("Title", null);
+        event = new Event("TitleA", null);
         event.addParticipant(participant1);
         event.addParticipant(participant2);
         event.addParticipant(participant3);
         event.addParticipant(participant4);
-        expense1 = new Expense("Drinks", 12, null, participant1);
+        expense1 = new Expense("Drinks", 12, new Date(1929), participant1);
         Expense expense2 = new Expense("Food", 20, null, participant2);
         event.addExpense(expense1);
         event.addExpense(expense2);
@@ -112,6 +109,54 @@ class StringGenerationUtilsTest {
         ObservableValue<String> result = sut.generateTextForMoneyTransfer(transfer);
         ObservableValue<String> expected =
                 stringToObservable("Jane paid 19.29" + FormattingUtils.CURRENCY + " to John");
+        assertEquals(expected.getValue(), result.getValue());
+    }
+
+    @Test
+    void generateTextForExpenseLabelAdmin() {
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("senderName", "John");
+        expectedValues.put("amount", "0.12" + FormattingUtils.CURRENCY);
+        expectedValues.put("expenseTitle", "Drinks");
+        expectedValues.put("date", "01/01/1970");
+        lenient().when(translation.getStringSubstitutionBinding("SGU.String.expenseStringAdmin", expectedValues))
+                .thenReturn(stringToObservable(expectedValues.get("senderName") + " paid "
+                        + expectedValues.get("amount") + " for "
+                        + expectedValues.get("expenseTitle") + " on "
+                        + expectedValues.get("date")));
+
+        ObservableValue<String> result = sut.generateTextForExpenseAdminLabel(expense1);
+        ObservableValue<String> expected =
+                stringToObservable("John paid 0.12" + FormattingUtils.CURRENCY + " for Drinks on 01/01/1970");
+        assertEquals(expected.getValue(), result.getValue());
+    }
+
+    @Test
+    void generateTextForEvent() {
+        String eventId = event.getId();
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("title", "TitleA");
+        expectedValues.put("id", eventId);
+        lenient().when(translation.getStringSubstitutionBinding("SGU.String.eventString", expectedValues))
+                .thenReturn(stringToObservable("Title: " + expectedValues.get("title")
+                                                + ", ID: "+ expectedValues.get("id")));
+
+        ObservableValue<String> result = sut.generateTextForEventLabel(event);
+        ObservableValue<String> expected =
+                stringToObservable("Title: TitleA, ID: " + eventId);
+        assertEquals(expected.getValue(), result.getValue());
+    }
+
+    @Test
+    void generateTextForParticipant() {
+        Map<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("participantName", "John");
+        lenient().when(translation.getStringSubstitutionBinding("SGU.String.participantString", expectedValues))
+                .thenReturn(stringToObservable("Participant: " + expectedValues.get("participantName")));
+
+        ObservableValue<String> result = sut.generateTextForParticipantLabel(participant1);
+        ObservableValue<String> expected =
+                stringToObservable("Participant: John");
         assertEquals(expected.getValue(), result.getValue());
     }
 }

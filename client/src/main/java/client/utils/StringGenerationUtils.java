@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class StringGenerationUtils {
-    private Translation translation;
+    private final Translation translation;
 
     /***
      * Constructor for StringGenerationUtils
@@ -57,7 +57,6 @@ public class StringGenerationUtils {
         ObservableValue<String> descriptionString =  translation.getStringSubstitutionBinding(
                 "SGU.String.expenseString", substituteValues);
 
-
         String includedString = generateIncludingString(expense, totalParticipants);
         return Bindings.concat(descriptionString, includedString);
     }
@@ -85,8 +84,7 @@ public class StringGenerationUtils {
             }
             includedSB.append(")");
         }
-        String includedString = includedSB.toString();
-        return includedString;
+        return includedSB.toString();
     }
 
     /**
