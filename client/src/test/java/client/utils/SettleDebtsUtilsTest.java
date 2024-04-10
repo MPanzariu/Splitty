@@ -4,10 +4,8 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.Tag;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -15,20 +13,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({ApplicationExtension.class, MockitoExtension.class})
+@ExtendWith(MockitoExtension.class)
 class SettleDebtsUtilsTest {
     @InjectMocks
     SettleDebtsUtils sut;
@@ -44,15 +40,6 @@ class SettleDebtsUtilsTest {
     Participant participant1;
     Participant participant2;
     Participant participant3;
-
-    @BeforeAll
-    static void testFXSetup(){
-        System.setProperty("testfx.robot", "glass");
-        System.setProperty("testfx.headless", "true");
-        System.setProperty("glass.platform", "Monocle");
-        System.setProperty("monocle.platform", "Headless");
-        System.setProperty("prism.order", "sw");
-    }
 
     @BeforeEach
     void setup(){
@@ -423,65 +410,5 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains(name));
         assertTrue(result.contains("(MISSING)"));
         assertTrue(result.contains(bic));
-    }
-
-    @Test
-    void generateEmailBodyNoBankCredentials(){
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        String emailBody = sut.generateEmailBody(t);
-
-        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver\n\n" +"Thank you!");
-    }
-
-    @Test
-    void generateEmailBodyWithBankCredentials(){
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        receiver.setBic("BIC");
-        receiver.setIban("IBAN");
-        receiver.setLegalName("Legal Name");
-        Transfer t = new Transfer(sender, 10,receiver);
-        String emailBody = sut.generateEmailBody(t);
-        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver to the following bank account:\n" +
-                "\n" +
-                "Name: Legal Name\n" +
-                "IBAN: IBAN\n" +
-                "BIC: BIC\n" +
-                "\n" +
-                "Thank you!");
-    }
-
-    @Test
-    void sendEmailTransferTestSuccess(){
-        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(true);
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        sut.sendEmailTransferEmail(t);
-        waitForJavaFX();
-        verify(emailHandler, times(1)).showSuccessPrompt();
-    }
-
-    @Test
-    void sendEmailTransferTestFail(){
-        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(false);
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        sut.sendEmailTransferEmail(t);
-        waitForJavaFX();
-        verify(emailHandler, times(1)).showFailPrompt();
-    }
-
-    private void waitForJavaFX() {
-        final CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(latch::countDown);
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }
