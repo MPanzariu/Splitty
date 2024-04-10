@@ -7,7 +7,7 @@ import java.util.Properties;
 public class ConfigUtils {
     public static final String CONFIG_NAME = "client/splitty.properties";
     // update this whenever you add/remove/change default properties
-    public static final int CONFIG_VERSION = 3;
+    public static final int CONFIG_VERSION = 4;
     public static final String DEFAULT_PROPS_SERVER_URL = "http://localhost:8080/";
     // Flag of Great Britain is used for representing English
     public static final String DEFAULT_PROPS_LANGUAGE = Locale.ENGLISH.getLanguage() + "_GB";
