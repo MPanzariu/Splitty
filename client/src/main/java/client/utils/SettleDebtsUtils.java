@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -19,26 +20,28 @@ public class SettleDebtsUtils {
     private final Translation translation;
     private final ServerUtils server;
     private final TransferMoneyUtils transferUtils;
-
+    private EmailHandler emailHandler;
 
     /***
      * Constructor for the utility class for the SettleDebts screen
      * @param translation - the Translation to use
      * @param server - the SeverUtils to use
      * @param transferUtils - the TransferMoneyUtils to use
+     * @param emailHandler - the emailHandler to use
      */
     @Inject
-    public SettleDebtsUtils(Translation translation, ServerUtils server, TransferMoneyUtils transferUtils) {
+    public SettleDebtsUtils(Translation translation, ServerUtils server, TransferMoneyUtils transferUtils, EmailHandler emailHandler) {
         this.translation = translation;
         this.server = server;
         this.transferUtils = transferUtils;
+        this.emailHandler = emailHandler;
     }
 
     //Pseudocode adapted from: https://stackoverflow.com/questions/4554655/who-owes-who-money-optimization
     /***
      * Calculates at most N-1 transfer instructions for N participants
      * @param creditMap a Map of participants to credit(+)/debt(-)
-     * @return a Set of Transfer instructions (sender, amount, receiver)
+     * @return a List of Transfer instructions (sender, amount, receiver)
      */
     public List<Transfer> calculateTransferInstructions(HashMap<Participant, BigDecimal> creditMap){
         List<Transfer> result = new LinkedList<>();
@@ -156,5 +159,55 @@ public class SettleDebtsUtils {
 
         return Bindings.concat(availability, "\n", translation.getStringSubstitutionBinding("SettleDebts.String.bankDetails",
                 substituteValues));
+    }
+
+
+    /**
+     * Sends the email to the participant to pay
+     * @param transfer the transfer to send the email for
+     */
+    public void sendEmailTransferEmail(Transfer transfer) {
+        String emailBody = generateEmailBody(transfer);
+        String emailSubject = "Payment Request";
+        boolean result = emailHandler.sendEmail(transfer.sender().getEmail(),emailSubject,emailBody);
+        if (result){
+            Platform.runLater(() -> {
+                emailHandler.showSuccessPrompt();
+            });
+        }else{
+            Platform.runLater(() -> {
+                emailHandler.showFailPrompt();
+            });
+        }
+    }
+
+    /**
+     * Generates an email body for the transfer
+     * @param transfer the transfer to generate the email body for
+     * @return the email body
+     */
+    public String generateEmailBody(Transfer transfer) {
+        String emailBody;
+        if (transfer.receiver().hasBankAccount()) {
+            emailBody= """
+                Please transfer the amount of {amount} to {receiver} to the following bank account:
+
+                {bankDetails}
+
+                Thank you!""";
+            emailBody = emailBody.replace("{bankDetails}",
+                    "Name: " + transfer.receiver().getLegalName() + "\n" +
+                               "IBAN: " + transfer.receiver().getIban() + "\n" +
+                               "BIC: " + transfer.receiver().getBic());
+        }else{
+            emailBody= """
+                Please transfer the amount of {amount} to {receiver}
+
+                Thank you!""";
+        }
+
+        emailBody = emailBody.replace("{amount}", FormattingUtils.getFormattedPrice(transfer.amount()));
+        emailBody = emailBody.replace("{receiver}", transfer.receiver().getName());
+        return emailBody;
     }
 }

@@ -18,8 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
-    private static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
-    private static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
+    private static final String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
+    private static final String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -209,23 +209,23 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                     .bind(translation.getStringBinding("Participants.Label.noName"));
             ok = false;
         }
-        if(participant.getEmail().equals("empty")){
+        if(participant.getEmail() != null &&participant.getEmail().equals("empty")){
             noEmail.textProperty()
                     .bind(translation.getStringBinding("Participants.Label.noEmail"));
             ok = false;
         }
         else{
-            if(participant.getEmail().equals("wrongEmail")){
+            if(participant.getEmail() != null && participant.getEmail().equals("wrongEmail")){
                 noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
             }
         }
-        if(participant.getIban().equals("wrongIban")) {
+        if(participant.getIban() != null && participant.getIban().equals("wrongIban")) {
             wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
             ok = false;
         }
-        if(participant.getBic().equals("wrongBic")){
+        if(participant.getBic() != null &&  participant.getBic().equals("wrongBic")){
             wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
             ok = false;
         }
@@ -358,6 +358,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkEmail (String email){
+        if (email == null || email.isEmpty()){
+            return false;
+        }
         String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailLike);
         Matcher matcher = emailPattern.matcher(email);
@@ -375,6 +378,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkBic (String bic){
+        if (bic == null || bic.isEmpty()){
+            return false;
+        }
         Matcher matcher = bicPattern.matcher(bic);
         return matcher.matches();
     }
@@ -384,7 +390,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param iban the value inserted by the user
      * @return true if the value is correct, false otherwise
      */
-    public boolean checkIban (String iban){
+    public boolean checkIban (String iban) {
+        if (iban == null || iban.isEmpty()){
+            return false;
+        }
         Matcher matcher = ibanPattern.matcher(iban);
         return matcher.matches();
     }
