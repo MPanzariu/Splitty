@@ -17,7 +17,7 @@ import java.util.Properties;
 public class Translation {
     private final ObservableResourceFactory resourceFactory;
     private Locale locale;
-    public static final String LANGUAGE_PATH = "lang/";
+    public static final String LANGUAGE_PATH = "client/lang/";
 
     /***
      * Constructor that takes the resourceFactory the Translation encapsulates

@@ -86,7 +86,7 @@ public class LanguageSwitchTests {
             languageProperties.setProperty("A", "");
             return null;
         }).when(readerUtils).loadProperties(languageProperties, reader);
-        when(readerUtils.createReader("lang/en_US.properties")).thenReturn(reader);
+        when(readerUtils.createReader(Translation.LANGUAGE_PATH + "en_US.properties")).thenReturn(reader);
         assertTrue(utils.hasEmptyProperty(Locale.of("en", "US")));
         verify(reader).close();
     }
@@ -103,7 +103,7 @@ public class LanguageSwitchTests {
             languageProperties.setProperty("error", "You're wrong!");
             return null;
         }).when(readerUtils).loadProperties(languageProperties, reader);
-        when(readerUtils.createReader("lang/en_US.properties")).thenReturn(reader);
+        when(readerUtils.createReader(Translation.LANGUAGE_PATH + "en_US.properties")).thenReturn(reader);
         assertFalse(utils.hasEmptyProperty(Locale.of("en", "US")));
         verify(reader).close();
     }

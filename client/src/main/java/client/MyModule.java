@@ -18,6 +18,7 @@ package client;
 import client.scenes.LanguageIndicatorCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 

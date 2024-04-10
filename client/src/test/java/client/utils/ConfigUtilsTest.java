@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class ConfigUtilsTest {
     Properties testProperties;

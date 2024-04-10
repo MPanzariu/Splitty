@@ -55,7 +55,7 @@ public class LanguageSwitchUtils {
      */
     public boolean hasEmptyProperty(Locale locale) {
         try {
-            FileReader reader = readerUtils.createReader("lang/" + locale.getLanguage() + "_" +
+            FileReader reader = readerUtils.createReader(Translation.LANGUAGE_PATH + locale.getLanguage() + "_" +
                     locale.getCountry() + ".properties");
             readerUtils.loadProperties(languageProperties, reader);
             reader.close();

@@ -29,6 +29,8 @@ public class GenerateLanguageTemplateCtrl implements Initializable, SimpleRefres
     private Button cancelButton;
     @FXML
     private Button confirmButton;
+    @FXML
+    private Label nameLabel;
     private final Translation translation;
     private final MainCtrl mainCtrl;
 
@@ -54,6 +56,7 @@ public class GenerateLanguageTemplateCtrl implements Initializable, SimpleRefres
         nameTextField.promptTextProperty().bind(translation.getStringBinding("Language.nameTextField"));
         cancelButton.textProperty().bind(translation.getStringBinding("Language.cancelButton"));
         confirmButton.textProperty().bind(translation.getStringBinding("Language.confirmButton"));
+        nameLabel.textProperty().bind(translation.getStringBinding("Language.nameLabel"));
     }
 
     /**
@@ -77,12 +80,12 @@ public class GenerateLanguageTemplateCtrl implements Initializable, SimpleRefres
     public void confirm() {
         try {
             if(isLanguageValid(nameTextField.getText())) {
-                Files.copy(Path.of("lang/template.properties"),
-                        Path.of("lang/" + nameTextField.getText() + ".properties"));
+                Files.copy(Path.of(Translation.LANGUAGE_PATH + "template.properties"),
+                        Path.of(Translation.LANGUAGE_PATH + nameTextField.getText() + ".properties"));
                 mainCtrl.closeLanguageGeneration();
                 nameTextField.clear();
             } else {
-                new Alert(Alert.AlertType.ERROR, ConfigUtils.CONFIG_COMMENTS).showAndWait();
+                new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.format").getValue()).showAndWait();
             }
         } catch (FileAlreadyExistsException e) {
             new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.languageExists").getValue())
