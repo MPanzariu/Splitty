@@ -1,11 +1,13 @@
 package client.utils;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +19,7 @@ import java.util.*;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SettleDebtsUtilsTest {
@@ -27,6 +29,8 @@ class SettleDebtsUtilsTest {
     ServerUtils server;
     @Mock
     Translation translation;
+    @Mock
+    TransferMoneyUtils transferUtils;
 
     Participant participant1;
     Participant participant2;
@@ -43,25 +47,26 @@ class SettleDebtsUtilsTest {
         return BigDecimal.valueOf(number);
     }
 
+    BigDecimal bigDecimalize(double number){
+        return BigDecimal.valueOf(number);
+    }
+
     /***
      * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 3 people (tends to leave rounding issues...)
      */
-    @Test
+    @RepeatedTest(5)
     void randomTransferInstructions(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
         Random rng = new Random();
 
-        Participant participant4 = new Participant("VVV");
-
         int rand1 = generateRandom(rng);
         int rand2 = generateRandom(rng);
-        int rand3 = generateRandom(rng);
-        int balancer = -(rand1+rand2+rand3);
+        int balancer = -(rand1+rand2);
 
-        creditMap.put(participant1, bigDecimalize(rand1));
-        creditMap.put(participant2, bigDecimalize(rand2));
-        creditMap.put(participant3, bigDecimalize(rand3));
-        creditMap.put(participant4, bigDecimalize(balancer));
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
 
         var initialResult = sut.calculateTransferInstructions(creditMap);
         assertTrue(initialResult.size()<creditMap.size());
@@ -136,31 +141,47 @@ class SettleDebtsUtilsTest {
     }
 
     /***
-     * Net positive amounts are rejected
+     * Amounts that will end up net-positive after rounding result in creditor not being paid off the missing cent fractions
      */
     @Test
     void netPositiveTransferInstructions(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Participant participant4 = new Participant("VVV");
+        Participant participant5 = new Participant("AAA");
 
-        creditMap.put(participant1, bigDecimalize(100));
-        creditMap.put(participant2, bigDecimalize(-10));
-        creditMap.put(participant3, bigDecimalize(-20));
+        BigDecimal credit = bigDecimalize(1.6);
+        BigDecimal debtAbovePointFive = bigDecimalize(-0.6);
+        BigDecimal fractionalShare = bigDecimalize(-0.3);
 
-        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
+        creditMap.put(participant1, credit);
+        creditMap.put(participant2, fractionalShare);
+        creditMap.put(participant3, fractionalShare);
+        creditMap.put(participant4, fractionalShare);
+        creditMap.put(participant5, debtAbovePointFive);
+
+        Transfer expectedTransfer = new Transfer(participant5, 1, participant1);
+        var result = sut.calculateTransferInstructions(creditMap);
+
+        assertTrue(result.contains(expectedTransfer));
+        assertEquals(1, result.size());
     }
 
     /***
-     * Net negative amounts are rejected
+     * Amounts that will end up net-negative after rounding result in creditor being paid off but debtors having negative balance
      */
     @Test
     void netNegativeTransferInstructions(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
 
-        creditMap.put(participant1, bigDecimalize(100));
-        creditMap.put(participant2, bigDecimalize(-70));
-        creditMap.put(participant3, bigDecimalize(-50));
+        creditMap.put(participant1, bigDecimalize(1.33));
+        creditMap.put(participant2, bigDecimalize(-0.66));
+        creditMap.put(participant3, bigDecimalize(-0.66));
 
-        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
+        Transfer expectedTransfer = new Transfer(participant2, 1, participant1);
+        var result = sut.calculateTransferInstructions(creditMap);
+
+        assertTrue(result.contains(expectedTransfer));
+        assertEquals(1, result.size());
     }
 
     /***
@@ -173,9 +194,14 @@ class SettleDebtsUtilsTest {
         Event event = new Event("Title!", null);
         event.addTag(new Tag("money transfer", null));
         Transfer transfer = new Transfer(participant1, 7, participant2);
+
+        Expense settleExpense = new Expense("Money Transfer", 7, null, participant2);
+        settleExpense.addParticipantToExpense(participant1);
+        when(transferUtils.transferMoney(transfer, event)).thenReturn(settleExpense);
+
         EventHandler<ActionEvent> result = sut.createSettleAction(transfer, event);
         result.handle(new ActionEvent());
-        assertNotNull(result);
+        verify(server).addExpense(event.getId(), settleExpense);
     }
 
     /***
