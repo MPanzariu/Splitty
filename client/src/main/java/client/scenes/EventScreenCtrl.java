@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -66,6 +67,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private Event event;
     private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
@@ -86,20 +88,18 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
-       // this.buttonsHBox = new HBox();
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
     }
@@ -118,6 +118,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         participantsName.textProperty()
@@ -360,12 +363,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @return the generated hBox, containing the expense details
      */
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
-        String log = "";
+        ObservableValue<String> expenseTextValue;
         if(expense.getPriceInCents() > 0)
-            log = generateTextForExpenseLabel(expense);
-        else if(expense.getPriceInCents() < 0)
-            log = generateTextForMoneyTransfer(expense);
-        Label expenseText = generateExpenseLabel(expense.getId(), log);
+            expenseTextValue = stringUtils.generateTextForExpenseLabel(expense, event.getParticipants().size());
+        else
+            expenseTextValue = stringUtils.generateTextForMoneyTransfer(expense);
+        Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label dateLabel = new Label();
         dateLabel.setPrefWidth(40);
@@ -392,64 +395,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * Generates the expense description for money transfers in this format: "A paid B 60.0"
-     * @param expense The money transfer
-     * @return Description of money transfer
-     */
-    private String generateTextForMoneyTransfer(Expense expense) {
-        Participant from = (Participant) expense.getParticipantsInExpense().toArray()[0];
-        double amount = expense.getPriceInCents() / -100.0;
-        return from.getName() +
-                " paid " +
-                expense.getOwedTo().getName() +
-                " " + amount;
-    }
-
-    /**
-     *
-     * @param expense the expense for which we are generating the
-     * label
-     * @return the resulting generated string
-     */
-    public String generateTextForExpenseLabel(Expense expense) {
-        String log = expense.stringOnScreen();
-        Set<Participant> participants = event.getParticipants();
-        boolean all = true;
-        for(Participant participant: participants) {
-            all = false;
-            for (Participant participant1 : expense.getParticipantsInExpense())
-                if (participant.getId() == participant1.getId()) {
-                    all = true;
-                    break;
-                }
-            if(!all)
-                break;
-        }
-        if(all)
-            log += '\n' + "(All)";
-        else {
-            if(expense.getParticipantsInExpense().isEmpty())
-                removeFromList(expense.getId());
-            log += '\n' + "(";
-            for(Participant participant: expense.getParticipantsInExpense())
-                if(event.getParticipants().contains(participant)) {
-                    log += participant.getName();
-                    log += " ";
-                }
-            log += ")";
-        }
-        return log;
-    }
-
-    /**
      * Creates a label that will later be added to the hBox from the expense listview
      * Furthermore, it allows the client to access set expense and edit it
      * @param expenseId the id of the expense we are creating a label for
-     * @param expenseTitle the title of the expense
+     * @param expenseDescription the description of the expense
      * @return the created label
      */
-    public Label generateExpenseLabel(long expenseId, String expenseTitle) {
-        Label expense = new Label(expenseTitle);
+    public Label generateExpenseLabel(long expenseId, ObservableValue<String> expenseDescription) {
+        Label expense = new Label();
+        expense.textProperty().bind(expenseDescription);
         expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
         expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
         expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));
