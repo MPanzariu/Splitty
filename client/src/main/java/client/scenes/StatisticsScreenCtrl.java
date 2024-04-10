@@ -5,6 +5,8 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import jakarta.inject.Inject;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -16,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import java.net.URL;
@@ -35,10 +38,9 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Label shareLabel;
     @FXML
-    private PieChart tagPieChart;
-    @FXML
     private Button goBackButton;
     private TableView<Participant> shareTable;
+    private PieChart tagPieChart;
     private Event event;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -89,11 +91,18 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     public void refresh(Event event) {
         this.event = event;
         setTotalSumOfExpenses();
-        setPieChart();
-        parentPane.getChildren().remove(shareTable);
+
+        var children = parentPane.getChildren();
+        children.remove(shareTable);
+        children.remove(tagPieChart);
+
         TableView<Participant> newTable = generateShareTable(event);
-        parentPane.getChildren().add(newTable);
+        PieChart newPieChart = generatePieChart(event);
+
+        children.add(newTable);
+        children.add(newPieChart);
         shareTable = newTable;
+        tagPieChart = newPieChart;
     }
 
     /**
@@ -105,10 +114,18 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * set up the pie chart with the colors of the tags, their contribution to the pie Chart and
+     * Generates the pie chart with the colors of the tags, their contribution to the pie Chart and
      * also has a way of showing the name of each tag in the piechart by using a line
+     * @param event the Event data to use
+     * @return a PieChart containing all relevant data
      */
-    private void setPieChart(){
+    private PieChart generatePieChart(Event event){
+        PieChart tagPieChart = new PieChart();
+        tagPieChart.setLayoutX(-150); //comical amounts of whitespace courtesy of JavaFX
+        tagPieChart.setLayoutY(140);
+        tagPieChart.setPrefHeight(300);
+        tagPieChart.setPrefWidth(750); //this is needed for a ~400px pie chart...
+
         Map<String, Integer> tagExpenseMap = new HashMap<>();
         Map<String, String> tagColorMap = new HashMap<>();
         Set<Expense> expenses = event.getExpenses();
@@ -121,25 +138,43 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
             tagExpenseMap.merge(tagName, expensePrice, Integer::sum);
             tagColorMap.putIfAbsent(tagName, colorCode);
         }
-        tagPieChart.getData().clear();
         tagPieChart.layout();
+        int sumOfTags = 0;
         for (Map.Entry<String, Integer> entry : tagExpenseMap.entrySet()) {
             PieChart.Data data = new PieChart.Data(entry.getKey(), entry.getValue());
             tagPieChart.getData().add(data);
+            sumOfTags += entry.getValue();
         }
+        final int finalSum = sumOfTags; //Lambda complains about non-final value
         tagPieChart.getData().forEach(data -> {
             String color = tagColorMap.get(data.getName());
             if (data.getNode() != null) {
                 data.getNode().setStyle("-fx-pie-color: " + color + ";");
+                data.nameProperty().bind(generateSegmentLabel(data, finalSum));
             } else {
                 data.nodeProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
                         newValue.setStyle("-fx-pie-color: " + color + ";");
+                        data.nameProperty().bind(generateSegmentLabel(data, finalSum));
                     }
                 });
             }
         });
         tagPieChart.setLegendVisible(false);
+        return tagPieChart;
+    }
+
+    /***
+     * Generates a segment label for a pie chart: Name \n XX€ (XX%)
+     * @param data the PieChart Data to use
+     * @param finalSum the total sum of all pie values
+     * @return a StringExpression to assign to a nameProperty inside a PieChart Data Node
+     */
+    public StringExpression generateSegmentLabel(PieChart.Data data, int finalSum){
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        String price = FormattingUtils.getFormattedPrice((int) data.getPieValue());
+        String percentageOfTotal = decimalFormat.format(100 * data.getPieValue() / finalSum);
+        return Bindings.concat(data.getName(), "\n" + price + " (" + percentageOfTotal + "%)");
     }
 
     /***
@@ -171,7 +206,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
         columnAmount.setPrefWidth(70);
         table.getColumns().add(columnAmount);
 
-        table.setLayoutX(400);
+        table.setLayoutX(440);
         table.setLayoutY(180);
         table.setPrefHeight(200);
         table.setPrefWidth(170);
