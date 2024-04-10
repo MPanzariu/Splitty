@@ -1,37 +1,36 @@
 package client.utils;
 
-import client.scenes.GenerateLanguageTemplate;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
 
 public class LanguageSwitchUtils {
     private final ObservableList<Locale> languages = FXCollections.observableArrayList();
-    private final Translation translation;
     private final File dir;
-    private final Properties properties;
+    private final Properties configProperties;
+    private final Properties languageProperties;
+    private final ReaderUtils readerUtils;
 
     /**
      * Constructor
-     * @param translation
-     * @param dir
-     * @param properties
+     * @param dir Language template directory
+     * @param configProperties Properties from the config file
+     * @param languageProperties Properties from the currently selected language
+     * @param readerUtils Utilities for reading (properties)
      */
     @Inject
-    public LanguageSwitchUtils(Translation translation, @Named("dir") File dir,
-                               @Named("config") Properties properties) {
-        this.translation = translation;
+    public LanguageSwitchUtils(@Named("dir") File dir,
+                               @Named("config") Properties configProperties, Properties languageProperties,
+                               ReaderUtils readerUtils) {
         this.dir = dir;
-        this.properties = properties;
+        this.configProperties = configProperties;
+        this.languageProperties = languageProperties;
+        this.readerUtils = readerUtils;
     }
 
     /**
@@ -41,11 +40,28 @@ public class LanguageSwitchUtils {
     public void persistLanguage(Locale language) {
         try {
             FileWriter writer = new FileWriter(ConfigUtils.CONFIG_NAME);
-            properties.setProperty("client.language", language.getLanguage() + "_" + language.getCountry());
-            properties.store(writer, ConfigUtils.CONFIG_COMMENTS);
+            configProperties.setProperty("client.language", language.getLanguage() + "_" + language.getCountry());
+            configProperties.store(writer, ConfigUtils.CONFIG_COMMENTS);
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(ConfigUtils.CONFIG_NAME + " is not found!");
+        }
+    }
+
+    /**
+     * Check if any of the properties has an empty value.
+     * @param locale Locale of selected properties file
+     * @return True iff any property has an empty value, else false.
+     */
+    public boolean hasEmptyProperty(Locale locale) {
+        try {
+            FileReader reader = readerUtils.createReader("lang/" + locale.getLanguage() + "_" +
+                    locale.getCountry() + ".properties");
+            readerUtils.loadProperties(languageProperties, reader);
+            reader.close();
+            return languageProperties.contains("");
+        } catch (IOException e) {
+            return false;
         }
     }
 
@@ -58,6 +74,8 @@ public class LanguageSwitchUtils {
         if(files != null) {
             for(File properties : files) {
                 String name = properties.getName();
+                if(name.equals("template.properties"))
+                    continue;
                 String[] parts = name.split("_|\\.");
                 languages.add(Locale.of(parts[0], parts[1]));
             }

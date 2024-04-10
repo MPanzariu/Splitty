@@ -45,6 +45,7 @@ public class MyModule implements Module {
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
         binder.bind(TransferMoneyUtils.class).in(Scopes.SINGLETON);
         binder.bind(Stage.class).in(Scopes.SINGLETON);
+        binder.bind(ReaderUtils.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }

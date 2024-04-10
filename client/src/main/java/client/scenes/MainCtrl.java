@@ -31,7 +31,7 @@ public class MainCtrl {
     private Scene deleteEventsScene;
     private TransferMoneyCtrl transferMoneyCtrl;
     private Scene transferMoneyScene;
-    private GenerateLanguageTemplate generateLanguageTemplateCtrl;
+    private GenerateLanguageTemplateCtrl generateLanguageTemplateCtrl;
     private Scene generateLanguageTemplateScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
@@ -69,6 +69,7 @@ public class MainCtrl {
      * @param addTagUI the add tag UI
      * @param emailInviteUI the email invite UI
      * @param statisticsScreenUI the statistics screen UI
+     * @param generateLanguageTemplatePair UI for generating an empty language template
      */
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
@@ -84,7 +85,7 @@ public class MainCtrl {
                            Pair<AddTagCtrl, Parent> addTagUI,
                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI,
-                           Pair<GenerateLanguageTemplate, Parent> generateLanguageTemplatePair){
+                           Pair<GenerateLanguageTemplateCtrl, Parent> generateLanguageTemplatePair){
 
 
         String[] languageParts = language.split("_|\\.");
@@ -147,7 +148,7 @@ public class MainCtrl {
                 new ScreenInfo(transferMoneyCtrl, true, transferMoneyScene, "TransferMoney.title"));
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
-        screenMap.put(GenerateLanguageTemplate.class,
+        screenMap.put(GenerateLanguageTemplateCtrl.class,
                 new ScreenInfo(generateLanguageTemplateCtrl, false, generateLanguageTemplateScene, "Event.Language.Generate"));
         manager.setScreenInfoMap(screenMap);
 

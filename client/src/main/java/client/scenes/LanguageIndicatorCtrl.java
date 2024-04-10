@@ -5,6 +5,7 @@ import client.utils.Translation;
 import com.google.inject.Inject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -24,6 +25,7 @@ public class LanguageIndicatorCtrl {
      * Constructor for the LanguageIndicatorCtrl
      * @param translation - the translation to use
      * @param utils - the language switch utils to use
+     * @param main - Main controller for switching screens
      */
     @Inject
     public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils, MainCtrl main) {
@@ -47,11 +49,11 @@ public class LanguageIndicatorCtrl {
                 super.updateItem(item, empty);
                 if(item == null || empty) {
                     setGraphic(null);
-                    setText(null);
+                    textProperty().unbind();
                 } else if(item.getLanguage().isEmpty()) {
-                    setText(generationMessage.get());
+                    textProperty().bind(generationMessage);
                 } else {
-                    setText(item.getLanguage());
+                    textProperty().bind(new SimpleStringProperty(item.getLanguage()));
                 }
             }
         };
@@ -77,9 +79,12 @@ public class LanguageIndicatorCtrl {
                 if(newValue.equals(Locale.ROOT)) {
                     languageIndicator.getSelectionModel().select(translation.getLocale());
                     main.openLanguageGeneration();
-                } else {
+                } else if(!utils.hasEmptyProperty(newValue)) {
                     translation.changeLanguage(newValue);
                     utils.persistLanguage(newValue);
+                } else {
+                    new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.errorLabel").getValue()).showAndWait();
+                    languageIndicator.setValue(oldValue);
                 }
             }
         });
