@@ -90,7 +90,6 @@ public class DeleteEventsScreenCtrl implements Initializable {
                     setGraphic(null);
                 } else {
                     textProperty().bind(stringUtils.generateTextForEventLabel(event));
-                    checkBox.setText("Title: " + event.getTitle() + ", ID: " + event.getId());
                     checkBox.setOnAction(e -> eventSelectionMap.put(event, checkBox.isSelected()));
                     if (!eventSelectionMap.containsKey(event)) {
                         eventSelectionMap.put(event, false);
