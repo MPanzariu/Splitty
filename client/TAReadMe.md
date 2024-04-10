@@ -23,3 +23,20 @@ _**These default values work for gmail:**_
 
  * spring.mail.properties.mail.smtp.starttls.enable=true (use TLS)
 
+**Implemented Shortcuts** 
+
+Main Menu:
+* Ctrl + A: Goes to admin overview password
+* Ctrl + E: Joins the most recently joined event from the history
+
+Event Overview:
+* Ctrl + T: Test email invite 
+* Ctrl + S: Switch to statistics screen 
+* Ctrl + E: Edit the title of the event 
+* Ctrl + Q: Add a new expense 
+* Ctrl + P: Add a new participant 
+* Ctrl + I: Invite by email 
+* Ctrl + B: Go to main screen 
+* Ctrl + F: Add tag 
+* Ctrl + D: Transfer movie 
+* Ctrl + G: Settle debts 
