@@ -41,6 +41,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox settleVBox;
     private Event event;
     private Pair<Pane, Button> lastExpanded;
+    private Styling styling;
 
     /***
      * Constructor for the SettleDebtsScreen
@@ -51,13 +52,15 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Inject
     public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,
-                                 SettleDebtsUtils utils, ImageUtils imageUtils) {
+                                 SettleDebtsUtils utils, ImageUtils imageUtils,
+                                 Styling styling) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
         this.event = null;
         this.lastExpanded = null;
+        this.styling = styling;
     }
 
     /***
@@ -121,7 +124,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         pane.getChildren().add(text);
         pane.setVisible(false);
         pane.setManaged(false);
-        Styling.applyStyling(pane, "borderVBox");
+        styling.applyStyling(pane, "borderVBox");
         pane.setMaxWidth(400);
         return pane;
     }
@@ -137,7 +140,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         text.setEditable(false);
         text.setPrefRowCount(4);
         text.setFont(new Font(14));
-        Styling.applyStyling(text, "backgroundLight");
+        styling.applyStyling(text, "backgroundLight");
         return text;
     }
 
@@ -168,7 +171,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public Button generateSettleButton(Transfer transfer) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
-        Styling.applyStyling(button, "positiveButton");
+        styling.applyStyling(button, "positiveButton");
         EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
         button.setOnAction(onClick);
 
@@ -183,7 +186,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
         Button button = new Button();
-        Styling.applyStyling(button, "positiveButton");
+        styling.applyStyling(button, "positiveButton");
         button.setGraphic(expandButtonInnerImage);
         button.setOnMouseClicked((action)-> {
             pane.setVisible(!pane.isVisible());

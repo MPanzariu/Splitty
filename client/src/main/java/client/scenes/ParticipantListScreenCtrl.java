@@ -35,6 +35,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     private final Translation translation;
     private final ImageUtils imageUtils;
     private Map<Long, HBox> map;
+    private Styling styling;
 
     /**
      * Constructor for the participant list screen
@@ -44,12 +45,15 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      * @param imageUtils the ImageUtils instance to use
      */
     @Inject
-    public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server, Translation translation, ImageUtils imageUtils) {
+    public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server,
+                                     Translation translation, ImageUtils imageUtils,
+                                     Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.imageUtils = imageUtils;
         this.map = new HashMap<>();
+        this.styling = styling;
     }
 
     /**
@@ -75,7 +79,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     public void initialize(URL location, ResourceBundle resources) {
         ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
         goBack.setGraphic(goBackImage);
-        Styling.applyStyling(goBack, "positiveButton");
+        styling.applyStyling(goBack, "positiveButton");
     }
 
     /**
