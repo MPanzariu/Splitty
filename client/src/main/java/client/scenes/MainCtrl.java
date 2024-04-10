@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -255,6 +256,7 @@ public class MainCtrl {
     }
 
     /**
+<<<<<<< HEAD
      * Adds shortcuts to the scene
      * ctrl + a switches to the admin password screen
      * ctrl + e switches to the event screen with the most recently joined event
@@ -336,18 +338,39 @@ public class MainCtrl {
                     eventScreenCtrl.addParticipants();
                 } else if (ctrlI.match(e)) {
                     eventScreenCtrl.switchToInviteEmail();
-                }else if (ctrlB.match(e)) {
+                } else if (ctrlB.match(e)) {
                     eventScreenCtrl.switchToMainScreen();
-                }else if (ctrlF.match(e)) {
+                } else if (ctrlF.match(e)) {
                     eventScreenCtrl.switchToAddTag();
-                }else if (ctrlD.match(e)){
+                } else if (ctrlD.match(e)) {
                     eventScreenCtrl.transferMoney();
-                }else if (ctrlG.match(e)){
+                } else if (ctrlG.match(e)) {
                     eventScreenCtrl.settleDebts();
                 }
             });
         };
         return shortcutFilter;
+    }
+
+    /**
+     * Shows an alert that tells the user if the email was sent successfully
+     * @param wasSuccessful true if the email was sent successfully, false otherwise
+     */
+    public void showEmailPrompt(boolean wasSuccessful) {
+        Alert a;
+        if (wasSuccessful){
+            System.out.println("Successfully sent email!");
+            a = new Alert(Alert.AlertType.INFORMATION);
+            a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
+            a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
+        }else{
+            System.out.println("Error while sending email!");
+            a = new Alert(Alert.AlertType.ERROR);
+            a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
+            a.titleProperty().bind(translation.getStringBinding("Email.ErrorTitle"));
+        }
+        a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
+        a.show();
     }
 }
 
