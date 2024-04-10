@@ -59,6 +59,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private final Translation translation;
     private final ManagementOverviewUtils utils;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private boolean listWasInitialized = false;
     private Styling styling;
 
@@ -70,16 +71,18 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * @param utils the ManagementOverviewUtils to use
      * @param imageUtils the ImageUtils to use
      * @param styling the Styling to use
+     * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
                                         ManagementOverviewUtils utils, ImageUtils imageUtils,
-                                        Styling styling) {
+                StringGenerationUtils stringUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
         objectMapper = new ObjectMapper();
         this.styling = styling;
     }
@@ -124,10 +127,10 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             protected void updateItem(Event event, boolean empty) {
                 super.updateItem(event, empty);
                 if(empty || event == null) {
-                    setText(null);
+                    textProperty().bind(translation.getStringBinding("empty"));
                     setGraphic(null);
                 } else {
-                    setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                    textProperty().bind(stringUtils.generateTextForEventLabel(event));
                 }
             }
         });
@@ -136,11 +139,11 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             protected void updateItem(Participant participant, boolean empty){
                 super.updateItem(participant, empty);
                 if(empty || participant == null){
-                    setText(null);
+                    textProperty().bind(translation.getStringBinding("empty"));
                     setGraphic(null);
                 }
                 else{
-                    setText("Participant: " + participant.getName());
+                    textProperty().bind(stringUtils.generateTextForParticipantLabel(participant));
                 }
             }
         });
@@ -149,15 +152,11 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             protected void updateItem(Expense expense, boolean empty){
                 super.updateItem(expense, empty);
                 if(empty || expense == null){
-                    setText(null);
+                    textProperty().bind(translation.getStringBinding("empty"));
                     setGraphic(null);
                 }
                 else{
-                    String expenseString = expense.getOwedTo().getName() + " paid ";
-                    expenseString+=(float)(expense.getPriceInCents()/100) + " euro for ";
-                    expenseString+=expense.getName() + " on ";
-                    expenseString+=expense.getDate().toString();
-                    setText(expenseString);
+                    textProperty().bind(stringUtils.generateTextForExpenseAdminLabel(expense));
                 }
             }
         });
