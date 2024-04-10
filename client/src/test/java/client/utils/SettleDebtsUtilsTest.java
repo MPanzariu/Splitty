@@ -56,7 +56,7 @@ class SettleDebtsUtilsTest {
      * Splitting expenses equally between 3 people (tends to leave rounding issues...)
      */
     @RepeatedTest(5)
-    void randomTransferInstructions(){
+    void randomTransferInstructions3X(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
         Random rng = new Random();
 
@@ -92,11 +92,92 @@ class SettleDebtsUtilsTest {
     }
 
     /***
+     * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 4 people (usually no rounding issues)
+     */
+    @RepeatedTest(5)
+    void randomTransferInstructions4X(){
+        Participant participant4 = new Participant("Alastor!");
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Random rng = new Random();
+
+        int rand1 = generateRandom(rng);
+        int rand2 = generateRandom(rng);
+        int rand3 = generateRandom(rng);
+        int balancer = -(rand1+rand2+rand3);
+
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
+        creditMap.put(participant4, bigDecimalize(balancer/100.0));
+
+        var initialResult = sut.calculateTransferInstructions(creditMap);
+        assertTrue(initialResult.size()<creditMap.size());
+
+        //Run one transfer at a time, and make sure it always settles the debt
+        int ceiling = creditMap.size();
+        for (Transfer transfer:
+                initialResult) {
+            BigDecimal balSender = creditMap.get(transfer.sender());
+            BigDecimal balReceiver = creditMap.get(transfer.receiver());
+            BigDecimal amount = bigDecimalize(transfer.amount());
+            creditMap.put(transfer.sender(), balSender.add(amount));
+            creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
+
+            var reranResult = sut.calculateTransferInstructions(creditMap);
+            ceiling -= 1;
+            assertTrue(reranResult.size()<ceiling);
+        }
+    }
+
+    /***
+     * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 5 people (tends to leave rounding issues too)
+     */
+    @RepeatedTest(5)
+    void randomTransferInstructions5X(){
+        Participant participant4 = new Participant("VVV");
+        Participant participant5 = new Participant("Alastor!");
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Random rng = new Random();
+
+        int rand1 = generateRandom(rng);
+        int rand2 = generateRandom(rng);
+        int rand3 = generateRandom(rng);
+        int rand4 = generateRandom(rng);
+        int balancer = -(rand1+rand2+rand3+rand4);
+
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
+        creditMap.put(participant4, bigDecimalize(balancer/100.0));
+        creditMap.put(participant5, bigDecimalize(balancer/100.0));
+
+        var initialResult = sut.calculateTransferInstructions(creditMap);
+        assertTrue(initialResult.size()<creditMap.size());
+
+        //Run one transfer at a time, and make sure it always settles the debt
+        int ceiling = creditMap.size();
+        for (Transfer transfer:
+                initialResult) {
+            BigDecimal balSender = creditMap.get(transfer.sender());
+            BigDecimal balReceiver = creditMap.get(transfer.receiver());
+            BigDecimal amount = bigDecimalize(transfer.amount());
+            creditMap.put(transfer.sender(), balSender.add(amount));
+            creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
+
+            var reranResult = sut.calculateTransferInstructions(creditMap);
+            ceiling -= 1;
+            assertTrue(reranResult.size()<ceiling);
+        }
+    }
+
+    /***
      * Generates a random number between min and max
      */
     private int generateRandom(Random random){
-        int min = -1000;
-        int max = 1000;
+        int min = -10000;
+        int max = 10000;
         return random.nextInt(max - min) + min;
     }
 
