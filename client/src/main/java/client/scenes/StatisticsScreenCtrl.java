@@ -41,7 +41,6 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
     private Button goBackButton;
     private TableView<Participant> shareTable;
     private PieChart tagPieChart;
-    private Event event;
     private final MainCtrl mainCtrl;
     private final Translation translation;
     private final ImageUtils imageUtils;
@@ -71,6 +70,18 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        addGeneratedImages();
+        bindLabels(statisticsLabel, totalCostLabel, pieChartLabel, shareLabel);
+    }
+
+    /***
+     * Binds all provided labels to the correct data
+     * @param statisticsLabel the statistics title label
+     * @param totalCostLabel the total cost of event label
+     * @param pieChartLabel the label above the pie chart
+     * @param shareLabel the label above the share table
+     */
+    public void bindLabels(Label statisticsLabel, Label totalCostLabel, Label pieChartLabel, Label shareLabel){
         statisticsLabel.textProperty()
                 .bind(translation.getStringBinding("Stats.Label.Statistics"));
         totalCostLabel.textProperty()
@@ -79,7 +90,6 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
                 .bind(translation.getStringBinding("Stats.Label.PieChart"));
         shareLabel.textProperty()
                 .bind(translation.getStringBinding("Stats.Label.Share"));
-        addGeneratedImages();
     }
 
     /**
@@ -89,9 +99,16 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Override
     public void refresh(Event event) {
-        this.event = event;
-        setTotalSumOfExpenses();
+        setTotalSumOfExpenses(expenseSumLabel, event);
+        populateParentPane(parentPane, event);
+    }
 
+    /***
+     * Generates the share table and pie chart and places them in the given Parent
+     * @param parentPane the Parent containing the generated objects
+     * @param event the Event data to use
+     */
+    public void populateParentPane(AnchorPane parentPane, Event event){
         var children = parentPane.getChildren();
         children.remove(shareTable);
         children.remove(tagPieChart);
@@ -107,8 +124,10 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
 
     /**
      * it sets the label holding the cost of the entire event with the sum of expenses inside the event
+     * @param expenseSumLabel the label to change the text of
+     * @param event the event data to use
      */
-    public void setTotalSumOfExpenses(){
+    public void setTotalSumOfExpenses(Label expenseSumLabel, Event event){
         int sum = event.getTotalSpending();
         expenseSumLabel.setText(FormattingUtils.getFormattedPrice(sum));
     }
@@ -119,7 +138,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param event the Event data to use
      * @return a PieChart containing all relevant data
      */
-    private PieChart generatePieChart(Event event){
+    public PieChart generatePieChart(Event event){
         PieChart tagPieChart = new PieChart();
         tagPieChart.setLayoutX(-150); //comical amounts of whitespace courtesy of JavaFX
         tagPieChart.setLayoutY(140);
@@ -151,13 +170,6 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
             if (data.getNode() != null) {
                 data.getNode().setStyle("-fx-pie-color: " + color + ";");
                 data.nameProperty().bind(generateSegmentLabel(data, finalSum));
-            } else {
-                data.nodeProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue != null) {
-                        newValue.setStyle("-fx-pie-color: " + color + ";");
-                        data.nameProperty().bind(generateSegmentLabel(data, finalSum));
-                    }
-                });
             }
         });
         tagPieChart.setLegendVisible(false);
