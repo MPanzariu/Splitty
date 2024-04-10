@@ -235,7 +235,7 @@ public class SettleDebtsUtils {
                 Thank you!""";
         }
 
-        emailBody = emailBody.replace("{amount}", transfer.amount() / 100.0 + " Euros");
+        emailBody = emailBody.replace("{amount}", FormattingUtils.getFormattedPrice(transfer.amount()));
         emailBody = emailBody.replace("{receiver}", transfer.receiver().getName());
         return emailBody;
     }

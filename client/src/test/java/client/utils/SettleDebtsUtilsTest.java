@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.autoconfigure.transaction.PlatformTransactionManagerCustomizer;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.math.BigDecimal;
@@ -331,7 +332,8 @@ class SettleDebtsUtilsTest {
         Participant receiver = new Participant("Receiver");
         Transfer t = new Transfer(sender, 10,receiver);
         String emailBody = sut.generateEmailBody(t);
-        assertEquals(emailBody, "Please transfer the amount of 0.1 Euros to Receiver\n\n" +"Thank you!");
+
+        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver\n\n" +"Thank you!");
     }
 
     @Test
@@ -343,7 +345,7 @@ class SettleDebtsUtilsTest {
         receiver.setLegalName("Legal Name");
         Transfer t = new Transfer(sender, 10,receiver);
         String emailBody = sut.generateEmailBody(t);
-        assertEquals(emailBody, "Please transfer the amount of 0.1 Euros to Receiver to the following bank account:\n" +
+        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver to the following bank account:\n" +
                 "\n" +
                 "Name: Legal Name\n" +
                 "IBAN: IBAN\n" +
