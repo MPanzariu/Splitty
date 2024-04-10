@@ -31,6 +31,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private final Translation translation;
     private final ManagementOverviewUtils utils;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private boolean listWasInitialized = false;
     /**
      * Constructor
@@ -40,15 +41,17 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * @param translation the Translation instance to use
      * @param utils       the ManagementOverviewUtils instance to use
      * @param imageUtils  the ImageUtils instance to use
+     * @param stringUtils the StringUtils instance to use
      */
     @Inject
     public DeleteEventsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                  ManagementOverviewUtils utils, ImageUtils imageUtils) {
+                                  ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
     }
 
     /**
@@ -83,10 +86,10 @@ public class DeleteEventsScreenCtrl implements Initializable {
             protected void updateItem(Event event, boolean empty) {
                 super.updateItem(event, empty);
                 if (empty || event == null || event.getId() == null) {
-                    setText(null);
+                    textProperty().bind(translation.getStringBinding("empty"));
                     setGraphic(null);
                 } else {
-                    checkBox.setText("Title: " + event.getTitle() + ", ID: " + event.getId());
+                    textProperty().bind(stringUtils.generateTextForEventLabel(event));
                     checkBox.setOnAction(e -> eventSelectionMap.put(event, checkBox.isSelected()));
                     if (!eventSelectionMap.containsKey(event)) {
                         eventSelectionMap.put(event, false);
@@ -96,6 +99,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
                 }
             }
         });
+        listWasInitialized = true;
     }
 
     /**
@@ -109,13 +113,13 @@ public class DeleteEventsScreenCtrl implements Initializable {
             System.out.println("No events selected");
         }
         else {
-            Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmationDialog.setTitle("Delete Confirmation");
-            confirmationDialog.setHeaderText("Delete Selected Events");
-            confirmationDialog.setContentText("Are you sure you want to delete the selected events?");
+            // The dialog segments do not have textProperties, so here we are, fetching Strings...
+            String confirmationTitle = translation.getStringBinding("DES.Confirm.Title").getValue();
+            String confirmationHeader = translation.getStringBinding("DES.Confirm.Header").getValue();
+            String confirmationContent = translation.getStringBinding("DES.Confirm.Content").getValue();
+
             ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-            ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
-            confirmationDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+            Alert confirmationDialog = generateConfirmationDialog(confirmationTitle, confirmationHeader, confirmationContent, buttonTypeYes);
             Optional<ButtonType> result = confirmationDialog.showAndWait();
             if (result.isPresent() && result.get() == buttonTypeYes) {
                 List<Event> selectedEvents = eventSelectionMap.entrySet().stream()
@@ -144,13 +148,12 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * on click delete all the events
      */
     public void deleteAllEvents() {
-        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationDialog.setTitle("Delete All Confirmation");
-        confirmationDialog.setHeaderText("Delete All Events");
-        confirmationDialog.setContentText("Are you sure you want to delete all the events?");
+        String confirmationTitle = translation.getStringBinding("DES.ConfirmAll.Title").getValue();
+        String confirmationHeader = translation.getStringBinding("DES.ConfirmAll.Header").getValue();
+        String confirmationContent = translation.getStringBinding("DES.ConfirmAll.Content").getValue();
+
         ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-        ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
-        confirmationDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+        Alert confirmationDialog = generateConfirmationDialog(confirmationTitle, confirmationHeader, confirmationContent, buttonTypeYes);
         Optional<ButtonType> result = confirmationDialog.showAndWait();
         if (result.isPresent() && result.get() == buttonTypeYes) {
             server.deleteAllEvents();
@@ -162,8 +165,28 @@ public class DeleteEventsScreenCtrl implements Initializable {
         }
     }
 
+    /***
+     * Generates a confirmation dialog with a given title, header, and content
+     * @param confirmationTitle the window title to use
+     * @param confirmationHeader the dialog header to use
+     * @param confirmationContent the dialog content to use
+     * @param buttonTypeYes the ButtonType of the Yes option
+     * @return a Alert with the corresponding details
+     */
+    public Alert generateConfirmationDialog(String confirmationTitle, String confirmationHeader,
+                                            String confirmationContent, ButtonType buttonTypeYes){
+        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationDialog.setTitle(confirmationTitle);
+        confirmationDialog.setHeaderText(confirmationHeader);
+        confirmationDialog.setContentText(confirmationContent);
+
+        ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+        confirmationDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+        return confirmationDialog;
+    }
+
     /**
-     * go to the managament overview screen
+     * go to the management overview screen
      * on button press go back to the management overview screen
      */
     public void goBackToManagementOverview() {
