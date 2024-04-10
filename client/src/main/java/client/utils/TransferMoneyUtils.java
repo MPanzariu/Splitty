@@ -95,9 +95,9 @@ public class TransferMoneyUtils {
      */
     private boolean isAmountInvalid() {
         try {
-            BigDecimal b = new BigDecimal(amount.getValue());
-            b = b.setScale(2, RoundingMode.HALF_UP);
-            return b.longValue() <= 0;
+            BigDecimal decimal = new BigDecimal(amount.getValue());
+            decimal = decimal.setScale(2, RoundingMode.HALF_UP);
+            return decimal.compareTo(BigDecimal.ZERO) <= 0;
         } catch(NumberFormatException e) {
             return true;
         }
@@ -107,7 +107,11 @@ public class TransferMoneyUtils {
      * Sends the money to the receiver.
      */
     public void send() {
-        Transfer transfer = new Transfer(from.get(), Integer.parseInt(amount.get()) * 100, to.get());
+        String amountString = amount.get();
+        BigDecimal amount = new BigDecimal(amountString);
+        amount = amount.setScale(2, RoundingMode.HALF_UP);
+        amount = amount.multiply(new BigDecimal(100));
+        Transfer transfer = new Transfer(from.get(), amount.intValue(), to.get());
         server.addExpense(event.getId(), transferMoney(transfer, event));
     }
 
@@ -123,7 +127,7 @@ public class TransferMoneyUtils {
     public Expense transferMoney(Transfer transfer, Event event) {
         Expense expense = new Expense("Money Transfer", transfer.amount() * -1,
                 new Date(), transfer.receiver());
-        expense.addParticipantToExpense(from.get());
+        expense.addParticipantToExpense(transfer.sender());
         expense.setExpenseTag((Tag) event.getEventTags().stream().filter(tag -> tag.getTagName().equals("money transfer")).toArray()[0]);
         return expense;
     }

@@ -13,10 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,7 +68,7 @@ class SettleDebtsUtilsTest {
 
         //Run one transfer at a time, and make sure it always settles the debt
         int ceiling = creditMap.size();
-        var transferSetAfterTransfer = new HashSet<>(initialResult);
+        var transferSetAfterTransfer = new ArrayList<>(initialResult);
         for (Transfer transfer:
              initialResult) {
             BigDecimal balSender = creditMap.get(transfer.sender());
