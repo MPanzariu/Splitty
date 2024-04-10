@@ -1,3 +1,4 @@
+### Configuration
 
 The splitty.properties file under the client folder is responsible for the configuration of the client side of the application. 
 The following are the properties that can be configured:
@@ -23,13 +24,13 @@ _**These default values work for gmail:**_
 
  * spring.mail.properties.mail.smtp.starttls.enable=true (use TLS)
 
-**Implemented Shortcuts** 
+### **Implemented Shortcuts** 
 
-Main Menu:
+**Main Menu:**
 * Ctrl + A: Goes to admin overview password
 * Ctrl + E: Joins the most recently joined event from the history
 
-Event Overview:
+**Event Overview:**
 * Ctrl + T: Test email invite 
 * Ctrl + S: Switch to statistics screen 
 * Ctrl + E: Edit the title of the event 
