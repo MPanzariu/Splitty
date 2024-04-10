@@ -162,7 +162,7 @@ public class EventTest {
         event.addExpense(expense1);
         event.addExpense(expense2);
 
-        var result = RoundUtils.roundMap(event.getExpenseShare(), RoundingMode.HALF_UP);
+        var result = RoundUtils.roundMap(event.getExpenseShare(true), RoundingMode.HALF_UP);
         assertEquals(10*cents, result.get(participant1));
         assertEquals(20*cents, result.get(participant2));
     }
@@ -189,7 +189,7 @@ public class EventTest {
             event.addExpense(expense);
         }
 
-        var result = RoundUtils.roundMap(event.getExpenseShare(), RoundingMode.HALF_UP);
+        var result = RoundUtils.roundMap(event.getExpenseShare(true), RoundingMode.HALF_UP);
         assertEquals(1000, result.get(participant1));
         assertEquals(1000, result.get(participant2));
         assertEquals(1000, result.get(participant3));
@@ -285,6 +285,23 @@ public class EventTest {
 
         var result = event.getTotalSpending();
         assertEquals((10+20+30)*cents, result);
+    }
+
+    @Test
+    public void sumExpensesWithNegatives() {
+        Expense expense1 = new Expense();
+        expense1.setPriceInCents(100);
+        event.addExpense(expense1);
+
+        Expense expense2 = new Expense();
+        expense2.setPriceInCents(200);
+        event.addExpense(expense2);
+
+        Expense expense3 = new Expense();
+        expense3.setPriceInCents(-100);
+        event.addExpense(expense3);
+
+        assertEquals(300, event.getTotalSpending());
     }
 
     @Test

@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -17,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static javafx.geometry.Pos.CENTER_RIGHT;
@@ -65,6 +67,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private final Translation translation;
     private final LanguageIndicatorCtrl languageCtrl;
     private final ImageUtils imageUtils;
+    private final StringGenerationUtils stringUtils;
     private Event event;
     private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
@@ -75,6 +78,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Label emailFeedbackLabel;
     @FXML
     private Button emailInviteButton;
+    @FXML
+    private Button transferMoneyButton;
     /**
      * Constructor
      *
@@ -83,20 +88,18 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.imageUtils = imageUtils;
+        this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
-       // this.buttonsHBox = new HBox();
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
     }
@@ -115,6 +118,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         participantsName.textProperty()
@@ -134,7 +140,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
-        emailHandler = new EmailHandler();
+        emailHandler = new EmailHandler(translation);
         if (emailHandler.isConfigured()) {
             enableEmailFeatures();
 
@@ -142,6 +148,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         emailFeedbackLabel.textProperty().bind(translation.getStringBinding("empty"));
         emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        transferMoneyButton.textProperty().bind(translation.getStringBinding("Event.Button.TransferMoney"));
     }
 
     /**
@@ -348,24 +355,29 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @return the generated hBox, containing the expense details
      */
     public HBox generateExpenseBox(Expense expense, Image removeImage) {
-        String log = generateTextForExpenseLabel(expense);
-        Label expenseText = generateExpenseLabel(expense.getId(), log);
-        ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
-        Label date = new Label();
-        var currentYear = new Date().getYear() + 1900;
-        var expenseYear = expense.getDate().getYear();
-        if(expenseYear != currentYear)
-            date.setText(expense.getDate().getDate() + "/" +
-                            + (expense.getDate().getMonth() + 1) + "\n/" +
-                        + (expense.getDate().getYear()));
-
+        ObservableValue<String> expenseTextValue;
+        if(expense.getPriceInCents() > 0)
+            expenseTextValue = stringUtils.generateTextForExpenseLabel(expense, event.getParticipants().size());
         else
-            date.setText(expense.getDate().getDate() + "/" +
-                + (expense.getDate().getMonth() + 1));
+            expenseTextValue = stringUtils.generateTextForMoneyTransfer(expense);
+        Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
+        ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
+        Label dateLabel = new Label();
+        dateLabel.setPrefWidth(40);
+        dateLabel.setWrapText(true);
+        Calendar expenseCalendar  = Calendar.getInstance();
+        expenseCalendar.setTime(expense.getDate());
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat shortDate = new SimpleDateFormat("dd/MM");
+        SimpleDateFormat fullDate = new SimpleDateFormat("dd/MM/yyyy");
+        if(expenseCalendar.get(Calendar.YEAR) != now.get(Calendar.YEAR))
+            dateLabel.setText(shortDate.format(expense.getDate()));
+        else
+            dateLabel.setText(fullDate.format(expense.getDate()));
         HBox xHBox = new HBox(xButton);
         HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
         xHBox.setAlignment((CENTER_RIGHT));
-        HBox expenseBox = new HBox(date, expenseText, xHBox);
+        HBox expenseBox = new HBox(dateLabel, expenseText, xHBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
@@ -375,50 +387,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     *
-     * @param expense the expense for which we are generating the
-     * label
-     * @return the resulting generated string
-     */
-    public String generateTextForExpenseLabel(Expense expense) {
-        String log = expense.stringOnScreen();
-        Set<Participant> participants = event.getParticipants();
-        boolean all = true;
-        for(Participant participant: participants) {
-            all = false;
-            for (Participant participant1 : expense.getParticipantsInExpense())
-                if (participant.getId() == participant1.getId()) {
-                    all = true;
-                    break;
-                }
-            if(!all)
-                break;
-        }
-        if(all)
-            log += '\n' + "(All)";
-        else {
-            if(expense.getParticipantsInExpense().isEmpty())
-                removeFromList(expense.getId());
-            log += '\n' + "(";
-            for(Participant participant: expense.getParticipantsInExpense())
-                if(event.getParticipants().contains(participant)) {
-                    log += participant.getName();
-                    log += " ";
-                }
-            log += ")";
-        }
-        return log;
-    }
-
-    /**
      * Creates a label that will later be added to the hBox from the expense listview
      * Furthermore, it allows the client to access set expense and edit it
      * @param expenseId the id of the expense we are creating a label for
-     * @param expenseTitle the title of the expense
+     * @param expenseDescription the description of the expense
      * @return the created label
      */
-    public Label generateExpenseLabel(long expenseId, String expenseTitle) {
-        Label expense = new Label(expenseTitle);
+    public Label generateExpenseLabel(long expenseId, ObservableValue<String> expenseDescription) {
+        Label expense = new Label();
+        expense.textProperty().bind(expenseDescription);
         expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
         expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
         expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));
@@ -537,6 +514,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
                 expensesLogListView.getItems().add(expenseBox);
             }
         }
+    }
+
+    /**
+     * Transfer to money transfer screen.
+     */
+    public void transferMoney() {
+        mainCtrl.switchScreens(TransferMoneyCtrl.class);
     }
 
     /**

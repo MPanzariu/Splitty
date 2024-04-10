@@ -222,7 +222,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             ok = false;
         }
         else{
-            if(participant.getEmail().equals("wrongEmail")){
+            if(participant.getEmail() != null && participant.getEmail().equals("wrongEmail")){
                 noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
@@ -231,11 +231,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setEmail(null);
             }
         }
-        if(participant.getIban().equals("wrongIban")) {
+        if(participant.getIban() != null && participant.getIban().equals("wrongIban")) {
             wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
             ok = false;
         }
-        if(participant.getBic().equals("wrongBic")){
+        if(participant.getBic() != null &&  participant.getBic().equals("wrongBic")){
             wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
             ok = false;
         }
@@ -369,6 +369,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkEmail (String email){
+        if (email == null || email.isEmpty()){
+            return false;
+        }
         String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailLike);
         if(email!=null){
@@ -384,6 +387,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkBic (String bic){
+        if (bic == null || bic.isEmpty()){
+            return false;
+        }
         Matcher matcher = bicPattern.matcher(bic);
         return matcher.matches();
     }

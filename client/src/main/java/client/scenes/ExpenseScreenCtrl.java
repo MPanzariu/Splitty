@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
@@ -123,6 +124,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     public void initializeTagComboBox(){
         tagComboBox.getItems().clear();
         Set<Tag> tags = currentEvent.getEventTags();
+        tags.removeIf(tag -> tag.getTagName().equals("money transfer"));
         tagComboBox.getItems().addAll(tags);
         tagComboBox.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -354,8 +356,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
         if(date != null) {
-            expenseDate = new Date(date.getYear(),
-                date.getMonthValue() - 1, date.getDayOfMonth());
+            expenseDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
