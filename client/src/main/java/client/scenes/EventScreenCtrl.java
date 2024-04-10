@@ -90,6 +90,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param styling     the Styling to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,

@@ -69,6 +69,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * @param translation the Translation to use
      * @param utils the ManagementOverviewUtils to use
      * @param imageUtils the ImageUtils to use
+     * @param styling the Styling to use
      */
     @Inject
     public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,

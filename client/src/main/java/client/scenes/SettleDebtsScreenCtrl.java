@@ -49,6 +49,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation the translation to use
      * @param utils the server utilities to use
      * @param imageUtils the image utilities to use
+     * @param styling the styling utilities to use
      */
     @Inject
     public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,

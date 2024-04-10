@@ -43,6 +43,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      * @param server the ServerUtils instance to use
      * @param translation the Translation instance to use
      * @param imageUtils the ImageUtils instance to use
+     * @param styling the Styling instance to use
      */
     @Inject
     public ParticipantListScreenCtrl(MainCtrl mainCtrl, ServerUtils server,

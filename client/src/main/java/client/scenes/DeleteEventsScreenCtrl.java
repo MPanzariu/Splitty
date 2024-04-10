@@ -41,6 +41,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * @param translation the Translation instance to use
      * @param utils       the ManagementOverviewUtils instance to use
      * @param imageUtils  the ImageUtils instance to use
+     * @param styling     the Styling instance to use
      */
     @Inject
     public DeleteEventsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
