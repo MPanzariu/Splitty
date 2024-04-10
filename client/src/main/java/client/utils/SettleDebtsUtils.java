@@ -1,6 +1,7 @@
 package client.utils;
 
 import com.google.inject.Inject;
+import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import javafx.beans.binding.Bindings;
@@ -17,29 +18,20 @@ public class SettleDebtsUtils {
 
     private final Translation translation;
     private final ServerUtils server;
+    private final TransferMoneyUtils transferUtils;
 
 
     /***
      * Constructor for the utility class for the SettleDebts screen
-     * @param translation - the translation to use
-     * @param server - the severUtils to use
+     * @param translation - the Translation to use
+     * @param server - the SeverUtils to use
+     * @param transferUtils - the TransferMoneyUtils to use
      */
     @Inject
-    public SettleDebtsUtils(Translation translation, ServerUtils server) {
+    public SettleDebtsUtils(Translation translation, ServerUtils server, TransferMoneyUtils transferUtils) {
         this.translation = translation;
         this.server = server;
-    }
-
-    /***
-     * Generates an expense that settled a debt (can not be implemented yet)
-     * @param transfer the Transfer data to use
-     * @return an Expense that settles the debt fully
-     */
-    public Expense createSettlementExpense(Transfer transfer) {
-
-        //This method can only be made when splitting an expense between only some people works
-        //This method SHOULD be implemented properly in the Open Debts optional requirement
-        return new Expense();
+        this.transferUtils = transferUtils;
     }
 
     //Pseudocode adapted from: https://stackoverflow.com/questions/4554655/who-owes-who-money-optimization
@@ -60,8 +52,8 @@ public class SettleDebtsUtils {
          * Real usage often creates problems with fractional cents causing net balances to be +- 1 instead of 0
          * This problem is solved here by rounding up
          */
-        if(netAmount == -1 ) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.DOWN);
-        else if (netAmount == 1) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.UP);
+        if(netAmount == -1 ) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.UP);
+        else if (netAmount == 1) roundedMap = RoundUtils.roundMap(unroundedMap, RoundingMode.DOWN);
         else if (netAmount != 0) throwBadBalanceException(creditMap,roundedMap);
         HashMap<Participant, Integer> processMap = new HashMap<>(roundedMap);
 
@@ -125,17 +117,14 @@ public class SettleDebtsUtils {
     /***
      * Generates the onClick action for a button that settles a particular debt
      * @param transfer the Transfer data to use
-     * @param eventId the corresponding event
+     * @param event the corresponding event
      * @return the action a button should perform to settle the debt
      */
-    public EventHandler<ActionEvent> createSettleAction(Transfer transfer, String eventId){
-        EventHandler<ActionEvent> onClick = (actionEvent) -> {
-            Expense settleExpense = createSettlementExpense(transfer);
-            //server.addExpense(eventId, settleExpense);
-            //This should not do anything yet! (this is extra functionality)
-            //This code should be uncommented when the Open Debts requirement is worked on
+    public EventHandler<ActionEvent> createSettleAction(Transfer transfer, Event event){
+        return (actionEvent) -> {
+            Expense settleExpense = transferUtils.transferMoney(transfer, event);
+            server.addExpense(event.getId(), settleExpense);
         };
-        return onClick;
     }
 
     /***

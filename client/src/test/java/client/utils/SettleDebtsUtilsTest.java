@@ -1,6 +1,8 @@
 package client.utils;
 
+import commons.Event;
 import commons.Participant;
+import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,24 +168,15 @@ class SettleDebtsUtilsTest {
 
     /***
      * [FEATURE NOT YET IMPLEMENTED]
-     * Checks if the Expense generated to settle a normal debt is correct
-     */
-    @Test
-    void createSettlementExpense() {
-        Transfer transfer = new Transfer(participant1, 7, participant2);
-        var result = sut.createSettlementExpense (transfer);
-        assertNotNull(result);
-    }
-
-    /***
-     * [FEATURE NOT YET IMPLEMENTED]
      * Checks if the Action executed when the Mark Received button is pressed
      * settles a normal debt correctly
      */
     @Test
     void createSettleAction() {
+        Event event = new Event("Title!", null);
+        event.addTag(new Tag("money transfer", null));
         Transfer transfer = new Transfer(participant1, 7, participant2);
-        EventHandler<ActionEvent> result = sut.createSettleAction(transfer, "ABC123");
+        EventHandler<ActionEvent> result = sut.createSettleAction(transfer, event);
         result.handle(new ActionEvent());
         assertNotNull(result);
     }

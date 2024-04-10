@@ -169,7 +169,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
         Styling.applyStyling(button, "positiveButton");
-        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
+        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event);
         button.setOnAction(onClick);
 
         return button;
