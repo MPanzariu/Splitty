@@ -102,6 +102,18 @@ public class TagServiceTest {
         verify(expenseRepository).save(expense);
         assertEquals(defaultTag, expense.getExpenseTag());
         verify(eventRepository).save(event);
-        assertFalse(event.getEventTags().contains(tagToRemove)); 
+        assertFalse(event.getEventTags().contains(tagToRemove));
+    }
+    @Test
+    void removeNonExistingTag() {
+        String eventId = "1";
+        Long tagId = 1L;
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            tagService.removeTag(eventId, tagId);
+        });
+        
+        verify(eventRepository, never()).findById(anyString());
     }
 }
