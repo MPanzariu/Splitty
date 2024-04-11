@@ -41,6 +41,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox settleVBox;
     private Event event;
     private Pair<Pane, Button> lastExpanded;
+    private Styling styling;
     private EmailHandler emailHandler;
 
     /***
@@ -49,17 +50,20 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation the translation to use
      * @param utils the server utilities to use
      * @param imageUtils the image utilities to use
+     * @param styling the styling utilities to use
      * @param emailHandler the email handler to use
      */
     @Inject
     public SettleDebtsScreenCtrl(MainCtrl mainCtrl, Translation translation,
-                                 SettleDebtsUtils utils, ImageUtils imageUtils, EmailHandler emailHandler) {
+                                 SettleDebtsUtils utils, ImageUtils imageUtils,
+                EmailHandler emailHandler, Styling styling) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
         this.event = null;
         this.lastExpanded = null;
+        this.styling = styling;
         this.emailHandler = emailHandler;
     }
 
@@ -126,7 +130,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         pane.getChildren().add(text);
         pane.setVisible(false);
         pane.setManaged(false);
-        Styling.applyStyling(pane, "borderVBox");
+        styling.applyStyling(pane, "borderVBox");
         pane.setMaxWidth(400);
         return pane;
     }
@@ -142,7 +146,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         text.setEditable(false);
         text.setPrefRowCount(4);
         text.setFont(new Font(14));
-        Styling.applyStyling(text, "backgroundLight");
+        styling.applyStyling(text, "backgroundLight");
         return text;
     }
 
@@ -174,7 +178,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public Button generateSettleButton(Transfer transfer) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
-        Styling.applyStyling(button, "positiveButton");
+        styling.applyStyling(button, "positiveButton");
         EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
         button.setOnAction(onClick);
 
@@ -189,7 +193,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public Button generateExpandButton(Pane pane, ImageView expandButtonInnerImage) {
         Button button = new Button();
-        Styling.applyStyling(button, "positiveButton");
+        styling.applyStyling(button, "positiveButton");
         button.setGraphic(expandButtonInnerImage);
         button.setOnMouseClicked((action)-> {
             pane.setVisible(!pane.isVisible());
@@ -227,9 +231,9 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         button.textProperty().bind
             (translation.getStringBinding("SettleDebts.Button.sendEmailInstructions"));
-        Styling.applyStyling(button, "positiveButton");
+        styling.applyStyling(button, "positiveButton");
         if (transfer.sender().getEmail().isEmpty() || !emailHandler.isConfigured()){
-            Styling.applyStyling(button, "disabledButton");
+            styling.applyStyling(button, "disabledButton");
         }else{
             button.setOnAction((action) -> {
                 Thread thread = new Thread(() -> {
