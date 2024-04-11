@@ -1,7 +1,9 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -9,8 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.TagRepository;
-import java.util.Optional;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,5 +59,49 @@ public class TagServiceTest {
         verify(eventRepository).save(eventCaptor.capture());
         assertEquals(1, eventCaptor.getValue().getEventTags().size());
         assertTrue(eventCaptor.getValue().getEventTags().iterator().next().getTagName().equals(tagName));
+    }
+    /**
+     * Tests adding a tag to an event that does not exist.
+     */
+    @Test
+    void addTagToNonExistingEvent() {
+        String eventId = "1";
+        String tagName = "Important";
+        String colorCode = "#FF0000";
+
+        when(eventRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            tagService.addTagToEvent(eventId, tagName, colorCode);
+        });
+    }
+
+    /**
+     * Tests removing a tag from an event, ensuring associated expenses are updated.
+     */
+    @Test
+    void removeTagFromEvent() {
+        String eventId = "1";
+        Long tagId = 1L;
+        Event event = new Event("Event1", null);
+        Tag tagToRemove = new Tag("Urgent", "#FF0000");
+        Tag defaultTag = new Tag("Default", "#000000");
+
+        Expense expense = new Expense();
+        expense.setExpenseTag(tagToRemove);
+
+        event.setEventTags(new HashSet<>(Set.of(tagToRemove, defaultTag)));
+        event.getExpenses().add(expense);
+
+        when(eventRepository.findById(anyString())).thenReturn(Optional.of(event));
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.of(tagToRemove));
+        when(expenseRepository.save(any(Expense.class))).then(returnsFirstArg());
+
+        tagService.removeTag(eventId, tagId);
+
+        verify(expenseRepository).save(expense);
+        assertEquals(defaultTag, expense.getExpenseTag());
+        verify(eventRepository).save(event);
+        assertFalse(event.getEventTags().contains(tagToRemove)); 
     }
 }
