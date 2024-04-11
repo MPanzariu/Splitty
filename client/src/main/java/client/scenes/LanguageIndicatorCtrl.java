@@ -44,7 +44,20 @@ public class LanguageIndicatorCtrl {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    setText(item.getLanguage());
+                    if(item.getLanguage().equals("en"))
+                        setText("English");
+                    if(item.getLanguage().equals("nl"))
+                        setText("Dutch");
+                    if(item.getLanguage().equals("ro"))
+                        setText("Romanian");
+                    try {
+                        Image img = new Image("images/flags/" + item.getLanguage() + "_flag - Copy.png");
+                        ImageView flag =
+                            new ImageView(img);
+                        setGraphic(flag);
+                    }catch (RuntimeException e){
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
         };
