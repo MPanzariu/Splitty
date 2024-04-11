@@ -71,4 +71,16 @@ public class TagControllerTest {
         verify(webSocketService).propagateEventUpdate(eventId);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    void removeTagFail() {
+        String eventId = "event1";
+        Long tagId = 1L;
+
+        doThrow(new IllegalArgumentException()).when(tagService).removeTag(anyString(), anyLong());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            tagController.removeTag(eventId, tagId);
+        });
+    }
 }
