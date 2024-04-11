@@ -213,7 +213,6 @@ public class MainCtrl {
         switchScreens(ParticipantScreenCtrl.class);
         participantScreenCtrl.setParticipant(participantId);
     }
-
     /**
      * switch to the login page for the management overview
      */
