@@ -104,6 +104,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
         this.styling = styling;
@@ -123,9 +126,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         participantsName.textProperty()
