@@ -35,7 +35,7 @@ public class MainCtrl {
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
     private final Translation translation;
-    private HashMap<Class<?>, ScreenInfo> screenMap;
+    private final HashMap<Class<?>, ScreenInfo> screenMap;
     private final String serverURL;
     private final String language;
     private final AppStateManager manager;
@@ -55,6 +55,7 @@ public class MainCtrl {
         this.manager = manager;
         this.serverURL = serverURL;
         this.language = language;
+        this.screenMap = new HashMap<>();
     }
 
     /**
@@ -89,7 +90,6 @@ public class MainCtrl {
                            Pair<AddTagCtrl, Parent> addTagUI,
                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
-        translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
@@ -106,7 +106,7 @@ public class MainCtrl {
 
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
-        showMainScreen();
+
         this.managementOvervirewPasswordScene = new Scene(managementOverviewPasswordUI.getValue());
         this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         this.managementOverviewScreenCtrl = managementOverviewScreenUI.getKey();
@@ -124,7 +124,6 @@ public class MainCtrl {
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
         EmailInviteCtrl emailInviteCtrl = emailInviteUI.getKey();
         Scene emailInviteScene = new Scene(emailInviteUI.getValue());
-        this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
         screenMap.put(ExpenseScreenCtrl.class,
@@ -146,12 +145,19 @@ public class MainCtrl {
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
+    }
 
+    /**
+     * Should be run upon starting the application, after initialize()
+     */
+    public void onStart(){
+        translation.changeLanguage(Locale.forLanguageTag(language));
         Runnable connectionErrorCallback = (()-> Platform.runLater(this::onConnectionError));
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
         manager.subscribeToUpdates(connectionErrorCallback);
+        showMainScreen();
         primaryStage.show();
     }
 
