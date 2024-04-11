@@ -33,6 +33,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
     private final ImageUtils imageUtils;
     private final StringGenerationUtils stringUtils;
     private boolean listWasInitialized = false;
+    private Styling styling;
     /**
      * Constructor
      *
@@ -41,16 +42,19 @@ public class DeleteEventsScreenCtrl implements Initializable {
      * @param translation the Translation instance to use
      * @param utils       the ManagementOverviewUtils instance to use
      * @param imageUtils  the ImageUtils instance to use
+     * @param styling     the Styling instance to use
      * @param stringUtils the StringUtils instance to use
      */
     @Inject
     public DeleteEventsScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                  ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
+                                  ManagementOverviewUtils utils, ImageUtils imageUtils,
+                                  StringGenerationUtils stringUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
+        this.styling = styling;
         this.stringUtils = stringUtils;
     }
 
@@ -109,7 +113,7 @@ public class DeleteEventsScreenCtrl implements Initializable {
     public void deleteSelectedEvents() {
         if(!eventSelectionMap.containsValue(true)){
             noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.No.Events.Selected.Label"));
-            Styling.changeStyling(noEventsSelectedLabel, "successText", "errorText");
+            styling.changeStyling(noEventsSelectedLabel, "successText", "errorText");
             System.out.println("No events selected");
         }
         else {
@@ -132,12 +136,12 @@ public class DeleteEventsScreenCtrl implements Initializable {
                     System.out.println("The following event has been deleted: " + current.getTitle());
                 }
                 noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deleted.Sucessfully"));
-                Styling.changeStyling(noEventsSelectedLabel, "errorText", "successText");
+                styling.changeStyling(noEventsSelectedLabel, "errorText", "successText");
                 eventSelectionMap.clear();
             } else {
                 noEventsSelectedLabel.textProperty().bind(translation.getStringBinding("DES.Event.Deletion.Cancel"));
                 System.out.println("Deletion cancelled.");
-                Styling.changeStyling(noEventsSelectedLabel, "successText", "errorText");
+                styling.changeStyling(noEventsSelectedLabel, "successText", "errorText");
             }
         }
     }
