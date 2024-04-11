@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -141,8 +142,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             .bind(translation.getStringBinding("Event.Button.AddTag"));
         showStatisticsButton.textProperty()
             .bind(translation.getStringBinding("Event.Button.Statistics"));
-        allExpenses.textProperty()
-                .bind(translation.getStringBinding("Event.Button.ShowAllExpenses"));
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
@@ -155,6 +154,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
         transferMoneyButton.textProperty().bind(translation.getStringBinding("Event.Button.TransferMoney"));
+        setButtonsNames("...");
     }
 
     /**
@@ -300,7 +300,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private void updateParticipantsDropdown(){
         List<String> names = new ArrayList<>();
         var boxItems = cBoxParticipantExpenses.getItems();
-        //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
             names.add(current.getName());
         }
@@ -316,9 +315,22 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param name the name from the buttons
      */
     public void setButtonsNames(String name) {
-        allExpenses.textProperty().set("All");
-        fromButton.textProperty().set("From " + name);
-        inButton.textProperty().set("Including " + name);
+        allExpenses.textProperty().bind(translation
+            .getStringBinding("Event.Button.ShowAllExpenses"));
+        fromButton.textProperty().bind(createFilterString(name, "From"));
+        inButton.textProperty().bind(createFilterString(name, "Including"));
+    }
+
+    public ObservableValue<String> createFilterString(String name, String filter) {
+        String show;
+        if(name == null || name.isEmpty() || name.equals("..."))
+            show = "...";
+        else
+            show = name;
+        Map<String, String> subValues = new HashMap<>();
+        subValues.put("participant", show);
+        return Bindings.concat(translation.getStringSubstitutionBinding("Event.String." + filter,
+            subValues));
     }
 
     /**
