@@ -80,6 +80,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button emailInviteButton;
     @FXML
     private Button transferMoneyButton;
+    private Styling styling;
     /**
      * Constructor
      *
@@ -88,11 +89,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param styling     the Styling to use
      * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils,
+                StringGenerationUtils stringUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
@@ -102,6 +105,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.hBoxMap = new HashMap<>();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
+        this.styling = styling;
     }
 
     /**
@@ -155,8 +159,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Enables the email features
      */
     private void enableEmailFeatures() {
-        Styling.removeStyling(testEmailButton, "disabledButton");
-        Styling.removeStyling(emailInviteButton, "disabledButton");
+        styling.removeStyling(testEmailButton, "disabledButton");
+        styling.removeStyling(emailInviteButton, "disabledButton");
         emailInviteButton.setOnAction(event -> mainCtrl.switchScreens(EmailInviteCtrl.class));
         testEmailButton.setOnAction(event -> sendTestEmail());
     }
@@ -453,7 +457,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if (!emailHandler.isConfigured()){
             return;
         }
-        Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+        styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
         emailFeedbackLabel.textProperty()
                 .bind(translation.getStringBinding("Event.Label.EmailFeedback.Sending"));
         Thread t = new Thread(() ->
@@ -461,11 +465,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             boolean emailSent = emailHandler.sendTestEmail();
             Platform.runLater(() -> {
                 if (emailSent) {
-                    Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+                    styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
                     emailFeedbackLabel.textProperty()
                             .bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
                 } else if (emailHandler.isConfigured()) {
-                    Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
+                    styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
                     emailFeedbackLabel.textProperty()
                             .bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
                 }
