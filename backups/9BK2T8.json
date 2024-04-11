@@ -1,1 +1,0 @@
-{"id":"9BK2T8","title":"Skydiving","creationDate":1711637306683,"lastActivity":1711637365967,"participants":[{"id":5,"name":"Felix","expensesOwedTo":[{"id":4,"name":"Gear","priceInCents":14000,"date":1691618400000,"owedTo":5}]},{"id":6,"name":"Randy","expensesOwedTo":[{"id":3,"name":"Instruction Lessons","priceInCents":34000,"date":1693951200000,"owedTo":6}]}],"expenses":[3,4]}

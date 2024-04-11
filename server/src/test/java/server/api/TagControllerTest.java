@@ -44,4 +44,31 @@ public class TagControllerTest {
         verify(webSocketService).propagateEventUpdate(eventId);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
+    @Test
+    void addTagToEventFail() {
+        String eventId = "event1";
+        String tagName = "urgent";
+        String colorCode = "#FF0000";
+
+        doThrow(new IllegalArgumentException()).when(tagService).addTagToEvent(anyString(), anyString(), anyString());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            tagController.addTagToEvent(eventId, tagName, colorCode);
+        });
+    }
+
+    @Test
+    void removeTagSuccess() {
+        String eventId = "event1";
+        Long tagId = 1L;
+
+        doNothing().when(tagService).removeTag(anyString(), anyLong());
+        doNothing().when(webSocketService).propagateEventUpdate(anyString());
+
+        ResponseEntity<?> response = tagController.removeTag(eventId, tagId);
+
+        verify(tagService).removeTag(eventId, tagId);
+        verify(webSocketService).propagateEventUpdate(eventId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }
