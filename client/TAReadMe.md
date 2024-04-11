@@ -5,6 +5,12 @@ The following are the properties that can be configured:
 
 (The client.language property can be changed through the UI so there is no need to change it through the config file.)
 
+**How to add another language:**
+This can be done in through the drop-down UI that displays the current language.
+Language should be in format: <languageCode>_<countryCode>. (E.g. en_GB)
+languageCode must be a ISO 639 alpha-2 language code.
+countryCode must be ISO 3166 alpha-2 country code.
+
 **How to change the default server**
 
 * connection.URL={your server URL e.g. http://localhost:8080}
