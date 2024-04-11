@@ -1,6 +1,8 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
@@ -10,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,8 +26,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final ImageUtils imageUtils;
     @FXML
     private Button cancelButton;
+    @FXML
+    private Button goBack;
     @FXML
     private Label title;
     @FXML
@@ -37,6 +43,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label wrongBic;
     @FXML
     private Label noEmail;
+    @FXML
+    private Label optional;
     @FXML
     private TextField nameField;
     @FXML
@@ -71,10 +79,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation for translating buttons and fields
      */
     @Inject
-    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
     }
 
     /***
@@ -102,6 +111,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
+        optional.textProperty().bind(translation.getStringBinding("Participants.Label.optional"));
         resetErrorFields();
         ibanField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (checkIban(newValue)) {
@@ -140,7 +150,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(participantId);
             if(participantId!=0) {
                 Participant participant = findById(participantId);
                 if (participant != null && participant.getName().equals(newValue))
@@ -158,6 +167,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         bindFieldsToEnter();
+        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
+        goBack.setGraphic(goBackImage);
+        Styling.applyStyling(goBack, "positiveButton");
     }
 
     /**
@@ -209,16 +221,14 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                     .bind(translation.getStringBinding("Participants.Label.noName"));
             ok = false;
         }
-        if(participant.getEmail() != null &&participant.getEmail().equals("empty")){
-            noEmail.textProperty()
-                    .bind(translation.getStringBinding("Participants.Label.noEmail"));
-            ok = false;
-        }
         else{
             if(participant.getEmail() != null && participant.getEmail().equals("wrongEmail")){
                 noEmail.textProperty()
                       .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
+                System.out.println("Email format is not correct");
+            } else if (participant.getEmail().equals("empty")) {
+                participant.setEmail(null);
             }
         }
         if(participant.getIban() != null && participant.getIban().equals("wrongIban")) {
@@ -248,6 +258,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void cancel() {
         clearFields();
+        saveId(0L);
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
@@ -301,7 +312,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setIban(iban);
             else{
                 participant.setIban("wrongIban");
-                System.out.println("wrongIban");
+                System.out.println("IBAN format is not correct");
             }
         }
         String bic = bicField.getText();
@@ -313,7 +324,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setBic(bic);
             else{
                 participant.setBic("wrongBic");
-                System.out.println("wrongBic");
+                System.out.println("BIC format is not correct");
             }
         }
         participant.setLegalName(accountHolder);
@@ -363,11 +374,9 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         }
         String emailLike = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailLike);
-        Matcher matcher = emailPattern.matcher(email);
-        if (matcher.matches()) {
-            return true;
-        } else {
-            System.out.println("Invalid Email");
+        if(email!=null){
+            Matcher matcher = emailPattern.matcher(email);
+            return matcher.matches();
         }
         return false;
     }
