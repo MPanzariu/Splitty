@@ -1,23 +1,58 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.Translation;
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationExtension;
+
+import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
+import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class ParticipantScreenCtrlTest {
+    private Participant participant1;
+    private Participant participant2;
+    private Event event;
+
     @Mock
     MainCtrl mainCtrl;
     @Mock
     Translation translation;
     @InjectMocks
     ParticipantScreenCtrl participantScreenCtrl;
+    @Mock
+    ImageUtils imageUtils;
+    @BeforeEach
+    public void setup(){
+        participant1 = new Participant(1, "John");
+        participant2 = new Participant(2, "Jane");
+        event = new Event("Title", null);
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+        lenient().doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
+        Image testImage = new WritableImage(1,1);
+        lenient().doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(anyString(), anyInt());
+    }
     @BeforeAll
     static void testFXSetup(){
         System.setProperty("testfx.robot", "glass");
@@ -62,4 +97,5 @@ public class ParticipantScreenCtrlTest {
         boolean result = participantScreenCtrl.checkEmail(email);
         assertFalse(result);
     }
+
 }

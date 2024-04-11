@@ -33,6 +33,8 @@
     -fx-background-color: default-negative-accent;
 }
 
+.warningLabel{ -fx-text-fill: #ff7200 }
+
 .button:hover{
     -fx-cursor: hand;
 }
@@ -130,4 +132,12 @@
 }
 .table-view .corner {
     -fx-background-color: transparent;
+}
+
+.fieldsBorderGreen{
+    -fx-border-color: #26c506;
+}
+
+.fieldsBorderRed{
+    -fx-border-color: red;
 }
