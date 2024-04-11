@@ -5,15 +5,20 @@ import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 public class MainCtrl {
 
@@ -29,24 +34,27 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private TransferMoneyCtrl transferMoneyCtrl;
-    private Scene transferMoneyScene;
     private final Translation translation;
     private HashMap<Class<?>, ScreenInfo> screenMap;
-    @Inject
-    @Named("client.language")
-    private String language;
+    private final String serverURL;
+    private final String language;
     private final AppStateManager manager;
 
     /**
      * Constructor
      * @param translation the translation
      * @param manager the app state manager
+     * @param serverURL the URl of the server
+     * @param language the language tag used in the client
      */
     @Inject
-    public MainCtrl(Translation translation, AppStateManager manager) {
+    public MainCtrl(Translation translation, AppStateManager manager,
+                    @Named("connection.URL") String serverURL,
+                    @Named("client.language") String language) {
         this.translation = translation;
         this.manager = manager;
+        this.serverURL = serverURL;
+        this.language = language;
     }
 
     /**
@@ -62,6 +70,7 @@ public class MainCtrl {
      * @param settleDebtsUI the settle debts UI
      * @param deleteEventsScreenUI the delete events screen UI
      * @param participantListUI the participant list UI
+     * @param transferMoneyUI the money transfer UI
      * @param addTagUI the add tag UI
      * @param emailInviteUI the email invite UI
      * @param statisticsScreenUI the statistics screen UI
@@ -77,11 +86,9 @@ public class MainCtrl {
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
                            Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
-                            Pair<AddTagCtrl, Parent> addTagUI,
-                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
-
-
+                           Pair<AddTagCtrl, Parent> addTagUI,
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
         translation.changeLanguage(Locale.forLanguageTag(language));
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
@@ -94,8 +101,8 @@ public class MainCtrl {
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
-        this.transferMoneyCtrl = transferMoneyUI.getKey();
-        this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
+        TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
+        Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
 
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
@@ -131,7 +138,7 @@ public class MainCtrl {
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
         screenMap.put(AddTagCtrl.class,
-                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
+                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.Window.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
         screenMap.put(TransferMoneyCtrl.class,
@@ -140,12 +147,11 @@ public class MainCtrl {
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
 
+        Runnable connectionErrorCallback = (()-> Platform.runLater(this::onConnectionError));
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
-        manager.subscribeToUpdates();
-        //This can also show a pop-up in the future, but right now it doesn't
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
-
+        manager.subscribeToUpdates(connectionErrorCallback);
         primaryStage.show();
     }
 
@@ -169,6 +175,52 @@ public class MainCtrl {
         startupScreenCtrl.refreshLanguageOnSwitchback();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
+    }
+
+    /***
+     * Executed when there is a connection error/interruption, generates a popup for the user
+     */
+    public void onConnectionError() {
+        showMainScreen();
+        String reconnectString = translation.getStringBinding("Main.ConnectionError.Reconnect").getValue();
+        String exitString = translation.getStringBinding("Main.ConnectionError.Exit").getValue();
+        ButtonType buttonTypeReconnect = new ButtonType(reconnectString, ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeExit = new ButtonType(exitString, ButtonBar.ButtonData.NO);
+        var connectionErrorPopup = generateConnectionErrorPopup(serverURL, buttonTypeReconnect, buttonTypeExit);
+
+        Optional<ButtonType> result = connectionErrorPopup.showAndWait();
+        if(result.isPresent() && result.get().equals(buttonTypeReconnect)){
+            manager.subscribeToUpdates(()-> Platform.runLater(this::onConnectionError));
+        } else {
+            Platform.exit();
+        }
+    }
+
+    /***
+     * Generates an alert popup on connection failure
+     * @param serverURL the URL of the server
+     * @param buttonTypeReconnect the ButtonType of the Reconnect button
+     * @param buttonTypeExit the ButtonType of the Exit button
+     * @return an Alert popup telling the user to either reconnect or exit the app
+     */
+    public Alert generateConnectionErrorPopup(String serverURL, ButtonType buttonTypeReconnect, ButtonType buttonTypeExit){
+        Map<String, String> substitutionMap = new HashMap<>();
+        substitutionMap.put("serverURL", serverURL);
+
+        Alert connectionErrorPopup = new Alert(Alert.AlertType.ERROR);
+        String errorTitle = translation.getStringBinding("Main.ConnectionError.Title").getValue();
+        String errorHeader = translation.getStringSubstitutionBinding("Main.ConnectionError.Header", substitutionMap)
+                .getValue();
+        String errorContent = translation.getStringSubstitutionBinding("Main.ConnectionError.Content", substitutionMap)
+                .getValue();
+
+        connectionErrorPopup.setTitle(errorTitle);
+        connectionErrorPopup.setHeaderText(errorHeader);
+        connectionErrorPopup.setContentText(errorContent);
+
+        connectionErrorPopup.getButtonTypes().setAll(buttonTypeExit, buttonTypeReconnect);
+
+        return connectionErrorPopup;
     }
 
     /**
