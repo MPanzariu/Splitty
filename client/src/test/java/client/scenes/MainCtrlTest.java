@@ -19,7 +19,12 @@ import client.utils.AppStateManager;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -149,6 +154,26 @@ public class MainCtrlTest {
         lenient().doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
         sut.onStart();
         verify(primaryStage).show();
+    }
+
+    @Test
+    void connectionErrorPopupTest(){
+        String binding = "Binding!";
+        ButtonType buttonTypeReconnect = new ButtonType("Reconnect", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeExit = new ButtonType("Exit", ButtonBar.ButtonData.NO);
+        runInitialization();
+        lenient().doReturn(stringToObservable(binding)).when(translation).getStringBinding(anyString());
+        lenient().doReturn(stringToObservable(binding)).when(translation).getStringSubstitutionBinding(anyString(), any());
+        Alert testAlert = mock(Alert.class);
+        ObservableList<ButtonType> buttonList = FXCollections.observableArrayList();
+        doReturn(buttonList).when(testAlert).getButtonTypes();
+        sut.generateConnectionErrorPopup(testAlert, serverURL, buttonTypeReconnect, buttonTypeExit);
+
+        verify(testAlert).setTitle(binding);
+        verify(testAlert).setHeaderText(binding);
+        verify(testAlert).setContentText(binding);
+        assertTrue(buttonList.contains(buttonTypeReconnect));
+        assertTrue(buttonList.contains(buttonTypeExit));
     }
 
 }

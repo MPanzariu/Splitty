@@ -188,11 +188,12 @@ public class MainCtrl {
      */
     public void onConnectionError() {
         showMainScreen();
+        Alert initialPopup = new Alert(Alert.AlertType.ERROR);
         String reconnectString = translation.getStringBinding("Main.ConnectionError.Reconnect").getValue();
         String exitString = translation.getStringBinding("Main.ConnectionError.Exit").getValue();
         ButtonType buttonTypeReconnect = new ButtonType(reconnectString, ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonTypeExit = new ButtonType(exitString, ButtonBar.ButtonData.NO);
-        var connectionErrorPopup = generateConnectionErrorPopup(serverURL, buttonTypeReconnect, buttonTypeExit);
+        var connectionErrorPopup = generateConnectionErrorPopup(initialPopup, serverURL, buttonTypeReconnect, buttonTypeExit);
 
         Optional<ButtonType> result = connectionErrorPopup.showAndWait();
         if(result.isPresent() && result.get().equals(buttonTypeReconnect)){
@@ -204,29 +205,29 @@ public class MainCtrl {
 
     /***
      * Generates an alert popup on connection failure
+     * @param initialPopup the already-initialized Alert popup
      * @param serverURL the URL of the server
      * @param buttonTypeReconnect the ButtonType of the Reconnect button
      * @param buttonTypeExit the ButtonType of the Exit button
      * @return an Alert popup telling the user to either reconnect or exit the app
      */
-    public Alert generateConnectionErrorPopup(String serverURL, ButtonType buttonTypeReconnect, ButtonType buttonTypeExit){
+    public Alert generateConnectionErrorPopup(Alert initialPopup,String serverURL, ButtonType buttonTypeReconnect, ButtonType buttonTypeExit){
         Map<String, String> substitutionMap = new HashMap<>();
         substitutionMap.put("serverURL", serverURL);
 
-        Alert connectionErrorPopup = new Alert(Alert.AlertType.ERROR);
         String errorTitle = translation.getStringBinding("Main.ConnectionError.Title").getValue();
         String errorHeader = translation.getStringSubstitutionBinding("Main.ConnectionError.Header", substitutionMap)
                 .getValue();
         String errorContent = translation.getStringSubstitutionBinding("Main.ConnectionError.Content", substitutionMap)
                 .getValue();
 
-        connectionErrorPopup.setTitle(errorTitle);
-        connectionErrorPopup.setHeaderText(errorHeader);
-        connectionErrorPopup.setContentText(errorContent);
+        initialPopup.setTitle(errorTitle);
+        initialPopup.setHeaderText(errorHeader);
+        initialPopup.setContentText(errorContent);
 
-        connectionErrorPopup.getButtonTypes().setAll(buttonTypeExit, buttonTypeReconnect);
+        initialPopup.getButtonTypes().setAll(buttonTypeExit, buttonTypeReconnect);
 
-        return connectionErrorPopup;
+        return initialPopup;
     }
 
     /**
