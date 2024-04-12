@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import static javafx.geometry.Pos.*;
 
@@ -41,8 +40,8 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox settleVBox;
     private Event event;
     private Pair<Pane, Button> lastExpanded;
-    private Styling styling;
-    private EmailHandler emailHandler;
+    private final Styling styling;
+    private final EmailHandler emailHandler;
 
     /***
      * Constructor for the SettleDebtsScreen
@@ -92,7 +91,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         List<Node> children = settleVBox.getChildren();
         children.clear();
         HashMap<Participant, BigDecimal> owedShares = event.getOwedShares();
-        Set<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
+        List<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
 
         Image expandButtonImage = imageUtils.loadImageFile("singlearrow.png");
 
@@ -179,7 +178,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
         styling.applyStyling(button, "positiveButton");
-        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
+        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event);
         button.setOnAction(onClick);
 
         return button;
