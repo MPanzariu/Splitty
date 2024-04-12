@@ -25,13 +25,16 @@ class ExpenseScreenCtrlTest {
     private ServerUtils serverUtilsMock;
     private MainCtrl mainCtrlMock;
     private Translation translationMock;
+    private ImageUtils imageUtils;
 
     @BeforeEach
     public void setUp() {
         serverUtilsMock = mock(ServerUtils.class);
         mainCtrlMock = mock(MainCtrl.class);
         translationMock = mock(Translation.class);
-        expenseScreenCtrl = new ExpenseScreenCtrl(serverUtilsMock, mainCtrlMock, translationMock);
+        imageUtils = mock(ImageUtils.class);
+        AddTagCtrl addTagCtrl = mock(AddTagCtrl.class);
+        expenseScreenCtrl = new ExpenseScreenCtrl(serverUtilsMock, mainCtrlMock, translationMock, imageUtils, addTagCtrl);
     }
 
     @Test

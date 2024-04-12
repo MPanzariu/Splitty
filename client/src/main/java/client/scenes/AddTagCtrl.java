@@ -3,6 +3,7 @@ package client.scenes;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import commons.Event;
+import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,6 +34,7 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private TextField tagNameTextField;
     private Event event;
+    private Long tagId;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
@@ -88,13 +90,26 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
+     * Fill the user inputs with the currently edited tag
+     * @param tag Currently edited tag
+     */
+    public void fillInput(Tag tag) {
+        tagId = tag.getId();
+        tagNameTextField.setText(tag.getTagName());
+        tagNameTextField.selectEnd();
+        tagNameTextField.deselect();
+        colorPicker.setValue(Color.valueOf(tag.getColorCode()));
+    }
+
+    /**
      * this is the method that runs when pressing the cancel button
-     * empties the filled in fields
+     * empties the filled in fields and sets tagId to null
      */
     public void onCancel() {
         errorMessageTagName.textProperty()
                 .bind(translation.getStringBinding("empty"));
         tagNameTextField.clear();
+        tagId = null;
         colorPicker.setValue(Color.WHITE);
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
@@ -102,8 +117,9 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     /**
      * this is the method that runs when pressing the confirm button
      * it first checks to see if the user wrote a title for the tag, else it gives an error
-     * then it gets the tag color from the colorPicker and adds a tag to an event in the server
-     * then, it clears all the fields
+     * then it gets the tag color from the colorPicker.
+     * If tagId is null, then a new tag is being created. Else the tag with tagId is edited.
+     * Afterward all user inputs are cleared and tagId is set to null
      */
     public void onConfirm(){
         String tagname = tagNameTextField.getText();
@@ -119,9 +135,13 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
                     (int) (selectedColor.getRed() * 255),
                     (int) (selectedColor.getGreen() * 255),
                     (int) (selectedColor.getBlue() * 255));
-            server.addTagToEvent(event.getId(), tagname, colorCode);
+            if(tagId == null)
+                server.addTagToEvent(event.getId(), tagname, colorCode);
+            else
+                server.editTag(event.getId(), String.valueOf(tagId), new Tag(tagname, colorCode));
             tagNameTextField.clear();
             colorPicker.setValue(Color.WHITE);
+            tagId = null;
             mainCtrl.switchScreens(EventScreenCtrl.class);
         }
     }

@@ -1,5 +1,7 @@
 package server.api;
 
+import commons.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +52,23 @@ public class TagController {
         tagService.removeTag(eventId, tagId);
         webSocketService.propagateEventUpdate(eventId);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Edit tag
+     * @param eventId ID of the event related to the edited tag
+     * @param tagId ID of the edited tag
+     * @param tag Edited tag
+     * @return If entity cannot be found, a 400 bad request response. Else 200 OK response.
+     */
+    @PutMapping("/tags/{eventId}/{tagId}")
+    public ResponseEntity<Tag> editTag(@PathVariable String eventId, @PathVariable Long tagId, @RequestBody Tag tag) {
+        try {
+            tagService.editTag(tagId, tag);
+            webSocketService.propagateEventUpdate(eventId);
+            return ResponseEntity.ok().build();
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

@@ -1,6 +1,8 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;
@@ -14,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -74,19 +77,25 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private final Translation translation;
     private long expenseId;
     private List<CheckBox> participantCheckBoxes;
+    private final ImageUtils imageUtils;
+    private final AddTagCtrl addTagCtrl;
 
     /**
      *
      * @param server the server to which the client is connected
      * @param mainCtrl the main controller
+     * @param imageUtils Utilities for image loading
+     * @param addTagCtrl Controller for adding/editing tags
      * @param translation the class that manages translations
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
-                              Translation translation) {
+                              Translation translation, ImageUtils imageUtils, AddTagCtrl addTagCtrl) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
+        this.imageUtils = imageUtils;
+        this.addTagCtrl = addTagCtrl;
     }
 
     /**
@@ -140,7 +149,15 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                             "-fx-background-radius: 15;" +
                             "-fx-padding: 5 10 5 10;" +
                             "-fx-text-fill: white;");
-                    setGraphic(label);
+                    Button editButton = new Button("", imageUtils.generateImageView("editing.png", 15));
+                    Styling.applyStyling(editButton, "positiveButton");
+                    editButton.setOnMousePressed(event -> {
+                        mainCtrl.switchScreens(AddTagCtrl.class);
+                        addTagCtrl.fillInput(item);
+                    });
+                    AnchorPane pane = new AnchorPane(label, editButton);
+                    AnchorPane.setRightAnchor(editButton, 0.0);
+                    setGraphic(pane);
                 }
             }
         });

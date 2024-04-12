@@ -20,6 +20,7 @@ import com.google.inject.name.Named;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -301,5 +302,19 @@ public class ServerUtils {
             System.out.println("Tag added successfully");
         else
             System.out.println("Tag was not added");
+    }
+
+    /**
+     * Requests the server to edit the tag
+     * @param eventId Event ID of the event related to this tag
+     * @param tagId ID of this tag
+     * @param tag Edited tag
+     */
+    public void editTag(String eventId, String tagId, Tag tag) {
+        ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/" + "tags/" + eventId + "/" + tagId)
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(tag, APPLICATION_JSON));
     }
 }
