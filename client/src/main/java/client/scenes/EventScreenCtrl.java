@@ -390,7 +390,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label dateLabel = new Label();
-        dateLabel.setPrefWidth(40);
+        dateLabel.setPrefWidth(45);
         dateLabel.setWrapText(true);
         expenseText.setPrefWidth(200);
         Calendar expenseCalendar  = Calendar.getInstance();
@@ -422,6 +422,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         hBoxMap.put(expense.getId(), expenseBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setAlignment(Pos.CENTER_LEFT);
+        System.out.println("date:" + datehBox.getWidth());
+        System.out.println("expense:" + expenseBox.getWidth());
+        System.out.println("tag:" + tagLabel.getWidth());
         return expenseBox;
     }
 
