@@ -52,3 +52,12 @@ _**These default values work for gmail:**_
 * Ctrl + F: Add tag 
 * Ctrl + D: Transfer movie 
 * Ctrl + G: Settle debts 
+
+## **Using the admin overview**
+You can find the password to the admin overview in the console under "server.api.AdminPasswordService".
+
+To export/import an event type it's ID (e.g. ABCDEF) in the text field and click export/import.
+
+To view participants and expenses of an event click on it from the list and they should appear in the relevant text areas.
+
+To delete events, click on "delete selected events" and then tick the ones you want to delete. After you have selected all of them click "delete selected events".
