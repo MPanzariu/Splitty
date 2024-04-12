@@ -31,6 +31,7 @@ class ManagementOverviewScreenCtrlTest {
     private ImageUtils imageUtils;
     private StringGenerationUtils stringUtils;
     private File file;
+    private Styling styling;
     @BeforeEach
     public void setUp(){
         translation = mock(Translation.class);
@@ -40,8 +41,10 @@ class ManagementOverviewScreenCtrlTest {
         mainCtrl = mock(MainCtrl.class);
         objectMapper = mock(ObjectMapper.class);
         file = mock(File.class);
+        styling = mock(Styling.class);
         stringUtils = mock(StringGenerationUtils.class);
-        managementOverviewScreenCtrl = new TestManagementOverviewScreenCtrl(server, mainCtrl, translation, utils, imageUtils, stringUtils);
+        managementOverviewScreenCtrl = new TestManagementOverviewScreenCtrl(server, mainCtrl, translation, utils,
+                imageUtils, stringUtils, styling);
         managementOverviewScreenCtrl.setObjectMapper(objectMapper);
     }
 
@@ -126,8 +129,9 @@ class ManagementOverviewScreenCtrlTest {
          * @param utils       the ManagementOverviewUtils to use
          */
         public TestManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                                ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
-            super(server, mainCtrl, translation, utils, imageUtils, stringUtils);
+                                                ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils,
+                                                Styling styling) {
+            super(server, mainCtrl, translation, utils, imageUtils, stringUtils, styling);
             bindings = new ArrayList<>();
         }
 

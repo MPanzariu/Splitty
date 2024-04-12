@@ -7,6 +7,7 @@ import commons.Expense;
 import commons.Participant;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -80,6 +81,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button emailInviteButton;
     @FXML
     private Button transferMoneyButton;
+    private Styling styling;
     /**
      * Constructor
      *
@@ -88,11 +90,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param translation the Translation to use
      * @param languageCtrl the LanguageIndicator to use
      * @param imageUtils  the ImageUtils to use
+     * @param styling     the Styling to use
      * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
+                           LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils,
+                StringGenerationUtils stringUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
@@ -100,8 +104,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
+        this.allExpenses = new Button();
+        this.fromButton = new Button();
+        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
+        this.styling = styling;
     }
 
     /**
@@ -118,9 +126,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         invitationCode.setEditable(false);
         testEmailButton.textProperty().bind(translation.getStringBinding("Event.Button.TestEmail"));
         participantsName.textProperty()
@@ -149,14 +154,15 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
         transferMoneyButton.textProperty().bind(translation.getStringBinding("Event.Button.TransferMoney"));
+        setButtonsNames("...");
     }
 
     /**
      * Enables the email features
      */
     private void enableEmailFeatures() {
-        Styling.removeStyling(testEmailButton, "disabledButton");
-        Styling.removeStyling(emailInviteButton, "disabledButton");
+        styling.removeStyling(testEmailButton, "disabledButton");
+        styling.removeStyling(emailInviteButton, "disabledButton");
         emailInviteButton.setOnAction(event -> mainCtrl.switchScreens(EmailInviteCtrl.class));
         testEmailButton.setOnAction(event -> sendTestEmail());
     }
@@ -294,7 +300,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private void updateParticipantsDropdown(){
         List<String> names = new ArrayList<>();
         var boxItems = cBoxParticipantExpenses.getItems();
-        //listViewExpensesParticipants.getItems().clear();
         for (Participant current : event.getParticipants()) {
             names.add(current.getName());
         }
@@ -310,9 +315,22 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param name the name from the buttons
      */
     public void setButtonsNames(String name) {
-        allExpenses.textProperty().set("All");
-        fromButton.textProperty().set("From " + name);
-        inButton.textProperty().set("Including " + name);
+        allExpenses.textProperty().bind(translation
+            .getStringBinding("Event.Button.ShowAllExpenses"));
+        fromButton.textProperty().bind(createFilterString(name, "From"));
+        inButton.textProperty().bind(createFilterString(name, "Including"));
+    }
+
+    public ObservableValue<String> createFilterString(String name, String filter) {
+        String show;
+        if(name == null || name.isEmpty() || name.equals("..."))
+            show = "...";
+        else
+            show = name;
+        Map<String, String> subValues = new HashMap<>();
+        subValues.put("participant", show);
+        return Bindings.concat(translation.getStringSubstitutionBinding("Event.String." + filter,
+            subValues));
     }
 
     /**
@@ -453,7 +471,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         if (!emailHandler.isConfigured()){
             return;
         }
-        Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+        styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
         emailFeedbackLabel.textProperty()
                 .bind(translation.getStringBinding("Event.Label.EmailFeedback.Sending"));
         Thread t = new Thread(() ->
@@ -461,11 +479,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             boolean emailSent = emailHandler.sendTestEmail();
             Platform.runLater(() -> {
                 if (emailSent) {
-                    Styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
+                    styling.changeStyling(emailFeedbackLabel, "errorText", "successText");
                     emailFeedbackLabel.textProperty()
                             .bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
                 } else if (emailHandler.isConfigured()) {
-                    Styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
+                    styling.changeStyling(emailFeedbackLabel, "successText", "errorText");
                     emailFeedbackLabel.textProperty()
                             .bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
                 }

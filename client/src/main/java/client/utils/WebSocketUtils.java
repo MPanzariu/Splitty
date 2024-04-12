@@ -31,9 +31,10 @@ public class WebSocketUtils {
 
     /***
      * Initiates the WebSocket connection
+     * @param onConnectionErrorCallback the Runnable to execute if there is a connection error
      */
-    public void startConnection(){
-        this.session = connect(serverURL);
+    public void startConnection(Runnable onConnectionErrorCallback) throws ExecutionException {
+        this.session = connect(serverURL, onConnectionErrorCallback);
     }
 
     /***
@@ -68,14 +69,12 @@ public class WebSocketUtils {
      * @param url the server URL to use
      * @return a StompSession for use in further communication
      */
-    private StompSession connect(String url){
+    private StompSession connect(String url, Runnable onConnectionErrorCallback) throws ExecutionException{
         var client = new StandardWebSocketClient();
         var stomp = new WebSocketStompClient(client);
         stomp.setMessageConverter(new MappingJackson2MessageConverter());
         try{
-            return stomp.connectAsync(url, getLoggingSessionHandlerAdapter()).get();
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            return stomp.connectAsync(url, getLoggingSessionHandlerAdapter(onConnectionErrorCallback)).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -85,8 +84,9 @@ public class WebSocketUtils {
     /***
      * Generates a SessionHandlerAdapter with error logging
      * @return the StompSessionHandlerAdapter to use
+     * @param onConnectionErrorCallback the Runnable to execute if there is a connection error
      */
-    public StompSessionHandlerAdapter getLoggingSessionHandlerAdapter(){
+    public StompSessionHandlerAdapter getLoggingSessionHandlerAdapter(Runnable onConnectionErrorCallback){
         return new StompSessionHandlerAdapter() {
             @Override
             public void handleException(StompSession session,
@@ -102,8 +102,7 @@ public class WebSocketUtils {
             @Override
             public void handleTransportError(StompSession session,
                                              Throwable exception) {
-                System.out.println("WEBSOCKET TRANSPORT ERROR:");
-                exception.printStackTrace();
+                onConnectionErrorCallback.run();
                 super.handleTransportError(session, exception);
             }
         };
