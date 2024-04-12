@@ -8,6 +8,7 @@ import commons.dto.EventNameChangeDTO;
 import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 
 public class AppStateManager {
@@ -31,7 +32,6 @@ public class AppStateManager {
     @Inject
     public AppStateManager(WebSocketUtils socketUtils, ServerUtils server, LPUtils lpUtils) {
         this.socketUtils = socketUtils;
-        socketUtils.startConnection();
         this.server = server;
         this.currentClientSubscription = null;
         this.currentlyOpen = null;
@@ -70,7 +70,11 @@ public class AppStateManager {
     public void closeOpenedEvent(){
         event = null;
         if(currentClientSubscription!=null){
-            this.currentClientSubscription.unsubscribe();
+            try {
+                this.currentClientSubscription.unsubscribe();
+            } catch(IllegalStateException e){
+                //This occurs if the server disconnected in the meantime, and is handled in WebSocketUtils and MainCtrl
+            }
             this.currentClientSubscription = null;
         }
     }
@@ -95,10 +99,16 @@ public class AppStateManager {
 
     /***
      * Register for messages of deletion and name changes
+     * @param onConnectionErrorCallback the Runnable to execute if there is a connection error
      */
-    public void subscribeToUpdates(){
-        socketUtils.registerForMessages(this::onDeletion, "/topic/events/deletions", EventDeletedDTO.class);
-        lpUtils.registerForNameUpdates(this::onNameChange);
+    public void subscribeToUpdates(Runnable onConnectionErrorCallback){
+        try {
+            socketUtils.startConnection(onConnectionErrorCallback);
+            socketUtils.registerForMessages(this::onDeletion, "/topic/events/deletions", EventDeletedDTO.class);
+            lpUtils.registerForNameUpdates(this::onNameChange);
+        } catch (ExecutionException e){
+            //The error callback is called within handleTransferError, so no extra handling is needed here
+        }
     }
 
     /***

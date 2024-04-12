@@ -219,7 +219,7 @@ public class StartupScreenCtrlTest{
         public List<String> calls = new LinkedList<>();
 
         public TestMainController() {
-            super(null, null);
+            super(null, null, "URL", "EN");
         }
 
         @Override
