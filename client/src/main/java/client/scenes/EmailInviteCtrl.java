@@ -35,10 +35,10 @@ public class EmailInviteCtrl implements Initializable, SimpleRefreshable {
     private Label nameFeedbackLabel;
     @FXML
     private Label emailFeedbackLabel;
-    private final Translation translation;
-    private final ServerUtils server;
-    private final MainCtrl mainCtrl;
-    private final EmailHandler emailHandler;
+    private Translation translation;
+    private ServerUtils server;
+    private MainCtrl mainCtrl;
+    private EmailHandler emailHandler;
     private Event event;
 
     /**

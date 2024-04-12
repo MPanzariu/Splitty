@@ -40,7 +40,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private VBox settleVBox;
     private Event event;
     private Pair<Pane, Button> lastExpanded;
-    private Styling styling;
+    private final Styling styling;
     private final EmailHandler emailHandler;
 
     /***
