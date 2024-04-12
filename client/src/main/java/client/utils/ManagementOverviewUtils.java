@@ -222,40 +222,82 @@ public class ManagementOverviewUtils {
         return events;
     }
 
+    /**
+     * Gets the ascending property
+     * @return the ascending string
+     */
     public SimpleStringProperty getAscending() {
         return ascending;
     }
 
+    /**
+     * Gets the descending property
+     * @return the descending property
+     */
     public SimpleStringProperty getDescending() {
         return descending;
     }
+
+    /**
+     * Binds the passed StringProperty
+     * @param ascending the string property
+     */
     public void bindAscending(StringProperty ascending) {
         this.ascending.bind(ascending);
     }
 
+    /**
+     * Binds the String property
+     * @param descending the string property
+     */
     public void bindDescending(StringProperty descending) {
         this.descending.bind(descending);
     }
 
+    /**
+     * Gets the order of events
+     * @return the order of the events
+     */
     public StringProperty getOrder() {
         return order;
     }
+
+    /**
+     * binds the order property
+     * @param order the order stringProperty
+     */
     public void bindOrder(StringProperty order) {
         this.order.bind(order);
     }
 
+    /**
+     * Sets the event field to the provided event
+     * @param events the event you want to be set
+     */
     public void setEvents(ObservableList<Event> events) {
         this.events.setAll(events);
     }
 
+    /**
+     * Binds the title property
+     * @param title the title string property
+     */
     public void bindTitle(StringProperty title) {
         this.title.bind(title);
     }
 
+    /**
+     * Binds creation property
+     * @param creationDate the creationDate property
+     */
     public void bindCreationDate(StringProperty creationDate) {
         this.creationDate.bind(creationDate);
     }
 
+    /**
+     * Binds the lastActivity property
+     * @param lastActivity the lastActivity property
+     */
     public void bindLastActivity(StringProperty lastActivity) {
         this.lastActivity.bind(lastActivity);
     }

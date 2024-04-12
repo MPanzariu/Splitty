@@ -330,6 +330,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         inButton.textProperty().bind(createFilterString(name, "Including"));
     }
 
+    /**
+     *
+     * @param name the name of the participant
+     * @param filter the name of the filter
+     * @return the string for the filter
+     */
     public ObservableValue<String> createFilterString(String name, String filter) {
         String show;
         if(name == null || name.isEmpty() || name.equals("..."))
