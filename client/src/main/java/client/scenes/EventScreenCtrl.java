@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -391,19 +392,31 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Label dateLabel = new Label();
         dateLabel.setPrefWidth(40);
         dateLabel.setWrapText(true);
+        expenseText.setPrefWidth(200);
         Calendar expenseCalendar  = Calendar.getInstance();
         expenseCalendar.setTime(expense.getDate());
         Calendar now = Calendar.getInstance();
         SimpleDateFormat shortDate = new SimpleDateFormat("dd/MM");
         SimpleDateFormat fullDate = new SimpleDateFormat("dd/MM/yyyy");
         if(expenseCalendar.get(Calendar.YEAR) != now.get(Calendar.YEAR))
-            dateLabel.setText(shortDate.format(expense.getDate()));
-        else
             dateLabel.setText(fullDate.format(expense.getDate()));
+        else
+            dateLabel.setText(shortDate.format(expense.getDate()));
         HBox xHBox = new HBox(xButton);
         HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
         xHBox.setAlignment((CENTER_RIGHT));
-        HBox expenseBox = new HBox(dateLabel, expenseText, xHBox);
+        Tag item = expense.getExpenseTag();
+        Label tagLabel = new Label(item.getTagName());
+        tagLabel.setWrapText(true);
+        tagLabel.setAlignment(Pos.CENTER);
+        tagLabel.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+            "-fx-background-radius: 3;" +
+            "-fx-padding: 1 2 1 2;" +
+            "-fx-text-fill: white;");
+        HBox datehBox = new HBox(dateLabel);
+        datehBox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(datehBox, javafx.scene.layout.Priority.ALWAYS);
+        HBox expenseBox = new HBox(datehBox, expenseText, tagLabel, xHBox);
         expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
@@ -422,6 +435,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public Label generateExpenseLabel(long expenseId, ObservableValue<String> expenseDescription) {
         Label expense = new Label();
         expense.textProperty().bind(expenseDescription);
+        expense.setWrapText(true);
         expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
         expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
         expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));

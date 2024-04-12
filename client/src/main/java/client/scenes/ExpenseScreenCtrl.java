@@ -443,13 +443,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         if(price == (int) price)
             sum.setText(Integer.toString((int)price));
         sum.setText(String.valueOf(price));
-        choosePayer.getEditor().setText(expense.getOwedTo().getName());
+        choosePayer.setValue(expense.getOwedTo().getName());
         Date expenseDate = expense.getDate();
         currency.setValue(expense.getCurrency());
         datePicker.getEditor()
             .setText((expenseDate.getMonth() + 1) + "/"
                 + expenseDate.getDate() + "/" +
-                expenseDate.getYear()); //needs revision
+                (expenseDate.getYear() + 1900)); //needs revision
         if(expense.getParticipantsInExpense()
             .containsAll(currentEvent.getParticipants())) {
             splitBetweenAllCheckBox.setSelected(true);
