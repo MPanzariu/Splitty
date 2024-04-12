@@ -40,8 +40,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import java.util.HashMap;
 
 import static client.TestObservableUtils.stringToObservable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -83,7 +82,6 @@ public class MainCtrlTest {
     Stage primaryStage;
     SimpleStringProperty titleProperty;
     private MainCtrl sut;
-
     @BeforeAll
     static void testFXSetup(){
         System.setProperty("testfx.robot", "glass");
@@ -128,6 +126,14 @@ public class MainCtrlTest {
                 participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen);
     }
 
+    @Test
+    void testGetEventFilterNotNull(){
+        assertNotNull(sut.getEventHandlerForEventScreen());;
+    }
+    @Test
+    void testGetEventFilterMainScreen() {
+        assertNotNull(sut.getEventHandlerForMainScreen());
+    }
     @Test
     void initializeTest(){
         HashMap<Class<?>, ScreenInfo> screenMap = new HashMap<>();
