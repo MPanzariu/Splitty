@@ -5,6 +5,7 @@ import client.utils.ScreenInfo;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
@@ -14,11 +15,15 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 public class MainCtrl {
 
@@ -34,25 +39,29 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private TransferMoneyCtrl transferMoneyCtrl;
-    private Scene transferMoneyScene;
     private final Translation translation;
-    private HashMap<Class<?>, ScreenInfo> screenMap;
     private EventScreenCtrl eventScreenCtrl;
-    @Inject
-    @Named("client.language")
-    private String language;
+    private final HashMap<Class<?>, ScreenInfo> screenMap;
+    private final String serverURL;
+    private final String language;
     private final AppStateManager manager;
 
     /**
      * Constructor
      * @param translation the translation
      * @param manager the app state manager
+     * @param serverURL the URl of the server
+     * @param language the language tag used in the client
      */
     @Inject
-    public MainCtrl(Translation translation, AppStateManager manager){
+    public MainCtrl(Translation translation, AppStateManager manager,
+                    @Named("connection.URL") String serverURL,
+                    @Named("client.language") String language) {
         this.translation = translation;
         this.manager = manager;
+        this.serverURL = serverURL;
+        this.language = language;
+        this.screenMap = new HashMap<>();
     }
 
     /**
@@ -68,10 +77,10 @@ public class MainCtrl {
      * @param settleDebtsUI the settle debts UI
      * @param deleteEventsScreenUI the delete events screen UI
      * @param participantListUI the participant list UI
+     * @param transferMoneyUI the money transfer UI
      * @param addTagUI the add tag UI
      * @param emailInviteUI the email invite UI
      * @param statisticsScreenUI the statistics screen UI
-     * @param transferMoneyUI the transfer money UI
      */
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
@@ -84,12 +93,9 @@ public class MainCtrl {
                            Pair<DeleteEventsScreenCtrl, Parent> deleteEventsScreenUI,
                            Pair<ParticipantListScreenCtrl, Parent> participantListUI,
                            Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
-                            Pair<AddTagCtrl, Parent> addTagUI,
-                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
-
-
-        translation.changeLanguage(Locale.forLanguageTag(language));
+                           Pair<AddTagCtrl, Parent> addTagUI,
+                           Pair<EmailInviteCtrl, Parent> emailInviteUI,
+                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
@@ -101,12 +107,12 @@ public class MainCtrl {
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
-        this.transferMoneyCtrl = transferMoneyUI.getKey();
-        this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
         this.eventScreenCtrl = eventUI.getKey();
+        TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
+        Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
-        showMainScreen();
+
         this.managementOvervirewPasswordScene = new Scene(managementOverviewPasswordUI.getValue());
         this.managementOverviewScreenScene = new Scene(managementOverviewScreenUI.getValue());
         this.managementOverviewScreenCtrl = managementOverviewScreenUI.getKey();
@@ -124,7 +130,6 @@ public class MainCtrl {
         this.managementOvervirewPasswordScene.getStylesheets().add("stylesheets/main.css");
         EmailInviteCtrl emailInviteCtrl = emailInviteUI.getKey();
         Scene emailInviteScene = new Scene(emailInviteUI.getValue());
-        this.screenMap = new HashMap<>();
         screenMap.put(EventScreenCtrl.class,
                 new ScreenInfo(eventScreenCtrl, true, eventScene, "Event.Window.title"));
         screenMap.put(ExpenseScreenCtrl.class,
@@ -138,7 +143,7 @@ public class MainCtrl {
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
         screenMap.put(AddTagCtrl.class,
-                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.WIndow.title"));
+                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.Window.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
         screenMap.put(TransferMoneyCtrl.class,
@@ -146,14 +151,21 @@ public class MainCtrl {
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
         manager.setScreenInfoMap(screenMap);
+    }
 
+    /**
+     * Should be run upon starting the application, after initialize()
+     */
+    public void onStart(){
+        translation.changeLanguage(Locale.forLanguageTag(language));
+        Runnable connectionErrorCallback = (()-> Platform.runLater(this::onConnectionError));
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
-        manager.subscribeToUpdates();
-        //This can also show a pop-up in the future, but right now it doesn't
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
         addMainScreenShortcuts();
         addEventScreenShortcuts();
+        manager.subscribeToUpdates(connectionErrorCallback);
+        showMainScreen();
         primaryStage.show();
     }
 
@@ -177,6 +189,53 @@ public class MainCtrl {
         startupScreenCtrl.refreshLanguageOnSwitchback();
         primaryStage.titleProperty().bind(translation.getStringBinding("Startup.Window.title"));
         primaryStage.setScene(startupScene);
+    }
+
+    /***
+     * Executed when there is a connection error/interruption, generates a popup for the user
+     */
+    public void onConnectionError() {
+        showMainScreen();
+        Alert initialPopup = new Alert(Alert.AlertType.ERROR);
+        String reconnectString = translation.getStringBinding("Main.ConnectionError.Reconnect").getValue();
+        String exitString = translation.getStringBinding("Main.ConnectionError.Exit").getValue();
+        ButtonType buttonTypeReconnect = new ButtonType(reconnectString, ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeExit = new ButtonType(exitString, ButtonBar.ButtonData.NO);
+        var connectionErrorPopup = generateConnectionErrorPopup(initialPopup, serverURL, buttonTypeReconnect, buttonTypeExit);
+
+        Optional<ButtonType> result = connectionErrorPopup.showAndWait();
+        if(result.isPresent() && result.get().equals(buttonTypeReconnect)){
+            manager.subscribeToUpdates(()-> Platform.runLater(this::onConnectionError));
+        } else {
+            Platform.exit();
+        }
+    }
+
+    /***
+     * Generates an alert popup on connection failure
+     * @param initialPopup the already-initialized Alert popup
+     * @param serverURL the URL of the server
+     * @param buttonTypeReconnect the ButtonType of the Reconnect button
+     * @param buttonTypeExit the ButtonType of the Exit button
+     * @return an Alert popup telling the user to either reconnect or exit the app
+     */
+    public Alert generateConnectionErrorPopup(Alert initialPopup,String serverURL, ButtonType buttonTypeReconnect, ButtonType buttonTypeExit){
+        Map<String, String> substitutionMap = new HashMap<>();
+        substitutionMap.put("serverURL", serverURL);
+
+        String errorTitle = translation.getStringBinding("Main.ConnectionError.Title").getValue();
+        String errorHeader = translation.getStringSubstitutionBinding("Main.ConnectionError.Header", substitutionMap)
+                .getValue();
+        String errorContent = translation.getStringSubstitutionBinding("Main.ConnectionError.Content", substitutionMap)
+                .getValue();
+
+        initialPopup.setTitle(errorTitle);
+        initialPopup.setHeaderText(errorHeader);
+        initialPopup.setContentText(errorContent);
+
+        initialPopup.getButtonTypes().setAll(buttonTypeExit, buttonTypeReconnect);
+
+        return initialPopup;
     }
 
     /**
@@ -256,7 +315,6 @@ public class MainCtrl {
     }
 
     /**
-<<<<<<< HEAD
      * Adds shortcuts to the scene
      * ctrl + a switches to the admin password screen
      * ctrl + e switches to the event screen with the most recently joined event
@@ -266,8 +324,12 @@ public class MainCtrl {
         getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
     }
 
+    /**
+     * Returns the event handler for main screen
+     * @return the event handler
+     */
     public EventHandler<KeyEvent> getEventHandlerForMainScreen() {
-        EventHandler<KeyEvent> shortcutFilter = event -> {
+        return event -> {
             KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
             //Switch to the event screen with the most recently joined event ctrl + e
             KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
@@ -277,7 +339,6 @@ public class MainCtrl {
                 switchToManagementOverviewPasswordScreen();
             }
         };
-        return shortcutFilter;
     }
 
     /**
@@ -300,7 +361,7 @@ public class MainCtrl {
      * @return the event handler
      */
     public EventHandler<KeyEvent> getEventHandlerForEventScreen() {
-        EventHandler<KeyEvent> shortcutFilter = event -> {
+        return event -> {
             //Switch to admin password screen ctrl + a
             KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
             //Test email invite ctrl + t
@@ -349,7 +410,6 @@ public class MainCtrl {
                 }
             });
         };
-        return shortcutFilter;
     }
 
     /**
