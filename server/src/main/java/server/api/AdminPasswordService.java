@@ -10,25 +10,29 @@ import java.util.Random;
 
 @Service
 public class AdminPasswordService {
-    static final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-    static final int passwordLength = 20;
+    private final char[] passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+    private final Random random;
     private String password = "";
 
     /***
-     * Constructor for object mappers
+     * Constructor for the AdminPasswordService
+     * @param random the Random object to use
      */
-    public AdminPasswordService(){}
+    public AdminPasswordService(Random random){
+        this.random = random;
+    }
 
     /**
      * generate a random password
      * @return the randomly generated password
      */
-    private String generatePassword() {
-        Random random = new Random();
+    public String generatePassword() {
+        int passwordLength = 20;
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < passwordLength; i++) {
-            password += passwordChars[random.nextInt(passwordChars.length)];
+            builder.append(passwordChars[random.nextInt(passwordChars.length)]);
         }
-        return password;
+        return builder.toString();
     }
     private static final Logger log = LoggerFactory.getLogger(AdminPasswordService.class);
 
@@ -50,7 +54,6 @@ public class AdminPasswordService {
      * @return whether the password is matching or not, boolean
      */
     public boolean passwordChecker(String inputPassword){
-        if(inputPassword.equals(this.password))return true;
-        else return false;
+        return inputPassword.equals(this.password);
     }
 }
