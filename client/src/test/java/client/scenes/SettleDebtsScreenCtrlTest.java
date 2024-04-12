@@ -4,16 +4,21 @@ import client.utils.*;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,11 +138,148 @@ class SettleDebtsScreenCtrlTest {
     }
 
     @Test
+    void participantBankTextTest(){
+        String testDescriptionString = participant2.getName() + " " + participant2.getLegalName()
+                + " " + participant2.getIban() + " " + participant2.getBic();
+        ObservableValue<String> bankDetails = stringToObservable(testDescriptionString);
+        doReturn(bankDetails).when(settleUtils).getBankDetails(participant2);
+        TextArea result = sut.generateParticipantText(participant2);
+
+        assertEquals(bankDetails.getValue(), result.textProperty().getValue());
+    }
+
+    @Test
+    void bankTextPaneTest(){
+        TextArea testArea = new TextArea("Text!!!");
+        Pane result = sut.generateBankDetailsPane(testArea);
+        assertEquals(testArea, result.getChildren().getFirst());
+        assertFalse(result.isVisible());
+    }
+
+    @Test
+    void transferDetailsBoxTest(){
+        Button buttonL = new Button();
+        Label midLabel = new Label();
+        Button buttonR = new Button();
+        Button buttonFarR = new Button();
+
+        HBox result = sut.generateTransferDetailsBox(buttonL, midLabel ,buttonR, buttonFarR);
+        ObservableList<Node> children = result.getChildren();
+        assertEquals(6, children.size());
+        assertEquals(buttonL, children.get(0));
+        assertEquals(midLabel, children.get(2));
+        assertEquals(buttonR, children.get(4));
+        assertEquals(buttonFarR, children.get(5));
+    }
+
+    @Test
+    void settleButtonTest(){
+        Transfer transfer = new Transfer(participant1, 333, participant2);
+        ObservableValue<String> buttonText = stringToObservable("Mark Received");
+        doReturn(buttonText).when(translation).getStringBinding("SettleDebts.Button.received");
+        final boolean[] handlerCalled = {false};
+        EventHandler<ActionEvent> onAction = event -> handlerCalled[0] = true;
+        doReturn(onAction).when(settleUtils).createSettleAction(transfer, event);
+
+        Button result = sut.generateSettleButton(transfer, event);
+
+        verify(translation).getStringBinding("SettleDebts.Button.received");
+        assertEquals(buttonText.getValue(), result.textProperty().getValue());
+
+        verify(settleUtils).createSettleAction(transfer, event);
+        ObjectProperty<EventHandler<ActionEvent>> onClick = result.onActionProperty();
+        onClick.get().handle(new ActionEvent());
+        assertTrue(handlerCalled[0]);
+    }
+
+    @Test
+    void twoExpandButtonsTest(){
+        Pane pane1 = new VBox();
+        Pane pane2 = new VBox();
+        pane1.setVisible(false);
+        pane1.setManaged(false);
+        pane2.setVisible(false);
+        pane2.setManaged(false);
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+
+        Button buttonForPane1 = sut.generateExpandButton(pane1, testImageView);
+        Button buttonForPane2 = sut.generateExpandButton(pane2, testImageView);
+
+        assertFalse(pane1.isVisible());
+        assertFalse(pane2.isVisible());
+
+        buttonForPane1.fire(); //Expand one
+
+        assertTrue(pane1.isVisible());
+        assertFalse(pane2.isVisible());
+
+        buttonForPane2.fire(); //Expand one, close the other
+
+        assertFalse(pane1.isVisible());
+        assertTrue(pane2.isVisible());
+
+        buttonForPane2.fire(); //Close the open one
+
+        assertFalse(pane1.isVisible());
+        assertFalse(pane2.isVisible());
+    }
+
+    @Test
     void validTransferLabelText(){
         Transfer exampleTransfer = new Transfer(new Participant("A!"), 19216801, new Participant("B!"));
         ObservableValue<String> observableText = stringToObservable("A! gives 192168.01\u20ac to B!");
         when(settleUtils.createTransferString(exampleTransfer)).thenReturn(observableText);
         Label transferLabel = sut.generateTransferLabel(exampleTransfer);
         assertEquals(observableText.getValue(), transferLabel.textProperty().getValue());
+    }
+
+    @Test
+    void emailLabelAvailableTest(){
+        ObservableValue<String> buttonText = stringToObservable("Send Email");
+        doReturn(buttonText).when(translation).getStringBinding("SettleDebts.Button.sendEmailInstructions");
+        doReturn(true).when(emailHandler).isConfigured();
+        Transfer transfer = new Transfer(participant1, 333, participant2);
+        var result = sut.generateSendEmailButton(transfer);
+
+        result.fire();
+        verify(settleUtils).sendEmailTransferEmail(transfer);
+    }
+
+    @Test
+    void emailLabelUnavailableTest(){
+        ObservableValue<String> buttonText = stringToObservable("Send Email");
+        doReturn(buttonText).when(translation).getStringBinding("SettleDebts.Button.sendEmailInstructions");
+        participant1.setEmail("");
+        Transfer transfer = new Transfer(participant1, 333, participant2);
+        var result = sut.generateSendEmailButton(transfer);
+
+        result.fire();
+        verify(settleUtils, never()).sendEmailTransferEmail(transfer);
+    }
+
+    @Test
+    void switchToEventTest(){
+        sut.switchToEventScreen();
+        verify(mainCtrl).switchScreens(EventScreenCtrl.class);
+    }
+
+    @Test
+    void bindLabelsTest(){
+        Label titleLabel = new Label();
+        ObservableValue<String> buttonText = stringToObservable("Open Debts");
+        doReturn(buttonText).when(translation).getStringBinding("SettleDebts.Label.title");
+        sut.bindLabels(titleLabel);
+        assertEquals(buttonText.getValue(), titleLabel.textProperty().getValue());
+    }
+
+    @Test
+    void generateImageTest(){
+        Button testButton = new Button();
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        when(imageUtils.generateImageView("goBack.png", 20)).thenReturn(testImageView);
+        sut.setGraphics(testButton);
+        assertEquals(testImageView, testButton.getGraphic());
     }
 }

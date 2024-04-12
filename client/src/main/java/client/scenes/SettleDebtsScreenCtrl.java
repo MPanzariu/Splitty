@@ -192,12 +192,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         styling.applyStyling(button, "positiveButton");
         button.setGraphic(expandButtonInnerImage);
-        button.setOnMouseClicked((action)-> {
+        button.setOnAction((action)-> {
             pane.setVisible(!pane.isVisible());
             pane.setManaged(!pane.isManaged());
             if(pane.isVisible()){
                 button.setRotate(90);
-                if(lastExpanded!=null) lastExpanded.getValue().getOnMouseClicked().handle(null);
+                if(lastExpanded!=null) lastExpanded.getValue().getOnAction().handle(null);
                 lastExpanded = new Pair<>(pane, button);
             } else {
                 button.setRotate(0);
