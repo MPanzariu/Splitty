@@ -161,10 +161,18 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * Enables the email features
      */
     private void enableEmailFeatures() {
+        emailInviteButton.setOnAction(a -> switchToInviteEmail());
         styling.removeStyling(testEmailButton, "disabledButton");
         styling.removeStyling(emailInviteButton, "disabledButton");
-        emailInviteButton.setOnAction(event -> mainCtrl.switchScreens(EmailInviteCtrl.class));
         testEmailButton.setOnAction(event -> sendTestEmail());
+    }
+    /**
+     * Switches to the invite email screen
+     */
+    public void switchToInviteEmail() {
+        if (emailHandler.isConfigured()){
+            mainCtrl.switchScreens(EmailInviteCtrl.class);
+        }
     }
 
     /**

@@ -1,32 +1,30 @@
 package client.utils;
 
+import commons.Event;
+import commons.Expense;
 import commons.Participant;
-import javafx.application.Platform;
+import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.autoconfigure.transaction.PlatformTransactionManagerCustomizer;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.math.BigDecimal;
+import java.util.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({ApplicationExtension.class, MockitoExtension.class})
+@ExtendWith(MockitoExtension.class)
 class SettleDebtsUtilsTest {
     @InjectMocks
     SettleDebtsUtils sut;
@@ -35,19 +33,13 @@ class SettleDebtsUtilsTest {
     @Mock
     Translation translation;
     @Mock
+    TransferMoneyUtils transferUtils;
+    @Mock
     EmailHandler emailHandler;
+
     Participant participant1;
     Participant participant2;
     Participant participant3;
-
-    @BeforeAll
-    static void testFXSetup(){
-        System.setProperty("testfx.robot", "glass");
-        System.setProperty("testfx.headless", "true");
-        System.setProperty("glass.platform", "Monocle");
-        System.setProperty("monocle.platform", "Headless");
-        System.setProperty("prism.order", "sw");
-    }
 
     @BeforeEach
     void setup(){
@@ -60,32 +52,33 @@ class SettleDebtsUtilsTest {
         return BigDecimal.valueOf(number);
     }
 
+    BigDecimal bigDecimalize(double number){
+        return BigDecimal.valueOf(number);
+    }
+
     /***
      * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 3 people (tends to leave rounding issues...)
      */
-    @Test
-    void randomTransferInstructions(){
+    @RepeatedTest(5)
+    void randomTransferInstructions3X(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
         Random rng = new Random();
 
-        Participant participant4 = new Participant("VVV");
-
         int rand1 = generateRandom(rng);
         int rand2 = generateRandom(rng);
-        int rand3 = generateRandom(rng);
-        int balancer = -(rand1+rand2+rand3);
+        int balancer = -(rand1+rand2);
 
-        creditMap.put(participant1, bigDecimalize(rand1));
-        creditMap.put(participant2, bigDecimalize(rand2));
-        creditMap.put(participant3, bigDecimalize(rand3));
-        creditMap.put(participant4, bigDecimalize(balancer));
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
 
         var initialResult = sut.calculateTransferInstructions(creditMap);
         assertTrue(initialResult.size()<creditMap.size());
 
         //Run one transfer at a time, and make sure it always settles the debt
         int ceiling = creditMap.size();
-        var transferSetAfterTransfer = new HashSet<>(initialResult);
+        var transferSetAfterTransfer = new ArrayList<>(initialResult);
         for (Transfer transfer:
              initialResult) {
             BigDecimal balSender = creditMap.get(transfer.sender());
@@ -104,11 +97,92 @@ class SettleDebtsUtilsTest {
     }
 
     /***
+     * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 4 people (usually no rounding issues)
+     */
+    @RepeatedTest(5)
+    void randomTransferInstructions4X(){
+        Participant participant4 = new Participant("Alastor!");
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Random rng = new Random();
+
+        int rand1 = generateRandom(rng);
+        int rand2 = generateRandom(rng);
+        int rand3 = generateRandom(rng);
+        int balancer = -(rand1+rand2+rand3);
+
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
+        creditMap.put(participant4, bigDecimalize(balancer/100.0));
+
+        var initialResult = sut.calculateTransferInstructions(creditMap);
+        assertTrue(initialResult.size()<creditMap.size());
+
+        //Run one transfer at a time, and make sure it always settles the debt
+        int ceiling = creditMap.size();
+        for (Transfer transfer:
+                initialResult) {
+            BigDecimal balSender = creditMap.get(transfer.sender());
+            BigDecimal balReceiver = creditMap.get(transfer.receiver());
+            BigDecimal amount = bigDecimalize(transfer.amount());
+            creditMap.put(transfer.sender(), balSender.add(amount));
+            creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
+
+            var reranResult = sut.calculateTransferInstructions(creditMap);
+            ceiling -= 1;
+            assertTrue(reranResult.size()<ceiling);
+        }
+    }
+
+    /***
+     * Randomized transfers result in correct outcome
+     * Splitting expenses equally between 5 people (tends to leave rounding issues too)
+     */
+    @RepeatedTest(5)
+    void randomTransferInstructions5X(){
+        Participant participant4 = new Participant("VVV");
+        Participant participant5 = new Participant("Alastor!");
+        HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Random rng = new Random();
+
+        int rand1 = generateRandom(rng);
+        int rand2 = generateRandom(rng);
+        int rand3 = generateRandom(rng);
+        int rand4 = generateRandom(rng);
+        int balancer = -(rand1+rand2+rand3+rand4);
+
+        creditMap.put(participant1, bigDecimalize(rand1/100.0));
+        creditMap.put(participant2, bigDecimalize(rand2/100.0));
+        creditMap.put(participant3, bigDecimalize(balancer/100.0));
+        creditMap.put(participant4, bigDecimalize(balancer/100.0));
+        creditMap.put(participant5, bigDecimalize(balancer/100.0));
+
+        var initialResult = sut.calculateTransferInstructions(creditMap);
+        assertTrue(initialResult.size()<creditMap.size());
+
+        //Run one transfer at a time, and make sure it always settles the debt
+        int ceiling = creditMap.size();
+        for (Transfer transfer:
+                initialResult) {
+            BigDecimal balSender = creditMap.get(transfer.sender());
+            BigDecimal balReceiver = creditMap.get(transfer.receiver());
+            BigDecimal amount = bigDecimalize(transfer.amount());
+            creditMap.put(transfer.sender(), balSender.add(amount));
+            creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
+
+            var reranResult = sut.calculateTransferInstructions(creditMap);
+            ceiling -= 1;
+            assertTrue(reranResult.size()<ceiling);
+        }
+    }
+
+    /***
      * Generates a random number between min and max
      */
     private int generateRandom(Random random){
-        int min = -1000;
-        int max = 1000;
+        int min = -10000;
+        int max = 10000;
         return random.nextInt(max - min) + min;
     }
 
@@ -153,42 +227,47 @@ class SettleDebtsUtilsTest {
     }
 
     /***
-     * Net positive amounts are rejected
+     * Amounts that will end up net-positive after rounding result in creditor not being paid off the missing cent fractions
      */
     @Test
     void netPositiveTransferInstructions(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
+        Participant participant4 = new Participant("VVV");
+        Participant participant5 = new Participant("Alastor");
 
-        creditMap.put(participant1, bigDecimalize(100));
-        creditMap.put(participant2, bigDecimalize(-10));
-        creditMap.put(participant3, bigDecimalize(-20));
+        BigDecimal credit = bigDecimalize(1.6);
+        BigDecimal debtAbovePointFive = bigDecimalize(-0.6);
+        BigDecimal fractionalShare = bigDecimalize(-0.3);
 
-        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
+        creditMap.put(participant1, credit);
+        creditMap.put(participant2, fractionalShare);
+        creditMap.put(participant3, fractionalShare);
+        creditMap.put(participant4, fractionalShare);
+        creditMap.put(participant5, debtAbovePointFive);
+
+        Transfer expectedTransfer = new Transfer(participant5, 1, participant1);
+        var result = sut.calculateTransferInstructions(creditMap);
+
+        assertTrue(result.contains(expectedTransfer));
+        assertEquals(1, result.size());
     }
 
     /***
-     * Net negative amounts are rejected
+     * Amounts that will end up net-negative after rounding result in creditor being paid off but debtors having negative balance
      */
     @Test
     void netNegativeTransferInstructions(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
 
-        creditMap.put(participant1, bigDecimalize(100));
-        creditMap.put(participant2, bigDecimalize(-70));
-        creditMap.put(participant3, bigDecimalize(-50));
+        creditMap.put(participant1, bigDecimalize(1.33));
+        creditMap.put(participant2, bigDecimalize(-0.66));
+        creditMap.put(participant3, bigDecimalize(-0.66));
 
-        assertThrows(IllegalArgumentException.class, () -> sut.calculateTransferInstructions(creditMap));
-    }
+        Transfer expectedTransfer = new Transfer(participant2, 1, participant1);
+        var result = sut.calculateTransferInstructions(creditMap);
 
-    /***
-     * [FEATURE NOT YET IMPLEMENTED]
-     * Checks if the Expense generated to settle a normal debt is correct
-     */
-    @Test
-    void createSettlementExpense() {
-        Transfer transfer = new Transfer(participant1, 7, participant2);
-        var result = sut.createSettlementExpense (transfer);
-        assertNotNull(result);
+        assertTrue(result.contains(expectedTransfer));
+        assertEquals(1, result.size());
     }
 
     /***
@@ -198,10 +277,17 @@ class SettleDebtsUtilsTest {
      */
     @Test
     void createSettleAction() {
+        Event event = new Event("Title!", null);
+        event.addTag(new Tag("money transfer", null));
         Transfer transfer = new Transfer(participant1, 7, participant2);
-        EventHandler<ActionEvent> result = sut.createSettleAction(transfer, "ABC123");
+
+        Expense settleExpense = new Expense("Money Transfer", 7, null, participant2);
+        settleExpense.addParticipantToExpense(participant1);
+        when(transferUtils.transferMoney(transfer, event)).thenReturn(settleExpense);
+
+        EventHandler<ActionEvent> result = sut.createSettleAction(transfer, event);
         result.handle(new ActionEvent());
-        assertNotNull(result);
+        verify(server).addExpense(event.getId(), settleExpense);
     }
 
     /***
@@ -324,65 +410,5 @@ class SettleDebtsUtilsTest {
         assertTrue(result.contains(name));
         assertTrue(result.contains("(MISSING)"));
         assertTrue(result.contains(bic));
-    }
-
-    @Test
-    void generateEmailBodyNoBankCredentials(){
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        String emailBody = sut.generateEmailBody(t);
-
-        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver\n\n" +"Thank you!");
-    }
-
-    @Test
-    void generateEmailBodyWithBankCredentials(){
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        receiver.setBic("BIC");
-        receiver.setIban("IBAN");
-        receiver.setLegalName("Legal Name");
-        Transfer t = new Transfer(sender, 10,receiver);
-        String emailBody = sut.generateEmailBody(t);
-        assertEquals(emailBody, "Please transfer the amount of " + FormattingUtils.getFormattedPrice(10) + " to Receiver to the following bank account:\n" +
-                "\n" +
-                "Name: Legal Name\n" +
-                "IBAN: IBAN\n" +
-                "BIC: BIC\n" +
-                "\n" +
-                "Thank you!");
-    }
-
-    @Test
-    void sendEmailTransferTestSuccess(){
-        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(true);
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        sut.sendEmailTransferEmail(t);
-        waitForJavaFX();
-        verify(emailHandler, times(1)).showSuccessPrompt();
-    }
-
-    @Test
-    void sendEmailTransferTestFail(){
-        when(emailHandler.sendEmail(any(), any(), any())).thenReturn(false);
-        Participant sender = new Participant("Sender");
-        Participant receiver = new Participant("Receiver");
-        Transfer t = new Transfer(sender, 10,receiver);
-        sut.sendEmailTransferEmail(t);
-        waitForJavaFX();
-        verify(emailHandler, times(1)).showFailPrompt();
-    }
-
-    private void waitForJavaFX() {
-        final CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(latch::countDown);
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

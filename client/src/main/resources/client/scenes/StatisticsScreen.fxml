@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="parentPane" prefHeight="500.0" prefWidth="620.0"
+<AnchorPane fx:id="parentPane" prefHeight="500.0" prefWidth="650.0"
             stylesheets="@../../stylesheets/main.css, @/stylesheets/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsScreenCtrl">
    <Label fx:id="statisticsLabel" layoutX="30.0" layoutY="20.0" prefHeight="40.0" prefWidth="300.0" styleClass="h1"
@@ -17,7 +16,6 @@
            prefHeight="25.0" prefWidth="29.0" styleClass="positiveButton"/>
    <Label fx:id="pieChartLabel" layoutX="30.0" layoutY="130.0" prefHeight="25.0" prefWidth="160.0"
           styleClass="large-text-emphasis" text="Label"/>
-   <PieChart fx:id="tagPieChart" layoutX="20.0" layoutY="140.0" prefHeight="300.0" prefWidth="400.0"/>
-   <Label fx:id="shareLabel" layoutX="400.0" layoutY="130.0" prefHeight="25.0" prefWidth="160.0"
+   <Label fx:id="shareLabel" layoutX="440.0" layoutY="130.0" prefHeight="25.0" prefWidth="160.0"
           styleClass="large-text-emphasis" text="Label"/>
 </AnchorPane>

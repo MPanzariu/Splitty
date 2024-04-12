@@ -7,8 +7,13 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -35,6 +40,7 @@ public class MainCtrl {
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
     private final Translation translation;
+    private EventScreenCtrl eventScreenCtrl;
     private final HashMap<Class<?>, ScreenInfo> screenMap;
     private final String serverURL;
     private final String language;
@@ -101,9 +107,9 @@ public class MainCtrl {
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
+        this.eventScreenCtrl = eventUI.getKey();
         TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
         Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
-
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
 
@@ -156,6 +162,8 @@ public class MainCtrl {
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
+        addMainScreenShortcuts();
+        addEventScreenShortcuts();
         manager.subscribeToUpdates(connectionErrorCallback);
         showMainScreen();
         primaryStage.show();
@@ -307,6 +315,104 @@ public class MainCtrl {
     }
 
     /**
+     * Adds shortcuts to the scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + e switches to the event screen with the most recently joined event
+     */
+    public void addMainScreenShortcuts() {
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForMainScreen();
+        getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Returns the event handler for main screen
+     * @return the event handler
+     */
+    public EventHandler<KeyEvent> getEventHandlerForMainScreen() {
+        return event -> {
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Switch to the event screen with the most recently joined event ctrl + e
+            KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+            if (ctrlE.match(event)) {
+                startupScreenCtrl.joinMostRecentEvent();
+            }else if (ctrlA.match(event)) {
+                switchToManagementOverviewPasswordScreen();
+            }
+        };
+    }
+
+    /**
+     * Adds shortcuts to the event scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + t tests the email invite
+     * ctrl + s switches to the statistics screen
+     * ctrl + e edits the title of the event
+     * ctrl + + adds a new expense
+     * ctrl + p adds a new participant
+     * ctrl + m transfers money
+     */
+    public void addEventScreenShortcuts(){
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForEventScreen();
+        this.eventScene.addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Generates the event handler for the event screen
+     * @return the event handler
+     */
+    public EventHandler<KeyEvent> getEventHandlerForEventScreen() {
+        return event -> {
+            //Switch to admin password screen ctrl + a
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Test email invite ctrl + t
+            KeyCombination ctrlT = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+            //Switch to statistics screen ctrl + s
+            KeyCombination ctrlS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+            //Edit the title of the event ctrl + w
+            KeyCombination ctrlW = new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
+            //Add a new expense ctrl + q
+            KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+            //Add a new participant ctrl + p
+            KeyCombination ctrlP = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+            //Invite by email ctrl + I
+            KeyCombination ctrlI = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+            //Go to main screen ctrl + b
+            KeyCombination ctrlB = new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+            //Add tag ctrl + f
+            KeyCombination ctrlF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+            //Transfer movie ctrl + d
+            KeyCombination ctrlD = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+            //Settle debts ctrl + g
+            KeyCombination ctrlG = new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
+            eventScene.setOnKeyPressed(e -> {
+                if (ctrlA.match(e)) {
+                    switchToManagementOverviewPasswordScreen();
+                } else if (ctrlT.match(e)) {
+                    eventScreenCtrl.sendTestEmail();
+                } else if (ctrlS.match(e)) {
+                    eventScreenCtrl.switchToStatistics();
+                } else if (ctrlW.match(e)) {
+                    switchScreens(EditTitleCtrl.class);
+                } else if (ctrlQ.match(e)) {
+                    eventScreenCtrl.addExpense();
+                } else if (ctrlP.match(e)) {
+                    eventScreenCtrl.addParticipants();
+                } else if (ctrlI.match(e)) {
+                    eventScreenCtrl.switchToInviteEmail();
+                } else if (ctrlB.match(e)) {
+                    eventScreenCtrl.switchToMainScreen();
+                } else if (ctrlF.match(e)) {
+                    eventScreenCtrl.switchToAddTag();
+                } else if (ctrlD.match(e)) {
+                    eventScreenCtrl.transferMoney();
+                } else if (ctrlG.match(e)) {
+                    eventScreenCtrl.settleDebts();
+                }
+            });
+        };
+    }
+
+    /**
      * Shows an alert that tells the user if the email was sent successfully
      * @param wasSuccessful true if the email was sent successfully, false otherwise
      */
@@ -327,3 +433,4 @@ public class MainCtrl {
         a.show();
     }
 }
+
