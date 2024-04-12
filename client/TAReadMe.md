@@ -44,7 +44,7 @@ _**These default values work for gmail:**_
 ### **Event Overview:**
 * Ctrl + T: Test email invite 
 * Ctrl + S: Switch to statistics screen 
-* Ctrl + E: Edit the title of the event 
+* Ctrl + W: Edit the title of the event 
 * Ctrl + Q: Add a new expense 
 * Ctrl + P: Add a new participant 
 * Ctrl + I: Invite by email 

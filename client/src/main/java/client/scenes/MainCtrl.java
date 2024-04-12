@@ -368,8 +368,8 @@ public class MainCtrl {
             KeyCombination ctrlT = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
             //Switch to statistics screen ctrl + s
             KeyCombination ctrlS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
-            //Edit the title of the event ctrl + e
-            KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+            //Edit the title of the event ctrl + w
+            KeyCombination ctrlW = new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
             //Add a new expense ctrl + q
             KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
             //Add a new participant ctrl + p
@@ -391,7 +391,7 @@ public class MainCtrl {
                     eventScreenCtrl.sendTestEmail();
                 } else if (ctrlS.match(e)) {
                     eventScreenCtrl.switchToStatistics();
-                } else if (ctrlE.match(e)) {
+                } else if (ctrlW.match(e)) {
                     switchScreens(EditTitleCtrl.class);
                 } else if (ctrlQ.match(e)) {
                     eventScreenCtrl.addExpense();
