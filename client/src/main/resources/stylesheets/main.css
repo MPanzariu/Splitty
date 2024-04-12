@@ -133,4 +133,6 @@
 }
 .chart-pie {
     -fx-padding: -100;
+    -fx-border-color: derive(-fx-pie-color, -40%);
+    -fx-border-width: 3px;
 }
