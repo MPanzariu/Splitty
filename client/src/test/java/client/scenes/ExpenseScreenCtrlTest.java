@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;
@@ -26,6 +27,7 @@ class ExpenseScreenCtrlTest {
     private MainCtrl mainCtrlMock;
     private Translation translationMock;
     private ImageUtils imageUtils;
+    private Styling styling;
 
     @BeforeEach
     public void setUp() {
@@ -34,7 +36,9 @@ class ExpenseScreenCtrlTest {
         translationMock = mock(Translation.class);
         imageUtils = mock(ImageUtils.class);
         AddTagCtrl addTagCtrl = mock(AddTagCtrl.class);
-        expenseScreenCtrl = new ExpenseScreenCtrl(serverUtilsMock, mainCtrlMock, translationMock, imageUtils, addTagCtrl);
+        styling = mock(Styling.class);
+        expenseScreenCtrl = new ExpenseScreenCtrl(serverUtilsMock, mainCtrlMock, translationMock, imageUtils,
+                addTagCtrl, styling);
     }
 
     @Test

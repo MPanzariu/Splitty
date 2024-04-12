@@ -79,6 +79,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private List<CheckBox> participantCheckBoxes;
     private final ImageUtils imageUtils;
     private final AddTagCtrl addTagCtrl;
+    private final Styling styling;
 
     /**
      *
@@ -90,12 +91,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
-                              Translation translation, ImageUtils imageUtils, AddTagCtrl addTagCtrl) {
+                              Translation translation, ImageUtils imageUtils, AddTagCtrl addTagCtrl, Styling styling) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
         this.imageUtils = imageUtils;
         this.addTagCtrl = addTagCtrl;
+        this.styling = styling;
     }
 
     /**
@@ -150,7 +152,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                             "-fx-padding: 5 10 5 10;" +
                             "-fx-text-fill: white;");
                     Button editButton = new Button("", imageUtils.generateImageView("editing.png", 15));
-                    Styling.applyStyling(editButton, "positiveButton");
+                    styling.applyStyling(editButton, "positiveButton");
                     editButton.setOnMousePressed(event -> {
                         mainCtrl.switchScreens(AddTagCtrl.class);
                         addTagCtrl.fillInput(item);
