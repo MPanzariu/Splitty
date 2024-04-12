@@ -243,7 +243,8 @@ class SettleDebtsScreenCtrlTest {
         var result = sut.generateSendEmailButton(transfer);
 
         result.fire();
-        verify(settleUtils).sendEmailTransferEmail(transfer);
+        //we can not run threads on the build server, so here we make sure it's not disabled instead
+        verify(styling, never()).applyStyling(any(), eq("disabledButton"));
     }
 
     @Test
@@ -255,6 +256,7 @@ class SettleDebtsScreenCtrlTest {
         var result = sut.generateSendEmailButton(transfer);
 
         result.fire();
+        verify(styling).applyStyling(any(), eq("disabledButton"));
         verify(settleUtils, never()).sendEmailTransferEmail(transfer);
     }
 
