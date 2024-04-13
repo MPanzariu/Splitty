@@ -1,15 +1,22 @@
 package client.scenes;
 
-import client.utils.AppStateManager;
-import client.utils.ScreenInfo;
-import client.utils.Translation;
+import client.Exceptions.IncompleteLanguageException;
+import client.Exceptions.InvalidLanguageFormatException;
+import client.Exceptions.MissingLanguageTemplateException;
+import client.utils.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import commons.Event;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -20,6 +27,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 public class MainCtrl {
 
@@ -35,11 +43,18 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
+    private TransferMoneyCtrl transferMoneyCtrl;
+    private Scene transferMoneyScene;
+    private GenerateLanguageTemplateCtrl generateLanguageTemplateCtrl;
+    private Scene generateLanguageTemplateScene;
     private final Translation translation;
+    private EventScreenCtrl eventScreenCtrl;
     private final HashMap<Class<?>, ScreenInfo> screenMap;
     private final String serverURL;
-    private final String language;
+    private String language;
     private final AppStateManager manager;
+    private final Stage currentStage;
+    private final Locale defaultLocale;
 
     /**
      * Constructor
@@ -51,12 +66,15 @@ public class MainCtrl {
     @Inject
     public MainCtrl(Translation translation, AppStateManager manager,
                     @Named("connection.URL") String serverURL,
-                    @Named("client.language") String language) {
+                    @Named("client.language") String language, @Named("defaultLocale") Locale defaultLocale,
+                    Stage currentStage) {
         this.translation = translation;
         this.manager = manager;
         this.serverURL = serverURL;
         this.language = language;
         this.screenMap = new HashMap<>();
+        this.currentStage = currentStage;
+        this.defaultLocale = defaultLocale;
     }
 
     /**
@@ -76,6 +94,7 @@ public class MainCtrl {
      * @param addTagUI the add tag UI
      * @param emailInviteUI the email invite UI
      * @param statisticsScreenUI the statistics screen UI
+     * @param generateLanguageTemplatePair UI for generating an empty language template
      */
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
@@ -90,21 +109,26 @@ public class MainCtrl {
                            Pair<TransferMoneyCtrl, Parent> transferMoneyUI,
                            Pair<AddTagCtrl, Parent> addTagUI,
                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
-                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI){
+                           Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI,
+                           Pair<GenerateLanguageTemplateCtrl, Parent> generateLanguageTemplatePair){
+
+
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();
         this.startupScene = new Scene(overview.getValue());
         this.eventScene = new Scene(eventUI.getValue());
-        EventScreenCtrl eventScreenCtrl = eventUI.getKey();
         Scene expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
         Scene participantListScene = new Scene(participantListUI.getValue());
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
-        TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
-        Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
+        this.transferMoneyCtrl = transferMoneyUI.getKey();
+        this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
+        this.generateLanguageTemplateCtrl = generateLanguageTemplatePair.getKey();
+        this.generateLanguageTemplateScene = new Scene(generateLanguageTemplatePair.getValue());
 
+        this.eventScreenCtrl = eventUI.getKey();
         EditTitleCtrl editTitleCtrl = editTitlePair.getKey();
         Scene editTitleScene = new Scene(editTitlePair.getValue());
 
@@ -145,21 +169,59 @@ public class MainCtrl {
                 new ScreenInfo(transferMoneyCtrl, true, transferMoneyScene, "TransferMoney.title"));
         screenMap.put(StatisticsScreenCtrl.class,
                 new ScreenInfo(statisticsScreenCtrl, true, statisticsScreenScene, "Statistics.Screen.Window.Title"));
+        screenMap.put(GenerateLanguageTemplateCtrl.class,
+                new ScreenInfo(generateLanguageTemplateCtrl, false, generateLanguageTemplateScene, "Event.Language.Generate"));
         manager.setScreenInfoMap(screenMap);
     }
 
     /**
      * Should be run upon starting the application, after initialize()
      */
-    public void onStart(){
-        translation.changeLanguage(Locale.forLanguageTag(language));
+    public void onStart() {
         Runnable connectionErrorCallback = (()-> Platform.runLater(this::onConnectionError));
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
         manager.setOnCurrentEventDeletedCallback(this::showMainScreen);
+        addMainScreenShortcuts();
+        addEventScreenShortcuts();
         manager.subscribeToUpdates(connectionErrorCallback);
+        loadClientLanguage();
         showMainScreen();
         primaryStage.show();
+    }
+
+    /**
+     * Loads the locale set in the config file.
+     * If the selected locale is not complete or is of an invalid format,
+     * then the client locale will be reset to the default locale.
+     */
+    private void loadClientLanguage() {
+        try {
+            if(!language.matches("\\p{Alpha}{2}_\\p{Alpha}{2}"))
+                throw new InvalidLanguageFormatException();
+            String[] parts = language.split("_");
+            translation.changeLanguage(Locale.of(parts[0], parts[1]));
+        } catch(PatternSyntaxException | InvalidLanguageFormatException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "Client language in the config file is an invalid language. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        } catch(IncompleteLanguageException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "The template of the client language set in the config file, is incomplete. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        } catch(MissingLanguageTemplateException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "The template of the client language set in the config file, is missing. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        }
+    }
+
+    /**
+     * Sets the client language
+     * @param language Client language
+     */
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     /***
@@ -308,17 +370,133 @@ public class MainCtrl {
     }
 
     /**
+     * Opens a window for generating an empty language template.
+     * This window blocks all parent windows.
+     */
+    public void openLanguageGeneration() {
+        if(!currentStage.getModality().equals(Modality.APPLICATION_MODAL))
+            currentStage.initModality(Modality.APPLICATION_MODAL);
+        currentStage.setScene(generateLanguageTemplateScene);
+        currentStage.show();
+    }
+
+    /**
+     * Close screen for generating an empty language template.
+     */
+    public void closeLanguageGeneration() {
+        currentStage.close();
+    }
+
+    /**
+     * Adds shortcuts to the scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + e switches to the event screen with the most recently joined event
+     */
+    public void addMainScreenShortcuts() {
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForMainScreen();
+        getMainMenuScene().addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Returns the event handler for main screen
+     * @return the event handler
+     */
+    public EventHandler<KeyEvent> getEventHandlerForMainScreen() {
+        return event -> {
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Switch to the event screen with the most recently joined event ctrl + e
+            KeyCombination ctrlE = new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+            if (ctrlE.match(event)) {
+                startupScreenCtrl.joinMostRecentEvent();
+            }else if (ctrlA.match(event)) {
+                switchToManagementOverviewPasswordScreen();
+            }
+        };
+    }
+
+    /**
+     * Adds shortcuts to the event scene
+     * ctrl + a switches to the admin password screen
+     * ctrl + t tests the email invite
+     * ctrl + s switches to the statistics screen
+     * ctrl + e edits the title of the event
+     * ctrl + + adds a new expense
+     * ctrl + p adds a new participant
+     * ctrl + m transfers money
+     */
+    public void addEventScreenShortcuts(){
+        EventHandler<KeyEvent> shortcutFilter = getEventHandlerForEventScreen();
+        this.eventScene.addEventFilter(KeyEvent.KEY_PRESSED, shortcutFilter);
+    }
+
+    /**
+     * Generates the event handler for the event screen
+     * @return the event handler
+     */
+    public EventHandler<KeyEvent> getEventHandlerForEventScreen() {
+        return event -> {
+            //Switch to admin password screen ctrl + a
+            KeyCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+            //Test email invite ctrl + t
+            KeyCombination ctrlT = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+            //Switch to statistics screen ctrl + s
+            KeyCombination ctrlS = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+            //Edit the title of the event ctrl + w
+            KeyCombination ctrlW = new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
+            //Add a new expense ctrl + q
+            KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+            //Add a new participant ctrl + p
+            KeyCombination ctrlP = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+            //Invite by email ctrl + I
+            KeyCombination ctrlI = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+            //Go to main screen ctrl + b
+            KeyCombination ctrlB = new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+            //Add tag ctrl + f
+            KeyCombination ctrlF = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+            //Transfer movie ctrl + d
+            KeyCombination ctrlD = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+            //Settle debts ctrl + g
+            KeyCombination ctrlG = new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
+            eventScene.setOnKeyPressed(e -> {
+                if (ctrlA.match(e)) {
+                    switchToManagementOverviewPasswordScreen();
+                } else if (ctrlT.match(e)) {
+                    eventScreenCtrl.sendTestEmail();
+                } else if (ctrlS.match(e)) {
+                    eventScreenCtrl.switchToStatistics();
+                } else if (ctrlW.match(e)) {
+                    switchScreens(EditTitleCtrl.class);
+                } else if (ctrlQ.match(e)) {
+                    eventScreenCtrl.addExpense();
+                } else if (ctrlP.match(e)) {
+                    eventScreenCtrl.addParticipants();
+                } else if (ctrlI.match(e)) {
+                    eventScreenCtrl.switchToInviteEmail();
+                } else if (ctrlB.match(e)) {
+                    eventScreenCtrl.switchToMainScreen();
+                } else if (ctrlF.match(e)) {
+                    eventScreenCtrl.switchToAddTag();
+                } else if (ctrlD.match(e)) {
+                    eventScreenCtrl.transferMoney();
+                } else if (ctrlG.match(e)) {
+                    eventScreenCtrl.settleDebts();
+                }
+            });
+        };
+    }
+
+    /**
      * Shows an alert that tells the user if the email was sent successfully
      * @param wasSuccessful true if the email was sent successfully, false otherwise
      */
     public void showEmailPrompt(boolean wasSuccessful) {
         Alert a;
-        if (wasSuccessful){
+        if (wasSuccessful) {
             System.out.println("Successfully sent email!");
             a = new Alert(Alert.AlertType.INFORMATION);
             a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Success"));
             a.titleProperty().bind(translation.getStringBinding("Email.SuccessTitle"));
-        }else{
+        } else {
             System.out.println("Error while sending email!");
             a = new Alert(Alert.AlertType.ERROR);
             a.contentTextProperty().bind(translation.getStringBinding("Event.Label.EmailFeedback.Fail"));
@@ -328,3 +506,4 @@ public class MainCtrl {
         a.show();
     }
 }
+

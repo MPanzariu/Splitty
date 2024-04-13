@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.Exceptions.MissingLanguageTemplateException;
 import client.utils.AppStateManager;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
@@ -38,10 +39,10 @@ import org.mockito.stubbing.Answer;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import static client.TestObservableUtils.stringToObservable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -80,10 +81,14 @@ public class MainCtrlTest {
     @Mock
     StatisticsScreenCtrl statisticsScreenCtrl;
     @Mock
+    GenerateLanguageTemplateCtrl generateTemplateScreenCtrl;
+    @Mock
     Stage primaryStage;
+    @Mock
+    Stage currentStage;
+    private Locale defaultLocale;
     SimpleStringProperty titleProperty;
     private MainCtrl sut;
-
     @BeforeAll
     static void testFXSetup(){
         System.setProperty("testfx.robot", "glass");
@@ -98,8 +103,9 @@ public class MainCtrlTest {
         translation = mock(Translation.class);
         manager = mock(AppStateManager.class);
         serverURL = "URL";
-        language = "EN";
-        sut = new MainCtrl(translation, manager, serverURL, language);
+        language = "en_GB";
+        defaultLocale = Locale.of("en", "GB");
+        sut = new MainCtrl(translation, manager, serverURL, language, defaultLocale, currentStage);
         titleProperty = new SimpleStringProperty();
         lenient().when(primaryStage.titleProperty()).thenReturn(titleProperty);
     }
@@ -122,12 +128,21 @@ public class MainCtrlTest {
         Pair<EmailInviteCtrl, Parent> emailInviteScreen = new Pair<>(emailInviteCtrl, new AnchorPane());
         Pair<TransferMoneyCtrl, Parent> transferMoney = new Pair<>(transferMoneyCtrl, new AnchorPane());
         Pair<StatisticsScreenCtrl, Parent> statisticsScreen = new Pair<>(statisticsScreenCtrl, new AnchorPane());
+        Pair<GenerateLanguageTemplateCtrl, Parent> generateTemplateScreen = new Pair<>(generateTemplateScreenCtrl, new AnchorPane());
 
         sut.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle,
                 managementOverviewPassword, managementOverviewScreen, settleDebtsScreen, deleteEventsScreen,
-                participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen);
+                participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen, generateTemplateScreen);
     }
 
+    @Test
+    void testGetEventFilterNotNull(){
+        assertNotNull(sut.getEventHandlerForEventScreen());;
+    }
+    @Test
+    void testGetEventFilterMainScreen() {
+        assertNotNull(sut.getEventHandlerForMainScreen());
+    }
     @Test
     void initializeTest(){
         HashMap<Class<?>, ScreenInfo> screenMap = new HashMap<>();
@@ -138,7 +153,7 @@ public class MainCtrlTest {
         doAnswer(stub).when(manager).setScreenInfoMap(any());
         runInitialization();
 
-        assertEquals(10, screenMap.size());
+        assertEquals(11, screenMap.size());
 
         /*
         All parents are initialized as new AnchorPanes, so we do need to get this one bit of data from the actual result
@@ -153,6 +168,7 @@ public class MainCtrlTest {
         runInitialization();
         lenient().doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
         sut.onStart();
+        verify(translation).changeLanguage(defaultLocale);
         verify(primaryStage).show();
     }
 

@@ -63,9 +63,10 @@ public class Main extends Application {
         var emailInviteScreen = FXML.load(EmailInviteCtrl.class, "client", "scenes", "EmailInvite.fxml");
         var transferMoney = FXML.load(TransferMoneyCtrl.class, "client", "scenes", "TransferMoney.fxml");
         var statisticsScreen = FXML.load(StatisticsScreenCtrl.class, "client", "scenes", "StatisticsScreen.fxml");
+        var generateLanguageTemplateScreen = FXML.load(GenerateLanguageTemplateCtrl.class, "client", "scenes", "GenerateLanguageTemplate.fxml");
         mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle,
                 managementOverviewPassword, managementOverviewScreen, settleDebtsScreen, deleteEventsScreen,
-                participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen);
+                participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen, generateLanguageTemplateScreen);
         mainCtrl.onStart();
     }
 }
