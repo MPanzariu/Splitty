@@ -223,80 +223,80 @@ public class ManagementOverviewUtils {
     }
 
     /**
-     * Gets the ascending property
-     * @return the ascending string
+     * Get ascending
+     * @return ascending string property
      */
     public SimpleStringProperty getAscending() {
         return ascending;
     }
 
     /**
-     * Gets the descending property
-     * @return the descending property
+     * Get descending
+     * @return Descending string property
      */
     public SimpleStringProperty getDescending() {
         return descending;
     }
 
     /**
-     * Binds the passed StringProperty
-     * @param ascending the string property
+     * Bind ascending
+     * @param ascending String property to bind ascending to
      */
     public void bindAscending(StringProperty ascending) {
         this.ascending.bind(ascending);
     }
 
     /**
-     * Binds the String property
-     * @param descending the string property
+     * Bind descending
+     * @param descending String property to bind descending to
      */
     public void bindDescending(StringProperty descending) {
         this.descending.bind(descending);
     }
 
     /**
-     * Gets the order of events
-     * @return the order of the events
+     * Get order
+     * @return String property of the order that events are sorted by
      */
     public StringProperty getOrder() {
         return order;
     }
 
     /**
-     * binds the order property
-     * @param order the order stringProperty
+     * Bind order
+     * @param order String property to bind order to
      */
     public void bindOrder(StringProperty order) {
         this.order.bind(order);
     }
 
     /**
-     * Sets the event field to the provided event
-     * @param events the event you want to be set
+     * Set events
+     * @param events New events
      */
     public void setEvents(ObservableList<Event> events) {
         this.events.setAll(events);
     }
 
     /**
-     * Binds the title property
-     * @param title the title string property
+     * Bind title
+     * @param title String property to bind title to
      */
     public void bindTitle(StringProperty title) {
         this.title.bind(title);
     }
 
     /**
-     * Binds creation property
-     * @param creationDate the creationDate property
+     * Bind creation date
+     * @param creationDate String property to bind creation date to
      */
     public void bindCreationDate(StringProperty creationDate) {
         this.creationDate.bind(creationDate);
     }
 
     /**
-     * Binds the lastActivity property
-     * @param lastActivity the lastActivity property
+     * Bind last activity
+     * @param lastActivity String property to bind last activity to
      */
     public void bindLastActivity(StringProperty lastActivity) {
         this.lastActivity.bind(lastActivity);

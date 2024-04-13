@@ -93,6 +93,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param imageUtils  the ImageUtils to use
      * @param styling     the Styling to use
      * @param stringUtils the StringGenerationUtils to use
+     * @param emailHandler Handles email related functionality
      */
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
@@ -331,10 +332,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     *
-     * @param name the name of the participant
-     * @param filter the name of the filter
-     * @return the string for the filter
+     * Creates the strings for the filer buttons above the expense overview taking dynamic translations into account.
+     * If no participant has been selected in the event overview, then "..." will be shown.
+     * Else the participant name will be shown.
+     * @param name Name of the selected participant
+     * @param filter String denoting the filter type: from or to
+     * @return Observable string for the filter button text
      */
     public ObservableValue<String> createFilterString(String name, String filter) {
         String show;
