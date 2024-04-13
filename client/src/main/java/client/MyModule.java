@@ -19,18 +19,22 @@ import client.scenes.AddTagCtrl;
 import client.scenes.LanguageIndicatorCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 
 import client.scenes.MainCtrl;
 import com.google.inject.name.Names;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Properties;
 
 public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
+        binder.bind(Locale.class).annotatedWith(Names.named("defaultLocale")).toInstance(Locale.of("en", "GB"));
         Properties properties = new ConfigUtils().easyLoadProperties();
         binder.bind(Properties.class).annotatedWith(Names.named("config")).toInstance(properties);
         Names.bindProperties(binder, properties);
@@ -45,6 +49,7 @@ public class MyModule implements Module {
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
         binder.bind(TransferMoneyUtils.class).in(Scopes.SINGLETON);
         binder.bind(AddTagCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(Stage.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
     }
