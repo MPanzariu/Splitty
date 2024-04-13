@@ -64,9 +64,9 @@ public class TagController {
     @PutMapping("/tags/{eventId}/{tagId}")
     public ResponseEntity<Tag> editTag(@PathVariable String eventId, @PathVariable Long tagId, @RequestBody Tag tag) {
         try {
-            tagService.editTag(tagId, tag);
+            Tag newTag = tagService.editTag(tagId, tag);
             webSocketService.propagateEventUpdate(eventId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(newTag);
         } catch(EntityNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }

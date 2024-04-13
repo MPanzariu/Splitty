@@ -79,11 +79,11 @@ public class TagService {
      * @param newTag Edited tag
      * @throws EntityNotFoundException Tag is not found in the database
      */
-    public void editTag(Long id, Tag newTag) throws EntityNotFoundException {
+    public Tag editTag(Long id, Tag newTag) throws EntityNotFoundException {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tag is not found"));
         tag.setTagName(newTag.getTagName());
         tag.setColorCode(newTag.getColorCode());
-        tagRepository.save(tag);
+        return tagRepository.save(tag);
     }
 }

@@ -6,6 +6,7 @@ import client.Exceptions.MissingLanguageTemplateException;
 import client.utils.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import commons.Tag;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -22,10 +23,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.PatternSyntaxException;
 
 public class MainCtrl {
@@ -33,6 +31,7 @@ public class MainCtrl {
     private Stage primaryStage;
     private StartupScreenCtrl startupScreenCtrl;
     private ExpenseScreenCtrl expenseScreenCtrl;
+    private AddTagCtrl tagCtrl;
     private Scene startupScene;
     private Scene eventScene;
     private Scene participantScene;
@@ -140,7 +139,7 @@ public class MainCtrl {
         this.deleteEventsScene = new Scene(deleteEventsScreenUI.getValue());
         this.deleteEventsScreenCtrl = deleteEventsScreenUI.getKey();
         Scene addTagScene = new Scene(addTagUI.getValue());
-        AddTagCtrl addTagCtrl = addTagUI.getKey();
+        tagCtrl = addTagUI.getKey();
         Scene statisticsScreenScene = new Scene(statisticsScreenUI.getValue());
         StatisticsScreenCtrl statisticsScreenCtrl = statisticsScreenUI.getKey();
         //initialize stylesheets
@@ -161,7 +160,7 @@ public class MainCtrl {
         screenMap.put(SettleDebtsScreenCtrl.class,
                 new ScreenInfo(settleDebtsScreenCtrl, true, settleDebtsScene, "SettleDebts.Window.title"));
         screenMap.put(AddTagCtrl.class,
-                new ScreenInfo(addTagCtrl,true, addTagScene, "AddTag.Window.title"));
+                new ScreenInfo(tagCtrl,true, addTagScene, "AddTag.Window.title"));
         screenMap.put(EmailInviteCtrl.class,
                 new ScreenInfo(emailInviteCtrl, false, emailInviteScene, "Email.TitleLabel"));
         screenMap.put(TransferMoneyCtrl.class,
@@ -323,6 +322,16 @@ public class MainCtrl {
     public void switchToEditExpense(long expenseId) {
         switchScreens(ExpenseScreenCtrl.class);
         expenseScreenCtrl.setExpense(expenseId);
+    }
+
+    /**
+     * Switches to the edit expense screen and sets the tags
+     * @param expenseId  the expense id of the expense to edit
+     */
+    public void switchToEditExpense(long expenseId, Set<Tag> tags) {
+        switchScreens(ExpenseScreenCtrl.class);
+        expenseScreenCtrl.setExpense(expenseId);
+        expenseScreenCtrl.setTags(tags);
     }
 
     /**
@@ -503,6 +512,16 @@ public class MainCtrl {
         }
         a.headerTextProperty().bind(translation.getStringBinding("Email.EmailFeedback"));
         a.show();
+    }
+
+    /**
+     * Switch to tag screen for editing a selected tag
+     * @param tag Selected tag
+     * @param expenseId ID of the expense the user came from
+     */
+    public void switchToEditTagScreen(Tag tag, Long expenseId) {
+        switchScreens(AddTagCtrl.class);
+        tagCtrl.fillInput(tag, expenseId);
     }
 }
 

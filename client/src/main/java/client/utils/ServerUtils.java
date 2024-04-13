@@ -310,11 +310,11 @@ public class ServerUtils {
      * @param tagId ID of this tag
      * @param tag Edited tag
      */
-    public void editTag(String eventId, String tagId, Tag tag) {
-        ClientBuilder.newClient()
+    public Tag editTag(String eventId, String tagId, Tag tag) {
+        return ClientBuilder.newClient()
                 .target(serverURL)
                 .path("api/events/" + "tags/" + eventId + "/" + tagId)
                 .request(APPLICATION_JSON)
-                .put(Entity.entity(tag, APPLICATION_JSON));
+                .put(Entity.entity(tag, APPLICATION_JSON), Tag.class);
     }
 }

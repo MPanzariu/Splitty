@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class AddTagCtrl implements Initializable, SimpleRefreshable {
     @FXML
@@ -35,25 +36,22 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     private TextField tagNameTextField;
     private Event event;
     private Long tagId;
+    private Long expenseId;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final Translation translation;
-    private final LanguageIndicatorCtrl languageCtrl;
 
     /**
      *
      * @param server the server to which the client is connected
      * @param mainCtrl the main controller
      * @param translation the class that manages translations
-     * @param languageCtrl the LanguageIndicator to use
      */
     @Inject
-    public AddTagCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                      LanguageIndicatorCtrl languageCtrl){
+    public AddTagCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation){
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
-        this.languageCtrl = languageCtrl;
     }
 
     /**
@@ -93,12 +91,17 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
      * Fill the user inputs with the currently edited tag
      * @param tag Currently edited tag
      */
-    public void fillInput(Tag tag) {
-        tagId = tag.getId();
+    public void fillInput(Tag tag, Long expenseId) {
+        setIds(tag, expenseId);
         tagNameTextField.setText(tag.getTagName());
         tagNameTextField.selectEnd();
         tagNameTextField.deselect();
         colorPicker.setValue(Color.valueOf(tag.getColorCode()));
+    }
+
+    public void setIds(Tag tag, Long expenseId) {
+        tagId = tag.getId();
+        this.expenseId = expenseId;
     }
 
     /**
@@ -109,9 +112,8 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
         errorMessageTagName.textProperty()
                 .bind(translation.getStringBinding("empty"));
         tagNameTextField.clear();
-        tagId = null;
         colorPicker.setValue(Color.WHITE);
-        mainCtrl.switchScreens(EventScreenCtrl.class);
+        switchScreens(null, null);
     }
 
     /**
@@ -135,14 +137,47 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
                     (int) (selectedColor.getRed() * 255),
                     (int) (selectedColor.getGreen() * 255),
                     (int) (selectedColor.getBlue() * 255));
+            Tag tag = null;
             if(tagId == null)
                 server.addTagToEvent(event.getId(), tagname, colorCode);
             else
-                server.editTag(event.getId(), String.valueOf(tagId), new Tag(tagname, colorCode));
+                tag = server.editTag(event.getId(), String.valueOf(tagId), new Tag(tagname, colorCode));
             tagNameTextField.clear();
             colorPicker.setValue(Color.WHITE);
-            tagId = null;
+            switchScreens(tag, event);
+        }
+    }
+
+    /**
+     * If a tag is currently being edited, then return to the expense screen with its data filled in again.
+     * Else switch to the event overview.
+     */
+    public void switchScreens(Tag tag, Event event) {
+        if(tagId != null) {
+            Set<Tag> tags = event.getEventTags();
+            tags.removeIf(tag1 -> tag1.getId() == tag.getId());
+            tags.add(tag);
+            mainCtrl.switchToEditExpense(expenseId, tags);
+            expenseId = null;
+        } else {
             mainCtrl.switchScreens(EventScreenCtrl.class);
         }
+        tagId = null;
+    }
+
+    public Long getTagId() {
+        return tagId;
+    }
+
+    public Long getExpenseId() {
+        return expenseId;
+    }
+
+    public void setExpenseId(Long expenseId) {
+        this.expenseId = expenseId;
+    }
+
+    public void setTagId(Long tagId) {
+        this.tagId = tagId;
     }
 }

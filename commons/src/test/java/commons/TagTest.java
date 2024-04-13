@@ -56,7 +56,7 @@ class TagTest {
     }
     @Test
     public void toStringTest(){
-        assertEquals("Tag{id='null', tagName='Food', colorCode='#008000'}", t1.toString());
-        assertEquals("Tag{id='null', tagName='Travel', colorCode='#FF0000'}", t2.toString());
+        assertEquals("Tag{id='0', tagName='Food', colorCode='#008000'}", t1.toString());
+        assertEquals("Tag{id='0', tagName='Travel', colorCode='#FF0000'}", t2.toString());
     }
 }

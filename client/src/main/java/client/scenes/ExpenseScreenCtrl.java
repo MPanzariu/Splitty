@@ -80,6 +80,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private final ImageUtils imageUtils;
     private final AddTagCtrl addTagCtrl;
     private final Styling styling;
+    private final ObservableList<Tag> tags = FXCollections.observableArrayList();
 
     /**
      *
@@ -138,6 +139,18 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         tags.removeIf(tag -> tag.getTagName().equals("money transfer"));
         tagComboBox.getItems().addAll(tags);
         tagComboBox.setCellFactory(lv -> new ListCell<>() {
+            private final Label label;
+            private final Button editButton;
+            private final AnchorPane pane;
+            {
+                label = new Label();
+                label.setAlignment(Pos.CENTER);
+                editButton = new Button("", imageUtils.generateImageView("editing.png", 15));
+                styling.applyStyling(editButton, "positiveButton");
+                pane = new AnchorPane(label);
+                AnchorPane.setRightAnchor(editButton, 0.0);
+            }
+
             @Override
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
@@ -145,20 +158,16 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Label label = new Label(item.getTagName());
-                    label.setAlignment(Pos.CENTER);
+                    label.setText(item.getTagName());
                     label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
                             "-fx-background-radius: 15;" +
                             "-fx-padding: 5 10 5 10;" +
                             "-fx-text-fill: white;");
-                    Button editButton = new Button("", imageUtils.generateImageView("editing.png", 15));
-                    styling.applyStyling(editButton, "positiveButton");
-                    editButton.setOnMousePressed(event -> {
-                        mainCtrl.switchScreens(AddTagCtrl.class);
-                        addTagCtrl.fillInput(item);
-                    });
-                    AnchorPane pane = new AnchorPane(label, editButton);
-                    AnchorPane.setRightAnchor(editButton, 0.0);
+                    if(!item.equals(findDefaultTag(tags))) {
+                        editButton.setOnMousePressed(event -> mainCtrl.switchToEditTagScreen(item, expenseId));
+                        if(!pane.getChildren().contains(editButton))
+                            pane.getChildren().add(editButton);
+                    }
                     setGraphic(pane);
                 }
             }
@@ -285,6 +294,14 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         choosePayer.setItems(getParticipantList());
         initializeTagComboBox();
         bindToEmpty();
+    }
+
+    /**
+     * Set event tags
+     * @param tags Set of tags
+     */
+    public void setTags(Set<Tag> tags) {
+        this.tags.setAll(tags);
     }
 
 
