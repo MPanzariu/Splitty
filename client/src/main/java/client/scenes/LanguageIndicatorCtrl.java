@@ -29,6 +29,7 @@ public class LanguageIndicatorCtrl {
      * @param translation - the translation to use
      * @param utils - the language switch utils to use
      * @param main - Main controller for switching screens
+     * @param imageUtils Utilities for loading images
      */
     @Inject
     public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils, MainCtrl main, ImageUtils imageUtils) {
