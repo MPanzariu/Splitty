@@ -45,10 +45,9 @@ public class Main extends Application {
     /**
      * Start method
      * @param primaryStage the primary stage for this application
-     * @throws IOException IOException
      */
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         var startUp = FXML.load(StartupScreenCtrl.class, "client", "scenes", "StartupScreen.fxml");
         var eventScreen = FXML.load(EventScreenCtrl.class, "client", "scenes", "EventScreen.fxml");
         var expenseScreen = FXML.load(ExpenseScreenCtrl.class, "client", "scenes", "ExpenseScreen.fxml");
@@ -68,5 +67,6 @@ public class Main extends Application {
         mainCtrl.initialize(primaryStage, startUp, eventScreen, expenseScreen, participantScreen, editTitle,
                 managementOverviewPassword, managementOverviewScreen, settleDebtsScreen, deleteEventsScreen,
                 participantListScreen, transferMoney, addTagScreen,emailInviteScreen, statisticsScreen, generateLanguageTemplateScreen);
+        mainCtrl.onStart();
     }
 }

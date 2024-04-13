@@ -1,7 +1,7 @@
 package client.scenes;
 
-import client.utils.ImageUtils;
 import client.utils.AppStateManager;
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -74,6 +74,20 @@ public class StartupScreenCtrl implements Initializable {
     }
 
     /**
+     * Joins the most recent event
+     */
+    public void joinMostRecentEvent() {
+        List<Node> children = getHistoryNodes();
+        if (children != null && !children.isEmpty()){
+            Node mostRecentNode = children.getFirst();
+            if (mostRecentNode instanceof HBox mostRecentHbox) {
+                String eventId = findKeyByValue(mostRecentHbox);
+                switchToEvent(eventId);
+            }
+        }
+    }
+
+    /**
      * Binds the fields to their matching binding
      */
     @Override
@@ -88,6 +102,11 @@ public class StartupScreenCtrl implements Initializable {
         bindLabel(createEventFeedback, "empty");
         bindButton(managementOverviewButton, "Startup.Button.Management.Overview");
         languageCtrl.initializeLanguageIndicator(languageIndicator);
+        Tooltip managementOverviewTooltip = new Tooltip();
+        managementOverviewTooltip.setText("Ctrl + A");
+        if (managementOverviewButton != null){
+            managementOverviewButton.setTooltip(managementOverviewTooltip);
+        }
     }
 
     /**
@@ -349,4 +368,6 @@ public class StartupScreenCtrl implements Initializable {
     public void goToTheManagementOverview() {
         mainCtrl.switchToManagementOverviewPasswordScreen();
     }
+
+
 }

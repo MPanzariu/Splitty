@@ -61,6 +61,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     private final ImageUtils imageUtils;
     private final StringGenerationUtils stringUtils;
     private boolean listWasInitialized = false;
+    private Styling styling;
 
     /**
      * Constructor
@@ -69,11 +70,13 @@ public class ManagementOverviewScreenCtrl implements Initializable {
      * @param translation the Translation to use
      * @param utils the ManagementOverviewUtils to use
      * @param imageUtils the ImageUtils to use
+     * @param styling the Styling to use
      * @param stringUtils the StringGenerationUtils to use
      */
     @Inject
     public ManagementOverviewScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
-                                        ManagementOverviewUtils utils, ImageUtils imageUtils, StringGenerationUtils stringUtils) {
+                                        ManagementOverviewUtils utils, ImageUtils imageUtils,
+                StringGenerationUtils stringUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
@@ -81,6 +84,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
         this.imageUtils = imageUtils;
         this.stringUtils = stringUtils;
         objectMapper = new ObjectMapper();
+        this.styling = styling;
     }
     /**
      * Initialize basic features for the Management Overview Screen
@@ -242,7 +246,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void exportButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
-        Styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
+        styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
         String eventId = getTextBoxText(backupEventIDTextField);
         Event event;
         try{
@@ -258,7 +262,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
             objectMapper.writeValue(backupFile, event);
             System.out.printf("Event %s has been exported to %s.json%n", eventId, eventId);
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.SuccessExport");
-            Styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
+            styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorExportingEvent");
             System.out.printf("Error exporting event %s%n", eventId);
@@ -271,7 +275,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
     @FXML
     public void importButtonClicked() {
         bindLabel(backupEventFeedbackLabel, "empty");
-        Styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
+        styling.changeStyling(backupEventFeedbackLabel, "successText", "errorText");
         String eventId = getTextBoxText(backupEventIDTextField);
         objectMapper.registerModule(new JavaTimeModule());
         try {
@@ -284,7 +288,7 @@ public class ManagementOverviewScreenCtrl implements Initializable {
                 server.deleteEvent(eventId); //event IDs are unique, but this should enable updating an event this way
             }
             server.addEvent(event);
-            Styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
+            styling.changeStyling(backupEventFeedbackLabel, "errorText", "successText");
 
         } catch (IOException e) {
             bindLabel(backupEventFeedbackLabel, "MOSCtrl.ErrorImportingEvent");

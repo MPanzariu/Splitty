@@ -53,7 +53,7 @@ public class LanguageIndicatorCtrl {
                 } else if(item.getLanguage().isEmpty()) {
                     textProperty().bind(generationMessage);
                 } else {
-                    textProperty().bind(new SimpleStringProperty(item.getLanguage()));
+                    textProperty().bind(new SimpleStringProperty(item.getDisplayLanguage()));
                 }
             }
         };
