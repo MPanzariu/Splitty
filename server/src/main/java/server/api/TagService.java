@@ -78,6 +78,7 @@ public class TagService {
      * @param id ID of edited tag
      * @param newTag Edited tag
      * @throws EntityNotFoundException Tag is not found in the database
+     * @return Tag that is edited
      */
     public Tag editTag(Long id, Tag newTag) throws EntityNotFoundException {
         Tag tag = tagRepository.findById(id)

@@ -89,6 +89,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * @param imageUtils Utilities for image loading
      * @param addTagCtrl Controller for adding/editing tags
      * @param translation the class that manages translations
+     * @param styling Used for styling
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,

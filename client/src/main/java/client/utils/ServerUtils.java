@@ -308,7 +308,8 @@ public class ServerUtils {
      * Requests the server to edit the tag
      * @param eventId Event ID of the event related to this tag
      * @param tagId ID of this tag
-     * @param tag Edited tag
+     * @param tag Tag that will be edited
+     * @return Edited tag
      */
     public Tag editTag(String eventId, String tagId, Tag tag) {
         return ClientBuilder.newClient()

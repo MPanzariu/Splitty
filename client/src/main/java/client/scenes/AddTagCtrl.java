@@ -90,6 +90,7 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     /**
      * Fill the user inputs with the currently edited tag
      * @param tag Currently edited tag
+     * @param expenseId ID of the expense where the user came from
      */
     public void fillInput(Tag tag, Long expenseId) {
         setIds(tag, expenseId);
@@ -99,6 +100,11 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
         colorPicker.setValue(Color.valueOf(tag.getColorCode()));
     }
 
+    /**
+     * Set the IDs of the currently edited tag and expense the user came from
+     * @param tag Currently edited tag
+     * @param expenseId ID of the expense the user came from
+     */
     public void setIds(Tag tag, Long expenseId) {
         tagId = tag.getId();
         this.expenseId = expenseId;
@@ -151,6 +157,8 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     /**
      * If a tag is currently being edited, then return to the expense screen with its data filled in again.
      * Else switch to the event overview.
+     * @param tag Edited tag
+     * @param event Event where the tags are from
      */
     public void switchScreens(Tag tag, Event event) {
         if(tagId != null) {
@@ -165,18 +173,34 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
         tagId = null;
     }
 
+    /**
+     * Get ID of edited tag.
+     * @return ID of the edited tag. Null if no tag is being edited.
+     */
     public Long getTagId() {
         return tagId;
     }
 
+    /**
+     * Get ID of the expense the user came from
+     * @return ID of the expense the user came from
+     */
     public Long getExpenseId() {
         return expenseId;
     }
 
+    /**
+     * Set the ID of the expense the user came from
+     * @param expenseId ID of the expense the user came from
+     */
     public void setExpenseId(Long expenseId) {
         this.expenseId = expenseId;
     }
 
+    /**
+     * Set the ID of the tag that is edited
+     * @param tagId ID of the tag that is edited
+     */
     public void setTagId(Long tagId) {
         this.tagId = tagId;
     }
