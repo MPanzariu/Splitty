@@ -1,7 +1,5 @@
 package client.utils;
 
-import com.google.inject.Inject;
-
 import java.io.*;
 import java.util.Locale;
 import java.util.Properties;

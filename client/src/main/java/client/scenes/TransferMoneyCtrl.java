@@ -49,6 +49,13 @@ public class TransferMoneyCtrl implements Initializable, SimpleRefreshable {
     private final MainCtrl ctrl;
     private final TransferMoneyUtils utils;
 
+    /**
+     * Controller for money transfer screen
+     * @param translation Translation utilities
+     * @param serverUtils Utilities for server communication
+     * @param ctrl Main controller
+     * @param utils Utilities for transfering money
+     */
     @Inject
     public TransferMoneyCtrl(Translation translation, ServerUtils serverUtils, MainCtrl ctrl,
                              TransferMoneyUtils utils) {
