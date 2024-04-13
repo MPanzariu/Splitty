@@ -30,6 +30,17 @@
     </module>
 
     <module name="TreeWalker">
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="stop parameter number check" />
+            <property name="onCommentFormat" value="resume parameter number check" />
+            <property name="checkFormat" value="ParameterNumberCheck" />
+        </module>
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="stop missing javadoc method check" />
+            <property name="onCommentFormat" value="resume missing javadoc method check" />
+            <property name="checkFormat" value="MissingJavadocMethod" />
+        </module>
+
         <module name="MissingJavadocMethod">
             <property name="severity" value="warning"/>
             <property name="scope" value="public"/>
