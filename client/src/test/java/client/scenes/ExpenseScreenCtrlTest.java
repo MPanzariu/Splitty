@@ -10,6 +10,7 @@ import commons.Tag;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ class ExpenseScreenCtrlTest {
         expense2.addParticipantToExpense(participant1);
         testEvent.addExpense(expense1);
         testEvent.addExpense(expense2);
-
+        sut.setCurrentEvent(testEvent);
         lenient().doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
     }
 
@@ -143,4 +144,75 @@ class ExpenseScreenCtrlTest {
         assertEquals("Binding!", button2.getText());
     }
 
+    @Test
+    public void findDefaultTagTestNoDefault() {
+        Set<Tag> tags = new HashSet<>();
+        tags.add(tag1);
+        tags.add(tag2);
+        Tag result = sut.findDefaultTag(tags);
+        assertNull(result);
+    }
+
+    @Test
+    public void findDefaultTagTest() {
+        Set<Tag> tags = new HashSet<>();
+        tags.add(tag1);
+        tags.add(tag2);
+        Tag expected = new Tag("default", "#31f3f2");
+        tags.add(expected);
+        Tag result = sut.findDefaultTag(tags);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void resetPaidBy() {
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setValue("value");
+        assertFalse(comboBox.getValue().isEmpty());
+        sut.resetPaidBy(comboBox);
+        assertTrue(comboBox.getValue().isEmpty());
+    }
+
+    @Test
+    public void resetAmountTest() {
+        TextField textField = new TextField("Value");
+        assertFalse(textField.getText().isEmpty());
+        sut.resetAmount(textField);
+        assertTrue(textField.getText().isEmpty());
+    }
+    @Test
+    public void resetExpensePurposeTest() {
+        TextField textField = new TextField("Value");
+        assertFalse(textField.getText().isEmpty());
+        sut.resetPurpose(textField);
+        assertTrue(textField.getText().isEmpty());
+    }
+
+    @Test
+    public void resetSplitMethodTest() {
+        CheckBox checkBox1 = new CheckBox();
+        CheckBox checkBox2 = new CheckBox();
+        CheckBox checkBoxInVBox = new CheckBox();
+        VBox vBox = new VBox(checkBoxInVBox);
+        assertFalse(vBox.getChildren().isEmpty());
+        sut.resetSplitMethod(checkBox1, checkBox2, vBox);
+        assertTrue(vBox.getChildren().isEmpty());
+
+    }
+
+    @Test
+    public void createNewExpenseTest() {
+        ComboBox<String> choosePayer = new ComboBox<>();
+        choosePayer.setValue("Vox");
+        TextField expensePurpose = new TextField("TVs");
+        TextField sum = new TextField("5");
+        DatePicker datePicker = new DatePicker(null);
+        ComboBox<String> currency = new ComboBox<>();
+        currency.setValue("EUR");
+        Expense expected = new Expense("TVs", 500, null, new Participant("Vox"));
+        expected.setCurrency("EUR");
+        Expense result = sut.createNewExpense(choosePayer, expensePurpose, sum, currency,
+            datePicker);
+        assertEquals(expected, result);
+    }
 }
