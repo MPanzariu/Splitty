@@ -168,7 +168,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         emailField.setOnKeyPressed(event -> bindOtherFields(event, emailField));
         ibanField.setOnKeyPressed(event -> bindOtherFields(event, ibanField));
         bicField.setOnKeyPressed(event -> bindOtherFields(event, bicField));
-        ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
     }
 
     public void bindNameField(KeyEvent event, TextField textField){
