@@ -60,6 +60,8 @@ public class MainCtrl {
      * @param manager the app state manager
      * @param serverURL the URl of the server
      * @param language the language tag used in the client
+     * @param defaultLocale The default locale for the client
+     * @param currentStage Currently open stage that is not the primary stage.
      */
     @Inject
     public MainCtrl(Translation translation, AppStateManager manager,
@@ -94,6 +96,7 @@ public class MainCtrl {
      * @param statisticsScreenUI the statistics screen UI
      * @param generateLanguageTemplatePair UI for generating an empty language template
      */
+    //stop parameter number check
     public void initialize(Stage primaryStage, Pair<StartupScreenCtrl, Parent> overview,
                            Pair<EventScreenCtrl, Parent> eventUI,
                            Pair<ExpenseScreenCtrl, Parent> expenseUI,
@@ -109,7 +112,7 @@ public class MainCtrl {
                            Pair<EmailInviteCtrl, Parent> emailInviteUI,
                            Pair<StatisticsScreenCtrl, Parent> statisticsScreenUI,
                            Pair<GenerateLanguageTemplateCtrl, Parent> generateLanguageTemplatePair){
-
+        //resume parameter number check
 
         this.primaryStage = primaryStage;
         this.startupScreenCtrl = overview.getKey();

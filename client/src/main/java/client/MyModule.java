@@ -19,7 +19,6 @@ import client.scenes.AddTagCtrl;
 import client.scenes.LanguageIndicatorCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
-import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 
@@ -32,6 +31,10 @@ import java.util.Locale;
 import java.util.Properties;
 
 public class MyModule implements Module {
+    /**
+     * Configure the dependency graph
+     * @param binder Binder that is used to form the dependency graph for the injector
+     */
     @Override
     public void configure(Binder binder) {
         binder.bind(Locale.class).annotatedWith(Names.named("defaultLocale")).toInstance(Locale.of("en", "GB"));
