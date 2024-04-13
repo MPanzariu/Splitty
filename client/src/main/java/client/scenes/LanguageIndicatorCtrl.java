@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.Exceptions.IncompleteLanguageException;
 import client.utils.LanguageSwitchUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -41,6 +42,7 @@ public class LanguageIndicatorCtrl {
      * @param languageIndicator Give language indicator
      */
     public void initializeLanguageIndicator(ComboBox<Locale> languageIndicator) {
+        languageIndicator.setValue(translation.getLocale());
         generationMessage.bind(translation.getStringBinding("Event.Language.Generate"));
         languageIndicator.setItems(utils.getLanguages());
         Callback<ListView<Locale>, ListCell<Locale>> cellFactory = listView -> new ListCell<>() {
@@ -79,12 +81,14 @@ public class LanguageIndicatorCtrl {
                 if(newValue.equals(Locale.ROOT)) {
                     languageIndicator.getSelectionModel().select(translation.getLocale());
                     main.openLanguageGeneration();
-                } else if(!utils.hasEmptyProperty(newValue)) {
-                    translation.changeLanguage(newValue);
-                    utils.persistLanguage(newValue);
                 } else {
-                    new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.errorLabel").getValue()).showAndWait();
-                    languageIndicator.setValue(oldValue);
+                    try {
+                        translation.changeLanguage(newValue);
+                    } catch(IncompleteLanguageException e) {
+                        new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.errorLabel")
+                                .getValue()).showAndWait();
+                        languageIndicator.setValue(oldValue);
+                    }
                 }
             }
         });

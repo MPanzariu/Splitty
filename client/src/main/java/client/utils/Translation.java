@@ -1,6 +1,10 @@
 package client.utils;
 
+import client.Exceptions.IncompleteLanguageException;
+import client.Exceptions.InvalidLanguageFormatException;
+import client.Exceptions.MissingLanguageTemplateException;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -8,6 +12,7 @@ import javafx.scene.control.TextField;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -18,14 +23,16 @@ public class Translation {
     private final ObservableResourceFactory resourceFactory;
     private Locale locale;
     public static final String LANGUAGE_PATH = "client/lang/";
+    private final Properties config;
 
     /***
      * Constructor that takes the resourceFactory the Translation encapsulates
      * @param resourceFactory - the ObservableResourceFactory to be used
      */
     @Inject
-    public Translation(ObservableResourceFactory resourceFactory) {
+    public Translation(ObservableResourceFactory resourceFactory, @Named("config") Properties config) {
         this.resourceFactory = resourceFactory;
+        this.config = config;
     }
 
     /***
@@ -51,7 +58,7 @@ public class Translation {
      * Changes the language resources supplied to those from a corresponding language file
      * @param locale - the Local corresponding to the language file to switch to
      */
-    public void changeLanguage(Locale locale) {
+    public void changeLanguage(Locale locale) throws IncompleteLanguageException, InvalidLanguageFormatException {
         String languageCode = locale.getLanguage();
         String countryCode = locale.getCountry();
         String fileName = languageCode + "_" + countryCode + ".properties";
@@ -60,22 +67,28 @@ public class Translation {
         File file = new File(LANGUAGE_PATH, fileName);
         try {
             languageProperties.load(new FileReader(file));
+            if(languageProperties.contains(""))
+                throw new IncompleteLanguageException();
         } catch (IOException e) {
             // no such localization file
             if(ConfigUtils.DEFAULT_PROPS_LANGUAGE.equals(locale.getLanguage())){
                 // a default language is missing!!!
                 throw new RuntimeException("Bundled language files could not be found");
-            }
-            else{
-                // try to load default instead
-                changeLanguage(Locale.forLanguageTag(ConfigUtils.DEFAULT_PROPS_LANGUAGE));
-                return;
-            }
+            } else
+                throw new MissingLanguageTemplateException();
         }
         this.locale = locale;
         @SuppressWarnings({"unchecked", "rawtypes"})
         Map<String, String> map = new HashMap<String, String>((Map) languageProperties);
         resourceFactory.setResources(map);
+        try {
+            FileWriter writer = new FileWriter(ConfigUtils.CONFIG_NAME);
+            config.setProperty("client.language", languageCode + "_" + countryCode);
+            config.store(writer, ConfigUtils.CONFIG_COMMENTS);
+        } catch(IOException e) {
+            throw new RuntimeException("Writing to config file went wrong");
+        }
+
     }
 
     /***

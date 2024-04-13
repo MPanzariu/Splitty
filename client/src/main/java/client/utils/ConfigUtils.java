@@ -1,5 +1,7 @@
 package client.utils;
 
+import com.google.inject.Inject;
+
 import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
@@ -15,12 +17,11 @@ public class ConfigUtils {
             System.lineSeparator() + "languageCode must be a ISO 639 alpha-2 language code." +
             System.lineSeparator() + "countryCode must be ISO 3166 alpha-2 country code." + System.lineSeparator();
 
-
     /***
      * Full method for loading properties from the config file, or generating a default one
      * @return all properties found in the config file
      */
-    public Properties easyLoadProperties(){
+    public Properties easyLoadProperties() {
         Properties properties = new Properties();
         boolean validConfigLoaded;
 
@@ -62,7 +63,7 @@ public class ConfigUtils {
         }
 
         // return false if our config has been updated in code, and thus the read one is invalid
-        return  String.valueOf(CONFIG_VERSION).equals(properties.get("config.version"));
+        return  String.valueOf(CONFIG_VERSION).equals(properties.getProperty("config.version"));
     }
 
     /***

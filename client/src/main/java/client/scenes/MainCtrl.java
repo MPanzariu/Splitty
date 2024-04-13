@@ -1,8 +1,9 @@
 package client.scenes;
 
-import client.utils.AppStateManager;
-import client.utils.ScreenInfo;
-import client.utils.Translation;
+import client.Exceptions.IncompleteLanguageException;
+import client.Exceptions.InvalidLanguageFormatException;
+import client.Exceptions.MissingLanguageTemplateException;
+import client.utils.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.application.Platform;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 public class MainCtrl {
 
@@ -48,10 +50,10 @@ public class MainCtrl {
     private EventScreenCtrl eventScreenCtrl;
     private final HashMap<Class<?>, ScreenInfo> screenMap;
     private final String serverURL;
-    private final String language;
+    private String language;
     private final AppStateManager manager;
-    @Inject
-    private Stage currentStage;
+    private final Stage currentStage;
+    private final Locale defaultLocale;
 
     /**
      * Constructor
@@ -63,12 +65,15 @@ public class MainCtrl {
     @Inject
     public MainCtrl(Translation translation, AppStateManager manager,
                     @Named("connection.URL") String serverURL,
-                    @Named("client.language") String language) {
+                    @Named("client.language") String language, @Named("defaultLocale") Locale defaultLocale,
+                    Stage currentStage) {
         this.translation = translation;
         this.manager = manager;
         this.serverURL = serverURL;
         this.language = language;
         this.screenMap = new HashMap<>();
+        this.currentStage = currentStage;
+        this.defaultLocale = defaultLocale;
     }
 
     /**
@@ -171,9 +176,7 @@ public class MainCtrl {
     /**
      * Should be run upon starting the application, after initialize()
      */
-    public void onStart(){
-        String[] languageParts = language.split("_|\\.");
-        translation.changeLanguage(Locale.of(languageParts[0], languageParts[1]));
+    public void onStart() {
         Runnable connectionErrorCallback = (()-> Platform.runLater(this::onConnectionError));
         primaryStage.setOnCloseRequest(e -> manager.onStop());
         manager.setStartupScreen(startupScreenCtrl);
@@ -181,8 +184,43 @@ public class MainCtrl {
         addMainScreenShortcuts();
         addEventScreenShortcuts();
         manager.subscribeToUpdates(connectionErrorCallback);
+        loadClientLanguage();
         showMainScreen();
         primaryStage.show();
+    }
+
+    /**
+     * Loads the locale set in the config file.
+     * If the selected locale is not complete or is of an invalid format,
+     * then the client locale will be reset to the default locale.
+     */
+    private void loadClientLanguage() {
+        try {
+            if(!language.matches("\\p{Alpha}{2}_\\p{Alpha}{2}"))
+                throw new InvalidLanguageFormatException();
+            String[] parts = language.split("_");
+            translation.changeLanguage(Locale.of(parts[0], parts[1]));
+        } catch(PatternSyntaxException | InvalidLanguageFormatException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "Client language in the config file is an invalid language. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        } catch(IncompleteLanguageException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "The template of the client language set in the config file, is incomplete. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        } catch(MissingLanguageTemplateException e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "The template of the client language set in the config file, is missing. Language will be reset to English").showAndWait();
+            translation.changeLanguage(defaultLocale);
+        }
+    }
+
+    /**
+     * Sets the client language
+     * @param language Client language
+     */
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     /***

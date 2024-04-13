@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.Exceptions.MissingLanguageTemplateException;
 import client.utils.AppStateManager;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
@@ -38,6 +39,7 @@ import org.mockito.stubbing.Answer;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +84,9 @@ public class MainCtrlTest {
     GenerateLanguageTemplateCtrl generateTemplateScreenCtrl;
     @Mock
     Stage primaryStage;
+    @Mock
+    Stage currentStage;
+    private Locale defaultLocale;
     SimpleStringProperty titleProperty;
     private MainCtrl sut;
     @BeforeAll
@@ -99,7 +104,8 @@ public class MainCtrlTest {
         manager = mock(AppStateManager.class);
         serverURL = "URL";
         language = "en_GB";
-        sut = new MainCtrl(translation, manager, serverURL, language);
+        defaultLocale = Locale.of("en", "GB");
+        sut = new MainCtrl(translation, manager, serverURL, language, defaultLocale, currentStage);
         titleProperty = new SimpleStringProperty();
         lenient().when(primaryStage.titleProperty()).thenReturn(titleProperty);
     }
@@ -162,6 +168,7 @@ public class MainCtrlTest {
         runInitialization();
         lenient().doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
         sut.onStart();
+        verify(translation).changeLanguage(defaultLocale);
         verify(primaryStage).show();
     }
 

@@ -10,7 +10,7 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class ConfigUtilsTest {
+class ProviceConfigUtilsTest {
     Properties testProperties;
     Properties expectedProperties;
     String versionString;
