@@ -29,7 +29,7 @@
    <Label fx:id="bic" layoutX="90.0" layoutY="300.0" styleClass="h2" text="BIC"/>
    <TextField fx:id="bicField" layoutX="209.0" layoutY="300.0" prefWidth="205" promptText="add BIC"
               styleClass="small-text"/>
-   <Button fx:id="okButton" layoutX="327.0" layoutY="354.0" mnemonicParsing="false" onAction="#confirmEdit"
+   <Button fx:id="okButton" layoutX="327.0" layoutY="354.0" mnemonicParsing="false" onAction="#confirmCreateEdit"
            prefHeight="30.0" prefWidth="87.0" text="OK">
       <styleClass>
          <String fx:value="positiveButton"/>
