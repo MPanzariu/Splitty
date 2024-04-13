@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.utils.ConfigUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;

@@ -222,40 +222,82 @@ public class ManagementOverviewUtils {
         return events;
     }
 
+    /**
+     * Get ascending
+     * @return ascending string property
+     */
     public SimpleStringProperty getAscending() {
         return ascending;
     }
 
+    /**
+     * Get descending
+     * @return Descending string property
+     */
     public SimpleStringProperty getDescending() {
         return descending;
     }
+
+    /**
+     * Bind ascending
+     * @param ascending String property to bind ascending to
+     */
     public void bindAscending(StringProperty ascending) {
         this.ascending.bind(ascending);
     }
 
+    /**
+     * Bind descending
+     * @param descending String property to bind descending to
+     */
     public void bindDescending(StringProperty descending) {
         this.descending.bind(descending);
     }
 
+    /**
+     * Get order
+     * @return String property of the order that events are sorted by
+     */
     public StringProperty getOrder() {
         return order;
     }
+
+    /**
+     * Bind order
+     * @param order String property to bind order to
+     */
     public void bindOrder(StringProperty order) {
         this.order.bind(order);
     }
 
+    /**
+     * Set events
+     * @param events New events
+     */
     public void setEvents(ObservableList<Event> events) {
         this.events.setAll(events);
     }
 
+    /**
+     * Bind title
+     * @param title String property to bind title to
+     */
     public void bindTitle(StringProperty title) {
         this.title.bind(title);
     }
 
+    /**
+     * Bind creation date
+     * @param creationDate String property to bind creation date to
+     */
     public void bindCreationDate(StringProperty creationDate) {
         this.creationDate.bind(creationDate);
     }
 
+    /**
+     * Bind last activity
+     * @param lastActivity String property to bind last activity to
+     */
     public void bindLastActivity(StringProperty lastActivity) {
         this.lastActivity.bind(lastActivity);
     }

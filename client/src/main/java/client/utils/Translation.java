@@ -28,6 +28,7 @@ public class Translation {
     /***
      * Constructor that takes the resourceFactory the Translation encapsulates
      * @param resourceFactory - the ObservableResourceFactory to be used
+     * @param config - Properties from the config file loaded at the start of the client
      */
     @Inject
     public Translation(ObservableResourceFactory resourceFactory, @Named("config") Properties config) {

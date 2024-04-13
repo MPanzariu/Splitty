@@ -40,6 +40,10 @@ public class TransferMoneyUtils {
     private final ServerUtils server;
     private Event event;
 
+    /**
+     * Constructs money utilities
+     * @param server Server utilities
+     */
     @Inject
     public TransferMoneyUtils(ServerUtils server) {
         this.server = server;
@@ -157,46 +161,90 @@ public class TransferMoneyUtils {
         amount.removeListener(amountChangeListener);
     }
 
+    /**
+     * Set boolean representing visibility of amount error label
+     * @param property Boolean property to set this to
+     */
     public void setIsAmountErrorVisible(BooleanProperty property) {
         isAmountErrorVisible = property;
     }
 
+    /**
+     * Set boolean representing visibility of sending participant error label
+     * @param isVisible The boolean property to set it to
+     */
     public void setIsFromErrorVisible(BooleanProperty isVisible) {
         isFromErrorVisible = isVisible;
     }
 
+    /**
+     * Set the sending participant
+     * @param participant Participant
+     */
     public void setFrom(ObjectProperty<Participant> participant) {
         from = participant;
     }
 
+    /**
+     * Set the event handler for the receiving partner combo box
+     * @param action Event handler
+     */
     public void setFromAction(ObjectProperty<EventHandler<ActionEvent>> action) {
         fromAction = action;
     }
 
+    /**
+     * Set the receiving participant
+     * @param participant Receiving participant
+     */
     public void setTo(ObjectProperty<Participant> participant) {
         to = participant;
     }
 
+    /**
+     * Set event handler for receiving participant
+     * @param action Event handler
+     */
     public void setToAction(ObjectProperty<EventHandler<ActionEvent>> action) {
         toAction = action;
     }
 
+    /**
+     * Set the boolean representing the visibility of the error message for the receiving participant
+     * @param isVisible Visibility of error label
+     */
     public void setIsToErrorVisible(BooleanProperty isVisible) {
         isToErrorVisible = isVisible;
     }
 
+    /**
+     * Set the transfer amount
+     * @param amount Transfer amount
+     */
     public void setAmount(StringProperty amount) {
         this.amount = amount;
     }
 
+    /**
+     * Get the participants of the combo boxes
+     * @return Participants of the combo boxes
+     */
     public ObservableList<Participant> getParticipants() {
         return participants;
     }
 
+    /**
+     * Get the available currencies for money transfer
+     * @return Available currencies for money transfer
+     */
     public ObservableList<String> getCurrencies() {
         return currencies;
     }
 
+    /**
+     * Set the selected currency for money transfer
+     * @param currency Selected currency for money transfer
+     */
     public void setSelectedCurrency(ObjectProperty<String> currency) {
         selectedCurrency = currency;
     }
