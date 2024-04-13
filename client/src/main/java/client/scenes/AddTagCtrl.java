@@ -119,7 +119,7 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
                 .bind(translation.getStringBinding("empty"));
         tagNameTextField.clear();
         colorPicker.setValue(Color.WHITE);
-        switchScreens(null, null);
+        switchScreens(null, event);
     }
 
     /**
@@ -163,8 +163,10 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
     public void switchScreens(Tag tag, Event event) {
         if(tagId != null) {
             Set<Tag> tags = event.getEventTags();
-            tags.removeIf(tag1 -> tag1.getId() == tag.getId());
-            tags.add(tag);
+            if(tag != null) {
+                tags.removeIf(tag1 -> tag1.getId() == tag.getId());
+                tags.add(tag);
+            }
             mainCtrl.switchToEditExpense(expenseId, tags);
             expenseId = null;
         } else {
