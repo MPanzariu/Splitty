@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import static javafx.geometry.Pos.*;
 
@@ -39,10 +38,9 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     private Button goBackButton;
     @FXML
     private VBox settleVBox;
-    private Event event;
     private Pair<Pane, Button> lastExpanded;
-    private Styling styling;
-    private EmailHandler emailHandler;
+    private final Styling styling;
+    private final EmailHandler emailHandler;
 
     /***
      * Constructor for the SettleDebtsScreen
@@ -61,7 +59,6 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         this.translation = translation;
         this.utils = utils;
         this.imageUtils = imageUtils;
-        this.event = null;
         this.lastExpanded = null;
         this.styling = styling;
         this.emailHandler = emailHandler;
@@ -79,20 +76,20 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        settleDebtsLabel.textProperty()
-                .bind(translation.getStringBinding("SettleDebts.Label.title"));
-        ImageView backImageView = imageUtils.generateImageView("goBack.png", 20);
-        goBackButton.setGraphic(backImageView);
+        bindLabels(settleDebtsLabel);
+        setGraphics(goBackButton);
     }
 
     /***
      * Populates the VBox with all the transfers
+     * @param settleVBox the VBox to populate
+     * @param event the Event data to use
      */
-    public void populateVBox(){
+    public void populateVBox(VBox settleVBox, Event event){
         List<Node> children = settleVBox.getChildren();
         children.clear();
         HashMap<Participant, BigDecimal> owedShares = event.getOwedShares();
-        Set<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
+        List<Transfer> transfers = utils.calculateTransferInstructions(owedShares);
 
         Image expandButtonImage = imageUtils.loadImageFile("singlearrow.png");
 
@@ -103,7 +100,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
             Button expandButton = generateExpandButton(bankDetailsPane, expandButtonInnerImage);
 
             Label transferLabel = generateTransferLabel(transfer);
-            Button settleButton = generateSettleButton(transfer);
+            Button settleButton = generateSettleButton(transfer, event);
             Button emailInstructionsButton = generateSendEmailButton(transfer);
             HBox transferBox = generateTransferDetailsBox
                     (expandButton, transferLabel, settleButton,emailInstructionsButton);
@@ -172,14 +169,14 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     /***
      * Generates a Button that marks a debt payment as received and settled
      * @param transfer the Transfer information to use
-     * @return a Button that settles the
-     * when clicked
+     * @param event the Event data to use
+     * @return a Button that settles the debt when clicked
      */
-    public Button generateSettleButton(Transfer transfer) {
+    public Button generateSettleButton(Transfer transfer, Event event) {
         Button button = new Button();
         button.textProperty().bind(translation.getStringBinding("SettleDebts.Button.received"));
         styling.applyStyling(button, "positiveButton");
-        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event.getId());
+        EventHandler<ActionEvent> onClick = utils.createSettleAction(transfer, event);
         button.setOnAction(onClick);
 
         return button;
@@ -195,12 +192,12 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
         Button button = new Button();
         styling.applyStyling(button, "positiveButton");
         button.setGraphic(expandButtonInnerImage);
-        button.setOnMouseClicked((action)-> {
+        button.setOnAction((action)-> {
             pane.setVisible(!pane.isVisible());
             pane.setManaged(!pane.isManaged());
             if(pane.isVisible()){
                 button.setRotate(90);
-                if(lastExpanded!=null) lastExpanded.getValue().getOnMouseClicked().handle(null);
+                if(lastExpanded!=null) lastExpanded.getValue().getOnAction().handle(null);
                 lastExpanded = new Pair<>(pane, button);
             } else {
                 button.setRotate(0);
@@ -236,9 +233,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
             styling.applyStyling(button, "disabledButton");
         }else{
             button.setOnAction((action) -> {
-                Thread thread = new Thread(() -> {
-                    utils.sendEmailTransferEmail(transfer);
-                });
+                Thread thread = new Thread(() -> utils.sendEmailTransferEmail(transfer));
                 thread.start();
             });
         }
@@ -250,8 +245,7 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
      * @param event the new event data to use
      */
     public void refresh(Event event){
-        this.event = event;
-        populateVBox();
+        populateVBox(settleVBox, event);
     }
 
     /***
@@ -260,4 +254,23 @@ public class SettleDebtsScreenCtrl implements Initializable, SimpleRefreshable {
     public void switchToEventScreen() {
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
+
+    /***
+     * Binds used labels to their text properties
+     * @param settleDebtsLabel the Settle Debts title label
+     */
+    public void bindLabels(Label settleDebtsLabel){
+        settleDebtsLabel.textProperty()
+                .bind(translation.getStringBinding("SettleDebts.Label.title"));
+    }
+
+    /***
+     * Loads graphics into specified buttons
+     * @param goBackButton the Go Back button
+     */
+    public void setGraphics(Button goBackButton){
+        ImageView backImageView = imageUtils.generateImageView("goBack.png", 20);
+        goBackButton.setGraphic(backImageView);
+    }
+
 }
