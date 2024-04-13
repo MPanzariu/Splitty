@@ -12,9 +12,13 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +37,7 @@ import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 class StatisticsScreenCtrlTest {
@@ -193,5 +198,15 @@ class StatisticsScreenCtrlTest {
         var resultText = resultLabel.getText();
         String expectedText = FormattingUtils.getFormattedPrice(250 + 500);
         assertEquals(expectedText, resultText);
+    }
+
+    @Test
+    void generateImageTest(){
+        Button testButton = new Button();
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        when(imageUtils.generateImageView("goBack.png", 15)).thenReturn(testImageView);
+        sut.addGeneratedImages(testButton);
+        assertEquals(testImageView, testButton.getGraphic());
     }
 }
