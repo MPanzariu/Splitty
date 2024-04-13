@@ -1,5 +1,7 @@
 package client.utils;
 
+import com.google.inject.Inject;
+
 import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
@@ -7,16 +9,19 @@ import java.util.Properties;
 public class ConfigUtils {
     public static final String CONFIG_NAME = "client/splitty.properties";
     // update this whenever you add/remove/change default properties
-    public static final int CONFIG_VERSION = 3;
+    public static final int CONFIG_VERSION = 4;
     public static final String DEFAULT_PROPS_SERVER_URL = "http://localhost:8080/";
-    public static final String DEFAULT_PROPS_LANGUAGE = Locale.ENGLISH.getLanguage();
-
+    // Flag of Great Britain is used for representing English
+    public static final String DEFAULT_PROPS_LANGUAGE = Locale.ENGLISH.getLanguage() + "_GB";
+    public static final String CONFIG_COMMENTS = "Language should be in format: <languageCode>_<countryCode>." +
+            System.lineSeparator() + "languageCode must be a ISO 639 alpha-2 language code." +
+            System.lineSeparator() + "countryCode must be ISO 3166 alpha-2 country code." + System.lineSeparator();
 
     /***
      * Full method for loading properties from the config file, or generating a default one
      * @return all properties found in the config file
      */
-    public Properties easyLoadProperties(){
+    public Properties easyLoadProperties() {
         Properties properties = new Properties();
         boolean validConfigLoaded;
 
@@ -32,7 +37,7 @@ public class ConfigUtils {
             properties = getDefault();
             try{
                 FileWriter writer = new FileWriter(CONFIG_NAME);
-                properties.store(writer, null);
+                properties.store(writer, CONFIG_COMMENTS);
             } catch (IOException e) {
                 // this should never happen unless we don't have write access at all
                 throw new RuntimeException(e);
@@ -58,7 +63,7 @@ public class ConfigUtils {
         }
 
         // return false if our config has been updated in code, and thus the read one is invalid
-        return  String.valueOf(CONFIG_VERSION).equals(properties.get("config.version"));
+        return  String.valueOf(CONFIG_VERSION).equals(properties.getProperty("config.version"));
     }
 
     /***

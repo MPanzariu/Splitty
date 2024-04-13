@@ -1,9 +1,12 @@
 package client.scenes;
 
+import client.Exceptions.IncompleteLanguageException;
 import client.utils.LanguageSwitchUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -16,16 +19,20 @@ import java.util.Locale;
 public class LanguageIndicatorCtrl {
     private final Translation translation;
     private final LanguageSwitchUtils utils;
+    private final MainCtrl main;
+    private final StringProperty generationMessage = new SimpleStringProperty();
 
     /**
      * Constructor for the LanguageIndicatorCtrl
      * @param translation - the translation to use
      * @param utils - the language switch utils to use
+     * @param main - Main controller for switching screens
      */
     @Inject
-    public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils) {
+    public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils, MainCtrl main) {
         this.translation = translation;
         this.utils = utils;
+        this.main = main;
     }
 
     /**
@@ -35,6 +42,8 @@ public class LanguageIndicatorCtrl {
      * @param languageIndicator Give language indicator
      */
     public void initializeLanguageIndicator(ComboBox<Locale> languageIndicator) {
+        languageIndicator.setValue(translation.getLocale());
+        generationMessage.bind(translation.getStringBinding("Event.Language.Generate"));
         languageIndicator.setItems(utils.getLanguages());
         Callback<ListView<Locale>, ListCell<Locale>> cellFactory = listView -> new ListCell<>() {
             @Override
@@ -42,22 +51,11 @@ public class LanguageIndicatorCtrl {
                 super.updateItem(item, empty);
                 if(item == null || empty) {
                     setGraphic(null);
-                    setText(null);
+                    textProperty().unbind();
+                } else if(item.getLanguage().isEmpty()) {
+                    textProperty().bind(generationMessage);
                 } else {
-                    if(item.getLanguage().equals("en"))
-                        setText("English");
-                    if(item.getLanguage().equals("nl"))
-                        setText("Dutch");
-                    if(item.getLanguage().equals("ro"))
-                        setText("Romanian");
-                    try {
-                        Image img = new Image("images/flags/" + item.getLanguage() + "_flag - small.png");
-                        ImageView flag =
-                            new ImageView(img);
-                        setGraphic(flag);
-                    }catch (RuntimeException e){
-                        System.out.println(e.getMessage());
-                    }
+                    textProperty().bind(new SimpleStringProperty(item.getDisplayLanguage()));
                 }
             }
         };
@@ -69,15 +67,32 @@ public class LanguageIndicatorCtrl {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    ImageView flag = loadFlag(item.getLanguage());
-                    flag.setFitWidth(getWidth());
-                    setGraphic(flag);
+                    if(!item.equals(Locale.ROOT)) {
+                        ImageView flag = loadFlag(item.getCountry().toLowerCase());
+                        flag.setFitWidth(getWidth());
+                        setGraphic(flag);
+                    }
+                }
+            }
+        });
+        languageIndicator.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            // Languages will be emptied in refresh() method, which should be ignored.
+            if(newValue != null) {
+                if(newValue.equals(Locale.ROOT)) {
+                    languageIndicator.getSelectionModel().select(translation.getLocale());
+                    main.openLanguageGeneration();
+                } else {
+                    try {
+                        translation.changeLanguage(newValue);
+                    } catch(IncompleteLanguageException e) {
+                        new Alert(Alert.AlertType.ERROR, translation.getStringBinding("Language.errorLabel")
+                                .getValue()).showAndWait();
+                        languageIndicator.setValue(oldValue);
+                    }
                 }
             }
         });
         languageIndicator.setCellFactory(cellFactory);
-        ReadOnlyObjectProperty<Locale> selectedLanguage = languageIndicator.getSelectionModel().selectedItemProperty();
-        utils.setBehavior(selectedLanguage);
     }
 
     /**
@@ -97,7 +112,7 @@ public class LanguageIndicatorCtrl {
      */
     public ImageView loadFlag(String lang) {
         // Should look if caching is beneficial when adding more languages
-        Image defaultLanguage = new Image("images/flags/" + lang + "_flag.png");
+        Image defaultLanguage = new Image("images/flags/" + lang + ".png");
         ImageView iv = new ImageView();
         iv.setImage(defaultLanguage);
         iv.setPreserveRatio(true);
