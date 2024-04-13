@@ -30,8 +30,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     @FXML
     private Button cancelButton;
     @FXML
-    private Button goBack;
-    @FXML
     private Label title;
     @FXML
     private Label name;
@@ -171,8 +169,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         ibanField.setOnKeyPressed(event -> bindOtherFields(event, ibanField));
         bicField.setOnKeyPressed(event -> bindOtherFields(event, bicField));
         ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
-        goBack.setGraphic(goBackImage);
-        Styling.applyStyling(goBack, "positiveButton");
     }
 
     public void bindNameField(KeyEvent event, TextField textField){

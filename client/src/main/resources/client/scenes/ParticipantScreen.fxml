@@ -67,5 +67,4 @@
          <String fx:value="small-text"/>
       </styleClass>
    </Label>
-   <Button fx:id="goBack" layoutX="90" layoutY="354.0" mnemonicParsing="false" onAction="#cancel" prefHeight="30" prefWidth="30" styleClass="positiveButton" />
 </AnchorPane>
