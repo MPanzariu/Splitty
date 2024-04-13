@@ -70,7 +70,7 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        addGeneratedImages();
+        addGeneratedImages(goBackButton);
         bindLabels(statisticsLabel, totalCostLabel, pieChartLabel, shareLabel);
     }
 
@@ -234,8 +234,10 @@ public class StatisticsScreenCtrl implements Initializable, SimpleRefreshable {
 
     /**
      * add the image to the go back button
+     * @param goBackButton the Go Back button
+     *
      */
-    private void addGeneratedImages() {
+    public void addGeneratedImages(Button goBackButton) {
         ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
         goBackButton.setGraphic(goBackImage);
     }
