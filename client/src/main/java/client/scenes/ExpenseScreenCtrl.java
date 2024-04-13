@@ -98,22 +98,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
-        splitBetweenAllCheckBox.setOnAction(event -> {
-            if (splitBetweenAllCheckBox.isSelected()) {
-                splitBetweenCustomCheckBox.setSelected(false);
-                participantsVBox.getChildren().clear();
-            }
-        });
-
-        splitBetweenCustomCheckBox.setOnAction(event -> {
-            if (splitBetweenCustomCheckBox.isSelected()) {
-                splitBetweenAllCheckBox.setSelected(false);
-                addParticipants();
-            }
-            if(!splitBetweenCustomCheckBox.isSelected()) {
-                participantsVBox.getChildren().clear();
-            }
-        });
+        initializeCheckBoxes();
     }
 
     /**
@@ -171,6 +156,29 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
+     * Initializes the checkboxes so the user is unable to choose
+     * both checkboxes at once
+     */
+    public void initializeCheckBoxes() {
+        splitBetweenAllCheckBox.setOnAction(event -> {
+            if (splitBetweenAllCheckBox.isSelected()) {
+                splitBetweenCustomCheckBox.setSelected(false);
+                participantsVBox.getChildren().clear();
+            }
+        });
+
+        splitBetweenCustomCheckBox.setOnAction(event -> {
+            if (splitBetweenCustomCheckBox.isSelected()) {
+                splitBetweenAllCheckBox.setSelected(false);
+                addParticipants();
+            }
+            if(!splitBetweenCustomCheckBox.isSelected()) {
+                participantsVBox.getChildren().clear();
+            }
+        });
+    }
+
+    /**
      * this method searches for the default tag
      * @param tags the tags in the current event
      * @return the default tag
@@ -206,38 +214,98 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Binds each text to a key in order to be used for translation
      */
-    private void binds() {
+    public void binds() {
+        bindLabels(addEditExpense, paidBy, purpose, amount, date,
+            splitMethod, expenseType);
+        bindComboBoxes(choosePayer);
+        bindTextFields(expensePurpose, sum);
+        bindDatePickers(datePicker);
+        bindCheckBoxes(splitBetweenAllCheckBox, splitBetweenCustomCheckBox);
+        bindButtons(cancel, confirm);
+        bindToEmpty();
+    }
+
+    /**
+     * Binds the labels on the screen, so they can be translated
+     * @param addEditExpense label
+     * @param paidBy label
+     * @param purpose label
+     * @param amount label
+     * @param date label
+     * @param splitMethod label
+     * @param expenseType label
+     */
+    public void bindLabels(Label addEditExpense, Label paidBy,
+                            Label purpose, Label amount,
+                            Label date, Label splitMethod, Label expenseType) {
         addEditExpense.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.Add"));
         paidBy.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.paid"));
-        choosePayer.promptTextProperty()
-                .bind(translation.getStringBinding("Expense.ComboBox.payer"));
         purpose.textProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
-        expensePurpose.promptTextProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
         amount.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.amount"));
-        sum.promptTextProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
         date.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.date"));
-        datePicker.promptTextProperty()
-                .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
         splitMethod.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.split"));
+        expenseType.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
+    }
+
+    /**
+     * Binds the comboBoxes on screen so they can be translated
+     * @param choosePayer comboBox
+     */
+    public void bindComboBoxes(ComboBox<String> choosePayer) {
+        choosePayer.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.ComboBox.payer"));
+    }
+
+    /**
+     * Binds the text prompt of every text field, so it can be translated
+     * @param expensePurpose textField
+     * @param sum testField
+     */
+    public void bindTextFields(TextField expensePurpose, TextField sum) {
+        expensePurpose.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
+        sum.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
+    }
+
+    /**
+     * Binds the text prompt of every datePicker, so it can be translated
+     * @param datePicker datePicker
+     */
+    public void bindDatePickers(DatePicker datePicker) {
+        datePicker.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
+    }
+
+    /**
+     * binds the text for all checkBoxes, so they can be translated
+     * @param splitBetweenAllCheckBox checkbox
+     * @param splitBetweenCustomCheckBox checkbox
+     */
+    public void bindCheckBoxes(CheckBox splitBetweenAllCheckBox, CheckBox splitBetweenCustomCheckBox) {
         splitBetweenAllCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitAll"));
         splitBetweenCustomCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitCustom"));
+    }
+
+    /**
+     * Binds the button text, so it can be translated
+     * @param cancel button
+     * @param confirm button
+     */
+    public void bindButtons(Button cancel, Button confirm) {
         cancel.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Cancel"));
         confirm.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Confirm"));
-        expenseType.textProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
-        bindToEmpty();
     }
 
     /**
