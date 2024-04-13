@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import commons.Event;
 import commons.Participant;
@@ -40,6 +41,8 @@ public class ParticipantScreenCtrlTest {
     ParticipantScreenCtrl participantScreenCtrl;
     @Mock
     ImageUtils imageUtils;
+    @Mock
+    Styling styling;
     @BeforeEach
     public void setup(){
         participant1 = new Participant(1, "John");
@@ -213,7 +216,7 @@ public class ParticipantScreenCtrlTest {
         Label wrongIban = new Label();
         Boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
         verify(server).addParticipant(eq(event.getId()), eq(participant));
         verify(mainCtrl).switchScreens(eq(EventScreenCtrl.class));
     }
@@ -237,7 +240,7 @@ public class ParticipantScreenCtrlTest {
         doReturn(wrongBicText).when(translation).getStringBinding("Participants.Label.wrongBic");
         ObservableValue<String> wrongIbanText = stringToObservable("Wrong Iban");
         doReturn(wrongIbanText).when(translation).getStringBinding("Participants.Label.wrongIban");
-        participantScreenCtrl.confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
         assertEquals("Enter Name", noName.getText());
         assertEquals("Wrong Bic", wrongBic.getText());
         assertEquals("Wrong Iban", wrongIban.getText());
@@ -258,7 +261,7 @@ public class ParticipantScreenCtrlTest {
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
         ObservableValue<String> noEmailText = stringToObservable("Wrong Email");
         doReturn(noEmailText).when(translation).getStringBinding("Participants.Label.wrongEmail");
-        participantScreenCtrl.confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
         assertEquals("Wrong Email", noEmail.getText());
         assertFalse(ok);
     }
@@ -275,7 +278,7 @@ public class ParticipantScreenCtrlTest {
         Label wrongIban = new Label();
         boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
         assertFalse(ok);
         assertNull(participant.getEmail());
     }
@@ -293,7 +296,7 @@ public class ParticipantScreenCtrlTest {
         Label wrongIban = new Label();
         Boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 1, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 1, nameField, holderField, emailField, ibanField, bicField);
         verify(server).editParticipant(eq(event.getId()), eq(1L), eq(participant));
         verify(mainCtrl).switchScreens(eq(ParticipantListScreenCtrl.class));
     }

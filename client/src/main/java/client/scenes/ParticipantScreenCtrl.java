@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final Styling styling;
     private final Translation translation;
     private final ImageUtils imageUtils;
     @FXML
@@ -75,11 +76,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param translation for translating buttons and fields
      */
     @Inject
-    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils) {
+    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.imageUtils = imageUtils;
+        this.styling = styling;
     }
 
     /***
@@ -154,13 +156,13 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 else {
                     if (checkParticipantName(newValue, event)) {
                         noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
-                        Styling.changeStyling(noName, "errorText", "warningLabel");
+                        styling.changeStyling(noName, "errorText", "warningLabel");
                     }
                 }
             }
             else if (checkParticipantName(newValue, event)) {
                 noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
-                Styling.changeStyling(noName, "errorText", "warningLabel");
+                styling.changeStyling(noName, "errorText", "warningLabel");
             }
         });
         nameField.setOnKeyPressed(event -> bindNameField(event, emailField));
@@ -188,7 +190,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
         Boolean ok = true;
         Participant participant = addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        confirmEdit(ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, nameField, holderField, emailField, ibanField, bicField);
+        confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, nameField, holderField, emailField, ibanField, bicField);
     }
     /**
      * method for clicking 'ok' in add/edit participant screen
@@ -196,12 +198,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * otherwise edits the participant
      * A few checks are made regarding the values inserted by the user
      */
-    public void confirmEdit(Boolean ok, Participant participant, Label noName, Label noEmail, Label wrongBic, Label wrongIban, Translation translation, ServerUtils server, MainCtrl mainCtrl, Event event, long participantId, TextField nameField, TextField holderField, TextField emailField, TextField ibanField, TextField bicField) {
+    public void confirmEdit(Styling styling, Boolean ok, Participant participant, Label noName, Label noEmail, Label wrongBic, Label wrongIban, Translation translation, ServerUtils server, MainCtrl mainCtrl, Event event, long participantId, TextField nameField, TextField holderField, TextField emailField, TextField ibanField, TextField bicField) {
         ok = true;
         if(participant.getName() == null || participant.getName().isEmpty()) {
             noName.textProperty()
                     .bind(translation.getStringBinding("Participants.Label.noName"));
-            Styling.changeStyling(noName, "warningLabel", "errorText");
+            styling.changeStyling(noName, "warningLabel", "errorText");
             ok = false;
         }
         else{
