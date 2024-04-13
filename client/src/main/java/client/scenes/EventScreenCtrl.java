@@ -73,9 +73,9 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Event event;
     private final Map<Long, HBox> hBoxMap;
     private Button selectedExpenseListButton;
+    private final EmailHandler emailHandler;
     @FXML
     private Button testEmailButton;
-    private EmailHandler emailHandler;
     @FXML
     private Label emailFeedbackLabel;
     @FXML
@@ -97,7 +97,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     @Inject
     public EventScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation,
                            LanguageIndicatorCtrl languageCtrl, ImageUtils imageUtils,
-                StringGenerationUtils stringUtils, Styling styling) {
+                StringGenerationUtils stringUtils, Styling styling, EmailHandler emailHandler) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
@@ -111,6 +111,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
         this.styling = styling;
+        this.emailHandler = emailHandler;
     }
 
     /**
@@ -146,7 +147,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         initializeEditTitle();
         addGeneratedImages();
         initializeParticipantsCBox();
-        emailHandler = new EmailHandler(translation);
         if (emailHandler.isConfigured()) {
             enableEmailFeatures();
 

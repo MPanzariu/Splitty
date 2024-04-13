@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ public class StartupScreenCtrlTest{
     private ImageUtils imageUtils;
     private AppStateManager manager;
     private Translation translation;
+    private Stage currentStage;
 
     @BeforeAll
     static void testFXSetup(){
@@ -57,6 +59,7 @@ public class StartupScreenCtrlTest{
         this.languageCtrl = mock(LanguageIndicatorCtrl.class);
         this.manager = mock(AppStateManager.class);
         this.translation = mock(Translation.class);
+        this.currentStage = mock(Stage.class);
         sut = new TestStartupScreenCtrl(this.testServerUtils, this.testMainController, translation,
                 languageCtrl, manager, imageUtils);
 
@@ -219,7 +222,7 @@ public class StartupScreenCtrlTest{
         public List<String> calls = new LinkedList<>();
 
         public TestMainController() {
-            super(null, null, "URL", "EN");
+            super(null, null, "URL", "EN", Locale.of("en", "GB"), currentStage);
         }
 
         @Override
