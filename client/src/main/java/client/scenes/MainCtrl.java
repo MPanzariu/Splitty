@@ -42,6 +42,8 @@ public class MainCtrl {
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
     private Scene generateLanguageTemplateScene;
+    private Scene participantListScene;
+    private ParticipantListScreenCtrl participantListScreenCtrl;
     private final Translation translation;
     private EventScreenCtrl eventScreenCtrl;
     private final HashMap<Class<?>, ScreenInfo> screenMap;
@@ -117,10 +119,10 @@ public class MainCtrl {
         this.eventScene = new Scene(eventUI.getValue());
         Scene expenseScene = new Scene(expenseUI.getValue());
         this.expenseScreenCtrl = expenseUI.getKey();
-        Scene participantListScene = new Scene(participantListUI.getValue());
-        ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
+        this.participantListScene = new Scene(participantListUI.getValue());
+        this.participantListScreenCtrl = participantListUI.getKey();
         TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
         Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
         GenerateLanguageTemplateCtrl generateLanguageTemplateCtrl = generateLanguageTemplatePair.getKey();
@@ -313,6 +315,14 @@ public class MainCtrl {
      */
     public Scene getParticipantScene(){
         return participantScene;
+    }
+
+    /**
+     * Gets the ParticipantListScreen
+     * @return the Participant List Screen
+     */
+    public Scene getParticipantListScene() {
+        return participantListScene;
     }
 
     /**

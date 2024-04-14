@@ -434,7 +434,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         HBox datehBox = new HBox(dateLabel);
         datehBox.setAlignment(Pos.CENTER);
         HBox.setHgrow(datehBox, javafx.scene.layout.Priority.ALWAYS);
-        HBox expenseBox = new HBox(datehBox, expenseText, tagLabel, xHBox);
+        HBox justExpenseBox = new HBox(datehBox, expenseText, tagLabel);
+        justExpenseBox.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
+        justExpenseBox.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
+        justExpenseBox.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expense.getId()));
+        justExpenseBox.setAlignment(Pos.CENTER);
+        HBox expenseBox = new HBox(justExpenseBox, xHBox);
         expenseBox.setPrefWidth(width);
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
