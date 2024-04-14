@@ -12,7 +12,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -201,7 +200,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * the actual method call when pressing confirm, calls confirmEdit
      */
-    //stop missing javadoc method check
     public void confirmCreateEdit(){
         resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
         Boolean ok = true;
@@ -209,8 +207,16 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         ArrayList<TextField> f= bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, f);
     }
-    //resume missing javadoc method check
 
+    /**
+     * adds fields to an array list to minimise parameter count
+     * @param nF name Text Field
+     * @param hF holder Text Field
+     * @param eF email Text Field
+     * @param iF iban Text Field
+     * @param bF bic Text Field
+     * @return an array list with all fields added
+     */
     public ArrayList<TextField> bindTextFields(TextField nF, TextField hF, TextField eF, TextField iF, TextField bF){
         ArrayList<TextField> fields = new ArrayList<>();
         fields.add(nF);
@@ -240,9 +246,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param pId the id of the participant
      * @param l text fields array list
      */
-    //stop missing javadoc method check
-    public void confirmEdit(Styling st, Boolean ok, Participant p, Label nN, Label nE, Label wB, Label wI, Translation t, ServerUtils s, MainCtrl m, Event e, long pId, ArrayList<TextField> l) {
+    //stop missing line length check
+    public void confirmEdit(Styling st, Boolean ok, Participant p, Label nN, Label nE, Label wB, Label wI,
+                            Translation t, ServerUtils s, MainCtrl m, Event e, long pId, ArrayList<TextField> l) {
         ok = true;
+        //resume missing line length check
         if(p.getName() == null || p.getName().isEmpty()) {
             nN.textProperty()
                     .bind(t.getStringBinding("Participants.Label.noName"));
@@ -279,7 +287,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             clearFields(l.get(0), l.get(1), l.get(3), l.get(4), l.get(2));
         }
     }
-    //resume missing javadoc method check
 
     /**
      * sets participant id back to 0 after editing so the field checks work
@@ -298,14 +305,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param wrongBic label displayed when the BIC format is incorrect
      * @param wrongIban label displayed when the IBAN format is incorrect
      */
-    //stop missing javadoc method check
     public void resetErrorFields(Translation translation, Label noName, Label noEmail, Label wrongBic, Label wrongIban){
         noName.textProperty().bind(translation.getStringBinding("empty"));
         noEmail.textProperty().bind(translation.getStringBinding("empty"));
         wrongBic.textProperty().bind(translation.getStringBinding("empty"));
         wrongIban.textProperty().bind(translation.getStringBinding("empty"));
     }
-    //resume missing javadoc method check
 
     /**
      * clears text fields when leaving the screen
@@ -422,7 +427,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param email the value inserted by the user
      * @return true if the value is correct, false otherwise
      */
-    //stop missing javadoc method check
     public boolean checkEmail (String email){
         if (email == null || email.isEmpty()){
             return false;
@@ -437,7 +441,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         }
         return false;
     }
-    //resume missing javadoc method check
 
     /**
      * checks if the inserted bic has an appropriate pattern

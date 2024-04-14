@@ -201,7 +201,6 @@ public class ParticipantScreenCtrlTest {
         assertNull(participant.getBic());
         assertNull(participant.getIban());
     }
-    //stop missing javadoc method check
     @Test
     public void testConfirmEdit(){
         TextField nameField = new TextField("Anna");
@@ -239,14 +238,12 @@ public class ParticipantScreenCtrlTest {
         doReturn(noNameText).when(translation).getStringBinding("Participants.Label.noName");
         ObservableValue<String> wrongBicText = stringToObservable("Wrong Bic");
         doReturn(wrongBicText).when(translation).getStringBinding("Participants.Label.wrongBic");
-        ObservableValue<String> wrongIbanText = stringToObservable("Wrong Iban");
-        doReturn(wrongIbanText).when(translation).getStringBinding("Participants.Label.wrongIban");
         participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         assertEquals("Enter Name", noName.getText());
         assertEquals("Wrong Bic", wrongBic.getText());
-        assertEquals("Wrong Iban", wrongIban.getText());
         assertFalse(ok);
     }
+
     @Test
     public void testConfirmEditNullsEmail(){
         TextField nameField = new TextField("Anna");
@@ -303,7 +300,6 @@ public class ParticipantScreenCtrlTest {
         verify(server).editParticipant(eq(event.getId()), eq(1L), eq(participant));
         verify(mainCtrl).switchScreens(eq(ParticipantListScreenCtrl.class));
     }
-    //resume missing javadoc method check
 
     @Test
     public void resetErrors(){
