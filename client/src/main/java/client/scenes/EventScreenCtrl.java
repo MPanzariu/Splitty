@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -231,8 +232,8 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public void refresh(Event event){
         this.event = event;
         updateEventText();
-        updateParticipants();
-        updateParticipantsDropdown();
+        participantsLabel.setText(generateParticipantString(event));
+        updateParticipantsDropdown(event, cBoxParticipantExpenses.getItems());
         refreshExpenseList();
         errorInvalidParticipant.textProperty()
                 .bind(translation.getStringBinding("empty"));
@@ -277,9 +278,11 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * set the participants in the event screen that are part of the current event
+     * Generates a String listing current event participants
+     * @param event the Event data to use
+     * @return a String listing current event participants
      */
-    private void updateParticipants(){
+    public String generateParticipantString(Event event){
         StringBuilder participantsText = new StringBuilder();
         Iterator<Participant> participantIterator = event.getParticipants().iterator();
         while(participantIterator.hasNext()){
@@ -289,17 +292,18 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
             else participantsText.append(current.getName());
         }
         if(participantsText.toString().isEmpty()) {
-            participantsLabel.setText("There are no participants");
+            return("There are no participants");
         }
-        else participantsLabel.setText(participantsText.toString());
+        else return participantsText.toString();
     }
 
     /**
      * show the participants of the current event
+     * @param event the Event data to use
+     * @param boxItems the ObservableList to load data into/from
      */
-    private void updateParticipantsDropdown(){
+    public void updateParticipantsDropdown(Event event, ObservableList<String> boxItems){
         List<String> names = new ArrayList<>();
-        var boxItems = cBoxParticipantExpenses.getItems();
         for (Participant current : event.getParticipants()) {
             names.add(current.getName());
         }
