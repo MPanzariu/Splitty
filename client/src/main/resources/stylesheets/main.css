@@ -87,6 +87,10 @@
     -fx-background-color: grey;
     -fx-cursor: default
 }
+.disabledButton:focused{
+    -fx-background-color: grey;
+    -fx-cursor: default
+}
 .borderVBox{
     -fx-border-radius: 10px;
     -fx-border-color: black;
