@@ -40,6 +40,11 @@
             <property name="onCommentFormat" value="resume missing javadoc method check" />
             <property name="checkFormat" value="MissingJavadocMethod" />
         </module>
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="stop missing line length check" />
+            <property name="onCommentFormat" value="resume missing line length method check" />
+            <property name="checkFormat" value="LineLengthCheck" />
+        </module>
 
         <module name="MissingJavadocMethod">
             <property name="severity" value="warning"/>

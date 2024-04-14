@@ -6,7 +6,6 @@ import client.Exceptions.MissingLanguageTemplateException;
 import client.utils.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import commons.Event;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;

@@ -17,8 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,7 +174,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * binds the nameField such that confirmCreateEdit is called when enter if a name is not inserted and redirects focus towards the email field otherwise
+     * binds the nameField such that confirmCreateEdit is called when enter if a name
+     * is not inserted and redirects focus towards the email field otherwise
      * @param event the event
      * @param textField the name field
      */
@@ -201,11 +201,24 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * the actual method call when pressing confirm, calls confirmEdit
      */
+    //stop missing javadoc method check
     public void confirmCreateEdit(){
         resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
         Boolean ok = true;
         Participant participant = addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, nameField, holderField, emailField, ibanField, bicField);
+        ArrayList<TextField> f= bindTextFields(nameField, holderField, emailField, ibanField, bicField);
+        confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, f);
+    }
+    //resume missing javadoc method check
+
+    public ArrayList<TextField> bindTextFields(TextField nF, TextField hF, TextField eF, TextField iF, TextField bF){
+        ArrayList<TextField> fields = new ArrayList<>();
+        fields.add(nF);
+        fields.add(hF);
+        fields.add(eF);
+        fields.add(iF);
+        fields.add(bF);
+        return fields;
     }
 
     /**
@@ -213,62 +226,60 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * if the participant is new it is added to the event
      * otherwise edits the participant
      * A few checks are made regarding the values inserted by the user
-     * @param styling styling
+     * @param st styling
      * @param ok boolean which checks correctness of text field inputs
-     * @param participant the newly created instance of a participant
-     * @param noName the label displayed when there is no name
-     * @param noEmail label displayed when the email format is incorrect
-     * @param wrongBic label displayed when the BIC format is incorrect
-     * @param wrongIban label displayed when the IBAN format is incorrect
-     * @param translation translation
-     * @param server server
-     * @param mainCtrl main controller
-     * @param event the event the participant is part of
-     * @param participantId the id of the participant
-     * @param nameField the name field
-     * @param holderField the account holder name field
-     * @param ibanField the iban field
-     * @param bicField the bic field
-     * @param emailField the email field
+     * @param p the newly created instance of a participant
+     * @param nN the label displayed when there is no name
+     * @param nE label displayed when the email format is incorrect
+     * @param wB label displayed when the BIC format is incorrect
+     * @param wI label displayed when the IBAN format is incorrect
+     * @param t translation
+     * @param s server
+     * @param m main controller
+     * @param e the event the participant is part of
+     * @param pId the id of the participant
+     * @param f text fields array list
      */
-    public void confirmEdit(Styling styling, Boolean ok, Participant participant, Label noName, Label noEmail, Label wrongBic, Label wrongIban, Translation translation, ServerUtils server, MainCtrl mainCtrl, Event event, long participantId, TextField nameField, TextField holderField, TextField emailField, TextField ibanField, TextField bicField) {
+    //stop missing javadoc method check
+    public void confirmEdit(Styling st, Boolean ok, Participant p, Label nN, Label nE, Label wB, Label wI, Translation t, ServerUtils s, MainCtrl m, Event e, long pId, ArrayList<TextField> l) {
         ok = true;
-        if(participant.getName() == null || participant.getName().isEmpty()) {
-            noName.textProperty()
-                    .bind(translation.getStringBinding("Participants.Label.noName"));
-            styling.changeStyling(noName, "warningLabel", "errorText");
+        if(p.getName() == null || p.getName().isEmpty()) {
+            nN.textProperty()
+                    .bind(t.getStringBinding("Participants.Label.noName"));
+            st.changeStyling(nN, "warningLabel", "errorText");
             ok = false;
         }
         else{
-            if(participant.getEmail() != null && participant.getEmail().equals("wrongEmail")){
-                noEmail.textProperty()
-                      .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
+            if(p.getEmail() != null && p.getEmail().equals("wrongEmail")){
+                nE.textProperty()
+                      .bind(t.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
                 System.out.println("Email format is not correct");
-            } else if (participant.getEmail().equals("empty")) {
-                participant.setEmail(null);
+            } else if (p.getEmail().equals("empty")) {
+                p.setEmail(null);
             }
         }
-        if(participant.getIban() != null && participant.getIban().equals("wrongIban")) {
-            wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
+        if(p.getIban() != null && p.getIban().equals("wrongIban")) {
+            wB.textProperty().bind(t.getStringBinding("Participants.Label.wrongIban"));
             ok = false;
         }
-        if(participant.getBic() != null &&  participant.getBic().equals("wrongBic")){
-            wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
+        if(p.getBic() != null &&  p.getBic().equals("wrongBic")){
+            wB.textProperty().bind(t.getStringBinding("Participants.Label.wrongBic"));
             ok = false;
         }
         if(ok){
-            if(participantId == 0){
-                server.addParticipant(event.getId(), participant);
-                mainCtrl.switchScreens(EventScreenCtrl.class);
+            if(pId == 0){
+                s.addParticipant(e.getId(), p);
+                m.switchScreens(EventScreenCtrl.class);
             }
             else {
-                server.editParticipant(event.getId(), participantId, participant);
-                mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
+                s.editParticipant(e.getId(), pId, p);
+                m.switchScreens(ParticipantListScreenCtrl.class);
             }
-            clearFields(nameField, holderField, ibanField, bicField, emailField);
+            clearFields(l.get(0), l.get(1), l.get(3), l.get(4), l.get(2));
         }
     }
+    //resume missing javadoc method check
 
     /**
      * sets participant id back to 0 after editing so the field checks work
@@ -287,12 +298,14 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param wrongBic label displayed when the BIC format is incorrect
      * @param wrongIban label displayed when the IBAN format is incorrect
      */
+    //stop missing javadoc method check
     public void resetErrorFields(Translation translation, Label noName, Label noEmail, Label wrongBic, Label wrongIban){
         noName.textProperty().bind(translation.getStringBinding("empty"));
         noEmail.textProperty().bind(translation.getStringBinding("empty"));
         wrongBic.textProperty().bind(translation.getStringBinding("empty"));
         wrongIban.textProperty().bind(translation.getStringBinding("empty"));
     }
+    //resume missing javadoc method check
 
     /**
      * clears text fields when leaving the screen
@@ -365,13 +378,13 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * sets up the fields and information for the participant we want to edit
      * @param id the id of the participant
      * @param event the event that the participant is part of
-     * @param nameField the name field
-     * @param holderField the account holder name field
-     * @param ibanField the iban field
-     * @param bicField the bic field
-     * @param emailField the email field
+     * @param nF the name field
+     * @param hF the account holder name field
+     * @param iF the iban field
+     * @param bF the bic field
+     * @param eF the email field
      */
-    public void setParticipant(long id, Event event, TextField nameField, TextField holderField, TextField ibanField, TextField bicField, TextField emailField) {
+    public void setParticipant(long id, Event event, TextField nF, TextField hF, TextField iF, TextField bF, TextField eF) {
         Set<Participant> participantList = event.getParticipants();
         Participant participantFin = null;
         for(Participant participant: participantList)
@@ -380,11 +393,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 break;
             }
         if(participantFin == null) return;
-        nameField.setText(participantFin.getName());
-        holderField.setText(participantFin.getLegalName());
-        ibanField.setText(participantFin.getIban());
-        bicField.setText(participantFin.getBic());
-        emailField.setText(participantFin.getEmail());
+        nF.setText(participantFin.getName());
+        hF.setText(participantFin.getLegalName());
+        iF.setText(participantFin.getIban());
+        bF.setText(participantFin.getBic());
+        eF.setText(participantFin.getEmail());
     }
 
     /**
@@ -409,6 +422,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param email the value inserted by the user
      * @return true if the value is correct, false otherwise
      */
+    //stop missing javadoc method check
     public boolean checkEmail (String email){
         if (email == null || email.isEmpty()){
             return false;
@@ -423,6 +437,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         }
         return false;
     }
+    //resume missing javadoc method check
 
     /**
      * checks if the inserted bic has an appropriate pattern

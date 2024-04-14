@@ -20,6 +20,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationExtension;
+
+import java.util.ArrayList;
+
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -202,7 +205,7 @@ public class ParticipantScreenCtrlTest {
         assertNull(participant.getBic());
         assertNull(participant.getIban());
     }
-
+    //stop missing javadoc method check
     @Test
     public void testConfirmEdit(){
         TextField nameField = new TextField("Anna");
@@ -215,8 +218,9 @@ public class ParticipantScreenCtrlTest {
         Label wrongBic = new Label();
         Label wrongIban = new Label();
         Boolean ok = false;
+        ArrayList<TextField> f = participantScreenCtrl.bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         verify(server).addParticipant(eq(event.getId()), eq(participant));
         verify(mainCtrl).switchScreens(eq(EventScreenCtrl.class));
     }
@@ -233,6 +237,7 @@ public class ParticipantScreenCtrlTest {
         Label wrongBic = new Label();
         Label wrongIban = new Label();
         boolean ok = false;
+        ArrayList<TextField> f = participantScreenCtrl.bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
         ObservableValue<String> noNameText = stringToObservable("Enter Name");
         doReturn(noNameText).when(translation).getStringBinding("Participants.Label.noName");
@@ -240,7 +245,7 @@ public class ParticipantScreenCtrlTest {
         doReturn(wrongBicText).when(translation).getStringBinding("Participants.Label.wrongBic");
         ObservableValue<String> wrongIbanText = stringToObservable("Wrong Iban");
         doReturn(wrongIbanText).when(translation).getStringBinding("Participants.Label.wrongIban");
-        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         assertEquals("Enter Name", noName.getText());
         assertEquals("Wrong Bic", wrongBic.getText());
         assertEquals("Wrong Iban", wrongIban.getText());
@@ -257,11 +262,12 @@ public class ParticipantScreenCtrlTest {
         Label noEmail = new Label();
         Label wrongBic = new Label();
         Label wrongIban = new Label();
+        ArrayList<TextField> f = participantScreenCtrl.bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
         ObservableValue<String> noEmailText = stringToObservable("Wrong Email");
         doReturn(noEmailText).when(translation).getStringBinding("Participants.Label.wrongEmail");
-        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         assertEquals("Wrong Email", noEmail.getText());
         assertFalse(ok);
     }
@@ -276,13 +282,13 @@ public class ParticipantScreenCtrlTest {
         Label noEmail = new Label();
         Label wrongBic = new Label();
         Label wrongIban = new Label();
+        ArrayList<TextField> f = participantScreenCtrl.bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         assertFalse(ok);
         assertNull(participant.getEmail());
     }
-
     @Test
     public void testConfirmEditEdit(){
         TextField nameField = new TextField("Anna");
@@ -294,12 +300,14 @@ public class ParticipantScreenCtrlTest {
         Label noEmail = new Label();
         Label wrongBic = new Label();
         Label wrongIban = new Label();
+        ArrayList<TextField> f = participantScreenCtrl.bindTextFields(nameField, holderField, emailField, ibanField, bicField);
         Boolean ok = false;
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
-        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 1, nameField, holderField, emailField, ibanField, bicField);
+        participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 1, f);
         verify(server).editParticipant(eq(event.getId()), eq(1L), eq(participant));
         verify(mainCtrl).switchScreens(eq(ParticipantListScreenCtrl.class));
     }
+    //resume missing javadoc method check
 
     @Test
     public void resetErrors(){
