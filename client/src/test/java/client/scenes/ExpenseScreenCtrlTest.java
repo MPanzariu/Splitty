@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;

@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.scenes.AddTagCtrl;
 import client.scenes.LanguageIndicatorCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
@@ -50,6 +51,7 @@ public class MyModule implements Module {
         binder.bind(LPUtils.class).in(Scopes.SINGLETON);
         binder.bind(AppStateManager.class).in(Scopes.SINGLETON);
         binder.bind(TransferMoneyUtils.class).in(Scopes.SINGLETON);
+        binder.bind(AddTagCtrl.class).in(Scopes.SINGLETON);
         binder.bind(Stage.class).in(Scopes.SINGLETON);
 
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);

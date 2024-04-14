@@ -72,4 +72,19 @@ public class TagService {
         event.removeTag(tag);
         eventRepository.save(event);
     }
+
+    /**
+     * Save edited tag to database
+     * @param id ID of edited tag
+     * @param newTag Edited tag
+     * @throws EntityNotFoundException Tag is not found in the database
+     * @return Tag that is edited
+     */
+    public Tag editTag(Long id, Tag newTag) throws EntityNotFoundException {
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tag is not found"));
+        tag.setTagName(newTag.getTagName());
+        tag.setColorCode(newTag.getColorCode());
+        return tagRepository.save(tag);
+    }
 }
