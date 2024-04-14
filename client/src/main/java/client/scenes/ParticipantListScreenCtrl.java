@@ -31,11 +31,11 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     @FXML
     private ListView<HBox> participantList;
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
     private final Translation translation;
+    private final MainCtrl mainCtrl;
     private final ImageUtils imageUtils;
-    private Map<Long, HBox> map;
-    private Styling styling;
+    private final Map<Long, HBox> map;
+    private final Styling styling;
 
     /**
      * Constructor for the participant list screen

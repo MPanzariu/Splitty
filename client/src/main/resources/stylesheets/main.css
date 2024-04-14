@@ -39,6 +39,8 @@
     -fx-background-color: default-negative-accent;
 }
 
+.warningLabel{ -fx-text-fill: #ff7200 }
+
 .button:hover{
     -fx-cursor: hand;
 }
@@ -141,4 +143,12 @@
     -fx-padding: -100;
     -fx-border-color: derive(-fx-pie-color, -40%);
     -fx-border-width: 3px;
+}
+
+.fieldsBorderGreen{
+    -fx-border-color: #26c506;
+}
+
+.fieldsBorderRed{
+    -fx-border-color: red;
 }
