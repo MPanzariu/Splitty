@@ -61,10 +61,17 @@ Used implicitly everywhere in the client that deals with connections: in [Server
 
 ### Unit Testing
 
+Configurable Subclass: [TestEventRepository](/server/src/test/java/server/api/TestEventRepository.java)
+
+Mockito: [SettleDebtsScreenCtrlTest](/client/src/test/java/client/scenes/SettleDebtsScreenCtrlTest.java)
+
 ### Indirection
+
+[SettleDebtsScreenCtrlTest](/client/src/test/java/client/scenes/SettleDebtsScreenCtrlTest.java), [EventControllerTest](/server/src/test/java/server/api/EventControllerTest.java)
 
 ### Endpoint Testing
 
+[ParticipantControllerTest](/server/src/test/java/server/api/ParticipantControllerTest.java), [EventControllerTest](/server/src/test/java/server/api/EventControllerTest.java)
 
 ## Live Language Switch
 
@@ -77,13 +84,8 @@ Used implicitly everywhere in the client that deals with connections: in [Server
 ## Email Notification
 
 ## HCI
-### Color Contrast
 
 ### Keyboard Shortcuts
-
-### Multi-modal Visualization
-
-### Logical Navigation
 
 ### Keyboard Navigation
 
