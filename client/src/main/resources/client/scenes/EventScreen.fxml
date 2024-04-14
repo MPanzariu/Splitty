@@ -30,7 +30,7 @@
             <String fx:value="small-text" />
          </styleClass>
          <tooltip>
-            <Tooltip text="Ctrl + E" />
+            <Tooltip text="Ctrl + W" />
          </tooltip>
       </Button>
       <TextField fx:id="invitationCode" layoutX="399.0" layoutY="30.0" prefHeight="51.0" prefWidth="139.0" styleClass="h1" text="Event">
