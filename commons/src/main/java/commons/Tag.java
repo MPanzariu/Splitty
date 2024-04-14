@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private long id;
     private String tagName;
     private String colorCode;
 
@@ -34,7 +34,7 @@ public class Tag {
      * Getter for the id
      * @return the id of the tag
      */
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

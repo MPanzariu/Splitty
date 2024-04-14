@@ -15,17 +15,21 @@
  */
 package client.scenes;
 
-import client.Exceptions.MissingLanguageTemplateException;
 import client.utils.AppStateManager;
 import client.utils.ScreenInfo;
 import client.utils.Translation;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -38,7 +42,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import static client.TestObservableUtils.stringToObservable;
@@ -137,7 +143,7 @@ public class MainCtrlTest {
 
     @Test
     void testGetEventFilterNotNull(){
-        assertNotNull(sut.getEventHandlerForEventScreen());;
+        assertNotNull(sut.getEventHandlerForEventScreen());
     }
     @Test
     void testGetEventFilterMainScreen() {
@@ -173,7 +179,7 @@ public class MainCtrlTest {
     }
 
     @Test
-    void connectionErrorPopupTest(){
+    void connectionErrorPopupTest() {
         String binding = "Binding!";
         ButtonType buttonTypeReconnect = new ButtonType("Reconnect", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonTypeExit = new ButtonType("Exit", ButtonBar.ButtonData.NO);
@@ -190,6 +196,70 @@ public class MainCtrlTest {
         verify(testAlert).setContentText(binding);
         assertTrue(buttonList.contains(buttonTypeReconnect));
         assertTrue(buttonList.contains(buttonTypeExit));
+    }
+
+    @Test
+    void eventScreenHandlerTest() {
+        runInitialization();
+        var result = sut.getEventHandlerForEventScreen();
+        result.handle(null);
+
+        List<KeyCode> codeList = new ArrayList<>();
+        codeList.add(KeyCode.A);
+        codeList.add(KeyCode.T);
+        codeList.add(KeyCode.S);
+        codeList.add(KeyCode.W);
+        codeList.add(KeyCode.Q);
+        codeList.add(KeyCode.P);
+        codeList.add(KeyCode.I);
+        codeList.add(KeyCode.B);
+        codeList.add(KeyCode.F);
+        codeList.add(KeyCode.D);
+        codeList.add(KeyCode.G);
+
+        doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
+        Scene eventScene = sut.getEventScene();
+        for(KeyCode code: codeList){
+            EventHandler<? super KeyEvent> onKeyPressed = eventScene.getOnKeyPressed();
+            KeyEvent keyEvent = new KeyEvent(KeyEvent.ANY, code.getChar(), code.getChar(), code, false, true, false, false);
+            onKeyPressed.handle(keyEvent);
+        }
+        verify(eventScreenCtrl).sendTestEmail();
+        verify(eventScreenCtrl).switchToStatistics();
+        verify(eventScreenCtrl).addExpense();
+        verify(eventScreenCtrl).addParticipants();
+        verify(eventScreenCtrl).switchToInviteEmail();
+        verify(eventScreenCtrl).switchToMainScreen();
+        verify(eventScreenCtrl).switchToAddTag();
+        verify(eventScreenCtrl).transferMoney();
+        verify(eventScreenCtrl).settleDebts();
+    }
+
+    @Test
+    void mainScreenHandlerTest() {
+        runInitialization();
+        var result = sut.getEventHandlerForMainScreen();
+
+        List<KeyCode> codeList = new ArrayList<>();
+        codeList.add(KeyCode.A);
+        codeList.add(KeyCode.E);
+
+        doReturn(stringToObservable("Binding!")).when(translation).getStringBinding(anyString());
+        for(KeyCode code: codeList){
+            KeyEvent keyEvent = new KeyEvent(KeyEvent.ANY, code.getChar(), code.getChar(), code, false, true, false, false);
+            result.handle(keyEvent);
+        }
+        verify(startupScreenCtrl).joinMostRecentEvent();
+    }
+
+    @Test
+    void swtichScreensTest(){
+        runInitialization();
+        ObservableValue<String> titleText = stringToObservable("Title!!!");
+        doReturn(titleText).when(translation).getStringBinding(anyString());
+        sut.switchScreens(SettleDebtsScreenCtrl.class);
+        verify(manager).onSwitchScreens(SettleDebtsScreenCtrl.class);
+        verify(primaryStage).titleProperty();
     }
 
 }

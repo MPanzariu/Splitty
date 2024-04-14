@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -81,7 +82,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button emailInviteButton;
     @FXML
     private Button transferMoneyButton;
-    private Styling styling;
+    private final Styling styling;
     /**
      * Constructor
      *
@@ -105,9 +106,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         this.stringUtils = stringUtils;
         this.event = null;
         this.hBoxMap = new HashMap<>();
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
         this.languageCtrl = languageCtrl;
         this.selectedExpenseListButton = null;
         this.styling = styling;
@@ -250,13 +248,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * UI for inviting participants that needs to be implemented when the button is pressed
-     */
-    public void inviteParticipants(){
-        //TODO: implement UI for inviting participants
-    }
-
-    /**
      * UI for editing current participants that needs to be implemented when the button is pressed
      */
     public void editCurrentParticipants(){
@@ -358,26 +349,43 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         refreshExpenseList();
     }
 
+    /***
+     * the action when we press the "From ..." button
+     */
+    public void fromFilter(){
+        this.selectedExpenseListButton = fromButton;
+        refreshExpenseList();
+    }
+
+    /***
+     * the action when we press the "Including ..." button
+     */
+    public void includingFilter(){
+        this.selectedExpenseListButton = inButton;
+        refreshExpenseList();
+    }
+
     private void refreshExpenseList() {
         Button selectedButton = selectedExpenseListButton;
         if(selectedButton == null) selectedButton = allExpenses;
-        if(selectedButton == allExpenses) showAllExpenseList();
-        else if(selectedButton == fromButton) fromFilter();
-        else if(selectedButton == inButton) includingFilter();
+        if(selectedButton == allExpenses) showAllExpenseList(event, expensesLogListView);
+        else if(selectedButton == fromButton) fromFilter(event, expensesLogListView, cBoxParticipantExpenses.getValue());
+        else if(selectedButton == inButton) includingFilter(event, expensesLogListView, cBoxParticipantExpenses.getValue());
     }
 
     /**
      * Generates a list of hBoxes stating with a human-readable String
      * that presents a quick overview of the expense presented
-     * the method throws an error
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
      */
-    public void showAllExpenseList() {
+    public void showAllExpenseList(Event event, ListView<HBox> expensesLogListView) {
         expensesLogListView.getItems().clear();
         //We only want to load this in once! IO is expensive.
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses()) {
             if(!expense.getParticipantsInExpense().isEmpty()){
-                HBox expenseBox = generateExpenseBox(expense, removeImage);
+                HBox expenseBox = generateExpenseBox(expense, event, removeImage, expensesLogListView.getPrefWidth());
                 expensesLogListView.getItems().add(expenseBox);
             }
         }
@@ -386,10 +394,12 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     /**
      *
      * @param expense the expense for which we need to generate the HBox
+     * @param event the Event data to use
      * @param removeImage the Image to use for the X icon
+     * @param width the width of the generated hBox
      * @return the generated hBox, containing the expense details
      */
-    public HBox generateExpenseBox(Expense expense, Image removeImage) {
+    public HBox generateExpenseBox(Expense expense, Event event, Image removeImage, double width) {
         ObservableValue<String> expenseTextValue;
         if(expense.getPriceInCents() > 0)
             expenseTextValue = stringUtils.generateTextForExpenseLabel(expense, event.getParticipants().size());
@@ -398,25 +408,37 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         Label expenseText = generateExpenseLabel(expense.getId(), expenseTextValue);
         ImageView xButton = generateRemoveButton(expense.getId(), removeImage);
         Label dateLabel = new Label();
-        dateLabel.setPrefWidth(40);
+        dateLabel.setPrefWidth(45);
         dateLabel.setWrapText(true);
+        expenseText.setPrefWidth(200);
         Calendar expenseCalendar  = Calendar.getInstance();
         expenseCalendar.setTime(expense.getDate());
         Calendar now = Calendar.getInstance();
         SimpleDateFormat shortDate = new SimpleDateFormat("dd/MM");
         SimpleDateFormat fullDate = new SimpleDateFormat("dd/MM/yyyy");
         if(expenseCalendar.get(Calendar.YEAR) != now.get(Calendar.YEAR))
-            dateLabel.setText(shortDate.format(expense.getDate()));
-        else
             dateLabel.setText(fullDate.format(expense.getDate()));
+        else
+            dateLabel.setText(shortDate.format(expense.getDate()));
         HBox xHBox = new HBox(xButton);
         HBox.setHgrow(xHBox, javafx.scene.layout.Priority.ALWAYS);
         xHBox.setAlignment((CENTER_RIGHT));
-        HBox expenseBox = new HBox(dateLabel, expenseText, xHBox);
-        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        Tag item = expense.getExpenseTag();
+        Label tagLabel = new Label(item.getTagName());
+        tagLabel.setWrapText(true);
+        tagLabel.setAlignment(Pos.CENTER);
+        tagLabel.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+            "-fx-background-radius: 3;" +
+            "-fx-padding: 1 2 1 2;" +
+            "-fx-text-fill: white;");
+        HBox datehBox = new HBox(dateLabel);
+        datehBox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(datehBox, javafx.scene.layout.Priority.ALWAYS);
+        HBox expenseBox = new HBox(datehBox, expenseText, tagLabel, xHBox);
+        expenseBox.setPrefWidth(width);
         expenseBox.setSpacing(10);
         hBoxMap.put(expense.getId(), expenseBox);
-        expenseBox.setPrefWidth(expensesLogListView.getPrefWidth());
+        expenseBox.setPrefWidth(width);
         expenseBox.setAlignment(Pos.CENTER_LEFT);
         return expenseBox;
     }
@@ -431,6 +453,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     public Label generateExpenseLabel(long expenseId, ObservableValue<String> expenseDescription) {
         Label expense = new Label();
         expense.textProperty().bind(expenseDescription);
+        expense.setWrapText(true);
         expense.setOnMouseEntered(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.HAND));
         expense.setOnMouseExited(mouseEvent -> mainCtrl.getEventScene().setCursor(Cursor.DEFAULT));
         expense.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditExpense(expenseId));
@@ -510,26 +533,28 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
     /**
      * Filters the expenses, showing only the ones that were paid by a certain participant
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
+     * @param name the participant name to filter by
      */
-    public void fromFilter() {
-        selectedExpenseListButton = fromButton;
+    public void fromFilter(Event event, ListView<HBox> expensesLogListView, String name) {
         expensesLogListView.getItems().clear();
-        String name = cBoxParticipantExpenses.getValue();
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses())
             if(expense.getOwedTo().getName().equals(name)) {
-                HBox expenseBox = generateExpenseBox(expense, removeImage);
+                HBox expenseBox = generateExpenseBox(expense, event, removeImage, expensesLogListView.getPrefWidth());
                 expensesLogListView.getItems().add(expenseBox);
             }
     }
 
     /**
      * Filters the expenses, showing the one a certain participant is part of
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
+     * @param name the participant name to filter by
      */
-    public void includingFilter() {
-        selectedExpenseListButton = inButton;
+    public void includingFilter(Event event, ListView<HBox> expensesLogListView, String name) {
         expensesLogListView.getItems().clear();
-        String name = cBoxParticipantExpenses.getValue();
         Set<Participant> eventParticipants = event.getParticipants();
         Participant selectedParticipant = null;
         for(Participant participant: eventParticipants) {
@@ -545,7 +570,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         for(Expense expense: eventExpenses) {
             Set<Participant>participantsInExpense = expense.getParticipantsInExpense();
             if(participantsInExpense.contains(selectedParticipant)) {
-                HBox expenseBox = generateExpenseBox(expense, removeImage);
+                HBox expenseBox = generateExpenseBox(expense, event, removeImage, expensesLogListView.getPrefWidth());
                 expensesLogListView.getItems().add(expenseBox);
             }
         }

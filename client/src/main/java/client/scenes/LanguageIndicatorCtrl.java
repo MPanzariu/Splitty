@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.Exceptions.IncompleteLanguageException;
+import client.utils.ImageUtils;
 import client.utils.LanguageSwitchUtils;
 import client.utils.Translation;
 import com.google.inject.Inject;
@@ -21,18 +22,21 @@ public class LanguageIndicatorCtrl {
     private final LanguageSwitchUtils utils;
     private final MainCtrl main;
     private final StringProperty generationMessage = new SimpleStringProperty();
+    private final ImageUtils imageUtils;
 
     /**
      * Constructor for the LanguageIndicatorCtrl
      * @param translation - the translation to use
      * @param utils - the language switch utils to use
      * @param main - Main controller for switching screens
+     * @param imageUtils Utilities for loading images
      */
     @Inject
-    public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils, MainCtrl main) {
+    public LanguageIndicatorCtrl(Translation translation, LanguageSwitchUtils utils, MainCtrl main, ImageUtils imageUtils) {
         this.translation = translation;
         this.utils = utils;
         this.main = main;
+        this.imageUtils = imageUtils;
     }
 
     /**
@@ -56,6 +60,9 @@ public class LanguageIndicatorCtrl {
                     textProperty().bind(generationMessage);
                 } else {
                     textProperty().bind(new SimpleStringProperty(item.getDisplayLanguage()));
+                    ImageView flag = loadFlag(item.getCountry().toLowerCase());
+                    flag.setFitWidth(50);
+                    setGraphic(flag);
                 }
             }
         };
