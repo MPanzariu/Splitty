@@ -12,6 +12,7 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 import server.database.TagRepository;
+import server.exceptions.TagNotFoundException;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -67,7 +68,7 @@ public class ExpenseService {
         if(expense.getExpenseTag() != null){
             long extractedTagId = expense.getExpenseTag().getId();
             Tag fetchedTag = tagRepository.findById(extractedTagId)
-                    .orElseThrow(() -> new EntityNotFoundException("Tag not found"));
+                    .orElseThrow(() -> new TagNotFoundException(extractedTagId));
             expense.setExpenseTag(fetchedTag);
         }
         expense.setParticipantToExpense(participants);

@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.Exceptions.InvalidTagException;
 import client.utils.ImageUtils;
 import client.utils.ServerUtils;
 import client.utils.Styling;
@@ -10,6 +11,7 @@ import commons.Participant;
 import commons.Tag;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -78,27 +81,23 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private long expenseId;
     private List<CheckBox> participantCheckBoxes;
     private final ImageUtils imageUtils;
-    private final AddTagCtrl addTagCtrl;
     private final Styling styling;
-    private final ObservableList<Tag> tags = FXCollections.observableArrayList();
 
     /**
      *
      * @param server the server to which the client is connected
      * @param mainCtrl the main controller
      * @param imageUtils Utilities for image loading
-     * @param addTagCtrl Controller for adding/editing tags
      * @param translation the class that manages translations
      * @param styling Used for styling
      */
     @Inject
     public ExpenseScreenCtrl (ServerUtils server, MainCtrl mainCtrl,
-                              Translation translation, ImageUtils imageUtils, AddTagCtrl addTagCtrl, Styling styling) {
+                              Translation translation, ImageUtils imageUtils, Styling styling) {
         this.mainCtrl = mainCtrl;
         this.translation = translation;
         this.server = server;
         this.imageUtils = imageUtils;
-        this.addTagCtrl = addTagCtrl;
         this.styling = styling;
     }
 
@@ -126,15 +125,19 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         tagComboBox.getItems().addAll(tags);
         tagComboBox.setCellFactory(lv -> new ListCell<>() {
             private final Label label;
+            private final HBox buttonsBox;
             private final Button editButton;
+            private final Button deleteButton;
             private final AnchorPane pane;
             {
                 label = new Label();
                 label.setAlignment(Pos.CENTER);
                 editButton = new Button("", imageUtils.generateImageView("editing.png", 15));
+                deleteButton = new Button("", imageUtils.generateImageView("x_remove.png", 15));
                 styling.applyStyling(editButton, "positiveButton");
-                pane = new AnchorPane(label);
-                AnchorPane.setRightAnchor(editButton, 0.0);
+                buttonsBox = new HBox(editButton, deleteButton);
+                pane = new AnchorPane(label, buttonsBox);
+                AnchorPane.setRightAnchor(buttonsBox, 0.0);
             }
 
             @Override
@@ -149,16 +152,27 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                             "-fx-background-radius: 15;" +
                             "-fx-padding: 5 10 5 10;" +
                             "-fx-text-fill: white;");
-                    if(!item.equals(findDefaultTag(tags))) {
+                    if(findDefaultTag(tags) != null && !item.equals(findDefaultTag(tags))) {
                         editButton.setOnMousePressed(event -> mainCtrl.switchToEditTagScreen(item, expenseId));
-                        if(!pane.getChildren().contains(editButton))
-                            pane.getChildren().add(editButton);
-                    }
+                        deleteButton.setOnMousePressed(event -> {
+                            server.deleteTag(currentEvent.getId(), String.valueOf(item.getId()));
+                            tagComboBox.getItems().remove(item);
+                            tagComboBox.setValue(findDefaultTag(tags));
+                        });
+                        buttonsBox.setVisible(true);
+                    } else
+                        buttonsBox.setVisible(false);
                     setGraphic(pane);
                 }
             }
         });
         tagComboBox.setButtonCell(new ListCell<>() {
+            private final Label label;
+            {
+                label = new Label();
+                label.setAlignment(Pos.CENTER);
+            }
+
             @Override
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
@@ -166,13 +180,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Label label = new Label(item.getTagName());
-                    label.setAlignment(Pos.CENTER);
+                    label.setText(item.getTagName());
                     label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
                             "-fx-background-radius: 15;" +
                             "-fx-padding: 5 10 5 10;" +
                             "-fx-text-fill: white;");
-
                     setGraphic(label);
                 }
             }
@@ -212,7 +224,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * @param tags the tags in the current event
      * @return the default tag
      */
-    public Tag findDefaultTag(Set<Tag> tags) {
+    public Tag findDefaultTag(Collection<Tag> tags) {
         for (Tag tag : tags) {
             if ("default".equals(tag.getTagName())) {
                 return tag;
@@ -366,15 +378,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * Set event tags
-     * @param tags Set of tags
-     */
-    public void setTags(Set<Tag> tags) {
-        this.tags.setAll(tags);
-    }
-
-
-    /**
      * When pressing the Cancel button it takes the user
      * back to the Event Screen
      */
@@ -387,6 +390,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * resets all the fields in the expenseScreen
      */
     public void resetAll() {
+        expenseId = 0;
         resetPaidBy(choosePayer);
         resetAmount(sum);
         resetPurpose(expensePurpose);
@@ -545,12 +549,21 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     public Tag getTagComboBox(ComboBox<Tag> tagComboBox){
         return tagComboBox.getValue();
     }
+
     /**
      * Adds the specified expense to the server
      * @param expense the provided expense
      */
-    public void addExpenseToTheServer(Expense expense) {
-        server.addExpense(currentEvent.getId(), expense);
+    public void addExpenseToTheServer(Expense expense) throws InvalidTagException {
+        try {
+            server.addExpense(currentEvent.getId(), expense);
+        } catch(WebApplicationException e) {
+            Long tagId = e.getResponse().readEntity(Long.class);
+            new Alert(Alert.AlertType.INFORMATION, "This tag has been deleted. Default tag will now be selected").showAndWait();
+            tagComboBox.setValue(findDefaultTag(tagComboBox.getItems()));
+            tagComboBox.getItems().removeIf(tag -> tag.getId() == tagId);
+            throw new InvalidTagException("Tag doesn't exist anymore. It probably has been deleted.");
+        }
     }
 
     /**
@@ -654,11 +667,14 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             toAdd = false;
         }
         if(toAdd) {
-            if(expenseId == 0)
-                addExpenseToTheServer(expense);
-            else {
+            if(expenseId == 0) {
+                try {
+                    addExpenseToTheServer(expense);
+                } catch (InvalidTagException e) {
+                    return;
+                }
+            } else {
                 editExpenseOnServer(expenseId, expense);
-                expenseId = 0;
             }
             resetAll();
             mainCtrl.switchScreens(EventScreenCtrl.class);

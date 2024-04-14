@@ -335,17 +335,6 @@ public class MainCtrl {
     }
 
     /**
-     * Switches to the edit expense screen and sets the tags
-     * @param expenseId  the expense id of the expense to edit
-     * @param tags New tags that should be saved into the expense types of the expense screen
-     */
-    public void switchToEditExpense(long expenseId, Set<Tag> tags) {
-        switchScreens(ExpenseScreenCtrl.class);
-        expenseScreenCtrl.setExpense(expenseId);
-        expenseScreenCtrl.setTags(tags);
-    }
-
-    /**
      * Switches to the edit participant screen
      * @param participantId the participant id of the participant to edit
      */

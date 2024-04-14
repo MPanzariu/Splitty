@@ -58,9 +58,9 @@ public class TagService {
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         Set<Expense> expenses = event.getExpenses();
 
-        Tag tagIfDefaultNotFound = new Tag("Default", "#000000");
+        Tag tagIfDefaultNotFound = new Tag("default", "#000000");
         Tag defaultTag = event.getEventTags().stream()
-                .filter(foundTag->foundTag.getTagName().equals("Default"))
+                .filter(foundTag->foundTag.getTagName().equals("default"))
                 .findFirst().orElse(tagIfDefaultNotFound);
 
         for(Expense expense : expenses){
