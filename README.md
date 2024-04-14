@@ -24,8 +24,8 @@ The amount owed by each participant is under the settle debts screen, extended i
 * You can find the password to the admin overview in the console under "server.api.AdminPasswordService".
 * To export/import an event type its ID (e.g. ABCDEF) in the text field and click export/import. The saved file can be found under client/backups
 * To view participants and expenses of an event click on it from the list, and they should appear in the relevant text areas.
+* An expense with a negative cost in the admin overview indicates a money transfer (which is shown as such in the regular client event overview)
 * To delete events, click on "delete selected events" and then tick the ones you want to delete. After you have selected all of them click "delete selected events".
-
 
 ## Live Language Switch
 
