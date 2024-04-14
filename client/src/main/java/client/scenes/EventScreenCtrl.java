@@ -82,7 +82,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private Button emailInviteButton;
     @FXML
     private Button transferMoneyButton;
-    private Styling styling;
+    private final Styling styling;
     /**
      * Constructor
      *
@@ -153,17 +153,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         emailInviteButton.textProperty().bind(translation.getStringBinding("Event.Button.InviteByEmail"));
         languageCtrl.initializeLanguageIndicator(languageIndicator);
         transferMoneyButton.textProperty().bind(translation.getStringBinding("Event.Button.TransferMoney"));
-        generateButtons(); //a Mockito thread can not do this, so it can't be in the constructor
         setButtonsNames("...");
-    }
-
-    /***
-     * Generates the three dynamically changed filter buttons
-     */
-    public void generateButtons(){
-        this.allExpenses = new Button();
-        this.fromButton = new Button();
-        this.inButton = new Button();
     }
 
     /**
@@ -359,6 +349,22 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
         refreshExpenseList();
     }
 
+    /***
+     * the action when we press the "From ..." button
+     */
+    public void fromFilter(){
+        this.selectedExpenseListButton = fromButton;
+        refreshExpenseList();
+    }
+
+    /***
+     * the action when we press the "Including ..." button
+     */
+    public void includingFilter(){
+        this.selectedExpenseListButton = inButton;
+        refreshExpenseList();
+    }
+
     private void refreshExpenseList() {
         Button selectedButton = selectedExpenseListButton;
         if(selectedButton == null) selectedButton = allExpenses;
@@ -532,7 +538,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param name the participant name to filter by
      */
     public void fromFilter(Event event, ListView<HBox> expensesLogListView, String name) {
-        selectedExpenseListButton = fromButton;
         expensesLogListView.getItems().clear();
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses())
@@ -549,7 +554,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param name the participant name to filter by
      */
     public void includingFilter(Event event, ListView<HBox> expensesLogListView, String name) {
-        selectedExpenseListButton = inButton;
         expensesLogListView.getItems().clear();
         Set<Participant> eventParticipants = event.getParticipants();
         Participant selectedParticipant = null;
