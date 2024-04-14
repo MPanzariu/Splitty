@@ -21,6 +21,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.Tag;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -141,7 +142,7 @@ public class ServerUtils {
      * @param expense the expense to be added
      * @return the expense added
      */
-    public Expense addExpense(String eventId, Expense expense) {
+    public Expense addExpense(String eventId, Expense expense) throws WebApplicationException {
         ClientBuilder.newClient()
                 .target(serverURL)
                 .path("api/events/" + eventId + "/expenses")
@@ -317,5 +318,18 @@ public class ServerUtils {
                 .path("api/events/" + "tags/" + eventId + "/" + tagId)
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(tag, APPLICATION_JSON), Tag.class);
+    }
+
+    /**
+     * Requests the server to delete a tag
+     * @param eventId ID of the event the tag is attached to
+     * @param tagId ID of the tag
+     */
+    public void deleteTag(String eventId, String tagId) {
+        ClientBuilder.newClient()
+                .target(serverURL)
+                .path("api/events/tags/" + eventId + "/" + tagId)
+                .request(APPLICATION_JSON)
+                .delete();
     }
 }
