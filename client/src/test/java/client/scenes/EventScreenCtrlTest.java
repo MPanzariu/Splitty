@@ -2,17 +2,37 @@ package client.scenes;
 
 import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.StringGenerationUtils;
 import client.utils.Translation;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testfx.framework.junit5.ApplicationExtension;
+
+import java.util.Date;
+
+import static client.TestObservableUtils.stringToObservable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class, ApplicationExtension.class})
 class EventScreenCtrlTest {
@@ -26,6 +46,8 @@ class EventScreenCtrlTest {
     LanguageIndicatorCtrl languageCtrl;
     @Mock
     ImageUtils imageUtils;
+    @Mock
+    StringGenerationUtils stringUtils;
 
     @InjectMocks
     EventScreenCtrl sut;
@@ -35,6 +57,8 @@ class EventScreenCtrlTest {
     private Participant participant4;
     private Event event;
     private Expense expense1;
+    private Tag tag1;
+    private Tag tag2;
 
     @BeforeEach
     public void setup(){
@@ -47,8 +71,12 @@ class EventScreenCtrlTest {
         event.addParticipant(participant2);
         event.addParticipant(participant3);
         event.addParticipant(participant4);
-        expense1 = new Expense("Drinks", 12, null, participant1);
-        Expense expense2 = new Expense("Food", 20, null, participant2);
+        tag1 = new Tag("Drinks!", "#000000");
+        tag2 = new Tag("Food!", "#FFFFFF");
+        expense1 = new Expense("Drinks", 12, new Date(1929), participant1);
+        expense1.setExpenseTag(tag1);
+        Expense expense2 = new Expense("Food", 20, new Date(2024), participant2);
+        expense2.setExpenseTag(tag2);
         event.addExpense(expense1);
         event.addExpense(expense2);
     }
@@ -60,5 +88,49 @@ class EventScreenCtrlTest {
         System.setProperty("glass.platform", "Monocle");
         System.setProperty("monocle.platform", "Headless");
         System.setProperty("prism.order", "sw");
+    }
+
+    @Test
+    void expenseBoxGenerationTest(){
+        ObservableValue<String> textDescription = stringToObservable("John paid 20\u20ac for Drinks");
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        doReturn(textDescription).when(stringUtils).generateTextForExpenseLabel( expense1, event.getParticipants().size());
+        doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
+        HBox result = sut.generateExpenseBox(expense1, event, testImage, 500);
+        ObservableList<Node> children = result.getChildren();
+
+        HBox dateBox = (HBox) children.get(0);
+        Label dateLabel = (Label) dateBox.getChildren().getFirst();
+        Label expenseText = (Label) children.get(1);
+        Label tagLabel = (Label) children.get(2);
+        HBox removeBox = (HBox) children.get(3);
+        ImageView removeButton = (ImageView) removeBox.getChildren().getFirst();
+
+        assertEquals("01/01/1970", dateLabel.textProperty().getValue());
+        assertEquals(textDescription.getValue(), expenseText.textProperty().getValue());
+        assertEquals(tag1.getTagName(), tagLabel.textProperty().getValue());
+        assertEquals(testImage, removeButton.getImage());
+    }
+
+    @Test
+    void labelGenerationTest(){
+        ObservableValue<String> textDescription = stringToObservable("John paid 20\u20ac for Drinks");
+        Scene testScene = new Scene(new AnchorPane());
+        doReturn(testScene).when(mainCtrl).getEventScene();
+        Label result = sut.generateExpenseLabel(expense1.getId(), textDescription);
+
+        assertEquals(textDescription.getValue(), result.textProperty().getValue());
+        result.onMouseEnteredProperty().get().handle(null);
+        verify(mainCtrl).getEventScene();
+    }
+
+    @Test
+    void removeButtonGenerationTest(){
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
+        var result = sut.generateRemoveButton(expense1.getId(), testImage);
+        assertEquals(testImage, result.getImage());
     }
 }
