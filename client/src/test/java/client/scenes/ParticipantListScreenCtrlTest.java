@@ -5,6 +5,7 @@ import commons.Event;
 import commons.Participant;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -23,10 +24,9 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 class ParticipantListScreenCtrlTest {
@@ -75,9 +75,10 @@ class ParticipantListScreenCtrlTest {
         ListView<HBox> participantList = new ListView<>();
         Image testImage = new WritableImage(1,1);
         doReturn(testImage).when(imageUtils).loadImageFile("x_remove.png");
-        doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(any(Image.class), eq(15));
+        doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(testImage, 15);
 
-        sut.refreshParticipantList(participantList, event);
+        sut.loadParticipantList(participantList);
+        sut.refreshParticipantList(event);
         ObservableList<HBox> hBoxes = participantList.getItems();
 
         List<String> labelTexts = new LinkedList<>();
@@ -97,6 +98,34 @@ class ParticipantListScreenCtrlTest {
 
         assertTrue(labelTexts.contains(participant1.getName()));
         assertTrue(labelTexts.contains(participant2.getName()));
+    }
+
+    @Test
+    void removeFromListTest(){
+        ListView<HBox> participantList = new ListView<>();
+        Image testImage = new WritableImage(1,1);
+        doReturn(testImage).when(imageUtils).loadImageFile("x_remove.png");
+        doReturn(new ImageView(testImage)).when(imageUtils).generateImageView(testImage, 15);
+        sut.loadParticipantList(participantList);
+        sut.refreshParticipantList(event);
+
+        long participantId = participant2.getId();
+        String eventId = event.getId();
+        sut.removeFromList(participantId, eventId);
+        verify(server).removeParticipant(eventId, participantId);
+
+        assertEquals(1, participantList.getItems().size());
+    }
+
+    @Test
+    void backButtonTest(){
+        Button backButton = new Button();
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        doReturn(testImageView).when(imageUtils).generateImageView("goBack.png", 15);
+        sut.prepareBackButton(backButton);
+        assertEquals(testImageView, backButton.getGraphic());
+        verify(styling).applyStyling(backButton, "positiveButton");
     }
 
 }

@@ -61,7 +61,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      * @param event updated Event information
      */
     public void refresh(Event event) {
-        refreshParticipantList(participantList, event);
+        refreshParticipantList(event);
     }
 
     /***
@@ -90,10 +90,9 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     }
     /**
      * Generates the participants in the list in the final form
-     * @param participantList the ListView that contains the participant list
      * @param event the Event data to use
      */
-    public void refreshParticipantList(ListView<HBox> participantList, Event event) {
+    public void refreshParticipantList(Event event) {
         participantList.getItems().clear();
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Participant participant: event.getParticipants()) {
@@ -167,6 +166,14 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
         HBox hBox = map.get(participantId);
         map.remove(participantId);
         participantList.getItems().remove(hBox);
+    }
+
+    /***
+     * Loads the specified participant list into the controller
+     * @param participantList the participant list used
+     */
+    public void loadParticipantList(ListView<HBox> participantList){
+        this.participantList = participantList;
     }
 
 }
