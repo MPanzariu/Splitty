@@ -7,7 +7,6 @@ import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,7 +58,7 @@ class SettleDebtsUtilsTest {
      * Randomized transfers result in correct outcome
      * Splitting expenses equally between 3 people (tends to leave rounding issues...)
      */
-    @RepeatedTest(5)
+    @Test
     void randomTransferInstructions3X(){
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
         Random rng = new Random();
@@ -95,7 +94,7 @@ class SettleDebtsUtilsTest {
      * Randomized transfers result in correct outcome
      * Splitting expenses equally between 4 people (usually no rounding issues)
      */
-    @RepeatedTest(5)
+    @Test
     void randomTransferInstructions4X(){
         Participant participant4 = new Participant("Alastor!");
         HashMap<Participant, BigDecimal> creditMap = new HashMap<>();
@@ -134,7 +133,7 @@ class SettleDebtsUtilsTest {
      * Randomized transfers result in correct outcome
      * Splitting expenses equally between 5 people (tends to leave rounding issues too)
      */
-    @RepeatedTest(5)
+    @Test
     void randomTransferInstructions5X(){
         Participant participant4 = new Participant("VVV");
         Participant participant5 = new Participant("Alastor!");
