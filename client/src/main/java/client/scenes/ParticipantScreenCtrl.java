@@ -1,6 +1,8 @@
 package client.scenes;
 
+import client.utils.ImageUtils;
 import client.utils.ServerUtils;
+import client.utils.Styling;
 import client.utils.Translation;
 import com.google.inject.Inject;
 import commons.Event;
@@ -11,18 +13,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
-    private static String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
-    private static String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final Styling styling;
     private final Translation translation;
+    private final ImageUtils imageUtils;
     @FXML
     private Button cancelButton;
     @FXML
@@ -37,6 +40,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label wrongBic;
     @FXML
     private Label noEmail;
+    @FXML
+    private Label optional;
     @FXML
     private TextField nameField;
     @FXML
@@ -59,25 +64,27 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private Label holder;
     @FXML
     private TextField holderField;
-    private static final Pattern bicPattern = Pattern.compile(bicLike);
-    private static final Pattern ibanPattern = Pattern.compile(ibanLike);
     private Event event;
     private long participantId;
 
     /**
-     * constructor
+     * contructor
      * @param server -> the server
      * @param mainCtrl main controller
      * @param translation for translating buttons and fields
+     * @param imageUtils for the back button
+     * @param styling for applying styling
      */
     @Inject
-    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation) {
+    public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils, Styling styling) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.translation = translation;
+        this.imageUtils = imageUtils;
+        this.styling = styling;
     }
 
-    /***
+    /**
      * binder for the buttons, fields, labels
      * @param location
      * The location used to resolve relative paths for the root object, or
@@ -87,6 +94,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * The resources used to localize the root object, or {@code null} if
      * the root object was not localized.
      */
+    @Override
     public void initialize(URL location, ResourceBundle resources) {
         title.textProperty().bind(translation.getStringBinding("Participants.Label.title"));
         cancelButton.textProperty().bind(translation.getStringBinding("Participants.Button.cancel"));
@@ -102,7 +110,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         holder.textProperty().bind(translation.getStringBinding("Participants.Label.holder"));
         iban.textProperty().bind(translation.getStringBinding("Participants.Label.iban"));
         bic.textProperty().bind(translation.getStringBinding("Participants.Label.bic"));
-        resetErrorFields();
+        optional.textProperty().bind(translation.getStringBinding("Participants.Label.optional"));
+        resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
         ibanField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (checkIban(newValue)) {
                 ibanField.setStyle("-fx-border-color: #26c506;");
@@ -140,58 +149,82 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
         });
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(participantId);
             if(participantId!=0) {
-                Participant participant = findById(participantId);
+                Participant participant = findById(participantId, event);
                 if (participant != null && participant.getName().equals(newValue))
                     noName.textProperty().bind(translation.getStringBinding("empty"));
                 else {
-                    if (checkParticipantName(newValue)) {
+                    if (checkParticipantName(newValue, event)) {
                         noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
-                        noName.setStyle("-fx-fill: #ff7200;");
+                        styling.changeStyling(noName, "errorText", "warningLabel");
                     }
                 }
             }
-            else if (checkParticipantName(newValue)) {
+            else if (checkParticipantName(newValue, event)) {
                 noName.textProperty().bind(translation.getStringBinding("Participants.Label.sameName"));
-                noName.setStyle("-fx-fill: #ff7200;");
+                styling.changeStyling(noName, "errorText", "warningLabel");
             }
         });
-        bindFieldsToEnter();
+        nameField.setOnKeyPressed(event -> bindNameField(event, emailField));
+        holderField.setOnKeyPressed(event -> bindOtherFields(event, holderField));
+        emailField.setOnKeyPressed(event -> bindOtherFields(event, emailField));
+        ibanField.setOnKeyPressed(event -> bindOtherFields(event, ibanField));
+        bicField.setOnKeyPressed(event -> bindOtherFields(event, bicField));
     }
 
     /**
-     * Binds the nameField, emailField, bicField, ibanField and holderField to the Enter key
+     * binds the nameField such that confirmCreateEdit is called when enter if a name
+     * is not inserted and redirects focus towards the email field otherwise
+     * @param event the event
+     * @param textField the name field
      */
+    public void bindNameField(KeyEvent event, TextField textField){
+        if (event.getCode() == KeyCode.ENTER) {
+            if(textField.getText()==null || textField.getText().isEmpty())
+                confirmCreateEdit();
+            else textField.requestFocus();
+        }
+    }
 
-    private void bindFieldsToEnter() {
-        nameField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                if(nameField.getText()==null || nameField.getText().isEmpty())
-                    confirmEdit();
-                else emailField.requestFocus();
-            }
-        });
-        emailField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                confirmEdit();
-            }
-        });
-        bicField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                confirmEdit();
-            }
-        });
-        ibanField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                confirmEdit();
-            }
-        });
-        holderField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                confirmEdit();
-            }
-        });
+    /**
+     * binds fields such that confirmCreateEdit is called when enter is pressed
+     * @param event the current event
+     * @param textField the given text field
+     */
+    public void bindOtherFields(KeyEvent event, TextField textField){
+        if (event.getCode() == KeyCode.ENTER)
+            if(textField.getText()==null || textField.getText().isEmpty())
+                confirmCreateEdit();
+    }
+
+    /**
+     * the actual method call when pressing confirm, calls confirmEdit
+     */
+    public void confirmCreateEdit(){
+        resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
+        Boolean ok = true;
+        Participant participant = addParticipant(nameField, emailField, holderField, bicField, ibanField);
+        ArrayList<TextField> f= bindTextFields(nameField, holderField, emailField, ibanField, bicField);
+        confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, f);
+    }
+
+    /**
+     * adds fields to an array list to minimise parameter count
+     * @param nF name Text Field
+     * @param hF holder Text Field
+     * @param eF email Text Field
+     * @param iF iban Text Field
+     * @param bF bic Text Field
+     * @return an array list with all fields added
+     */
+    public ArrayList<TextField> bindTextFields(TextField nF, TextField hF, TextField eF, TextField iF, TextField bF){
+        ArrayList<TextField> fields = new ArrayList<>();
+        fields.add(nF);
+        fields.add(hF);
+        fields.add(eF);
+        fields.add(iF);
+        fields.add(bF);
+        return fields;
     }
 
     /**
@@ -199,72 +232,95 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * if the participant is new it is added to the event
      * otherwise edits the participant
      * A few checks are made regarding the values inserted by the user
+     * @param st styling
+     * @param ok boolean which checks correctness of text field inputs
+     * @param p the newly created instance of a participant
+     * @param nN the label displayed when there is no name
+     * @param nE label displayed when the email format is incorrect
+     * @param wB label displayed when the BIC format is incorrect
+     * @param wI label displayed when the IBAN format is incorrect
+     * @param t translation
+     * @param s server
+     * @param m main controller
+     * @param e the event the participant is part of
+     * @param pId the id of the participant
+     * @param l text fields array list
      */
-    public void confirmEdit() {
-        Participant participant = addParticipant();
-        resetErrorFields();
-        boolean ok = true;
-        if(participant.getName() == null || participant.getName().isEmpty()) {
-            noName.textProperty()
-                    .bind(translation.getStringBinding("Participants.Label.noName"));
-            ok = false;
-        }
-        if(participant.getEmail() != null &&participant.getEmail().equals("empty")){
-            noEmail.textProperty()
-                    .bind(translation.getStringBinding("Participants.Label.noEmail"));
+    //stop missing line length check
+    public void confirmEdit(Styling st, Boolean ok, Participant p, Label nN, Label nE, Label wB, Label wI,
+                            Translation t, ServerUtils s, MainCtrl m, Event e, long pId, ArrayList<TextField> l) {
+        ok = true;
+        //resume missing line length check
+        if(p.getName() == null || p.getName().isEmpty()) {
+            nN.textProperty()
+                    .bind(t.getStringBinding("Participants.Label.noName"));
+            st.changeStyling(nN, "warningLabel", "errorText");
             ok = false;
         }
         else{
-            if(participant.getEmail() != null && participant.getEmail().equals("wrongEmail")){
-                noEmail.textProperty()
-                      .bind(translation.getStringBinding("Participants.Label.wrongEmail"));
+            if(p.getEmail() != null && p.getEmail().equals("wrongEmail")){
+                nE.textProperty()
+                      .bind(t.getStringBinding("Participants.Label.wrongEmail"));
                 ok = false;
+                System.out.println("Email format is not correct");
+            } else if (p.getEmail().equals("empty")) {
+                p.setEmail("");
             }
         }
-        if(participant.getIban() != null && participant.getIban().equals("wrongIban")) {
-            wrongIban.textProperty().bind(translation.getStringBinding("Participants.Label.wrongIban"));
+        if(p.getIban() != null && p.getIban().equals("wrongIban")) {
+            wI.textProperty().bind(t.getStringBinding("Participants.Label.wrongIban"));
             ok = false;
         }
-        if(participant.getBic() != null &&  participant.getBic().equals("wrongBic")){
-            wrongBic.textProperty().bind(translation.getStringBinding("Participants.Label.wrongBic"));
+        if(p.getBic() != null &&  p.getBic().equals("wrongBic")){
+            wB.textProperty().bind(t.getStringBinding("Participants.Label.wrongBic"));
             ok = false;
         }
         if(ok){
-            if(participantId == 0){
-                server.addParticipant(event.getId(), participant);
-                mainCtrl.switchScreens(EventScreenCtrl.class);
+            if(pId == 0){
+                s.addParticipant(e.getId(), p);
+                m.switchScreens(EventScreenCtrl.class);
             }
             else {
-                server.editParticipant(event.getId(), participantId, participant);
-                participantId = 0;
-                mainCtrl.switchScreens(ParticipantListScreenCtrl.class);
+                s.editParticipant(e.getId(), pId, p);
+                m.switchScreens(ParticipantListScreenCtrl.class);
             }
-            clearFields();
+            clearFields(l.get(0), l.get(1), l.get(3), l.get(4), l.get(2));
         }
     }
 
     /**
-     * takes you back to the event screen if 'abort' is clicked
+     * sets participant id back to 0 after editing so the field checks work
      */
     public void cancel() {
-        clearFields();
+        clearFields(nameField, holderField, ibanField, bicField, emailField);
+        saveId(0L);
         mainCtrl.switchScreens(EventScreenCtrl.class);
     }
 
     /**
-     * resets the errors for the wrong values
+     * resets the error fields when a new screen is loaded
+     * @param translation translation
+     * @param noName the label displayed when there is no name
+     * @param noEmail label displayed when the email format is incorrect
+     * @param wrongBic label displayed when the BIC format is incorrect
+     * @param wrongIban label displayed when the IBAN format is incorrect
      */
-    public void resetErrorFields(){
+    public void resetErrorFields(Translation translation, Label noName, Label noEmail, Label wrongBic, Label wrongIban){
         noName.textProperty().bind(translation.getStringBinding("empty"));
         noEmail.textProperty().bind(translation.getStringBinding("empty"));
         wrongBic.textProperty().bind(translation.getStringBinding("empty"));
         wrongIban.textProperty().bind(translation.getStringBinding("empty"));
     }
 
-    /***
-     * Removes text from all details fields
+    /**
+     * clears text fields when leaving the screen
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
      */
-    public void clearFields(){
+    public void clearFields(TextField nameField, TextField holderField, TextField ibanField, TextField bicField, TextField emailField){
         nameField.clear();
         holderField.clear();
         ibanField.clear();
@@ -273,12 +329,15 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * creates an instance of a participant which is being assigned/updated
-     * in the confirm method
-     * Checks for the correctness of certain values
-     * @return returns the new participant
+     * creates a new instance of a participant when hitting confirm
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
+     * @return a new participant with information about the details for checks
      */
-    public Participant addParticipant(){
+    public Participant addParticipant(TextField nameField, TextField emailField, TextField holderField, TextField bicField, TextField ibanField){
         String name = nameField.getText();
         Participant participant = new Participant(name);
         String email = emailField.getText();
@@ -301,7 +360,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setIban(iban);
             else{
                 participant.setIban("wrongIban");
-                System.out.println("wrongIban");
+                System.out.println("IBAN format is not correct");
             }
         }
         String bic = bicField.getText();
@@ -313,7 +372,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 participant.setBic(bic);
             else{
                 participant.setBic("wrongBic");
-                System.out.println("wrongBic");
+                System.out.println("BIC format is not correct");
             }
         }
         participant.setLegalName(accountHolder);
@@ -321,26 +380,37 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * sets up the screen when editing a participant
-     * -> selects details of the participant in the current state
-     * @param id -> id of the participant
+     * sets up the fields and information for the participant we want to edit
+     * @param id the id of the participant
+     * @param event the event that the participant is part of
+     * @param nF the name field
+     * @param hF the account holder name field
+     * @param iF the iban field
+     * @param bF the bic field
+     * @param eF the email field
      */
-    public void setParticipant(long id) {
+    public void setParticipant(long id, Event event, TextField nF, TextField hF, TextField iF, TextField bF, TextField eF) {
         Set<Participant> participantList = event.getParticipants();
         Participant participantFin = null;
-        for(Participant participant: participantList){
+        for(Participant participant: participantList)
             if(participant.getId() == id) {
                 participantFin = participant;
                 break;
             }
-        }
         if(participantFin == null) return;
-        nameField.setText(participantFin.getName());
-        holderField.setText(participantFin.getLegalName());
-        ibanField.setText(participantFin.getIban());
-        bicField.setText(participantFin.getBic());
-        emailField.setText(participantFin.getEmail());
-        participantId = id;
+        nF.setText(participantFin.getName());
+        hF.setText(participantFin.getLegalName());
+        iF.setText(participantFin.getIban());
+        bF.setText(participantFin.getBic());
+        eF.setText(participantFin.getEmail());
+    }
+
+    /**
+     * calls the method for setting up foelds when editing participants
+     * @param id the id of the participant being edited
+     */
+    public void callSetParticipant(long id){
+        setParticipant(id, event, nameField, holderField, ibanField, bicField, emailField);
     }
 
     /**
@@ -349,7 +419,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void refresh(Event event){
         this.event = event;
-        resetErrorFields();
+        resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
     }
 
     /**
@@ -378,6 +448,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkBic (String bic){
+        String bicLike= "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$";
+        Pattern bicPattern = Pattern.compile(bicLike);
         if (bic == null || bic.isEmpty()){
             return false;
         }
@@ -391,6 +463,8 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @return true if the value is correct, false otherwise
      */
     public boolean checkIban (String iban) {
+        String ibanLike = "^([A-Z]{2}[0-9]{2})(?:[ ]?([0-9]{4})){4}$";
+        Pattern ibanPattern = Pattern.compile(ibanLike);
         if (iban == null || iban.isEmpty()){
             return false;
         }
@@ -401,9 +475,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * checks if the participant name is already in the list of participants
      * @param name the value inserted by the user
+     * @param event the event we want to search in
      * @return true if the value is correct, false otherwise
      */
-    public boolean checkParticipantName(String name){
+    public boolean checkParticipantName(String name, Event event){
         Set<Participant> participantList = event.getParticipants();
         for(Participant participant: participantList)
             if(participant.getName().equals(name)) {
@@ -423,9 +498,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Gets a participant based on id
      * @param id id of the participant
+     * @param event the event we want to search in
      * @return the participant
      */
-    public Participant findById(long id){
+    public Participant findById(long id, Event event){
         Set<Participant> participantList = event.getParticipants();
         Participant participantF = null;
         for(Participant participant: participantList)

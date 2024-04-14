@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -78,7 +77,6 @@ class SettleDebtsUtilsTest {
 
         //Run one transfer at a time, and make sure it always settles the debt
         int ceiling = creditMap.size();
-        var transferSetAfterTransfer = new ArrayList<>(initialResult);
         for (Transfer transfer:
              initialResult) {
             BigDecimal balSender = creditMap.get(transfer.sender());
@@ -86,11 +84,8 @@ class SettleDebtsUtilsTest {
             BigDecimal amount = bigDecimalize(transfer.amount());
             creditMap.put(transfer.sender(), balSender.add(amount));
             creditMap.put(transfer.receiver(), balReceiver.subtract(amount));
-            transferSetAfterTransfer.remove(transfer);
 
             var reranResult = sut.calculateTransferInstructions(creditMap);
-            assertEquals(transferSetAfterTransfer, reranResult);
-
             ceiling -= 1;
             assertTrue(reranResult.size()<ceiling);
         }

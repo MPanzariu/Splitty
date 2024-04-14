@@ -41,9 +41,6 @@ public class MainCtrl {
     private ManagementOverviewScreenCtrl managementOverviewScreenCtrl;
     private DeleteEventsScreenCtrl deleteEventsScreenCtrl;
     private Scene deleteEventsScene;
-    private TransferMoneyCtrl transferMoneyCtrl;
-    private Scene transferMoneyScene;
-    private GenerateLanguageTemplateCtrl generateLanguageTemplateCtrl;
     private Scene generateLanguageTemplateScene;
     private final Translation translation;
     private EventScreenCtrl eventScreenCtrl;
@@ -124,9 +121,9 @@ public class MainCtrl {
         ParticipantListScreenCtrl participantListScreenCtrl = participantListUI.getKey();
         this.participantScene = new Scene(participantUI.getValue());
         this.participantScreenCtrl = participantUI.getKey();
-        this.transferMoneyCtrl = transferMoneyUI.getKey();
-        this.transferMoneyScene = new Scene(transferMoneyUI.getValue());
-        this.generateLanguageTemplateCtrl = generateLanguageTemplatePair.getKey();
+        TransferMoneyCtrl transferMoneyCtrl = transferMoneyUI.getKey();
+        Scene transferMoneyScene = new Scene(transferMoneyUI.getValue());
+        GenerateLanguageTemplateCtrl generateLanguageTemplateCtrl = generateLanguageTemplatePair.getKey();
         this.generateLanguageTemplateScene = new Scene(generateLanguageTemplatePair.getValue());
 
         this.eventScreenCtrl = eventUI.getKey();
@@ -345,7 +342,7 @@ public class MainCtrl {
     public void switchToEditParticipant(long participantId) {
         participantScreenCtrl.saveId(participantId);
         switchScreens(ParticipantScreenCtrl.class);
-        participantScreenCtrl.setParticipant(participantId);
+        participantScreenCtrl.callSetParticipant(participantId);
     }
     /**
      * switch to the login page for the management overview
