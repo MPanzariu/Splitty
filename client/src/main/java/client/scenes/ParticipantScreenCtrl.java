@@ -282,6 +282,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
             }
             else {
                 s.editParticipant(e.getId(), pId, p);
+                saveId(0L);
                 m.switchScreens(ParticipantListScreenCtrl.class);
             }
             clearFields(l.get(0), l.get(1), l.get(3), l.get(4), l.get(2));
