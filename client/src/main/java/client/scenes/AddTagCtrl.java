@@ -167,7 +167,7 @@ public class AddTagCtrl implements Initializable, SimpleRefreshable {
                 tags.removeIf(tag1 -> tag1.getId() == tag.getId());
                 tags.add(tag);
             }
-            mainCtrl.switchToEditExpense(expenseId, tags);
+            mainCtrl.switchToEditExpense(expenseId);
             expenseId = null;
         } else {
             mainCtrl.switchScreens(EventScreenCtrl.class);
