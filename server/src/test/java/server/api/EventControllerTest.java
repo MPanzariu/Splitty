@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
-import server.websockets.WebSocketService;
 
 
 import java.util.Date;
