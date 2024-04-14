@@ -264,11 +264,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
                 ok = false;
                 System.out.println("Email format is not correct");
             } else if (p.getEmail().equals("empty")) {
-                p.setEmail(null);
+                p.setEmail("");
             }
         }
         if(p.getIban() != null && p.getIban().equals("wrongIban")) {
-            wB.textProperty().bind(t.getStringBinding("Participants.Label.wrongIban"));
+            wI.textProperty().bind(t.getStringBinding("Participants.Label.wrongIban"));
             ok = false;
         }
         if(p.getBic() != null &&  p.getBic().equals("wrongBic")){

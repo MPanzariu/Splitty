@@ -280,7 +280,7 @@ public class ParticipantScreenCtrlTest {
         Participant participant = participantScreenCtrl.addParticipant(nameField, emailField, holderField, bicField, ibanField);
         participantScreenCtrl.confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, 0, f);
         assertFalse(ok);
-        assertNull(participant.getEmail());
+        assertEquals(participant.getEmail(), "");
     }
     @Test
     public void testConfirmEditEdit(){
