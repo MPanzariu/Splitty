@@ -82,7 +82,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     private List<CheckBox> participantCheckBoxes;
     private final ImageUtils imageUtils;
     private final Styling styling;
-    private int i = 0;
 
     /**
      *
@@ -144,13 +143,11 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
             @Override
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
-                int j = i;
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     label.setText(item.getTagName());
-                    System.out.println(j + ": Label of: " + label.getText());
                     label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
                             "-fx-background-radius: 15;" +
                             "-fx-padding: 5 10 5 10;" +
@@ -158,7 +155,6 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                     if(findDefaultTag(tags) != null && !item.equals(findDefaultTag(tags))) {
                         editButton.setOnMousePressed(event -> mainCtrl.switchToEditTagScreen(item, expenseId));
                         deleteButton.setOnMousePressed(event -> {
-                            System.out.println(j + ": Pressed delete on: " + item.getTagName());
                             server.deleteTag(currentEvent.getId(), String.valueOf(item.getId()));
                             tagComboBox.getItems().remove(item);
                             tagComboBox.setValue(findDefaultTag(tags));
@@ -168,29 +164,31 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
                         buttonsBox.setVisible(false);
                     setGraphic(pane);
                 }
-                System.out.println("----------------");
-                i++;
             }
         });
-//        tagComboBox.setButtonCell(new ListCell<>() {
-//            @Override
-//            protected void updateItem(Tag item, boolean empty) {
-//                super.updateItem(item, empty);
-//                if (empty || item == null) {
-//                    setText(null);
-//                    setGraphic(null);
-//                } else {
-//                    Label label = new Label(item.getTagName());
-//                    label.setAlignment(Pos.CENTER);
-//                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
-//                            "-fx-background-radius: 15;" +
-//                            "-fx-padding: 5 10 5 10;" +
-//                            "-fx-text-fill: white;");
-//
-//                    setGraphic(label);
-//                }
-//            }
-//        });
+        tagComboBox.setButtonCell(new ListCell<>() {
+            private final Label label;
+            {
+                label = new Label();
+                label.setAlignment(Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Tag item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    label.setText(item.getTagName());
+                    label.setStyle("-fx-background-color: " + item.getColorCode() + ";" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 5 10 5 10;" +
+                            "-fx-text-fill: white;");
+                    setGraphic(label);
+                }
+            }
+        });
 
         Tag defaultTag = findDefaultTag(tags);
         if (!tags.isEmpty()) {
