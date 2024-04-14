@@ -31,7 +31,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class ParticipantScreenCtrlTest {
     private Participant participant1;
-    private Participant participant2;
     private Event event;
 
     @Mock
@@ -49,7 +48,7 @@ public class ParticipantScreenCtrlTest {
     @BeforeEach
     public void setup(){
         participant1 = new Participant(1, "John");
-        participant2 = new Participant(2, "Jane");
+        Participant participant2 = new Participant(2, "Jane");
         event = new Event("Title", null);
         event.addParticipant(participant1);
         event.addParticipant(participant2);
@@ -79,8 +78,7 @@ public class ParticipantScreenCtrlTest {
     }
     @Test
     public void testIbanNull() {
-        String iban = null;
-        boolean result = participantScreenCtrl.checkIban(iban);
+        boolean result = participantScreenCtrl.checkIban(null);
         assertFalse(result);
     }
     @Test
@@ -97,8 +95,7 @@ public class ParticipantScreenCtrlTest {
     }
     @Test
     public void testBicNull() {
-        String bic = null;
-        boolean result = participantScreenCtrl.checkBic(bic);
+        boolean result = participantScreenCtrl.checkBic(null);
         assertFalse(result);
     }
     @Test
@@ -115,8 +112,7 @@ public class ParticipantScreenCtrlTest {
     }
     @Test
     public void testEmailNull() {
-        String email = null;
-        boolean result = participantScreenCtrl.checkEmail(email);
+        boolean result = participantScreenCtrl.checkEmail(null);
         assertFalse(result);
     }
     @Test

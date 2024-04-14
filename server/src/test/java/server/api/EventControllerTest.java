@@ -151,9 +151,6 @@ public class EventControllerTest {
         assertEquals(orderedList, response.getBody());
     }
 
-    /**
-     * Tests last activity for constructor
-     */
 //    @Test
 //    void orderUnorderedListByLastActivityStandard(){
 //        when(eventService.createEvent(anyString())).thenAnswer(stubCreate);

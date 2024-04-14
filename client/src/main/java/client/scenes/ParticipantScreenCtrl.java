@@ -238,7 +238,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
      * @param m main controller
      * @param e the event the participant is part of
      * @param pId the id of the participant
-     * @param f text fields array list
+     * @param l text fields array list
      */
     //stop missing javadoc method check
     public void confirmEdit(Styling st, Boolean ok, Participant p, Label nN, Label nE, Label wB, Label wI, Translation t, ServerUtils s, MainCtrl m, Event e, long pId, ArrayList<TextField> l) {
