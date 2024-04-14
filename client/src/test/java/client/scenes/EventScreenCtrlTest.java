@@ -154,7 +154,8 @@ class EventScreenCtrlTest {
         ObservableList<HBox> items = testListView.getItems();
         assertEquals(1, items.size());
         HBox result = items.getFirst();
-        Label expenseLabel = (Label) result.getChildren().get(1);
+        HBox expense = (HBox) result.getChildren().get(0);
+        Label expenseLabel = (Label) expense.getChildren().get(1);
         assertEquals(textDescription.getValue(), expenseLabel.textProperty().getValue());
     }
 
@@ -172,7 +173,8 @@ class EventScreenCtrlTest {
         ObservableList<HBox> items = testListView.getItems();
         assertEquals(1, items.size());
         HBox result = items.getFirst();
-        Label expenseLabel = (Label) result.getChildren().get(1);
+        HBox expense = (HBox) result.getChildren().get(0);
+        Label expenseLabel = (Label) expense.getChildren().get(1);
         assertEquals(textDescription.getValue(), expenseLabel.textProperty().getValue());
     }
 }
