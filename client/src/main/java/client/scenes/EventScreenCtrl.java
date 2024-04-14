@@ -279,8 +279,10 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     /**
      * Generates a String listing current event participants
+     * @param event the Event data to use
+     * @return a String listing current event participants
      */
-    private String generateParticipantString(Event event){
+    public String generateParticipantString(Event event){
         StringBuilder participantsText = new StringBuilder();
         Iterator<Participant> participantIterator = event.getParticipants().iterator();
         while(participantIterator.hasNext()){
@@ -300,7 +302,7 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
      * @param event the Event data to use
      * @param boxItems the ObservableList to load data into/from
      */
-    private void updateParticipantsDropdown(Event event, ObservableList<String> boxItems){
+    public void updateParticipantsDropdown(Event event, ObservableList<String> boxItems){
         List<String> names = new ArrayList<>();
         for (Participant current : event.getParticipants()) {
             names.add(current.getName());

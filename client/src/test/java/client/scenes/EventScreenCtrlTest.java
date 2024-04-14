@@ -9,6 +9,7 @@ import commons.Expense;
 import commons.Participant;
 import commons.Tag;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -32,6 +33,7 @@ import java.util.Date;
 
 import static client.TestObservableUtils.stringToObservable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -173,5 +175,33 @@ class EventScreenCtrlTest {
         HBox result = items.getFirst();
         Label expenseLabel = (Label) result.getChildren().get(1);
         assertEquals(textDescription.getValue(), expenseLabel.textProperty().getValue());
+    }
+
+    @Test
+    void participantStringMultipleTest(){
+        var result = sut.generateParticipantString(event);
+        assertTrue(result.contains(participant1.getName()));
+        assertTrue(result.contains(participant2.getName()));
+        assertTrue(result.contains(participant3.getName()));
+        assertTrue(result.contains(participant4.getName()));
+    }
+
+    @Test
+    void participantStringNoneTest(){
+        Event emptyEvent = new Event("TITLE!!", null);
+        var result = sut.generateParticipantString(emptyEvent);
+        assertTrue(result.contains("no participants"));
+    }
+
+    @Test
+    void dropdownTest(){
+        String name1 = participant1.getName();
+        String name2 = participant2.getName();
+        String name3 = participant3.getName();
+        String name4 = participant4.getName();
+        ObservableList<String> participantItems = FXCollections.observableArrayList(name1, name2, name3);
+        sut.updateParticipantsDropdown(event, participantItems);
+        ObservableList<String> expected = FXCollections.observableArrayList(name1, name2, name3, name4);
+        assertEquals(expected, participantItems);
     }
 }
