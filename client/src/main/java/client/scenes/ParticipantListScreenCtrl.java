@@ -25,7 +25,6 @@ import javafx.scene.layout.Region;
 import static javafx.geometry.Pos.CENTER_LEFT;
 
 public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshable {
-    private Event event;
     @FXML
     private Button goBack;
     @FXML
@@ -62,8 +61,7 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      * @param event updated Event information
      */
     public void refresh(Event event) {
-        this.event = event;
-        showParticipantList();
+        refreshParticipantList(event);
     }
 
     /***
@@ -78,22 +76,31 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        prepareBackButton(goBack);
+    }
+
+    /***
+     * Loads the back arrow image into the Go Back button
+     * @param goBack the Go Back button
+     */
+    public void prepareBackButton(Button goBack){
         ImageView goBackImage = imageUtils.generateImageView("goBack.png", 15);
         goBack.setGraphic(goBackImage);
         styling.applyStyling(goBack, "positiveButton");
     }
-
     /**
      * Generates the participants in the list in the final form
+     * @param event the Event data to use
      */
-    public void showParticipantList () {
+    public void refreshParticipantList(Event event) {
         participantList.getItems().clear();
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Participant participant: event.getParticipants()) {
             HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
             Region region = new Region();
             HBox.setHgrow(region, Priority.ALWAYS);
-            HBox participantBox = new HBox(generateRemoveButton(participant.getId(), removeImage), participantB1, region);
+            ImageView removeButton = generateRemoveButton(participant.getId(), event.getId(), removeImage);
+            HBox participantBox = new HBox(removeButton, participantB1, region);
             participantBox.setAlignment(Pos.CENTER_RIGHT);
             participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
@@ -106,17 +113,18 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     /**
      * generates the remove button for each participant
      * @param participantId the participant for which the remove button is being generated
+     * @param eventId the ID of the relevant event
      * @param removeImage the Image to place on the button
      * @return returns the symbol
      */
-    public ImageView generateRemoveButton(long participantId, Image removeImage) {
+    public ImageView generateRemoveButton(long participantId, String eventId, Image removeImage) {
         ImageView imageView = imageUtils.generateImageView(removeImage, 15);
         imageView.setPickOnBounds(true);
         imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene().
                 setCursor(Cursor.HAND));
         imageView.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantScene().
                 setCursor(Cursor.DEFAULT));
-        imageView.setOnMouseClicked(mouseEvent -> removeFromList(participantId));
+        imageView.setOnMouseClicked(mouseEvent -> removeFromList(participantId, eventId));
         return imageView;
     }
 
@@ -151,12 +159,21 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     /**
      * Removes the participant from the list if deleted
      * @param participantId the ID of the participant
+     * @param eventId the ID of the event
      */
-    public void removeFromList(long participantId){
-        server.removeParticipant(event.getId(), participantId);
+    public void removeFromList(long participantId, String eventId){
+        server.removeParticipant(eventId, participantId);
         HBox hBox = map.get(participantId);
         map.remove(participantId);
         participantList.getItems().remove(hBox);
+    }
+
+    /***
+     * Loads the specified participant list into the controller
+     * @param participantList the participant list used
+     */
+    public void loadParticipantList(ListView<HBox> participantList){
+        this.participantList = participantList;
     }
 
 }
