@@ -20,7 +20,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
@@ -97,15 +96,14 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Participant participant: event.getParticipants()) {
             HBox participantB1 = generateParticipantBox(participant.getId(), participant.getName());
-            Region region = new Region();
-            HBox.setHgrow(region, Priority.ALWAYS);
             ImageView removeButton = generateRemoveButton(participant.getId(), event.getId(), removeImage);
-            HBox participantBox = new HBox(removeButton, participantB1, region);
+            HBox participantBox = new HBox(removeButton, participantB1);
             participantBox.setAlignment(Pos.CENTER_RIGHT);
             participantBox.setStyle("-fx-border-style: none;");
             participantBox.setSpacing(10);
             map.put(participant.getId(), participantBox);
             participantBox.setAlignment(CENTER_LEFT);
+            HBox.setHgrow(participantB1, Priority.ALWAYS);
             participantList.getItems().add(participantBox);
         }
     }
@@ -120,9 +118,9 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
     public ImageView generateRemoveButton(long participantId, String eventId, Image removeImage) {
         ImageView imageView = imageUtils.generateImageView(removeImage, 15);
         imageView.setPickOnBounds(true);
-        imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene().
+        imageView.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantListScene().
                 setCursor(Cursor.HAND));
-        imageView.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantScene().
+        imageView.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantListScene().
                 setCursor(Cursor.DEFAULT));
         imageView.setOnMouseClicked(mouseEvent -> removeFromList(participantId, eventId));
         return imageView;
@@ -137,13 +135,11 @@ public class ParticipantListScreenCtrl implements Initializable, SimpleRefreshab
      */
     public HBox generateParticipantBox(long participantId, String name) {
         HBox hbox = new HBox();
-        Region region = new Region();
-        HBox.setHgrow(region, Priority.ALWAYS);
         Label participant = new Label(name);
-        hbox.getChildren().addAll(participant, region);
-        hbox.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantScene()
+        hbox.getChildren().add(participant);
+        hbox.setOnMouseEntered(mouseEvent -> mainCtrl.getParticipantListScene()
                 .setCursor(Cursor.HAND));
-        hbox.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantScene()
+        hbox.setOnMouseExited(mouseEvent -> mainCtrl.getParticipantListScene()
                 .setCursor(Cursor.DEFAULT));
         hbox.setOnMouseClicked(mouseEvent -> mainCtrl.switchToEditParticipant(participantId));
         return hbox;
