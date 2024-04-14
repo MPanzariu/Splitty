@@ -46,7 +46,7 @@ public class TagController {
      * @param tagId id of the tag to remove
      * @return ResponseEntity of the request
      */
-    @DeleteMapping("/{eventId}/tag/{tagId}")
+    @DeleteMapping("/tags/{eventId}/{tagId}")
     public ResponseEntity<?> removeTag(@PathVariable String eventId,
                                        @PathVariable Long tagId){
         tagService.removeTag(eventId, tagId);

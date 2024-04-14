@@ -51,7 +51,7 @@ class AddTagCtrlTest {
         tagCtrl.switchScreens(new Tag(), event);
         assertEquals(null, tagCtrl.getTagId());
         assertEquals(null, tagCtrl.getExpenseId());
-        verify(mainCtrl).switchToEditExpense(5L, event.getEventTags());
+        verify(mainCtrl).switchToEditExpense(5L);
     }
 
     /**

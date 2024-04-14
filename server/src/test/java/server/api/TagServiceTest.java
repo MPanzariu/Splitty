@@ -85,7 +85,7 @@ public class TagServiceTest {
         Long tagId = 1L;
         Event event = new Event("Event1", null);
         Tag tagToRemove = new Tag("Urgent", "#FF0000");
-        Tag defaultTag = new Tag("Default", "#000000");
+        Tag defaultTag = new Tag("default", "#000000");
 
         Expense expense = new Expense();
         expense.setExpenseTag(tagToRemove);
