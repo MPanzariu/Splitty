@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.ResponseEntity;
 import server.database.EventRepository;
+import server.websockets.WebSocketService;
 
 
 import java.util.Date;
@@ -26,9 +27,12 @@ public class EventControllerTest {
 
     @Mock
     EventService eventService;
-
+    @Mock
+    private WebSocketService socketService;
     @InjectMocks
     EventController controller;
+    @Captor
+    ArgumentCaptor<String> nameCaptor;
 
     Answer<?> stubCreate;
 
@@ -203,7 +207,8 @@ public class EventControllerTest {
     void editTitleNotExisting(){
         Event event = new Event("Title", null);
         when(eventService.editTitle(anyString(), anyString())).thenThrow(new EntityNotFoundException(":{"));
-        assertThrows(EntityNotFoundException.class, () -> controller.editTitle(event.getId(), "New Title"));
+        assertThrows(EntityNotFoundException.class, () -> {
+            controller.editTitle(event.getId(), "New Title");});
         verify(eventService).editTitle(event.getId(), "New Title");
     }
 
