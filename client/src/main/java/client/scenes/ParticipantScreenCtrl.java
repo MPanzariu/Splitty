@@ -70,10 +70,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     private long participantId;
 
     /**
-     * constructor
+     * contructor
      * @param server -> the server
      * @param mainCtrl main controller
      * @param translation for translating buttons and fields
+     * @param imageUtils for the back button
+     * @param styling for applying styling
      */
     @Inject
     public ParticipantScreenCtrl(ServerUtils server, MainCtrl mainCtrl, Translation translation, ImageUtils imageUtils, Styling styling) {
@@ -270,11 +272,6 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
 
     /**
      * sets participant id back to 0 after editing so the field checks work
-     * @param nameField the name field
-     * @param holderField the account holder name field
-     * @param ibanField the iban field
-     * @param bicField the bic field
-     * @param emailField the email field
      */
     public void cancel() {
         clearFields(nameField, holderField, ibanField, bicField, emailField);
