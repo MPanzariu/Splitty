@@ -116,4 +116,33 @@ public class TagServiceTest {
         
         verify(eventRepository, never()).findById(anyString());
     }
+
+    /**
+     * The tag received from the repository should have the same name and color as the new tag.
+     * Tag repository should save updated tag.
+     */
+    @Test
+    public void editExistingTag() {
+        long id = 5;
+        Tag newTag = new Tag("Food", "#FFFFFF");
+        Tag oldTag = new Tag("Travel", "#000000");
+        when(tagRepository.findById(id)).thenReturn(Optional.of(oldTag));
+        tagService.editTag(id, newTag);
+        assertEquals(oldTag, newTag);
+        verify(tagRepository).save(oldTag);
+    }
+
+    /**
+     * EntityNotFoundException should be thrown when a tag is not found by the given ID.
+     * The exception message should indicate that it cannot be found.
+     */
+    @Test
+    public void editNonExistingTag() {
+        long id = 5;
+        Tag newTag = new Tag("Food", "#FFFFFF");
+        when(tagRepository.findById(id)).thenReturn(Optional.empty());
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                tagService.editTag(id, newTag));
+        assertEquals(exception.getMessage(), "Tag is not found");
+    }
 }
