@@ -1,7 +1,7 @@
 # Relevant Rubric Pointers
 ## Basic Requirements
 
-TODO
+**TODO**
 
 ## Technology
 
@@ -78,6 +78,16 @@ Mockito: [SettleDebtsScreenCtrlTest](/client/src/test/java/client/scenes/SettleD
 ## Detailed Expenses
 
 ## Open Debts
+
+Payment instructions: available on the Settle Debts screen, accessible by pressing Settle Debts on the Event overview [(controller)](/client/src/main/java/client/scenes/SettleDebtsScreenCtrl.java)
+
+Marking money as received: the Mark Received button next to debt instructions on the Settle Debts adds a new transfer expense settling a debt
+
+Only see participants who owe money: only the generated minimum amount of transfers show up on the Settle Debts
+
+Add bank accounts: fields are available when adding or editing participant information
+
+Short summary and expandable/collapsable details: On the Settle Debts screen, transfer instructions are shown as a short X pays Y to Z instruction label, and a larger pane that can be opened by pressing the [>] button next to it
 
 ## Statistics
 
