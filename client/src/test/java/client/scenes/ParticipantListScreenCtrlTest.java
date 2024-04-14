@@ -101,6 +101,14 @@ class ParticipantListScreenCtrlTest {
     }
 
     @Test
+    void participantBoxTest(){
+        HBox result = sut.generateParticipantBox(participant1.getId(), participant1.getName());
+        var children = result.getChildren();
+        Label textLabel = (Label) children.get(0);
+        assertEquals(participant1.getName(), textLabel.getText());
+    }
+
+    @Test
     void removeFromListTest(){
         ListView<HBox> participantList = new ListView<>();
         Image testImage = new WritableImage(1,1);
