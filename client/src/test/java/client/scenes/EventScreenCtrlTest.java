@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -74,8 +75,12 @@ class EventScreenCtrlTest {
         tag1 = new Tag("Drinks!", "#000000");
         tag2 = new Tag("Food!", "#FFFFFF");
         expense1 = new Expense("Drinks", 12, new Date(1929), participant1);
+        expense1.addParticipantToExpense(participant1);
+        expense1.addParticipantToExpense(participant2);
         expense1.setExpenseTag(tag1);
         Expense expense2 = new Expense("Food", 20, new Date(2024), participant2);
+        expense2.addParticipantToExpense(participant2);
+        expense2.addParticipantToExpense(participant3);
         expense2.setExpenseTag(tag2);
         event.addExpense(expense1);
         event.addExpense(expense2);
@@ -92,10 +97,10 @@ class EventScreenCtrlTest {
 
     @Test
     void expenseBoxGenerationTest(){
-        ObservableValue<String> textDescription = stringToObservable("John paid 20\u20ac for Drinks");
+        ObservableValue<String> textDescription = stringToObservable("John paid 12\u20ac for Drinks (John, Jane)");
         Image testImage = new WritableImage(1,1);
         ImageView testImageView = new ImageView(testImage);
-        doReturn(textDescription).when(stringUtils).generateTextForExpenseLabel( expense1, event.getParticipants().size());
+        doReturn(textDescription).when(stringUtils).generateTextForExpenseLabel(expense1, event.getParticipants().size());
         doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
         HBox result = sut.generateExpenseBox(expense1, event, testImage, 500);
         ObservableList<Node> children = result.getChildren();
@@ -115,7 +120,7 @@ class EventScreenCtrlTest {
 
     @Test
     void labelGenerationTest(){
-        ObservableValue<String> textDescription = stringToObservable("John paid 20\u20ac for Drinks");
+        ObservableValue<String> textDescription = stringToObservable("John paid 12\u20ac for Drinks (John, Jane)");
         Scene testScene = new Scene(new AnchorPane());
         doReturn(testScene).when(mainCtrl).getEventScene();
         Label result = sut.generateExpenseLabel(expense1.getId(), textDescription);
@@ -132,5 +137,41 @@ class EventScreenCtrlTest {
         doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
         var result = sut.generateRemoveButton(expense1.getId(), testImage);
         assertEquals(testImage, result.getImage());
+    }
+
+    @Test
+    void includingFilterTest(){
+        ObservableValue<String> textDescription = stringToObservable("John paid 12\u20ac for Drinks (John, Jane)");
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        doReturn(textDescription).when(stringUtils).generateTextForExpenseLabel(expense1, event.getParticipants().size());
+        doReturn(testImage).when(imageUtils).loadImageFile("x_remove.png");
+        doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
+        ListView<HBox> testListView = new ListView<>();
+
+        sut.includingFilter(event, testListView, participant1.getName());
+        ObservableList<HBox> items = testListView.getItems();
+        assertEquals(1, items.size());
+        HBox result = items.getFirst();
+        Label expenseLabel = (Label) result.getChildren().get(1);
+        assertEquals(textDescription.getValue(), expenseLabel.textProperty().getValue());
+    }
+
+    @Test
+    void fromFilterTest(){
+        ObservableValue<String> textDescription = stringToObservable("Jane paid 20\u20ac for Drinks (Jane, Mike)");
+        Image testImage = new WritableImage(1,1);
+        ImageView testImageView = new ImageView(testImage);
+        doReturn(textDescription).when(stringUtils).generateTextForExpenseLabel(expense1, event.getParticipants().size());
+        doReturn(testImage).when(imageUtils).loadImageFile("x_remove.png");
+        doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
+        ListView<HBox> testListView = new ListView<>();
+
+        sut.fromFilter(event, testListView, participant1.getName());
+        ObservableList<HBox> items = testListView.getItems();
+        assertEquals(1, items.size());
+        HBox result = items.getFirst();
+        Label expenseLabel = (Label) result.getChildren().get(1);
+        assertEquals(textDescription.getValue(), expenseLabel.textProperty().getValue());
     }
 }

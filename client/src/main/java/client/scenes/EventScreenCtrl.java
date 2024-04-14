@@ -258,13 +258,6 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
 
     /**
-     * UI for inviting participants that needs to be implemented when the button is pressed
-     */
-    public void inviteParticipants(){
-        //TODO: implement UI for inviting participants
-    }
-
-    /**
      * UI for editing current participants that needs to be implemented when the button is pressed
      */
     public void editCurrentParticipants(){
@@ -369,17 +362,18 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     private void refreshExpenseList() {
         Button selectedButton = selectedExpenseListButton;
         if(selectedButton == null) selectedButton = allExpenses;
-        if(selectedButton == allExpenses) showAllExpenseList();
-        else if(selectedButton == fromButton) fromFilter();
-        else if(selectedButton == inButton) includingFilter();
+        if(selectedButton == allExpenses) showAllExpenseList(event, expensesLogListView);
+        else if(selectedButton == fromButton) fromFilter(event, expensesLogListView, cBoxParticipantExpenses.getValue());
+        else if(selectedButton == inButton) includingFilter(event, expensesLogListView, cBoxParticipantExpenses.getValue());
     }
 
     /**
      * Generates a list of hBoxes stating with a human-readable String
      * that presents a quick overview of the expense presented
-     * the method throws an error
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
      */
-    public void showAllExpenseList() {
+    public void showAllExpenseList(Event event, ListView<HBox> expensesLogListView) {
         expensesLogListView.getItems().clear();
         //We only want to load this in once! IO is expensive.
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
@@ -533,11 +527,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
     }
     /**
      * Filters the expenses, showing only the ones that were paid by a certain participant
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
+     * @param name the participant name to filter by
      */
-    public void fromFilter() {
+    public void fromFilter(Event event, ListView<HBox> expensesLogListView, String name) {
         selectedExpenseListButton = fromButton;
         expensesLogListView.getItems().clear();
-        String name = cBoxParticipantExpenses.getValue();
         Image removeImage = imageUtils.loadImageFile("x_remove.png");
         for(Expense expense: event.getExpenses())
             if(expense.getOwedTo().getName().equals(name)) {
@@ -548,11 +544,13 @@ public class EventScreenCtrl implements Initializable, SimpleRefreshable{
 
     /**
      * Filters the expenses, showing the one a certain participant is part of
+     * @param event the Event data to use
+     * @param expensesLogListView the ListView containing expense data HBoxes
+     * @param name the participant name to filter by
      */
-    public void includingFilter() {
+    public void includingFilter(Event event, ListView<HBox> expensesLogListView, String name) {
         selectedExpenseListButton = inButton;
         expensesLogListView.getItems().clear();
-        String name = cBoxParticipantExpenses.getValue();
         Set<Participant> eventParticipants = event.getParticipants();
         Participant selectedParticipant = null;
         for(Participant participant: eventParticipants) {
