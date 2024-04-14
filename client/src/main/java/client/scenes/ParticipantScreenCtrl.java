@@ -84,7 +84,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         this.styling = styling;
     }
 
-    /***
+    /**
      * binder for the buttons, fields, labels
      * @param location
      * The location used to resolve relative paths for the root object, or
@@ -172,6 +172,11 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         bicField.setOnKeyPressed(event -> bindOtherFields(event, bicField));
     }
 
+    /**
+     * binds the nameField such that confirmCreateEdit is called when enter if a name is not inserted and redirects focus towards the email field otherwise
+     * @param event the event
+     * @param textField the name field
+     */
     public void bindNameField(KeyEvent event, TextField textField){
         if (event.getCode() == KeyCode.ENTER) {
             if(textField.getText()==null || textField.getText().isEmpty())
@@ -180,23 +185,49 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         }
     }
 
+    /**
+     * binds fields such that confirmCreateEdit is called when enter is pressed
+     * @param event the current event
+     * @param textField the given text field
+     */
     public void bindOtherFields(KeyEvent event, TextField textField){
         if (event.getCode() == KeyCode.ENTER)
             if(textField.getText()==null || textField.getText().isEmpty())
                 confirmCreateEdit();
     }
 
+    /**
+     * the actual method call when pressing confirm, calls confirmEdit
+     */
     public void confirmCreateEdit(){
         resetErrorFields(translation, noName, noEmail, wrongBic, wrongIban);
         Boolean ok = true;
         Participant participant = addParticipant(nameField, emailField, holderField, bicField, ibanField);
         confirmEdit(styling, ok, participant, noName, noEmail, wrongBic, wrongIban, translation, server, mainCtrl, event, participantId, nameField, holderField, emailField, ibanField, bicField);
     }
+
     /**
      * method for clicking 'ok' in add/edit participant screen
      * if the participant is new it is added to the event
      * otherwise edits the participant
      * A few checks are made regarding the values inserted by the user
+     * @param styling styling
+     * @param ok boolean which checks correctness of text field inputs
+     * @param participant the newly created instance of a participant
+     * @param noName the label displayed when there is no name
+     * @param noEmail label displayed when the email format is incorrect
+     * @param wrongBic label displayed when the BIC format is incorrect
+     * @param wrongIban label displayed when the IBAN format is incorrect
+     * @param translation translation
+     * @param server server
+     * @param mainCtrl main controller
+     * @param event the event the participant is part of
+     * @param participantId the id of the participant
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
      */
     public void confirmEdit(Styling styling, Boolean ok, Participant participant, Label noName, Label noEmail, Label wrongBic, Label wrongIban, Translation translation, ServerUtils server, MainCtrl mainCtrl, Event event, long participantId, TextField nameField, TextField holderField, TextField emailField, TextField ibanField, TextField bicField) {
         ok = true;
@@ -238,7 +269,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * takes you back to the event screen if 'abort' is clicked
+     * sets participant id back to 0 after editing so the field checks work
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
      */
     public void cancel() {
         clearFields(nameField, holderField, ibanField, bicField, emailField);
@@ -247,7 +283,12 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * resets the errors for the wrong values
+     * resets the error fields when a new screen is loaded
+     * @param translation translation
+     * @param noName the label displayed when there is no name
+     * @param noEmail label displayed when the email format is incorrect
+     * @param wrongBic label displayed when the BIC format is incorrect
+     * @param wrongIban label displayed when the IBAN format is incorrect
      */
     public void resetErrorFields(Translation translation, Label noName, Label noEmail, Label wrongBic, Label wrongIban){
         noName.textProperty().bind(translation.getStringBinding("empty"));
@@ -256,8 +297,13 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         wrongIban.textProperty().bind(translation.getStringBinding("empty"));
     }
 
-    /***
-     * Removes text from all details fields
+    /**
+     * clears text fields when leaving the screen
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
      */
     public void clearFields(TextField nameField, TextField holderField, TextField ibanField, TextField bicField, TextField emailField){
         nameField.clear();
@@ -268,10 +314,13 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * creates an instance of a participant which is being assigned/updated
-     * in the confirm method
-     * Checks for the correctness of certain values
-     * @return returns the new participant
+     * creates a new instance of a participant when hitting confirm
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
+     * @return a new participant with information about the details for checks
      */
     public Participant addParticipant(TextField nameField, TextField emailField, TextField holderField, TextField bicField, TextField ibanField){
         String name = nameField.getText();
@@ -316,9 +365,14 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
-     * sets up the screen when editing a participant
-     * -> selects details of the participant in the current state
-     * @param id -> id of the participant
+     * sets up the fields and information for the participant we want to edit
+     * @param id the id of the participant
+     * @param event the event that the participant is part of
+     * @param nameField the name field
+     * @param holderField the account holder name field
+     * @param ibanField the iban field
+     * @param bicField the bic field
+     * @param emailField the email field
      */
     public void setParticipant(long id, Event event, TextField nameField, TextField holderField, TextField ibanField, TextField bicField, TextField emailField) {
         Set<Participant> participantList = event.getParticipants();
@@ -336,6 +390,10 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
         emailField.setText(participantFin.getEmail());
     }
 
+    /**
+     * calls the method for setting up foelds when editing participants
+     * @param id the id of the participant being edited
+     */
     public void callSetParticipant(long id){
         setParticipant(id, event, nameField, holderField, ibanField, bicField, emailField);
     }
@@ -402,6 +460,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * checks if the participant name is already in the list of participants
      * @param name the value inserted by the user
+     * @param event the event we want to search in
      * @return true if the value is correct, false otherwise
      */
     public boolean checkParticipantName(String name, Event event){
@@ -424,6 +483,7 @@ public class ParticipantScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Gets a participant based on id
      * @param id id of the participant
+     * @param event the event we want to search in
      * @return the participant
      */
     public Participant findById(long id, Event event){

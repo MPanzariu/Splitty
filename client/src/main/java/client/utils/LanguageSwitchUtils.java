@@ -7,7 +7,6 @@ import javafx.collections.ObservableList;
 
 import java.io.*;
 import java.util.Locale;
-import java.util.Properties;
 
 public class LanguageSwitchUtils {
     private final ObservableList<Locale> languages = FXCollections.observableArrayList();

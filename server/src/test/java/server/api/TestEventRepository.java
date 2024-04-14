@@ -18,6 +18,7 @@ public class TestEventRepository implements EventRepository {
     private List<Event> events = new ArrayList<>();
     private List<String> calledMethods = new ArrayList<>();
 
+    //stop missing javadoc method check
     @Override
     public void flush() {
 
@@ -99,41 +100,6 @@ public class TestEventRepository implements EventRepository {
     }
 
     @Override
-    public <S extends Event> S save(S entity) {
-        calledMethods.add("save");
-        events.add(entity);
-        return entity;
-    }
-
-    @Override
-    public <S extends Event> List<S> saveAll(Iterable<S> entities) {
-        return null;
-    }
-
-    @Override
-    public Optional<Event> findById(String s) {
-        calledMethods.add("findById");
-        Event event = null;
-        for(int i = 0; i < events.size(); i++) {
-            if(events.get(i).getId().equals(s)) {
-                event = events.get(i);
-                break;
-            }
-        }
-        return Optional.ofNullable(event);
-    }
-
-    @Override
-    public boolean existsById(String s) {
-        return false;
-    }
-
-    @Override
-    public List<Event> findAll() {
-        return events;
-    }
-
-    @Override
     public List<Event> findAllById(Iterable<String> strings) {
         return null;
     }
@@ -176,5 +142,56 @@ public class TestEventRepository implements EventRepository {
     @Override
     public Page<Event> findAll(Pageable pageable) {
         return null;
+    }
+
+    @Override
+    public boolean existsById(String s) {
+        return false;
+    }
+
+    @Override
+    public <S extends Event> List<S> saveAll(Iterable<S> entities) {
+        return null;
+    }
+    //resume missing javadoc method check
+
+    /**
+     * Save entity to the repository
+     * @param entity Entity to be saved
+     * @return Saved entity
+     * @param <S> Type of the entity
+     */
+    @Override
+    public <S extends Event> S save(S entity) {
+        calledMethods.add("save");
+        events.add(entity);
+        return entity;
+    }
+
+    /**
+     * Find entity by ID
+     * @param s String of entity ID
+     * @return Optional of the found or not found event
+     */
+    @Override
+    public Optional<Event> findById(String s) {
+        calledMethods.add("findById");
+        Event event = null;
+        for(int i = 0; i < events.size(); i++) {
+            if(events.get(i).getId().equals(s)) {
+                event = events.get(i);
+                break;
+            }
+        }
+        return Optional.ofNullable(event);
+    }
+
+    /**
+     * Find all events
+     * @return All events
+     */
+    @Override
+    public List<Event> findAll() {
+        return events;
     }
 }
