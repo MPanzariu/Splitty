@@ -104,12 +104,13 @@ class EventScreenCtrlTest {
         doReturn(testImageView).when(imageUtils).generateImageView(testImage, 15);
         HBox result = sut.generateExpenseBox(expense1, event, testImage, 500);
         ObservableList<Node> children = result.getChildren();
-
-        HBox dateBox = (HBox) children.get(0);
+        HBox justExpense = (HBox)children.get(0);
+        ObservableList<Node> children1 = justExpense.getChildren();
+        HBox dateBox = (HBox) children1.get(0);
         Label dateLabel = (Label) dateBox.getChildren().getFirst();
-        Label expenseText = (Label) children.get(1);
-        Label tagLabel = (Label) children.get(2);
-        HBox removeBox = (HBox) children.get(3);
+        Label expenseText = (Label) children1.get(1);
+        Label tagLabel = (Label) children1.get(2);
+        HBox removeBox = (HBox) children.get(1);
         ImageView removeButton = (ImageView) removeBox.getChildren().getFirst();
 
         assertEquals("01/01/1970", dateLabel.textProperty().getValue());
