@@ -111,22 +111,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         participantCheckBoxes = new ArrayList<>();
         choosePayer.setItems(getParticipantList());
         binds();
-        splitBetweenAllCheckBox.setOnAction(event -> {
-            if (splitBetweenAllCheckBox.isSelected()) {
-                splitBetweenCustomCheckBox.setSelected(false);
-                participantsVBox.getChildren().clear();
-            }
-        });
-
-        splitBetweenCustomCheckBox.setOnAction(event -> {
-            if (splitBetweenCustomCheckBox.isSelected()) {
-                splitBetweenAllCheckBox.setSelected(false);
-                addParticipants();
-            }
-            if(!splitBetweenCustomCheckBox.isSelected()) {
-                participantsVBox.getChildren().clear();
-            }
-        });
+        initializeCheckBoxes();
     }
 
     /**
@@ -200,11 +185,34 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     }
 
     /**
+     * Initializes the checkboxes so the user is unable to choose
+     * both checkboxes at once
+     */
+    public void initializeCheckBoxes() {
+        splitBetweenAllCheckBox.setOnAction(event -> {
+            if (splitBetweenAllCheckBox.isSelected()) {
+                splitBetweenCustomCheckBox.setSelected(false);
+                participantsVBox.getChildren().clear();
+            }
+        });
+
+        splitBetweenCustomCheckBox.setOnAction(event -> {
+            if (splitBetweenCustomCheckBox.isSelected()) {
+                splitBetweenAllCheckBox.setSelected(false);
+                addParticipants();
+            }
+            if(!splitBetweenCustomCheckBox.isSelected()) {
+                participantsVBox.getChildren().clear();
+            }
+        });
+    }
+
+    /**
      * this method searches for the default tag
      * @param tags the tags in the current event
      * @return the default tag
      */
-    private Tag findDefaultTag(Set<Tag> tags) {
+    public Tag findDefaultTag(Set<Tag> tags) {
         for (Tag tag : tags) {
             if ("default".equals(tag.getTagName())) {
                 return tag;
@@ -235,38 +243,98 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Binds each text to a key in order to be used for translation
      */
-    private void binds() {
+    public void binds() {
+        bindLabels(addEditExpense, paidBy, purpose, amount, date,
+            splitMethod, expenseType);
+        bindComboBoxes(choosePayer);
+        bindTextFields(expensePurpose, sum);
+        bindDatePickers(datePicker);
+        bindCheckBoxes(splitBetweenAllCheckBox, splitBetweenCustomCheckBox);
+        bindButtons(cancel, confirm);
+        bindToEmpty();
+    }
+
+    /**
+     * Binds the labels on the screen, so they can be translated
+     * @param addEditExpense label
+     * @param paidBy label
+     * @param purpose label
+     * @param amount label
+     * @param date label
+     * @param splitMethod label
+     * @param expenseType label
+     */
+    public void bindLabels(Label addEditExpense, Label paidBy,
+                            Label purpose, Label amount,
+                            Label date, Label splitMethod, Label expenseType) {
         addEditExpense.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.Add"));
         paidBy.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.paid"));
-        choosePayer.promptTextProperty()
-                .bind(translation.getStringBinding("Expense.ComboBox.payer"));
         purpose.textProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
-        expensePurpose.promptTextProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
         amount.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.amount"));
-        sum.promptTextProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
         date.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.date"));
-        datePicker.promptTextProperty()
-                .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
         splitMethod.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.split"));
+        expenseType.textProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
+    }
+
+    /**
+     * Binds the comboBoxes on screen so they can be translated
+     * @param choosePayer comboBox
+     */
+    public void bindComboBoxes(ComboBox<String> choosePayer) {
+        choosePayer.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.ComboBox.payer"));
+    }
+
+    /**
+     * Binds the text prompt of every text field, so it can be translated
+     * @param expensePurpose textField
+     * @param sum testField
+     */
+    public void bindTextFields(TextField expensePurpose, TextField sum) {
+        expensePurpose.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.purpose"));
+        sum.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.Label.Display.amount"));
+    }
+
+    /**
+     * Binds the text prompt of every datePicker, so it can be translated
+     * @param datePicker datePicker
+     */
+    public void bindDatePickers(DatePicker datePicker) {
+        datePicker.promptTextProperty()
+            .bind(translation.getStringBinding("Expense.DatePicker.Display.date"));
+    }
+
+    /**
+     * binds the text for all checkBoxes, so they can be translated
+     * @param splitBetweenAllCheckBox checkbox
+     * @param splitBetweenCustomCheckBox checkbox
+     */
+    public void bindCheckBoxes(CheckBox splitBetweenAllCheckBox, CheckBox splitBetweenCustomCheckBox) {
         splitBetweenAllCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitAll"));
         splitBetweenCustomCheckBox.textProperty()
             .bind(translation.getStringBinding("Expense.Label.Display.splitCustom"));
+    }
+
+    /**
+     * Binds the button text, so it can be translated
+     * @param cancel button
+     * @param confirm button
+     */
+    public void bindButtons(Button cancel, Button confirm) {
         cancel.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Cancel"));
         confirm.textProperty()
             .bind(translation.getStringBinding("Expense.Button.Confirm"));
-        expenseType.textProperty()
-            .bind(translation.getStringBinding("Expense.Label.Display.expenseType"));
-        bindToEmpty();
     }
 
     /**
@@ -319,40 +387,44 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      * resets all the fields in the expenseScreen
      */
     public void resetAll() {
-        resetPaidBy();
-        resetAmount();
-        resetPurpose();
+        resetPaidBy(choosePayer);
+        resetAmount(sum);
+        resetPurpose(expensePurpose);
         resetDate();
         resetCurrency();
-        resetSplitMethod();
+        resetSplitMethod(splitBetweenAllCheckBox, splitBetweenCustomCheckBox, participantsVBox);
     }
 
     /**
      * resets the text from the Paid by field
+     * @param choosePayer the choosePayer comboBox
      */
-    public void resetPaidBy() {
+    public void resetPaidBy(ComboBox<String> choosePayer) {
         choosePayer.setValue("");
     }
 
     /**
      * resets the amount inserted in the amount TextField
+     * @param sum the sum textBox
      */
-    public void resetAmount() {
-        this.sum.clear();
+    public void resetAmount(TextField sum) {
+        sum.clear();
     }
 
     /**
      * resets the text inserted in the purpose TextField
+     * @param expensePurpose the expensePurpose textField
      */
-    public void resetPurpose() {
-        this.expensePurpose.clear();
+    public void resetPurpose(TextField expensePurpose) {
+        expensePurpose.clear();
     }
 
     /**
      * resets the date chosen for the datePicker field
+     *
      */
     public void resetDate() {
-        this.datePicker.getEditor().clear();
+        datePicker.getEditor().clear();
     }
 
     /**
@@ -365,8 +437,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
 
     /**
      * resets the checkboxes for the split methods
+     * @param splitBetweenAllCheckBox checkbox
+     * @param splitBetweenCustomCheckBox checkbox
+     * @param participantsVBox VBox
      */
-    public void resetSplitMethod() {
+    public void resetSplitMethod(CheckBox splitBetweenAllCheckBox,
+                                 CheckBox splitBetweenCustomCheckBox,
+                                    VBox participantsVBox) {
         splitBetweenAllCheckBox.setSelected(false);
         splitBetweenCustomCheckBox.setSelected(false);
         participantsVBox.getChildren().clear();
@@ -375,16 +452,21 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
     /**
      * Creates a new expense based on the information provided
      * in the ExpenseScreen
+     * @param choosePayer comboBox
+     * @param expensePurpose textField
+     * @param sum textField
+     * @param currency comboBox
+     * @param datePicker datePicker field
      * @return the newly created expense
      */
-    public Expense createNewExpense() {
+    public Expense createNewExpense(ComboBox<String> choosePayer, TextField expensePurpose,
+                                    TextField sum, ComboBox<String> currency, DatePicker datePicker) {
         String name = getTextFieldText(expensePurpose);
         String priceInMoney = getTextFieldText(sum);
         double price = 0;
         try {
             price = Double.parseDouble(priceInMoney);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("Please enter a valid number");
         }
         String curr = getComboBox(currency);
@@ -392,28 +474,40 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         //change in case of wanting to implement another date system
         LocalDate date = getLocalDate(datePicker);
         Date expenseDate = null;
-        if(date != null) {
+        if (date != null) {
             expenseDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         String participantName = getComboBox(choosePayer);
         Iterator<Participant> participantIterator = currentEvent.getParticipants().iterator();
         Participant participant = null;
-        while(participantIterator.hasNext()){
+        while (participantIterator.hasNext()) {
             Participant current = participantIterator.next();
-            if(current.getName().equals(participantName)) {
+            if (current.getName().equals(participantName)) {
                 participant = current;
                 break;
             }
         }
         Expense resultExpense = new Expense(name, priceInCents, expenseDate, participant);
+        resultExpense.setCurrency(curr);
+        return resultExpense;
+    }
+
+    /**
+     * In continuation of the createNewExpenseMethod, adds the tag field
+     * and the participant that will pay for the expense
+     * @return the full expense
+     */
+    public Expense createFullExpense(){
+        Expense expense = createNewExpense(choosePayer, expensePurpose, sum,
+                                currency, datePicker);
         Set<Participant> participantSet = getParticipantsForExpense();
         for(Participant part: participantSet) {
-            resultExpense.addParticipantToExpense(part);
+            expense.addParticipantToExpense(part);
         }
-        resultExpense.setCurrency(curr);
+
         Tag selectedTag = getTagComboBox(tagComboBox);
-        resultExpense.setExpenseTag(selectedTag);
-        return resultExpense;
+        expense.setExpenseTag(selectedTag);
+        return expense;
     }
 
     /**
@@ -480,13 +574,13 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
         if(price == (int) price)
             sum.setText(Integer.toString((int)price));
         sum.setText(String.valueOf(price));
-        choosePayer.getEditor().setText(expense.getOwedTo().getName());
+        choosePayer.setValue(expense.getOwedTo().getName());
         Date expenseDate = expense.getDate();
         currency.setValue(expense.getCurrency());
         datePicker.getEditor()
             .setText((expenseDate.getMonth() + 1) + "/"
                 + expenseDate.getDate() + "/" +
-                expenseDate.getYear()); //needs revision
+                (expenseDate.getYear() + 1900)); //needs revision
         if(expense.getParticipantsInExpense()
             .containsAll(currentEvent.getParticipants())) {
             splitBetweenAllCheckBox.setSelected(true);
@@ -525,7 +619,7 @@ public class ExpenseScreenCtrl implements Initializable, SimpleRefreshable {
      */
     public void addExpenseToEvenScreen() {
         boolean toAdd = true;
-        Expense expense = createNewExpense();
+        Expense expense = createFullExpense();
         bindToEmpty();
         if(expense.getOwedTo() == null) {
             errorParticipants.textProperty()
