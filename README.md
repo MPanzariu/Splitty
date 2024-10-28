@@ -1,9 +1,5 @@
 # Splitty
 
-## Grading
-
-To ease grading, links to examples of rubrics being fulfilled in the code itself are included in [rubric.md](rubric.md)
-
 ## Configuration
 
 The configuration file is found at ```client/splitty.properties```
